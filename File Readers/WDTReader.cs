@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,11 @@ namespace WoWFormatTest
 {
     class WDTReader
     {
-        public void LoadWDT(string basedir, string mapname)
+        public void LoadWDT(string mapname)
         {
             Console.WriteLine("Loading WDT for map " + mapname);
+
+            string basedir = ConfigurationManager.AppSettings["basedir"];
             string filename = basedir + "World\\Maps\\" + mapname + "\\" + mapname + ".wdt";
             FileStream wdt = File.Open(filename, FileMode.Open);
             BinaryReader bin = new BinaryReader(wdt);
@@ -56,7 +59,7 @@ namespace WoWFormatTest
                             {
                                 //ADT exists
                                 ADTReader adtreader = new ADTReader();
-                                adtreader.LoadADT(basedir, mapname, x, y);
+                                adtreader.LoadADT(mapname, x, y);
                             }
                         }
                     }
@@ -79,7 +82,7 @@ namespace WoWFormatTest
                         String wmofilename = str.ToString();
 
                         WMOReader wmoreader = new WMOReader();
-                        wmoreader.LoadWMO(basedir, wmofilename);
+                        wmoreader.LoadWMO(wmofilename);
                     }
 
                     continue;

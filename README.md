@@ -7,4 +7,8 @@ Built from the ground up, but with lots of copy pasta from older projects.
 - [CSDBCReader](http://marlamin.com/u/CSDBCReader.dll)
 
 ## Thanks
-Many thanks to TOM_RUS, JustMaku, BoogieMan and all the people they base their work on
+- TOM_RUS
+- JustMak
+- BoogieMan 
+- WoWDev wiki authors
+- ..and all the people the above people base their work on

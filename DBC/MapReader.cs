@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSDBCReader;
+using System.Configuration;
 
 namespace WoWFormatTest
 {
@@ -12,7 +13,9 @@ namespace WoWFormatTest
         public Dictionary<int, string> GetMaps()
         {
             Dictionary<int, string> maps = new Dictionary<int, string>();
-            DBCFile Map = new CSDBCReader.DBCFile(@"C:\WoD\18297_halfpush_full\DBFilesClient\Map.dbc");
+            string basedir = ConfigurationManager.AppSettings["basedir"];
+
+            DBCFile Map = new CSDBCReader.DBCFile(basedir + "DBFilesClient\\Map.dbc");
             Map.Read(false);
             DBCDataTable dbc = Map.GetDataTable();
             for (int i = 0; i < dbc.Rows.Length; i++){

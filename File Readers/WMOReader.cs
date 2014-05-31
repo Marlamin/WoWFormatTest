@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Configuration;
 
 namespace WoWFormatTest
 {
     class WMOReader
     {
-        public void LoadWMO(string basedir, string filename)
+        public void LoadWMO(string filename)
         {
+            string basedir = ConfigurationManager.AppSettings["basedir"];
+
             if(File.Exists(basedir + filename)){
                 Console.WriteLine("     WMO " + filename + " exists");
             }else{
