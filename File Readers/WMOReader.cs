@@ -14,13 +14,13 @@ namespace WoWFormatTest
         private List<String> m2Files;
         public void LoadWMO(string filename)
         {
-            string basedir = ConfigurationManager.AppSettings["basedir"];
+            var basedir = ConfigurationManager.AppSettings["basedir"];
 
             m2Files = new List<string>();
             blpFiles = new List<string>();
 
-            FileStream wmo = File.Open(basedir + filename, FileMode.Open);
-            BinaryReader bin = new BinaryReader(wmo);
+            var wmo = File.Open(basedir + filename, FileMode.Open);
+            var bin = new BinaryReader(wmo);
             BlizzHeader chunk;
 
             long position = 0;
@@ -74,11 +74,11 @@ namespace WoWFormatTest
         public void ReadMOTXChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of BLP filenames
-            byte[] blpFilesChunk = bin.ReadBytes((int)chunk.Size);
+            var blpFilesChunk = bin.ReadBytes((int)chunk.Size);
 
-            StringBuilder str = new StringBuilder();
+            var str = new StringBuilder();
 
-            for (int i = 0; i < blpFilesChunk.Length; i++)
+            for (var i = 0; i < blpFilesChunk.Length; i++)
             {
                 if (blpFilesChunk[i] == '\0')
                 {
@@ -99,11 +99,11 @@ namespace WoWFormatTest
         public void ReadMODNChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of M2 filenames, but are still named after MDXs internally. Have to rename!
-            byte[] m2FilesChunk = bin.ReadBytes((int)chunk.Size);
+            var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
 
-            StringBuilder str = new StringBuilder();
+            var str = new StringBuilder();
 
-            for (int i = 0; i < m2FilesChunk.Length; i++)
+            for (var i = 0; i < m2FilesChunk.Length; i++)
             {
                 if (m2FilesChunk[i] == '\0')
                 {
@@ -111,7 +111,7 @@ namespace WoWFormatTest
                     {
                         m2Files.Add(str.ToString());
                         //Console.WriteLine("         " + str.ToString());
-                        M2Reader m2reader = new M2Reader();
+                        var m2reader = new M2Reader();
                         m2reader.LoadM2(str.ToString());
                         
                     }

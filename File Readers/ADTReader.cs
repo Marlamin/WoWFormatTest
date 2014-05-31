@@ -15,7 +15,7 @@ namespace WoWFormatTest
 
         public void LoadADT(string mapname, int x, int y)
         {
-            string basedir = ConfigurationManager.AppSettings["basedir"];
+            var basedir = ConfigurationManager.AppSettings["basedir"];
 
             m2Files = new List<string>();
             wmoFiles = new List<string>();
@@ -23,11 +23,11 @@ namespace WoWFormatTest
 
             Console.WriteLine("Loading {0}_{1} ADT for map {2}", y, x, mapname);
 
-            string filename = Path.Combine(basedir, "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x); // x and y are flipped because blizzard
+            var filename = Path.Combine(basedir, "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x); // x and y are flipped because blizzard
 
-            FileStream adt = File.Open(filename + ".adt", FileMode.Open);
+            var adt = File.Open(filename + ".adt", FileMode.Open);
 
-            BinaryReader bin = new BinaryReader(adt);
+            var bin = new BinaryReader(adt);
             BlizzHeader chunk = null;
             long position = 0;
             while (position < adt.Length)
@@ -61,7 +61,7 @@ namespace WoWFormatTest
 
             adt.Close();
 
-            using (FileStream adtobj0 = File.Open(filename + "_obj0.adt", FileMode.Open))
+            using (var adtobj0 = File.Open(filename + "_obj0.adt", FileMode.Open))
             {
                 ReadObjHeader(mapname, x, y, filename, adtobj0, "OBJ0", ref chunk);
             }
@@ -84,7 +84,7 @@ namespace WoWFormatTest
 
         private void ReadObjHeader(string mapname, int x, int y, string filename, FileStream adtObjStream, string objName, ref BlizzHeader chunk)
         {
-            BinaryReader bin = new BinaryReader(adtObjStream);
+            var bin = new BinaryReader(adtObjStream);
             long position = 0;
 
             //Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, objName, mapname);
@@ -111,7 +111,7 @@ namespace WoWFormatTest
 
         private void ReadTexHeader(string mapname, int x, int y, string filename, FileStream adtTexStream, string texName, ref BlizzHeader chunk)
         {
-            BinaryReader bin = new BinaryReader(adtTexStream);
+            var bin = new BinaryReader(adtTexStream);
             long position = 0;
             //Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, texName, mapname);
 
@@ -135,9 +135,9 @@ namespace WoWFormatTest
         public void ReadMWMOChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of WMO filenames
-            byte[] wmoFilesChunk = bin.ReadBytes((int)chunk.Size);
+            var wmoFilesChunk = bin.ReadBytes((int)chunk.Size);
 
-            StringBuilder str = new StringBuilder();
+            var str = new StringBuilder();
 
             for (int i = 0; i < wmoFilesChunk.Length; i++)
             {
@@ -147,7 +147,7 @@ namespace WoWFormatTest
                     {
                         wmoFiles.Add(str.ToString());
                         //Console.WriteLine("     " + str.ToString());
-                        WMOReader wmoreader = new WMOReader();
+                        var wmoreader = new WMOReader();
                         wmoreader.LoadWMO(str.ToString());
                     }
                     str = new StringBuilder();
@@ -162,16 +162,18 @@ namespace WoWFormatTest
         public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of M2 filenames, but are still named after MDXs internally. Have to rename!
-            byte[] m2FilesChunk = bin.ReadBytes((int)chunk.Size);
+            var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
 
-            StringBuilder str = new StringBuilder();
+            var str = new StringBuilder();
 
-            for (int i = 0; i < m2FilesChunk.Length; i++)
+            for (var i = 0; i < m2FilesChunk.Length; i++)
             {
                 if (m2FilesChunk[i] == '\0')
                 {
                     if (str.Length > 1)
                     {
+                        var m2reader = new M2Reader();
+                        m2reader.LoadM2(str.ToString());
                         m2Files.Add(str.ToString());
                         //Console.WriteLine("     " + str.ToString());
                     }
@@ -187,11 +189,11 @@ namespace WoWFormatTest
         public void ReadMTEXChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of BLP filenames
-            byte[] blpFilesChunk = bin.ReadBytes((int)chunk.Size);
+            var blpFilesChunk = bin.ReadBytes((int)chunk.Size);
 
-            StringBuilder str = new StringBuilder();
+            var str = new StringBuilder();
 
-            for (int i = 0; i < blpFilesChunk.Length; i++)
+            for (var i = 0; i < blpFilesChunk.Length; i++)
             {
                 if (blpFilesChunk[i] == '\0')
                 {

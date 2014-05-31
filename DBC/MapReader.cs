@@ -13,19 +13,19 @@ namespace WoWFormatTest
     {
         public Dictionary<int, string> GetMaps()
         {
-            Dictionary<int, string> maps = new Dictionary<int, string>();
-            string basedir = ConfigurationManager.AppSettings["basedir"];
+            var maps = new Dictionary<int, string>();
+            var basedir = ConfigurationManager.AppSettings["basedir"];
 
-            DBCFile Map = new CSDBCReader.DBCFile(Path.Combine(basedir, "DBFilesClient\\Map.dbc"));
+            var Map = new CSDBCReader.DBCFile(Path.Combine(basedir, "DBFilesClient\\Map.dbc"));
             Map.Read(false);
-            DBCDataTable dbc = Map.GetDataTable();
-            for (int i = 0; i < dbc.Rows.Length; i++){
-                DBCDataRow row = dbc.Rows[i];
-                int mapid = 0;
-                string mapname = "";
-                for (int x = 0; x < row.Cells.Length; x++)
+            var dbc = Map.GetDataTable();
+            for (var i = 0; i < dbc.Rows.Length; i++){
+                var row = dbc.Rows[i];
+                var mapid = 0;
+                var mapname = "";
+                for (var x = 0; x < row.Cells.Length; x++)
                 {
-                    DBCDataField field = row.Cells[x];
+                    var field = row.Cells[x];
 
                     if (x == 0)
                     {
@@ -33,7 +33,7 @@ namespace WoWFormatTest
                     }
                     if (x == 1)
                     {
-                        int stringoffset = BitConverter.ToInt32(field.Value, 0);
+                        var stringoffset = BitConverter.ToInt32(field.Value, 0);
                         mapname = Map.Reader.ReadString(stringoffset);
                     }       
                 }

@@ -15,13 +15,13 @@ namespace WoWFormatTest
         {
             filename = filename.Replace("MDX", "M2");
             filename = filename.Replace("MDL", "M2");
-            string basedir = ConfigurationManager.AppSettings["basedir"];
+            var basedir = ConfigurationManager.AppSettings["basedir"];
 
             blpFiles = new List<string>();
-
+            /*
             FileStream m2 = File.Open(basedir + filename, FileMode.Open);
             BinaryReader bin = new BinaryReader(m2);
-            /*
+            
             long position = 0;
 
             //M2's aren't chunked and have a stringblock at the end instead of right in the middle. Fun times ahead!
@@ -29,8 +29,9 @@ namespace WoWFormatTest
             while (position < m2.Length)
             {
                 position++;
-            }*/
+            }
             m2.Close();
+            */
         }
     }
 }

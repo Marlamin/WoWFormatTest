@@ -13,10 +13,10 @@ namespace WoWFormatTest
         {
             //Console.WriteLine("Loading WDT for map " + map);
 
-            string basedir = ConfigurationManager.AppSettings["basedir"];
-            string filename = Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt");
-            FileStream wdt = File.Open(filename, FileMode.Open);
-            BinaryReader bin = new BinaryReader(wdt);
+            var basedir = ConfigurationManager.AppSettings["basedir"];
+            var filename = Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt");
+            var wdt = File.Open(filename, FileMode.Open);
+            var bin = new BinaryReader(wdt);
             BlizzHeader chunk;
             long position = 0;
             while (position < wdt.Length)
@@ -49,16 +49,16 @@ namespace WoWFormatTest
                         throw new Exception("MAIN size is wrong! (" + chunk.Size.ToString() + ")");
                     }
 
-                    for (int x = 0; x < 64; x++)
+                    for (var x = 0; x < 64; x++)
                     {
-                        for (int y = 0; y < 64; y++)
+                        for (var y = 0; y < 64; y++)
                         {
-                            UInt32 flags = bin.ReadUInt32();
-                            UInt32 unused = bin.ReadUInt32();
+                            var flags = bin.ReadUInt32();
+                            var unused = bin.ReadUInt32();
                             if (flags == 1)
                             {
                                 //ADT exists
-                                ADTReader adtreader = new ADTReader();
+                                var adtreader = new ADTReader();
                                 adtreader.LoadADT(map, x, y);
                             }
                         }
@@ -73,15 +73,15 @@ namespace WoWFormatTest
                     {
                         bin.BaseStream.Position = bin.BaseStream.Position - 1;
 
-                        StringBuilder str = new StringBuilder();
+                        var str = new StringBuilder();
                         char c;
                         while ((c = bin.ReadChar()) != '\0')
                         {
                             str.Append(c);
                         }
-                        String wmofilename = str.ToString();
+                        var wmofilename = str.ToString();
 
-                        WMOReader wmoreader = new WMOReader();
+                        var wmoreader = new WMOReader();
                         wmoreader.LoadWMO(wmofilename);
                     }
 
