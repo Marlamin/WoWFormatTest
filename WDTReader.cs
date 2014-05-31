@@ -65,6 +65,22 @@ namespace WoWFormatTest
 
                 if (chunk.Is("MWMO"))
                 {
+                    if (bin.ReadByte() != 0)
+                    {
+                        bin.BaseStream.Position = bin.BaseStream.Position - 1;
+
+                        StringBuilder str = new StringBuilder();
+                        char c;
+                        while ((c = bin.ReadChar()) != '\0')
+                        {
+                            str.Append(c);
+                        }
+                        String wmofilename = str.ToString();
+
+                        WMOReader wmoreader = new WMOReader();
+                        wmoreader.LoadWMO(basedir, wmofilename);
+                    }
+
                     continue;
                 }
 
@@ -75,11 +91,6 @@ namespace WoWFormatTest
 
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
-        }
-
-        public void ParseMAINChunk()
-        {
-
         }
     }
 }
