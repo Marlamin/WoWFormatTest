@@ -80,19 +80,19 @@ namespace WoWFormatTest
             }
         }
 
-        private void ReadObjHeader(string mapname, int x, int y, string filename, FileStream adtObjSteam, string objName, ref BlizzHeader chunk)
+        private void ReadObjHeader(string mapname, int x, int y, string filename, FileStream adtObjStream, string objName, ref BlizzHeader chunk)
         {
-            BinaryReader bin = new BinaryReader(adtObjSteam);
+            BinaryReader bin = new BinaryReader(adtObjStream);
             long position = 0;
 
             Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, objName, mapname);
 
-            while (position < adtObjSteam.Length)
+            while (position < adtObjStream.Length)
             {
-                adtObjSteam.Position = position;
+                adtObjStream.Position = position;
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
-                position = adtObjSteam.Position + chunk.Size;
+                position = adtObjStream.Position + chunk.Size;
 
                 if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
                 if (chunk.Is("MMDX")) { ReadMMDXChunk(chunk, bin); continue; }
@@ -107,18 +107,18 @@ namespace WoWFormatTest
             }
         }
 
-        private void ReadTexHeader(string mapname, int x, int y, string filename, FileStream adtTexSteam, string texName, ref BlizzHeader chunk)
+        private void ReadTexHeader(string mapname, int x, int y, string filename, FileStream adtTexStream, string texName, ref BlizzHeader chunk)
         {
-            BinaryReader bin = new BinaryReader(adtTexSteam);
+            BinaryReader bin = new BinaryReader(adtTexStream);
             long position = 0;
             Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, texName, mapname);
 
-            while (position < adtTexSteam.Length)
+            while (position < adtTexStream.Length)
             {
-                adtTexSteam.Position = position;
+                adtTexStream.Position = position;
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
-                position = adtTexSteam.Position + chunk.Size;
+                position = adtTexStream.Position + chunk.Size;
 
                 if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
                 if (chunk.Is("MAMP")) { continue; }
