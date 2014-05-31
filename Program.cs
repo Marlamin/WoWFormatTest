@@ -21,6 +21,7 @@ namespace WoWFormatTest
             {
                 if (File.Exists(Path.Combine(basedir, "World\\Maps\\", map.Value, map.Value + ".wdt")))
                 {
+                    Console.WriteLine("Loading " + map.Value + "...");
                     WDTReader wdtreader = new WDTReader();
                     wdtreader.LoadWDT(map.Value);
                 }

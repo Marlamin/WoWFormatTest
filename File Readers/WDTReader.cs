@@ -11,7 +11,7 @@ namespace WoWFormatTest
     {
         public void LoadWDT(string map)
         {
-            Console.WriteLine("Loading WDT for map " + map);
+            //Console.WriteLine("Loading WDT for map " + map);
 
             string basedir = ConfigurationManager.AppSettings["basedir"];
             string filename = Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt");

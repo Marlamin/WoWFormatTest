@@ -85,7 +85,7 @@ namespace WoWFormatTest
                     if (str.Length > 1)
                     {
                         blpFiles.Add(str.ToString());
-                        Console.WriteLine("         " + str.ToString());
+                        //Console.WriteLine("         " + str.ToString());
                     }
                     str = new StringBuilder();
                 }
@@ -110,7 +110,10 @@ namespace WoWFormatTest
                     if (str.Length > 1)
                     {
                         m2Files.Add(str.ToString());
-                        Console.WriteLine("         " + str.ToString());
+                        //Console.WriteLine("         " + str.ToString());
+                        M2Reader m2reader = new M2Reader();
+                        m2reader.LoadM2(str.ToString());
+                        
                     }
                     str = new StringBuilder();
                 }

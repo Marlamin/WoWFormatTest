@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="File Readers\ADTReader.cs" />
+    <Compile Include="File Readers\M2Reader.cs" />
     <Compile Include="Utils\BlizzHeader.cs" />
     <Compile Include="DBC\MapReader.cs" />
     <Compile Include="Program.cs" />

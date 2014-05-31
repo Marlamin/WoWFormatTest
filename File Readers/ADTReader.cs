@@ -87,7 +87,7 @@ namespace WoWFormatTest
             BinaryReader bin = new BinaryReader(adtObjStream);
             long position = 0;
 
-            Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, objName, mapname);
+            //Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, objName, mapname);
 
             while (position < adtObjStream.Length)
             {
@@ -113,7 +113,7 @@ namespace WoWFormatTest
         {
             BinaryReader bin = new BinaryReader(adtTexStream);
             long position = 0;
-            Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, texName, mapname);
+            //Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, texName, mapname);
 
             while (position < adtTexStream.Length)
             {
@@ -146,7 +146,7 @@ namespace WoWFormatTest
                     if (str.Length > 1)
                     {
                         wmoFiles.Add(str.ToString());
-                        Console.WriteLine("     " + str.ToString());
+                        //Console.WriteLine("     " + str.ToString());
                         WMOReader wmoreader = new WMOReader();
                         wmoreader.LoadWMO(str.ToString());
                     }
@@ -173,7 +173,7 @@ namespace WoWFormatTest
                     if (str.Length > 1)
                     {
                         m2Files.Add(str.ToString());
-                        Console.WriteLine("     " + str.ToString());
+                        //Console.WriteLine("     " + str.ToString());
                     }
                     str = new StringBuilder();
                 }
@@ -198,7 +198,7 @@ namespace WoWFormatTest
                     if (str.Length > 1)
                     {
                         blpFiles.Add(str.ToString());
-                        Console.WriteLine("     " + str.ToString());
+                        //Console.WriteLine("     " + str.ToString());
                     }
                     str = new StringBuilder();
                 }
