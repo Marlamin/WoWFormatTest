@@ -23,7 +23,7 @@ namespace WoWFormatTest
 
             Console.WriteLine("Loading " + y + "_" + x + " ADT for map " + mapname);
 
-            string filename = basedir + "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x; // x and y are flipped because blizzard
+            string filename = Path.Combine(basedir, "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x); // x and y are flipped because blizzard
 
             FileStream adt = File.Open(filename + ".adt", FileMode.Open);
 

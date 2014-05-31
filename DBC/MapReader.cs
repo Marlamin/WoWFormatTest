@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CSDBCReader;
 using System.Configuration;
+using System.IO;
 
 namespace WoWFormatTest
 {
@@ -15,7 +16,7 @@ namespace WoWFormatTest
             Dictionary<int, string> maps = new Dictionary<int, string>();
             string basedir = ConfigurationManager.AppSettings["basedir"];
 
-            DBCFile Map = new CSDBCReader.DBCFile(basedir + "DBFilesClient\\Map.dbc");
+            DBCFile Map = new CSDBCReader.DBCFile(Path.Combine(basedir, "DBFilesClient\\Map.dbc"));
             Map.Read(false);
             DBCDataTable dbc = Map.GetDataTable();
             for (int i = 0; i < dbc.Rows.Length; i++){

@@ -9,12 +9,12 @@ namespace WoWFormatTest
 {
     class WDTReader
     {
-        public void LoadWDT(string mapname)
+        public void LoadWDT(string map)
         {
-            Console.WriteLine("Loading WDT for map " + mapname);
+            Console.WriteLine("Loading WDT for map " + map);
 
             string basedir = ConfigurationManager.AppSettings["basedir"];
-            string filename = basedir + "World\\Maps\\" + mapname + "\\" + mapname + ".wdt";
+            string filename = Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt");
             FileStream wdt = File.Open(filename, FileMode.Open);
             BinaryReader bin = new BinaryReader(wdt);
             BlizzHeader chunk;
@@ -59,7 +59,7 @@ namespace WoWFormatTest
                             {
                                 //ADT exists
                                 ADTReader adtreader = new ADTReader();
-                                adtreader.LoadADT(mapname, x, y);
+                                adtreader.LoadADT(map, x, y);
                             }
                         }
                     }

@@ -14,7 +14,7 @@ namespace WoWFormatTest
         {
             string basedir = ConfigurationManager.AppSettings["basedir"];
 
-            if(File.Exists(basedir + filename)){
+            if(File.Exists(Path.Combine(basedir + filename))){
                 Console.WriteLine("     WMO " + filename + " exists");
             }else{
                 Console.WriteLine("     WMO " + filename + "does not exist");

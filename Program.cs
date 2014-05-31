@@ -19,7 +19,7 @@ namespace WoWFormatTest
             Dictionary<int, string> maps = reader.GetMaps();
             foreach (KeyValuePair<int, string> map in maps)
             {
-                if (File.Exists(basedir + "World\\Maps\\" + map.Value + "\\" + map.Value + ".wdt"))
+                if (File.Exists(Path.Combine(basedir, "World\\Maps\\", map.Value, map.Value + ".wdt")))
                 {
                     WDTReader wdtreader = new WDTReader();
                     wdtreader.LoadWDT(map.Value);
