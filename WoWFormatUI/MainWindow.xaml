@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WoW Format Test UI" Height="355" Width="530" ResizeMode="NoResize">
     <Grid>
-        <ListBox HorizontalAlignment="Left" Height="268" Margin="10,10,0,0" VerticalAlignment="Top" Width="152">
+        <ListBox x:Name="MapListBox" HorizontalAlignment="Left" Height="268" Margin="10,10,0,0" VerticalAlignment="Top" Width="152">
 
         </ListBox>
-        <Button Content="Load Map" HorizontalAlignment="Left" Margin="10,289,0,0" VerticalAlignment="Top" Width="497"/>
+        <Button Content="Load Map" HorizontalAlignment="Left" Margin="10,289,0,0" VerticalAlignment="Top" Width="497" Click="Button_Click"/>
         <Grid HorizontalAlignment="Left" Height="268" Margin="167,10,0,0" VerticalAlignment="Top" Width="340"/>
 
     </Grid>

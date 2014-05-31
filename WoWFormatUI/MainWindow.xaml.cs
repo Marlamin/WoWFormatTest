@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WoWFormatLib.DBC;
+using WoWFormatLib.FileReaders;
 
 namespace WoWFormatUI
 {
@@ -23,11 +26,20 @@ namespace WoWFormatUI
         public MainWindow()
         {
             InitializeComponent();
+            var reader = new MapReader(ConfigurationManager.AppSettings["basedir"]);
+            Dictionary<int, string> maps = reader.GetMaps();
+            foreach (KeyValuePair<int, string> map in maps)
+            {
+                MapListBox.Items.Add(map.Value);
+            }
         }
 
-        private void ListBoxItem_Selected(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            if (MapListBox.SelectedValue != null)
+            {
+                Console.WriteLine(MapListBox.SelectedValue.ToString());
+            }
         }
     }
 }
