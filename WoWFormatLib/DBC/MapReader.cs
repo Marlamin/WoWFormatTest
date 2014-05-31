@@ -7,9 +7,9 @@ using CSDBCReader;
 using System.Configuration;
 using System.IO;
 
-namespace WoWFormatTest
+namespace WoWFormatLib.DBC
 {
-    class MapReader
+    public class MapReader
     {
         public Dictionary<int, string> GetMaps()
         {

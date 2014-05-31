@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Configuration;
+using WoWFormatLib.Utils;
 
-namespace WoWFormatTest
+namespace WoWFormatLib.FileReaders
 {
-    class WMOReader
+    public class WMOReader
     {
         private List<String> blpFiles;
         private List<String> m2Files;

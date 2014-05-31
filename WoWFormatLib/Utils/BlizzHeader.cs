@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoWFormatTest
+namespace WoWFormatLib.Utils
 {
-    class BlizzHeader
+    public class BlizzHeader
     {
         private char[] header;
         UInt32 size;

@@ -4,10 +4,11 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WoWFormatLib.Utils;
 
-namespace WoWFormatTest
+namespace WoWFormatLib.FileReaders
 {
-    class ADTReader
+    public class ADTReader
     {
         private List<String> m2Files;
         private List<String> wmoFiles;

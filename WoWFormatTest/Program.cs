@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using CSDBCReader;
 using System.IO;
 using System.Configuration;
+using WoWFormatLib.DBC;
+using WoWFormatLib.FileReaders;
 
-namespace WoWFormatTest
+namespace WoWFormatLib
 {
     class Program
     {

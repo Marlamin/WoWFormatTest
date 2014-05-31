@@ -4,10 +4,11 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WoWFormatLib.Utils;
 
-namespace WoWFormatTest
+namespace WoWFormatLib.FileReaders
 {
-    class WDTReader
+    public class WDTReader
     {
         public void LoadWDT(string map)
         {

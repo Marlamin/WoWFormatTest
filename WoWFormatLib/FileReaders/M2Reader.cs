@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WoWFormatTest
+namespace WoWFormatLib.FileReaders
 {
-    class M2Reader
+    public class M2Reader
     {
         private List<String> blpFiles;
         public void LoadM2(string filename)
