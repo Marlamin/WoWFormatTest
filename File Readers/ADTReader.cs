@@ -39,10 +39,12 @@ namespace WoWFormatTest
 
                 switch (chunk.ToString())
                 {
-                    case "MVER": if (bin.ReadUInt32() != 18)
+                    case "MVER": 
+                        if (bin.ReadUInt32() != 18)
                         {
                             throw new Exception("Unsupported ADT version!");
-                        } continue;
+                        } 
+                        continue;
                     case "MHDR":
                     case "MH2O":
                     case "MCNK":
@@ -53,11 +55,11 @@ namespace WoWFormatTest
                     case "MBMI":
                     case "MBNV": continue;
                     default:
-                        break;
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
                 }
-
-                throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
+
+            adt.Close();
 
             using (FileStream adtobj0 = File.Open(filename + "_obj0.adt", FileMode.Open))
             {

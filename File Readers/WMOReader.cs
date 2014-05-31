@@ -10,45 +10,115 @@ namespace WoWFormatTest
 {
     class WMOReader
     {
+        private List<String> blpFiles;
+        private List<String> m2Files;
         public void LoadWMO(string filename)
         {
             string basedir = ConfigurationManager.AppSettings["basedir"];
 
-            FileStream wdt = File.Open(basedir + filename, FileMode.Open);
-            BinaryReader bin = new BinaryReader(wdt);
+            m2Files = new List<string>();
+            blpFiles = new List<string>();
+
+            FileStream wmo = File.Open(basedir + filename, FileMode.Open);
+            BinaryReader bin = new BinaryReader(wmo);
             BlizzHeader chunk;
 
             long position = 0;
-            while (position < wdt.Length)
+            while (position < wmo.Length)
             {
-                wdt.Position = position;
+                wmo.Position = position;
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
-                position = wdt.Position + chunk.Size;
+                position = wmo.Position + chunk.Size;
 
-                if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 17) { throw new Exception("Unsupported WMO version!"); } continue; }
-                if (chunk.Is("MOHD")) { continue; }
-                if (chunk.Is("MOTX")) { continue; }
-                if (chunk.Is("MOMT")) { continue; }
-                if (chunk.Is("MOGN")) { continue; }
-                if (chunk.Is("MOGI")) { continue; }
-                if (chunk.Is("MOSB")) { continue; }
-                if (chunk.Is("MOPV")) { continue; }
-                if (chunk.Is("MOPT")) { continue; }
-                if (chunk.Is("MOPR")) { continue; }
-                if (chunk.Is("MOVV")) { continue; }
-                if (chunk.Is("MOVB")) { continue; }
-                if (chunk.Is("MOLT")) { continue; }
-                if (chunk.Is("MODS")) { continue; }
-                if (chunk.Is("MODN")) { continue; }
-                if (chunk.Is("MODD")) { continue; }
-                if (chunk.Is("MFOG")) { continue; }
-                if (chunk.Is("MCVP")) { continue; }
+                switch (chunk.ToString())
+                {
+                    case "MVER": 
+                        if (bin.ReadUInt32() != 17)
+                        {
+                            throw new Exception("Unsupported WMO version!");
+                        } 
+                        continue;
+                    case "MOHD":
+                        continue;
+                    case "MOTX":
+                        ReadMOTXChunk(chunk, bin);
+                        continue;
+                    case "MOMT":
+                    case "MOGN":
+                    case "MOGI":
+                    case "MOSB":
+                    case "MOPV":
+                    case "MOPT":
+                    case "MOPR":
+                    case "MOVV":
+                    case "MOVB":
+                    case "MOLT":
+                    case "MODS":
+                        continue;
+                    case "MODN":
+                        ReadMODNChunk(chunk, bin);
+                        continue;
+                    case "MODD":
+                    case "MFOG":
+                    case "MCVP":
+                        continue;
 
-                throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                    default:
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                }
             }
+            wmo.Close();
+        }
 
-            wdt.Close();
+        public void ReadMOTXChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of BLP filenames
+            byte[] blpFilesChunk = bin.ReadBytes((int)chunk.Size);
+
+            StringBuilder str = new StringBuilder();
+
+            for (int i = 0; i < blpFilesChunk.Length; i++)
+            {
+                if (blpFilesChunk[i] == '\0')
+                {
+                    if (str.Length > 1)
+                    {
+                        blpFiles.Add(str.ToString());
+                        Console.WriteLine("         " + str.ToString());
+                    }
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)blpFilesChunk[i]);
+                }
+            }
+        }
+
+        public void ReadMODNChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
+            byte[] m2FilesChunk = bin.ReadBytes((int)chunk.Size);
+
+            StringBuilder str = new StringBuilder();
+
+            for (int i = 0; i < m2FilesChunk.Length; i++)
+            {
+                if (m2FilesChunk[i] == '\0')
+                {
+                    if (str.Length > 1)
+                    {
+                        m2Files.Add(str.ToString());
+                        Console.WriteLine("         " + str.ToString());
+                    }
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)m2FilesChunk[i]);
+                }
+            }
         }
     }
 }
