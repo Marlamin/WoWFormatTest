@@ -26,28 +26,12 @@ namespace WoWFormatTest
 
         public void Flip()
         {
-            char t;
-
-            t = header[0];
-            header[0] = header[3];
-            header[3] = t;
-
-            t = header[1];
-            header[1] = header[2];
-            header[2] = t;
+            header = header.Reverse().ToArray();
         }
 
         public bool Is(String name)
         {
-            if (name.Length == 4){
-                if (header[0] == name[0] && header[1] == name[1] && header[2] == name[2] && header[3] == name[3]){
-                    return true;
-                }else{
-                    return false;
-                }
-            }else{
-                return false;
-            }
+            return string.Join(string.Empty, header).Equals(name, StringComparison.InvariantCulture);
         }
 
         public override String ToString() { return new String(header); }

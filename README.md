@@ -12,3 +12,4 @@ Built from the ground up, but with lots of copy pasta from older projects.
 - BoogieMan 
 - WoWDev wiki authors
 - ..and all the people the above people base their work on
+- also Thoorium
