@@ -12,9 +12,9 @@ namespace WoWFormatTest
         public void LoadWMO(string basedir, string filename)
         {
             if(File.Exists(basedir + filename)){
-                Console.WriteLine("WMO " + filename + " exists");
+                Console.WriteLine("     WMO " + filename + " exists");
             }else{
-                Console.WriteLine("WMO " + filename + "does not exist");
+                Console.WriteLine("     WMO " + filename + "does not exist");
             }
         }
     }

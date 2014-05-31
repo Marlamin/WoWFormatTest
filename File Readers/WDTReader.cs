@@ -54,6 +54,7 @@ namespace WoWFormatTest
                             UInt32 unused = bin.ReadUInt32();
                             if (flags == 1)
                             {
+                                //ADT exists
                                 ADTReader adtreader = new ADTReader();
                                 adtreader.LoadADT(basedir, mapname, x, y);
                             }

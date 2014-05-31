@@ -11,7 +11,7 @@ namespace WoWFormatTest
         public void LoadADT(string basedir, string mapname, int x, int y)
         {
             Console.WriteLine("Loading " + y + "_" + x + " ADT for map " + mapname);
-            string filename = basedir + "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x; // x and y are flipped
+            string filename = basedir + "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x; // x and y are flipped because blizzard
             FileStream adt = File.Open(filename + ".adt", FileMode.Open);
             FileStream adtobj0 = File.Open(filename + "_obj0.adt", FileMode.Open);
             FileStream adtobj1 = File.Open(filename + "_obj1.adt", FileMode.Open);
@@ -54,9 +54,9 @@ namespace WoWFormatTest
                 position = adtobj0.Position + chunk.Size;
 
                 if (chunk.Is("MVER")){ if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
-                if (chunk.Is("MMDX")) { continue; }
+                if (chunk.Is("MMDX")) { ReadMMDXChunk(bin); continue; }
                 if (chunk.Is("MMID")) { continue; }
-                if (chunk.Is("MWMO")) { continue; }
+                if (chunk.Is("MWMO")) { ReadMWMOChunk(bin); continue; }
                 if (chunk.Is("MWID")) { continue; }
                 if (chunk.Is("MDDF")) { continue; }
                 if (chunk.Is("MODF")) { continue; }
@@ -77,9 +77,9 @@ namespace WoWFormatTest
                 position = adtobj1.Position + chunk.Size;
 
                 if (chunk.Is("MVER")){ if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
-                if (chunk.Is("MMDX")) { continue; }
+                if (chunk.Is("MMDX")) { ReadMMDXChunk(bin);  continue; }
                 if (chunk.Is("MMID")) { continue; }
-                if (chunk.Is("MWMO")) { continue; }
+                if (chunk.Is("MWMO")) { ReadMWMOChunk(bin);  continue; }
                 if (chunk.Is("MWID")) { continue; }
                 if (chunk.Is("MDDF")) { continue; }
                 if (chunk.Is("MODF")) { continue; }
@@ -127,8 +127,21 @@ namespace WoWFormatTest
 
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
-
         }
-        
+
+        public void ReadMMDXChunk(BinaryReader bin)
+        {
+            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
+        }
+
+        public void ReadMWMOChunk(BinaryReader bin)
+        {
+            //List of WMO filenames
+        }
+
+        public void ReadMTEXChunk(BinaryReader bin)
+        {
+            //List of BLP filenames
+        }
     }
 }
