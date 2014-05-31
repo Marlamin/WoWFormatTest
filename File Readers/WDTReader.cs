@@ -15,87 +15,90 @@ namespace WoWFormatTest
 
             var basedir = ConfigurationManager.AppSettings["basedir"];
             var filename = Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt");
-            var wdt = File.Open(filename, FileMode.Open);
+            using (FileStream wdt = File.Open(filename, FileMode.Open))
+            {
+                ReadWDT(map, filename, wdt);
+            }
+        }
+
+        private static void ReadWDT(string map, string filename, FileStream wdt)
+        {
             var bin = new BinaryReader(wdt);
             BlizzHeader chunk;
             long position = 0;
             while (position < wdt.Length)
             {
                 wdt.Position = position;
-                
+
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
 
                 position = wdt.Position + chunk.Size;
 
-                if (chunk.Is("MVER"))
+                switch (chunk.ToString())
                 {
-                    if (bin.ReadUInt32() != 18)
-                    {
-                        throw new Exception("Unsupported WDT version!");
-                    }
-                    continue;
+                    case "MVER": ChunkMVER(bin);
+                        continue;
+                    case "MAIN": ChunkMAIN(map, bin, chunk);
+                        continue;
+                    case "MWMO": ChunkMWMO(bin);
+                        continue;
+                    case "MPHD":
+                    case "MODF": continue;
+                    default:
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
                 }
-
-                if (chunk.Is("MPHD"))
-                {
-                    continue;
-                }
-
-                if (chunk.Is("MAIN"))
-                {
-                    if (chunk.Size != 4096 * 8)
-                    {
-                        throw new Exception("MAIN size is wrong! (" + chunk.Size.ToString() + ")");
-                    }
-
-                    for (var x = 0; x < 64; x++)
-                    {
-                        for (var y = 0; y < 64; y++)
-                        {
-                            var flags = bin.ReadUInt32();
-                            var unused = bin.ReadUInt32();
-                            if (flags == 1)
-                            {
-                                //ADT exists
-                                var adtreader = new ADTReader();
-                                adtreader.LoadADT(map, x, y);
-                            }
-                        }
-                    }
-
-                    continue;
-                }
-
-                if (chunk.Is("MWMO"))
-                {
-                    if (bin.ReadByte() != 0)
-                    {
-                        bin.BaseStream.Position = bin.BaseStream.Position - 1;
-
-                        var str = new StringBuilder();
-                        char c;
-                        while ((c = bin.ReadChar()) != '\0')
-                        {
-                            str.Append(c);
-                        }
-                        var wmofilename = str.ToString();
-
-                        var wmoreader = new WMOReader();
-                        wmoreader.LoadWMO(wmofilename);
-                    }
-
-                    continue;
-                }
-
-                if (chunk.Is("MODF"))
-                {
-                    continue;
-                }
-
-                throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
-            wdt.Close();
+        }
+
+        private static void ChunkMWMO(BinaryReader bin)
+        {
+            if (bin.ReadByte() != 0)
+            {
+                bin.BaseStream.Position = bin.BaseStream.Position - 1;
+
+                var str = new StringBuilder();
+                char c;
+                while ((c = bin.ReadChar()) != '\0')
+                {
+                    str.Append(c);
+                }
+                var wmofilename = str.ToString();
+
+                var wmoreader = new WMOReader();
+                wmoreader.LoadWMO(wmofilename);
+            }
+        }
+
+        private static void ChunkMAIN(string map, BinaryReader bin, BlizzHeader chunk)
+        {
+            if (chunk.Size != 4096 * 8)
+            {
+                throw new Exception("MAIN size is wrong! (" + chunk.Size.ToString() + ")");
+            }
+
+            for (var x = 0; x < 64; x++)
+            {
+                for (var y = 0; y < 64; y++)
+                {
+                    var flags = bin.ReadUInt32();
+                    var unused = bin.ReadUInt32();
+                    if (flags == 1)
+                    {
+                        //ADT exists
+                        var adtreader = new ADTReader();
+                        adtreader.LoadADT(map, x, y);
+                    }
+                }
+            }
+        }
+
+        private static void ChunkMVER(BinaryReader bin)
+        {
+            if (bin.ReadUInt32() != 18)
+            {
+                throw new Exception("Unsupported WDT version!");
+            }
         }
     }
 }

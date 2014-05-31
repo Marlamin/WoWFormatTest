@@ -13,8 +13,8 @@ namespace WoWFormatTest
         private List<String> blpFiles;
         public void LoadM2(string filename)
         {
-            filename = filename.Replace("MDX", "M2");
-            filename = filename.Replace("MDL", "M2");
+            filename = filename.Replace("MDX", "M2").Replace("MDL", "M2");
+
             var basedir = ConfigurationManager.AppSettings["basedir"];
 
             blpFiles = new List<string>();

@@ -19,7 +19,14 @@ namespace WoWFormatTest
             m2Files = new List<string>();
             blpFiles = new List<string>();
 
-            var wmo = File.Open(basedir + filename, FileMode.Open);
+            using (FileStream wmoStream = File.Open(basedir + filename, FileMode.Open))
+            {
+                ReadWMO(filename, wmoStream);
+            }
+        }
+
+        private void ReadWMO(string filename, FileStream wmo)
+        {
             var bin = new BinaryReader(wmo);
             BlizzHeader chunk;
 
@@ -33,15 +40,14 @@ namespace WoWFormatTest
 
                 switch (chunk.ToString())
                 {
-                    case "MVER": 
+                    case "MVER":
                         if (bin.ReadUInt32() != 17)
                         {
                             throw new Exception("Unsupported WMO version!");
-                        } 
-                        continue;
-                    case "MOHD":
+                        }
                         continue;
                     case "MOTX":
+                    case "MODN":
                         ReadMOTXChunk(chunk, bin);
                         continue;
                     case "MOMT":
@@ -55,20 +61,15 @@ namespace WoWFormatTest
                     case "MOVB":
                     case "MOLT":
                     case "MODS":
-                        continue;
-                    case "MODN":
-                        ReadMODNChunk(chunk, bin);
-                        continue;
+                    case "MOHD":
                     case "MODD":
                     case "MFOG":
                     case "MCVP":
                         continue;
-
                     default:
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
                 }
             }
-            wmo.Close();
         }
 
         public void ReadMOTXChunk(BlizzHeader chunk, BinaryReader bin)
