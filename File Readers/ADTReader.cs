@@ -142,7 +142,6 @@ namespace WoWFormatTest
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
 
-            if (mapname == "Draenor") { Console.ReadLine(); }
         }
 
         public void ReadMWMOChunk(BlizzHeader chunk, BinaryReader bin)
