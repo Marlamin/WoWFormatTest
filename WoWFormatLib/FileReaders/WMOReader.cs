@@ -13,10 +13,15 @@ namespace WoWFormatLib.FileReaders
     {
         private List<String> blpFiles;
         private List<String> m2Files;
+        private string basedir;
+
+        public WMOReader(string basedir)
+        {
+            this.basedir = basedir;
+        }
+
         public void LoadWMO(string filename)
         {
-            var basedir = ConfigurationManager.AppSettings["basedir"];
-
             m2Files = new List<string>();
             blpFiles = new List<string>();
 
@@ -113,7 +118,7 @@ namespace WoWFormatLib.FileReaders
                     {
                         m2Files.Add(str.ToString());
                         //Console.WriteLine("         " + str.ToString());
-                        var m2reader = new M2Reader();
+                        var m2reader = new M2Reader(basedir);
                         m2reader.LoadM2(str.ToString());
                         
                     }

@@ -11,10 +11,17 @@ namespace WoWFormatLib.DBC
 {
     public class MapReader
     {
+        private string basedir;
+
+        public MapReader(string basedir)
+        {
+            this.basedir = basedir;
+        }
+
+
         public Dictionary<int, string> GetMaps()
         {
             var maps = new Dictionary<int, string>();
-            var basedir = ConfigurationManager.AppSettings["basedir"];
 
             var Map = new CSDBCReader.DBCFile(Path.Combine(basedir, "DBFilesClient\\Map.dbc"));
             Map.Read(false);

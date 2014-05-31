@@ -10,11 +10,18 @@ namespace WoWFormatLib.FileReaders
 {
     public class WDTReader
     {
+        private string basedir;        
+
+        public WDTReader(string basedir)
+        {
+            this.basedir = basedir;
+        }
+
+
         public void LoadWDT(string map)
         {
             //Console.WriteLine("Loading WDT for map " + map);
 
-            var basedir = ConfigurationManager.AppSettings["basedir"];
             var filename = Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt");
             using (FileStream wdt = File.Open(filename, FileMode.Open))
             {
@@ -22,7 +29,7 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private static void ReadWDT(string map, string filename, FileStream wdt)
+        private void ReadWDT(string map, string filename, FileStream wdt)
         {
             var bin = new BinaryReader(wdt);
             BlizzHeader chunk;
@@ -52,7 +59,7 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private static void ReadMWMOChunk(BinaryReader bin)
+        private void ReadMWMOChunk(BinaryReader bin)
         {
             if (bin.ReadByte() != 0)
             {
@@ -66,12 +73,12 @@ namespace WoWFormatLib.FileReaders
                 }
                 var wmofilename = str.ToString();
 
-                var wmoreader = new WMOReader();
+                var wmoreader = new WMOReader(basedir);
                 wmoreader.LoadWMO(wmofilename);
             }
         }
 
-        private static void ReadMAINChunk(string map, BinaryReader bin, BlizzHeader chunk)
+        private void ReadMAINChunk(string map, BinaryReader bin, BlizzHeader chunk)
         {
             if (chunk.Size != 4096 * 8)
             {
@@ -87,14 +94,14 @@ namespace WoWFormatLib.FileReaders
                     if (flags == 1)
                     {
                         //ADT exists
-                        var adtreader = new ADTReader();
+                        var adtreader = new ADTReader(basedir);
                         adtreader.LoadADT(map, x, y);
                     }
                 }
             }
         }
 
-        private static void ReadMVERChunk(BinaryReader bin)
+        private void ReadMVERChunk(BinaryReader bin)
         {
             if (bin.ReadUInt32() != 18)
             {

@@ -15,25 +15,26 @@ namespace WoWFormatLib
     {
         static void Main(string[] args)
         {
-            LoadAllMaps();
+            string basedir = ConfigurationManager.AppSettings["basedir"];
+            LoadAllMaps(basedir);
         }
 
-        static void LoadAllMaps()
+        static void LoadAllMaps(string basedir)
         {
-            var reader = new MapReader();
+            var reader = new MapReader(basedir);
             Dictionary<int, string> maps = reader.GetMaps();
             foreach (KeyValuePair<int, string> map in maps)
             {
-                LoadMap(map.Value);
+                LoadMap(map.Value, basedir);
             }
         }
-        static void LoadMap(string map)
+        static void LoadMap(string map, string basedir)
         {
-            string basedir = ConfigurationManager.AppSettings["basedir"];
+            
             if (File.Exists(Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt")))
             {
                 Console.WriteLine("Loading " + map + "...");
-                var wdtreader = new WDTReader();
+                var wdtreader = new WDTReader(basedir);
                 wdtreader.LoadWDT(map);
             }
             else

@@ -11,11 +11,16 @@ namespace WoWFormatLib.FileReaders
     public class M2Reader
     {
         private List<String> blpFiles;
+        private string basedir;
+
+        public M2Reader(string basedir)
+        {
+            this.basedir = basedir;
+        }
+
         public void LoadM2(string filename)
         {
             filename = Path.ChangeExtension(filename, "M2");
-
-            var basedir = ConfigurationManager.AppSettings["basedir"];
 
             blpFiles = new List<string>();
             /*
