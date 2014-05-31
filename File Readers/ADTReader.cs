@@ -9,7 +9,7 @@ namespace WoWFormatTest
 {
     class ADTReader
     {
-        private List<String> m2Files; 
+        private List<String> m2Files;
         private List<String> wmoFiles;
         private List<String> blpFiles;
 
@@ -21,14 +21,14 @@ namespace WoWFormatTest
             wmoFiles = new List<string>();
             blpFiles = new List<string>();
 
-            Console.WriteLine("Loading " + y + "_" + x + " ADT for map " + mapname);
+            Console.WriteLine("Loading {0}_{1} ADT for map {2}", y, x, mapname);
 
             string filename = Path.Combine(basedir, "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x); // x and y are flipped because blizzard
 
             FileStream adt = File.Open(filename + ".adt", FileMode.Open);
 
             BinaryReader bin = new BinaryReader(adt);
-            BlizzHeader chunk;
+            BlizzHeader chunk = null;
             long position = 0;
             while (position < adt.Length)
             {
@@ -37,34 +37,64 @@ namespace WoWFormatTest
                 chunk.Flip();
                 position = adt.Position + chunk.Size;
 
-                if (chunk.Is("MVER")){ if (bin.ReadUInt32() != 18){throw new Exception("Unsupported ADT version!");} continue; }
-                if (chunk.Is("MHDR")){ continue; }
-                if (chunk.Is("MH2O")){ continue; }
-                if (chunk.Is("MCNK")){ continue; }
-                if (chunk.Is("MFBO")){ continue; }
-
-                //model.blob stuff
-                if (chunk.Is("MBMH")){ continue; }
-                if (chunk.Is("MBBB")){ continue; }
-                if (chunk.Is("MBMI")){ continue; }
-                if (chunk.Is("MBNV")){ continue; }
+                switch (chunk.ToString())
+                {
+                    case "MVER": if (bin.ReadUInt32() != 18)
+                        {
+                            throw new Exception("Unsupported ADT version!");
+                        } continue;
+                    case "MHDR":
+                    case "MH2O":
+                    case "MCNK":
+                    case "MFBO":
+                    //model.blob stuff
+                    case "MBMH":
+                    case "MBBB":
+                    case "MBMI":
+                    case "MBNV": continue;
+                    default:
+                        break;
+                }
 
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
 
-            FileStream adtobj0 = File.Open(filename + "_obj0.adt", FileMode.Open);
-            bin = new BinaryReader(adtobj0);
-            position = 0;
-            Console.WriteLine("Loading " + y + "_" + x + " OBJ0 ADT for map " + mapname);
-
-            while (position < adtobj0.Length)
+            using (FileStream adtobj0 = File.Open(filename + "_obj0.adt", FileMode.Open))
             {
-                adtobj0.Position = position;
+                ReadObjHeader(mapname, x, y, filename, adtobj0, "OBJ0", ref chunk);
+            }
+
+            using (FileStream adtobj1 = File.Open(filename + "_obj1.adt", FileMode.Open))
+            {
+                ReadObjHeader(mapname, x, y, filename, adtobj1, "OBJ1", ref chunk);
+            }
+
+            using (FileStream adttex0 = File.Open(filename + "_tex0.adt", FileMode.Open))
+            {
+                ReadTexHeader(mapname, x, y, filename, adttex0, "TEX0", ref chunk);
+            }
+
+            using (FileStream adttex1 = File.Open(filename + "_tex1.adt", FileMode.Open))
+            {
+                ReadTexHeader(mapname, x, y, filename, adttex1, "TEX1", ref chunk);
+            }
+        }
+
+        private void ReadObjHeader(string mapname, int x, int y, string filename, FileStream adtObjSteam, string objName, ref BlizzHeader chunk)
+        {
+            BinaryReader bin = new BinaryReader(adtObjSteam);
+            long position = 0;
+
+            Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, objName, mapname);
+
+            while (position < adtObjSteam.Length)
+            {
+                adtObjSteam.Position = position;
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
-                position = adtobj0.Position + chunk.Size;
+                position = adtObjSteam.Position + chunk.Size;
 
-                if (chunk.Is("MVER")){ if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
+                if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
                 if (chunk.Is("MMDX")) { ReadMMDXChunk(chunk, bin); continue; }
                 if (chunk.Is("MMID")) { continue; }
                 if (chunk.Is("MWMO")) { ReadMWMOChunk(chunk, bin); continue; }
@@ -75,73 +105,29 @@ namespace WoWFormatTest
 
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
+        }
 
-            FileStream adtobj1 = File.Open(filename + "_obj1.adt", FileMode.Open);
-            bin = new BinaryReader(adtobj1);
-            position = 0;
-            Console.WriteLine("Loading " + y + "_" + x + " OBJ1 ADT for map " + mapname);
+        private void ReadTexHeader(string mapname, int x, int y, string filename, FileStream adtTexSteam, string texName, ref BlizzHeader chunk)
+        {
+            BinaryReader bin = new BinaryReader(adtTexSteam);
+            long position = 0;
+            Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, texName, mapname);
 
-            while (position < adtobj1.Length)
+            while (position < adtTexSteam.Length)
             {
-                adtobj1.Position = position;
+                adtTexSteam.Position = position;
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
-                position = adtobj1.Position + chunk.Size;
-
-                if (chunk.Is("MVER")){ if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
-                if (chunk.Is("MMDX")) { ReadMMDXChunk(chunk, bin);  continue; }
-                if (chunk.Is("MMID")) { continue; }
-                if (chunk.Is("MWMO")) { ReadMWMOChunk(chunk, bin);  continue; }
-                if (chunk.Is("MWID")) { continue; }
-                if (chunk.Is("MDDF")) { continue; }
-                if (chunk.Is("MODF")) { continue; }
-                if (chunk.Is("MCNK")) { continue; }
-
-                throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
-            }
-
-            FileStream adttex0 = File.Open(filename + "_tex0.adt", FileMode.Open);
-            bin = new BinaryReader(adttex0);
-            position = 0;
-            Console.WriteLine("Loading " + y + "_" + x + " TEX0 ADT for map " + mapname);
-
-            while (position < adttex0.Length)
-            {
-                adttex0.Position = position;
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
-                position = adttex0.Position + chunk.Size;
+                position = adtTexSteam.Position + chunk.Size;
 
                 if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
                 if (chunk.Is("MAMP")) { continue; }
-                if (chunk.Is("MTEX")) { ReadMTEXChunk(chunk, bin);  continue; }
+                if (chunk.Is("MTEX")) { ReadMTEXChunk(chunk, bin); continue; }
                 if (chunk.Is("MCNK")) { continue; }
                 if (chunk.Is("MTXP")) { continue; }
 
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
-
-            FileStream adttex1 = File.Open(filename + "_tex1.adt", FileMode.Open);
-            bin = new BinaryReader(adttex1);
-            position = 0;
-            Console.WriteLine("Loading " + y + "_" + x + " TEX1 ADT for map " + mapname);
-
-            while (position < adttex1.Length)
-            {
-                adttex1.Position = position;
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
-                position = adttex1.Position + chunk.Size;
-
-                if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
-                if (chunk.Is("MAMP")) { continue; }
-                if (chunk.Is("MTEX")) { ReadMTEXChunk(chunk, bin);  continue; }
-                if (chunk.Is("MCNK")) { continue; }
-                if (chunk.Is("MTXP")) { continue; }
-
-                throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
-            }
-
         }
 
         public void ReadMWMOChunk(BlizzHeader chunk, BinaryReader bin)
@@ -163,7 +149,9 @@ namespace WoWFormatTest
                         wmoreader.LoadWMO(str.ToString());
                     }
                     str = new StringBuilder();
-                }else{
+                }
+                else
+                {
                     str.Append((char)wmoFilesChunk[i]);
                 }
             }
