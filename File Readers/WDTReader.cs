@@ -37,11 +37,11 @@ namespace WoWFormatTest
 
                 switch (chunk.ToString())
                 {
-                    case "MVER": ChunkMVER(bin);
+                    case "MVER": ReadMVERChunk(bin);
                         continue;
-                    case "MAIN": ChunkMAIN(map, bin, chunk);
+                    case "MAIN": ReadMAINChunk(map, bin, chunk);
                         continue;
-                    case "MWMO": ChunkMWMO(bin);
+                    case "MWMO": ReadMWMOChunk(bin);
                         continue;
                     case "MPHD":
                     case "MODF": continue;
@@ -51,7 +51,7 @@ namespace WoWFormatTest
             }
         }
 
-        private static void ChunkMWMO(BinaryReader bin)
+        private static void ReadMWMOChunk(BinaryReader bin)
         {
             if (bin.ReadByte() != 0)
             {
@@ -70,7 +70,7 @@ namespace WoWFormatTest
             }
         }
 
-        private static void ChunkMAIN(string map, BinaryReader bin, BlizzHeader chunk)
+        private static void ReadMAINChunk(string map, BinaryReader bin, BlizzHeader chunk)
         {
             if (chunk.Size != 4096 * 8)
             {
@@ -93,7 +93,7 @@ namespace WoWFormatTest
             }
         }
 
-        private static void ChunkMVER(BinaryReader bin)
+        private static void ReadMVERChunk(BinaryReader bin)
         {
             if (bin.ReadUInt32() != 18)
             {
