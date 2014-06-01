@@ -17,6 +17,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WoWFormatLib.DBC;
 using WoWFormatLib.FileReaders;
+using System.Threading;
+using System.ComponentModel;
 
 namespace WoWFormatUI
 {
@@ -25,6 +27,11 @@ namespace WoWFormatUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private volatile bool fCancelMapLoading = false;
+        private bool fLoading = false;
+
+        private delegate void LoadMapDelegate(string basedir, WDTReader wdt);
+
         public MainWindow()
         {
             InitializeComponent();
@@ -39,55 +46,95 @@ namespace WoWFormatUI
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            LoadMap();
+        }
+
+        private void LoadMap()
+        {
             var basedir = ConfigurationManager.AppSettings["basedir"];
+            string _SelectedMapName = MapListBox.SelectedValue.ToString();
+            WDTGrid.Children.Clear();
+            pbLoadMap.Value = 0d;
+
             if (MapListBox.SelectedValue != null)
             {
                 var wdt = new WDTReader(basedir);
-                if(File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", MapListBox.SelectedValue.ToString(), MapListBox.SelectedValue.ToString() + ".wdt"))){
-                    wdt.LoadWDT(MapListBox.SelectedValue.ToString());
-                    List<int[]> tiles = wdt.getTiles();
-                    WDTGrid.Children.Clear();
+                if (File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", MapListBox.SelectedValue.ToString(), MapListBox.SelectedValue.ToString() + ".wdt")))
+                {
+                    BackgroundWorker _BackgroundWorker = new BackgroundWorker();
+                    _BackgroundWorker.WorkerReportsProgress = true;
 
-                    foreach(var tile in tiles){
-                        var x = tile[0];
-                        var y = tile[1];
-                        Rectangle rect = new Rectangle();
-                        rect.Name = MapListBox.SelectedValue.ToString() + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts, this breaks when the mapname has special characters (zg)D:
-                        rect.Width = WDTGrid.Width / 64;
-                        rect.Height = WDTGrid.Height / 64;
-                        rect.VerticalAlignment = VerticalAlignment.Top;
-                        rect.HorizontalAlignment = HorizontalAlignment.Left;
-                        rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
-                        var xmargin = x * rect.Width;
-                        var ymargin = y * rect.Height;
-                        rect.Margin = new Thickness(xmargin, ymargin, 0, 0);
-                        var blp = new BLPReader(basedir);
-                        if (File.Exists(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
+                    _BackgroundWorker.DoWork += new DoWorkEventHandler(
+                        (object o, DoWorkEventArgs args) =>
                         {
-                            //Kalimdor takes a few seconds to load, and takes up about ~4xxMB of memory after its loaded, this can be much improved
-                            blp.LoadBLP("World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
-                            BitmapImage bitmapImage = new BitmapImage();
-                            using (MemoryStream bitmap = blp.asBitmapStream())
+                            BackgroundWorker _Worker = o as BackgroundWorker;
+                            wdt.LoadWDT(_SelectedMapName);
+                            List<int[]> tiles = wdt.getTiles();
+
+                            for (int i = 0; i < tiles.Count; i++)
                             {
-                                bitmapImage.BeginInit();
-                                bitmapImage.StreamSource = bitmap;
-                                bitmapImage.DecodePixelHeight = Convert.ToInt32(rect.Width);
-                                bitmapImage.DecodePixelWidth = Convert.ToInt32(rect.Height);
-                                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                                bitmapImage.EndInit();
+                                if (fCancelMapLoading)
+                                    break;
+
+                                Action _LoadTileAction = delegate() { LoadTile(basedir, tiles[i]);};
+                                this.Dispatcher.Invoke(_LoadTileAction);
+                                //LoadTile(basedir, tiles[i]);
+                                _Worker.ReportProgress((i * 100) / tiles.Count);
                             }
-                            ImageBrush imgBrush = new ImageBrush(bitmapImage);
-                            rect.Fill = imgBrush;
-                        }
-                        else
+
+                            _Worker.ReportProgress(100);
+
+                        });
+
+                    _BackgroundWorker.ProgressChanged += new ProgressChangedEventHandler(
+                        (object o, ProgressChangedEventArgs args) =>
                         {
-                            rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
-                            Console.WriteLine(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
-                        }
-                        WDTGrid.Children.Add(rect);
-                    }
+                            pbLoadMap.Value = args.ProgressPercentage;
+                        });
+
+                    _BackgroundWorker.RunWorkerAsync();
                 }
             }
+        }
+
+        private void LoadTile(string basedir, int[] tile)
+        {
+            var x = tile[0];
+            var y = tile[1];
+            Rectangle rect = new Rectangle();
+            rect.Name = MapListBox.SelectedValue.ToString() + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts, this breaks when the mapname has special characters (zg)D:
+            rect.Width = WDTGrid.Width / 64;
+            rect.Height = WDTGrid.Height / 64;
+            rect.VerticalAlignment = VerticalAlignment.Top;
+            rect.HorizontalAlignment = HorizontalAlignment.Left;
+            rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
+            var xmargin = x * rect.Width;
+            var ymargin = y * rect.Height;
+            rect.Margin = new Thickness(xmargin, ymargin, 0, 0);
+            var blp = new BLPReader(basedir);
+            if (File.Exists(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
+            {
+                //Kalimdor takes a few seconds to load, and takes up about ~4xxMB of memory after its loaded, this can be much improved
+                blp.LoadBLP("World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                BitmapImage bitmapImage = new BitmapImage();
+                using (MemoryStream bitmap = blp.asBitmapStream())
+                {
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = bitmap;
+                    bitmapImage.DecodePixelHeight = Convert.ToInt32(rect.Width);
+                    bitmapImage.DecodePixelWidth = Convert.ToInt32(rect.Height);
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+                }
+                ImageBrush imgBrush = new ImageBrush(bitmapImage);
+                rect.Fill = imgBrush;
+            }
+            else
+            {
+                rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
+                Console.WriteLine(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+            }
+            WDTGrid.Children.Add(rect);
         }
 
         private void Rectangle_Mousedown(object sender, RoutedEventArgs e) {
