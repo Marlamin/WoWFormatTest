@@ -93,6 +93,9 @@ namespace WoWFormatUI
         private void Rectangle_Mousedown(object sender, RoutedEventArgs e) {
             string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
             Console.WriteLine("Detected mouse event on " + name + "!");
+            var rw = new RenderWindow(name);
+            rw.Show();
+            this.Close();
         }
     }
 }
