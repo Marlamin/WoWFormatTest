@@ -9,6 +9,7 @@ Built from the ground up, but with lots of copy pasta from older projects.
 
 ## Thanks
 - TOM_RUS
+- flippy84
 - JustMak
 - BoogieMan 
 - WoWDev wiki authors

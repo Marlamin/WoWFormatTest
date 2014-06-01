@@ -50,9 +50,11 @@ namespace WoWFormatLib.FileReaders
                             throw new Exception("Unsupported ADT version!");
                         } 
                         continue;
+                    case "MCNK":
+                        ReadMCNKChunk(chunk, bin);
+                        continue;
                     case "MHDR":
                     case "MH2O":
-                    case "MCNK":
                     case "MFBO":
                     //model.blob stuff
                     case "MBMH":
@@ -214,6 +216,12 @@ namespace WoWFormatLib.FileReaders
                     str.Append((char)blpFilesChunk[i]);
                 }
             }
+        }
+        public void ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //this will be called 256 times per adt, needs to be v optimized
+            var flags = bin.ReadUInt32();
+            var IndexX = bin.ReadUInt32();
         }
     }
 }
