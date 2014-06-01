@@ -10,7 +10,8 @@ namespace WoWFormatLib.FileReaders
 {
     public class WDTReader
     {
-        private string basedir;        
+        private string basedir;
+        public List<int[]> tiles;
 
         public WDTReader(string basedir)
         {
@@ -20,13 +21,20 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadWDT(string map)
         {
-            //Console.WriteLine("Loading WDT for map " + map);
-
+            tiles = new List<int[]>();
             var filename = Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt");
-            using (FileStream wdt = File.Open(filename, FileMode.Open))
+            if (File.Exists(filename))
             {
-                ReadWDT(map, filename, wdt);
+                using (FileStream wdt = File.Open(filename, FileMode.Open))
+                {
+                    ReadWDT(map, filename, wdt);
+                }
             }
+            else
+            {
+                throw new Exception("WDT not found!");
+            }
+
         }
 
         private void ReadWDT(string map, string filename, FileStream wdt)
@@ -73,8 +81,8 @@ namespace WoWFormatLib.FileReaders
                 }
                 var wmofilename = str.ToString();
 
-                var wmoreader = new WMOReader(basedir);
-                wmoreader.LoadWMO(wmofilename);
+                //var wmoreader = new WMOReader(basedir);
+                //wmoreader.LoadWMO(wmofilename);
             }
         }
 
@@ -94,8 +102,10 @@ namespace WoWFormatLib.FileReaders
                     if (flags == 1)
                     {
                         //ADT exists
-                        var adtreader = new ADTReader(basedir);
-                        adtreader.LoadADT(map, x, y);
+                       // var adtreader = new ADTReader(basedir);
+                      //  adtreader.LoadADT(map, x, y);
+                        int[] xy = new int[] {y, x};
+                        tiles.Add(xy);
                     }
                 }
             }
@@ -107,6 +117,12 @@ namespace WoWFormatLib.FileReaders
             {
                 throw new Exception("Unsupported WDT version!");
             }
+        }
+
+        //TODO there's probably a better way to do this
+        public List<int[]> getTiles()
+        {
+            return tiles;
         }
     }
 }

@@ -34,28 +34,6 @@ namespace WoWFormatUI
             {
                 MapListBox.Items.Add(map.Value);
             }
-
-            for (var x = 0; x < 64; x++)
-            {
-                for (var y = 0; y < 64; y++)
-                {
-                    Rectangle rect = new Rectangle();
-                    rect.Width = WDTGrid.Width / 64;
-                    rect.Height = WDTGrid.Height / 64;
-                    rect.VerticalAlignment = VerticalAlignment.Top;
-                    rect.HorizontalAlignment = HorizontalAlignment.Left;
-                    var xmargin = x * rect.Width;
-                    var ymargin = y * rect.Height;
-                    rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
-                    rect.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-                    rect.Margin = new Thickness(xmargin, ymargin, rect.Margin.Right, rect.Margin.Bottom );
-                    var filename = System.IO.Path.Combine(basedir, "World\\Maps\\" + "Kalimdor" + "\\" + "Kalimdor" + "_" + x + "_" + y + ".adt");
-                    if (File.Exists(filename))
-                    {
-                        WDTGrid.Children.Add(rect);
-                    }
-                }
-            }
         }
 
         private void WDTGrid_MouseLeftButtonUp (object sender, MouseEventArgs e)
@@ -72,35 +50,28 @@ namespace WoWFormatUI
             var basedir = ConfigurationManager.AppSettings["basedir"];
             if (MapListBox.SelectedValue != null)
             {
+                var wdt = new WDTReader(basedir);
+                wdt.LoadWDT(MapListBox.SelectedValue.ToString());
+                List<int[]> tiles = wdt.getTiles();
                 Console.WriteLine(MapListBox.SelectedValue.ToString());
                 WDTGrid.Children.Clear();
-                for (var x = 0; x < 64; x++)
-                {
-                    for (var y = 0; y < 64; y++)
-                    {
-                        Rectangle rect = new Rectangle();
-                        rect.Width = WDTGrid.Width / 64;
-                        rect.Height = WDTGrid.Height / 64;
-                        rect.VerticalAlignment = VerticalAlignment.Top;
-                        rect.HorizontalAlignment = HorizontalAlignment.Left;
-                        var xmargin = x * rect.Width;
-                        var ymargin = y * rect.Height;
-                        rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
-                        rect.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-                        rect.Margin = new Thickness(xmargin, ymargin, rect.Margin.Right, rect.Margin.Bottom);
-                        var filename = System.IO.Path.Combine(basedir, "World\\Maps\\" + MapListBox.SelectedValue.ToString() + "\\" + MapListBox.SelectedValue.ToString() + "_" + x + "_" + y + ".adt");
-                        if (File.Exists(filename))
-                        {
-                            WDTGrid.Children.Add(rect);
-                        }
-                    }
+
+                foreach(var tile in tiles){
+                    var x = tile[0];
+                    var y = tile[1];
+                    Rectangle rect = new Rectangle();
+                    rect.Width = WDTGrid.Width / 64;
+                    rect.Height = WDTGrid.Height / 64;
+                    rect.VerticalAlignment = VerticalAlignment.Top;
+                    rect.HorizontalAlignment = HorizontalAlignment.Left;
+                    var xmargin = x * rect.Width;
+                    var ymargin = y * rect.Height;
+                    rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
+                    rect.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
+                    rect.Margin = new Thickness(xmargin, ymargin, rect.Margin.Right, rect.Margin.Bottom);
+                    WDTGrid.Children.Add(rect);
                 }
             }
-        }
-
-        private void WDTGrid_MouseLeftButtonUp_1(object sender, MouseButtonEventArgs e)
-        {
-
         }
     }
 }
