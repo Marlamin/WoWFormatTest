@@ -9,15 +9,10 @@ namespace WoWRenderTest
 {
     class MpqArchive
     {
-        private const int MpqOpenReadOnly = 256;
-        private static readonly IntPtr Archive;
-
         static MpqArchive()
         {
 
         }
-
-        private const int SfileInfoFileSize = 105;
 
         static public Stream Open(string file)
         {
