@@ -276,7 +276,7 @@ namespace WoWRenderTest
             Texture2D depthBuffer = null;
             DepthStencilView depthView = null;
             /* SHARPDX UPDATES BROKE THIS */
-            //context.Rasterizer.SetViewports(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height));
+            context.Rasterizer.SetViewport(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height));
 
             var resized = true;
             var proj = Matrix.Identity;
@@ -324,7 +324,7 @@ namespace WoWRenderTest
 
                     depthView = new DepthStencilView(device, depthBuffer);
                     /* SHARPDX UPDATES BROKE THIS */
-                    //context.Rasterizer.SetViewports(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height));
+                    context.Rasterizer.SetViewport(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height));
                     proj = Matrix.PerspectiveFovLH((float)Math.PI / 2.0f, form.ClientSize.Width / (float)form.ClientSize.Height, 0.1f, 1000.0f);
 
                     context.OutputMerger.SetTargets(depthView, renderView);
