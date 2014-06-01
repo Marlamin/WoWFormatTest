@@ -92,6 +92,13 @@ namespace WoWFormatUI
                             pbLoadMap.Value = args.ProgressPercentage;
                         });
 
+                    _BackgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                    (object sender, RunWorkerCompletedEventArgs args) =>
+                    {
+                        fCancelMapLoading = false;
+                    });
+
+
                     _BackgroundWorker.RunWorkerAsync();
                 }
             }
@@ -138,6 +145,7 @@ namespace WoWFormatUI
         }
 
         private void Rectangle_Mousedown(object sender, RoutedEventArgs e) {
+            fCancelMapLoading = true;
             string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
             Console.WriteLine("Detected mouse event on " + name + "!");
             var rw = new RenderWindow(name);
