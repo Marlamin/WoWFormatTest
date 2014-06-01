@@ -73,12 +73,12 @@ namespace WoWRenderTest
 
         public Adt(string file, Device device)
         {
-            var s = file.Split(new[] { '_', '.', '\\' });
+            var s = Path.GetFileName(file).Split(new[] { '_', '.', '\\' });
 
-            int.TryParse(s[4], out X);
+            int.TryParse(s[1], out X);
 
-            int.TryParse(s[5], out Y);
-            string map = s[3];
+            int.TryParse(s[2], out Y);
+            string map = s[0];
 
             var min = new Vector3((X - 32) * chunkSize - border, float.MinValue, (31-Y) * chunkSize - border);
             var max = new Vector3((X - 31) * chunkSize + border, float.MaxValue, (32-Y) * chunkSize + border);
