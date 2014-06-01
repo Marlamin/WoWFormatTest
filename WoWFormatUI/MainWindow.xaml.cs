@@ -116,7 +116,7 @@ namespace WoWFormatUI
             var y = tile[1];
             string _SelectedMapName = ((KeyValuePair<int, string>)MapListBox.SelectedValue).Value;
             Rectangle rect = new Rectangle();
-            rect.Name = _SelectedMapName.Replace("'", string.Empty) + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts, this breaks when the mapname has special characters (zg)D:
+            rect.Name = _SelectedMapName.Replace("'", string.Empty).Replace(" ", string.Empty) + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts, this breaks when the mapname has special characters (zg)D:
             rect.Width = WDTGrid.Width / 64;
             rect.Height = WDTGrid.Height / 64;
             rect.VerticalAlignment = VerticalAlignment.Top;
