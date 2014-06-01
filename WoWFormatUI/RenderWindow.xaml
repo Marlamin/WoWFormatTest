@@ -1,7 +1,7 @@
 ﻿<Window x:Class="WoWFormatUI.RenderWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="RenderWindow" Height="600" Width="791.8">
+        Title="RenderWindow" Height="600" Width="790" Background="Red">
     <Grid>
         <Canvas HorizontalAlignment="Left" Height="569" VerticalAlignment="Top" Width="784" Background="Black">
             <Label x:Name="RenderLabel" Content="Label" Canvas.Left="357" Canvas.Top="164" Foreground="White" Background="{x:Null}"/>

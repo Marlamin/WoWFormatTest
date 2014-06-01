@@ -26,7 +26,6 @@ namespace WoWFormatUI
             Closing += OnWindowClosing;
             InitializeComponent();
             RenderLabel.Content = name;
-            Console.WriteLine(name);
         }
 
         public void OnWindowClosing(object sender, CancelEventArgs e)
