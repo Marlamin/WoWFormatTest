@@ -1,13 +1,13 @@
 ﻿<Window x:Class="WoWFormatUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WoW Format Test UI" Height="355" Width="530" ResizeMode="NoResize">
+        Title="WoW Format Test UI" Height="610" Width="810" ResizeMode="NoResize" Background="White">
     <Grid>
-        <ListBox x:Name="MapListBox" HorizontalAlignment="Left" Height="268" Margin="10,10,0,0" VerticalAlignment="Top" Width="152">
+        <ListBox x:Name="MapListBox" HorizontalAlignment="Left" Height="514" Margin="10,10,0,0" VerticalAlignment="Top" Width="231">
 
         </ListBox>
-        <Button Content="Load Map" HorizontalAlignment="Left" Margin="10,289,0,0" VerticalAlignment="Top" Width="497" Click="Button_Click"/>
-        <Grid HorizontalAlignment="Left" Height="268" Margin="167,10,0,0" VerticalAlignment="Top" Width="340"/>
+        <Button Content="Load Map" HorizontalAlignment="Left" Margin="10,529,0,0" VerticalAlignment="Top" Width="774" Click="Button_Click" Height="32"/>
+        <Grid x:Name="WDTGrid" HorizontalAlignment="Left" Height="514" Margin="246,10,0,0" VerticalAlignment="Top" Width="538" MouseLeftButtonUp="WDTGrid_MouseLeftButtonUp"/>
 
     </Grid>
 </Window>
