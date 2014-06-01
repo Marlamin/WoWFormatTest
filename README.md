@@ -5,6 +5,7 @@ Built from the ground up, but with lots of copy pasta from older projects.
 
 ## Requirements
 - [CSDBCReader](http://marlamin.com/u/CSDBCReader.dll)
+- [SereniaBLPLib](http://marlamin.com/u/SereniaBLPLib.dll)
 
 ## Thanks
 - TOM_RUS
@@ -15,11 +16,9 @@ Built from the ground up, but with lots of copy pasta from older projects.
 - also Thoorium
 
 ## To Do
-- Make WDT preview rectangles clickable (and return the tile that was clicked on)
 - After clicking on rectangles, load ADT
 - 3D rendering (SharpDX or SharpGL?)
 - ADT 3D
 - WMO 3D
 - M2 3D
-- BLP parsing (or use SereniaBLPLib?)
 - Get rid of DBC dependency

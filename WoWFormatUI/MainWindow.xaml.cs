@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.IO;
+using System.Drawing.Imaging;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -36,15 +37,6 @@ namespace WoWFormatUI
             }
         }
 
-        private void WDTGrid_MouseLeftButtonUp (object sender, MouseEventArgs e)
-        {
-            foreach (Rectangle child in WDTGrid.Children)
-            {
-                Point point = new Point(e.GetPosition(WDTGrid).X, e.GetPosition(WDTGrid).Y);
-                //check if there is a rectangle at that point
-            }
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var basedir = ConfigurationManager.AppSettings["basedir"];
@@ -60,18 +52,46 @@ namespace WoWFormatUI
                     var x = tile[0];
                     var y = tile[1];
                     Rectangle rect = new Rectangle();
+                    rect.Name = MapListBox.SelectedValue.ToString() + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts
                     rect.Width = WDTGrid.Width / 64;
                     rect.Height = WDTGrid.Height / 64;
                     rect.VerticalAlignment = VerticalAlignment.Top;
                     rect.HorizontalAlignment = HorizontalAlignment.Left;
+                    rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
                     var xmargin = x * rect.Width;
                     var ymargin = y * rect.Height;
-                    rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
-                    rect.Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0));
-                    rect.Margin = new Thickness(xmargin, ymargin, rect.Margin.Right, rect.Margin.Bottom);
+                    rect.Margin = new Thickness(xmargin, ymargin, 0, 0);
+                    var blp = new BLPReader(basedir);
+                    if (File.Exists(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
+                    {
+                        //Kalimdor takes a few seconds to load, and takes up about ~6xxMB of memory after its loaded, this can be much improved
+                        blp.LoadBLP("World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                        BitmapImage bitmapImage = new BitmapImage();
+                        using (MemoryStream bitmap = blp.asBitmapStream())
+                        {
+                            bitmapImage.BeginInit();
+                            bitmapImage.StreamSource = bitmap;
+                            bitmapImage.DecodePixelHeight = Convert.ToInt32(rect.Width);
+                            bitmapImage.DecodePixelWidth = Convert.ToInt32(rect.Height);
+                            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmapImage.EndInit();
+                        }
+                        ImageBrush imgBrush = new ImageBrush(bitmapImage);
+                        rect.Fill = imgBrush;
+                    }
+                    else
+                    {
+                        rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
+                        Console.WriteLine(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                    }
                     WDTGrid.Children.Add(rect);
                 }
             }
+        }
+
+        private void Rectangle_Mousedown(object sender, RoutedEventArgs e) {
+            string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
+            Console.WriteLine("Detected mouse event on " + name + "!");
         }
     }
 }
