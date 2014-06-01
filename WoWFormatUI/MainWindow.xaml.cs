@@ -43,48 +43,49 @@ namespace WoWFormatUI
             if (MapListBox.SelectedValue != null)
             {
                 var wdt = new WDTReader(basedir);
-                wdt.LoadWDT(MapListBox.SelectedValue.ToString());
-                List<int[]> tiles = wdt.getTiles();
-                Console.WriteLine(MapListBox.SelectedValue.ToString());
-                WDTGrid.Children.Clear();
+                if(File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", MapListBox.SelectedValue.ToString(), MapListBox.SelectedValue.ToString() + ".wdt"))){
+                    wdt.LoadWDT(MapListBox.SelectedValue.ToString());
+                    List<int[]> tiles = wdt.getTiles();
+                    WDTGrid.Children.Clear();
 
-                foreach(var tile in tiles){
-                    var x = tile[0];
-                    var y = tile[1];
-                    Rectangle rect = new Rectangle();
-                    rect.Name = MapListBox.SelectedValue.ToString() + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts
-                    rect.Width = WDTGrid.Width / 64;
-                    rect.Height = WDTGrid.Height / 64;
-                    rect.VerticalAlignment = VerticalAlignment.Top;
-                    rect.HorizontalAlignment = HorizontalAlignment.Left;
-                    rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
-                    var xmargin = x * rect.Width;
-                    var ymargin = y * rect.Height;
-                    rect.Margin = new Thickness(xmargin, ymargin, 0, 0);
-                    var blp = new BLPReader(basedir);
-                    if (File.Exists(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
-                    {
-                        //Kalimdor takes a few seconds to load, and takes up about ~6xxMB of memory after its loaded, this can be much improved
-                        blp.LoadBLP("World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
-                        BitmapImage bitmapImage = new BitmapImage();
-                        using (MemoryStream bitmap = blp.asBitmapStream())
+                    foreach(var tile in tiles){
+                        var x = tile[0];
+                        var y = tile[1];
+                        Rectangle rect = new Rectangle();
+                        rect.Name = MapListBox.SelectedValue.ToString() + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts, this breaks when the mapname has special characters (zg)D:
+                        rect.Width = WDTGrid.Width / 64;
+                        rect.Height = WDTGrid.Height / 64;
+                        rect.VerticalAlignment = VerticalAlignment.Top;
+                        rect.HorizontalAlignment = HorizontalAlignment.Left;
+                        rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
+                        var xmargin = x * rect.Width;
+                        var ymargin = y * rect.Height;
+                        rect.Margin = new Thickness(xmargin, ymargin, 0, 0);
+                        var blp = new BLPReader(basedir);
+                        if (File.Exists(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
                         {
-                            bitmapImage.BeginInit();
-                            bitmapImage.StreamSource = bitmap;
-                            bitmapImage.DecodePixelHeight = Convert.ToInt32(rect.Width);
-                            bitmapImage.DecodePixelWidth = Convert.ToInt32(rect.Height);
-                            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                            bitmapImage.EndInit();
+                            //Kalimdor takes a few seconds to load, and takes up about ~4xxMB of memory after its loaded, this can be much improved
+                            blp.LoadBLP("World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                            BitmapImage bitmapImage = new BitmapImage();
+                            using (MemoryStream bitmap = blp.asBitmapStream())
+                            {
+                                bitmapImage.BeginInit();
+                                bitmapImage.StreamSource = bitmap;
+                                bitmapImage.DecodePixelHeight = Convert.ToInt32(rect.Width);
+                                bitmapImage.DecodePixelWidth = Convert.ToInt32(rect.Height);
+                                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                                bitmapImage.EndInit();
+                            }
+                            ImageBrush imgBrush = new ImageBrush(bitmapImage);
+                            rect.Fill = imgBrush;
                         }
-                        ImageBrush imgBrush = new ImageBrush(bitmapImage);
-                        rect.Fill = imgBrush;
+                        else
+                        {
+                            rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
+                            Console.WriteLine(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                        }
+                        WDTGrid.Children.Add(rect);
                     }
-                    else
-                    {
-                        rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
-                        Console.WriteLine(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
-                    }
-                    WDTGrid.Children.Add(rect);
                 }
             }
         }
