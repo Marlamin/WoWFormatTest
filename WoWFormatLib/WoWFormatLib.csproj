@@ -33,8 +33,12 @@
     <Reference Include="CSDBCReader">
       <HintPath>..\CSDBCReader.dll</HintPath>
     </Reference>
+    <Reference Include="SereniaBLPLib">
+      <HintPath>..\SereniaBLPLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +48,7 @@
   <ItemGroup>
     <Compile Include="DBC\MapReader.cs" />
     <Compile Include="FileReaders\ADTReader.cs" />
+    <Compile Include="FileReaders\BLPReader.cs" />
     <Compile Include="FileReaders\M2Reader.cs" />
     <Compile Include="FileReaders\WDTReader.cs" />
     <Compile Include="FileReaders\WMOReader.cs" />

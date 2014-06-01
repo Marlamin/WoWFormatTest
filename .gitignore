@@ -12,3 +12,4 @@ _ReSharper.*
 *.resharper
 Ankh.NoLoad
 CSDBCReader.dll
+SereniaBLPLib.dll
