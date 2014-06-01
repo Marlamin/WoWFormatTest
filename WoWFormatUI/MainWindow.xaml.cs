@@ -58,12 +58,12 @@ namespace WoWFormatUI
                 return;
 
             var basedir = ConfigurationManager.AppSettings["basedir"];
-            string _SelectedMapName = MapListBox.SelectedValue.ToString();
+            string _SelectedMapName = ((KeyValuePair<int, string>)MapListBox.SelectedValue).Value;
             WDTGrid.Children.Clear();
             pbLoadMap.Value = 0d;
             
             var wdt = new WDTReader(basedir);
-            if (File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", MapListBox.SelectedValue.ToString(), MapListBox.SelectedValue.ToString() + ".wdt")))
+            if (File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", _SelectedMapName, _SelectedMapName + ".wdt")))
             {
                 Stopwatch _SW = new Stopwatch();
                 BackgroundWorker _BackgroundWorker = new BackgroundWorker();
@@ -114,14 +114,15 @@ namespace WoWFormatUI
         {
             var x = tile[0];
             var y = tile[1];
+            string _SelectedMapName = ((KeyValuePair<int, string>)MapListBox.SelectedValue).Value;
             Rectangle rect = new Rectangle();
-            rect.Name = MapListBox.SelectedValue.ToString() + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts, this breaks when the mapname has special characters (zg)D:
+            rect.Name = _SelectedMapName + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts, this breaks when the mapname has special characters (zg)D:
             rect.Width = WDTGrid.Width / 64;
             rect.Height = WDTGrid.Height / 64;
             rect.VerticalAlignment = VerticalAlignment.Top;
             rect.HorizontalAlignment = HorizontalAlignment.Left;
 
-            if (File.Exists(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
+            if (File.Exists(basedir + "World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
             {                
                 rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
                 var xmargin = x * rect.Width;
@@ -130,7 +131,7 @@ namespace WoWFormatUI
                 var blp = new BLPReader(basedir);
 
                 //Kalimdor takes a few seconds to load, and takes up about ~4xxMB of memory after its loaded, this can be much improved
-                blp.LoadBLP("World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                blp.LoadBLP("World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
                 BitmapImage bitmapImage = new BitmapImage();
                 using (MemoryStream bitmap = blp.asBitmapStream())
                 {
@@ -147,7 +148,7 @@ namespace WoWFormatUI
             else
             {
                 rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
-                Console.WriteLine(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                Console.WriteLine(basedir + "World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
             }
             WDTGrid.Children.Add(rect);
         }
