@@ -19,6 +19,7 @@ using WoWFormatLib.DBC;
 using WoWFormatLib.FileReaders;
 using System.Threading;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace WoWFormatUI
 {
@@ -40,8 +41,10 @@ namespace WoWFormatUI
             Dictionary<int, string> maps = reader.GetMaps();
             foreach (KeyValuePair<int, string> map in maps)
             {
-                MapListBox.Items.Add(map.Value);
+                MapListBox.Items.Add(map);
             }
+            MapListBox.DisplayMemberPath = "Value";
+            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -51,57 +54,60 @@ namespace WoWFormatUI
 
         private void LoadMap()
         {
+            if (MapListBox.SelectedValue == null)
+                return;
+
             var basedir = ConfigurationManager.AppSettings["basedir"];
             string _SelectedMapName = MapListBox.SelectedValue.ToString();
             WDTGrid.Children.Clear();
             pbLoadMap.Value = 0d;
-
-            if (MapListBox.SelectedValue != null)
+            
+            var wdt = new WDTReader(basedir);
+            if (File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", MapListBox.SelectedValue.ToString(), MapListBox.SelectedValue.ToString() + ".wdt")))
             {
-                var wdt = new WDTReader(basedir);
-                if (File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", MapListBox.SelectedValue.ToString(), MapListBox.SelectedValue.ToString() + ".wdt")))
-                {
-                    BackgroundWorker _BackgroundWorker = new BackgroundWorker();
-                    _BackgroundWorker.WorkerReportsProgress = true;
+                Stopwatch _SW = new Stopwatch();
+                BackgroundWorker _BackgroundWorker = new BackgroundWorker();
+                _BackgroundWorker.WorkerReportsProgress = true;
 
-                    _BackgroundWorker.DoWork += new DoWorkEventHandler(
-                        (object o, DoWorkEventArgs args) =>
-                        {
-                            BackgroundWorker _Worker = o as BackgroundWorker;
-                            wdt.LoadWDT(_SelectedMapName);
-                            List<int[]> tiles = wdt.getTiles();
-
-                            for (int i = 0; i < tiles.Count; i++)
-                            {
-                                if (fCancelMapLoading)
-                                    break;
-
-                                Action _LoadTileAction = delegate() { LoadTile(basedir, tiles[i]);};
-                                this.Dispatcher.Invoke(_LoadTileAction);
-                                //LoadTile(basedir, tiles[i]);
-                                _Worker.ReportProgress((i * 100) / tiles.Count);
-                            }
-
-                            _Worker.ReportProgress(100);
-
-                        });
-
-                    _BackgroundWorker.ProgressChanged += new ProgressChangedEventHandler(
-                        (object o, ProgressChangedEventArgs args) =>
-                        {
-                            pbLoadMap.Value = args.ProgressPercentage;
-                        });
-
-                    _BackgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
-                    (object sender, RunWorkerCompletedEventArgs args) =>
+                _BackgroundWorker.DoWork += new DoWorkEventHandler(
+                    (object o, DoWorkEventArgs args) =>
                     {
-                        fCancelMapLoading = false;
+                        _SW.Start();
+                        BackgroundWorker _Worker = o as BackgroundWorker;
+                        wdt.LoadWDT(_SelectedMapName);
+                        List<int[]> tiles = wdt.getTiles();
+
+                        for (int i = 0; i < tiles.Count; i++)
+                        {
+                            if (fCancelMapLoading)
+                                break;
+
+                            Action _LoadTileAction = delegate() { LoadTile(basedir, tiles[i]);};
+                            this.Dispatcher.Invoke(_LoadTileAction);
+                            _Worker.ReportProgress((i * 100) / tiles.Count);
+                        }
+
+                        _Worker.ReportProgress(100);
+
                     });
 
+                _BackgroundWorker.ProgressChanged += new ProgressChangedEventHandler(
+                    (object o, ProgressChangedEventArgs args) =>
+                    {
+                        pbLoadMap.Value = args.ProgressPercentage;
+                    });
 
-                    _BackgroundWorker.RunWorkerAsync();
-                }
-            }
+                _BackgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
+                (object sender, RunWorkerCompletedEventArgs args) =>
+                {
+                    fCancelMapLoading = false;
+                    _SW.Stop();
+                    Console.WriteLine("Loading {0} took {1} seconds", _SelectedMapName, _SW.Elapsed.TotalSeconds, _SW.ElapsedMilliseconds);
+                });
+
+
+                _BackgroundWorker.RunWorkerAsync();
+            }            
         }
 
         private void LoadTile(string basedir, int[] tile)
@@ -114,13 +120,15 @@ namespace WoWFormatUI
             rect.Height = WDTGrid.Height / 64;
             rect.VerticalAlignment = VerticalAlignment.Top;
             rect.HorizontalAlignment = HorizontalAlignment.Left;
-            rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
-            var xmargin = x * rect.Width;
-            var ymargin = y * rect.Height;
-            rect.Margin = new Thickness(xmargin, ymargin, 0, 0);
-            var blp = new BLPReader(basedir);
+
             if (File.Exists(basedir + "World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
-            {
+            {                
+                rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
+                var xmargin = x * rect.Width;
+                var ymargin = y * rect.Height;
+                rect.Margin = new Thickness(xmargin, ymargin, 0, 0);
+                var blp = new BLPReader(basedir);
+
                 //Kalimdor takes a few seconds to load, and takes up about ~4xxMB of memory after its loaded, this can be much improved
                 blp.LoadBLP("World\\Minimaps\\" + MapListBox.SelectedValue.ToString() + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
                 BitmapImage bitmapImage = new BitmapImage();
@@ -151,6 +159,18 @@ namespace WoWFormatUI
             var rw = new RenderWindow(name);
             rw.Show();
             this.Close();
+        }
+
+        private void rbSortName_Checked(object sender, RoutedEventArgs e)
+        {
+            MapListBox.Items.SortDescriptions.Clear();
+            MapListBox.Items.SortDescriptions.Add(new SortDescription("Value", ListSortDirection.Ascending));
+        }
+
+        private void rbSortMapId_Checked(object sender, RoutedEventArgs e)
+        {
+            MapListBox.Items.SortDescriptions.Clear();
+            MapListBox.Items.SortDescriptions.Add(new SortDescription("Key", ListSortDirection.Ascending));
         }
     }
 }
