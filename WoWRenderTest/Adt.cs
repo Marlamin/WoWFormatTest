@@ -2,17 +2,16 @@
 using System.Drawing.Imaging;
 using System.IO;
 using SharpDX;
-//using SharpDX.DXGI;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Linq;
 using System;
 using System.Collections.Generic;
 using SharpDX.DXGI;
-using Device = SharpDX.Direct3D11.Device;
 using SharpDX.Direct3D11;
-using Resource = SharpDX.Direct3D11.Resource;
 using SharpDX.Toolkit.Graphics;
+using Device = SharpDX.Direct3D11.Device;
+using Resource = SharpDX.Direct3D11.Resource;
 using Texture2D = SharpDX.Direct3D11.Texture2D;
 using SamplerState = SharpDX.Direct3D11.SamplerState;
 using Buffer = SharpDX.Direct3D11.Buffer;
@@ -111,149 +110,11 @@ namespace WoWRenderTest
         public MCNK[,] MapChunks;
     }
 
-    class Model
-    {
-        private static Buffer _vertexBuffer;
-        private static Buffer _indexBuffer;
-        private int index;
-        private int count;
-        private static long vertexOffset;
-
-        public Model(Device device, Vector4[] vertices)
-        {
-            var context = device.ImmediateContext;
-            if (_vertexBuffer == null)
-            {
-                _vertexBuffer = new Buffer(device, Utilities.SizeOf<Vector4>() * 2 * 100000, ResourceUsage.Dynamic, BindFlags.VertexBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, Utilities.SizeOf<Vector4>() * 2);
-                context.InputAssembler.SetVertexBuffers(1, new SharpDX.Direct3D11.VertexBufferBinding(_vertexBuffer, Utilities.SizeOf<Vector4>() * 2, 0));
-
-                _indexBuffer = new Buffer(device, Utilities.SizeOf<short>(), ResourceUsage.Dynamic, BindFlags.IndexBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, Utilities.SizeOf<short>());
-                context.InputAssembler.SetIndexBuffer(_indexBuffer, Format.R16_UInt, 0);
-            }
-
-            DataStream stream;
-            context.MapSubresource(_vertexBuffer, MapMode.WriteNoOverwrite, MapFlags.None, out stream);
-
-            stream.Seek(vertexOffset, SeekOrigin.Begin);
-            
-            count = vertices.Length / 2;
-            index = (int) stream.Position / 32;
-
-            stream.WriteRange(vertices);
-
-            vertexOffset = stream.Position;
-
-            context.UnmapSubresource(_vertexBuffer, 0);
-        }
-
-        public void Render(Device device)
-        {
-            var context = device.ImmediateContext;
-
-            context.Draw(count, index);
-        }
-
-        public static Vector4[] Parse(string s, Vector3 position, Vector3 rotation, float scale)
-        {
-            float d = (float)(Math.PI / 180);
-
-            Matrix m = Matrix.Identity;
-            m *= Matrix.RotationX(rotation.X * d);
-            m *= Matrix.RotationY(-rotation.Y * d);
-            m *= Matrix.RotationZ(rotation.Z * d);
-
-            return Parse(s, position, m, scale);
-        }
-
-        public static Vector4[] Parse(string s, Vector3 position, Matrix rotation, float scale)
-        {
-            var vertices = new List<Vector4>();
-            var color = new[]
-            {
-                new Color4(1, 0, 0, 1),
-                new Color4(.8f, 0, 0, 1)
-            };
-
-            var file = new MpqFile(MpqArchive.Open(s));
-            var header = file.ReadStruct<M2Header>();
-
-            if(header.magic != "MD20")
-                throw new NotSupportedException();
-
-            if(header.version != 264)
-                throw new NotSupportedException();
-
-            if (header.numBoundingVertices == 0)
-                return vertices.ToArray();
-
-            var indices = new short[header.numBoundingTriangles];
-            file.Seek(header.offsetBoundingTriangles, SeekOrigin.Begin);
-
-            for (int i = 0; i < indices.Length; i++)
-            {
-                indices[i] = file.ReadInt16();
-            }
-
-            var vertices2 = new Vector4[header.numBoundingVertices];
-            file.Seek(header.offsetBoundingVertices, SeekOrigin.Begin);
-            float[] tmp = new float[3];
-
-            var m = Matrix.Identity;
-            m *= rotation;
-            m *= Matrix.Scaling(scale);
-            m *= Matrix.Translation(position);
-
-            Vector4 pos = new Vector4(position, 0);
-
-            for (int i = 0; i < vertices2.Length; i++)
-            {
-                tmp[0] = file.ReadSingle();
-                tmp[1] = file.ReadSingle();
-                tmp[2] = file.ReadSingle();
-
-                vertices2[i] = new Vector4(tmp[1], tmp[2], -tmp[0], 1);
-                vertices2[i] = Vector4.Transform(vertices2[i], m);
-            }
-
-            for (int i = 0; i < indices.Length; i += 3)
-            {
-                vertices.AddRange(new[]
-                {
-                    vertices2[indices[i + 2]], color[i / 3 % 2].ToVector4(),
-                    vertices2[indices[i + 1]], color[i / 3 % 2].ToVector4(),
-                    vertices2[indices[i]], color[i / 3 % 2].ToVector4(),
-                });
-            }
-
-            return vertices.ToArray();
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    struct M2Header
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        private char[] _magic;
-        public uint version;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0xD0)]
-        private byte[] pad;
-
-        public uint numBoundingTriangles;
-        public uint offsetBoundingTriangles;
-        public uint numBoundingVertices;
-        public uint offsetBoundingVertices;
-
-        public string magic
-        {
-            get { return new string(_magic, 0, 4); }
-        }
-    }
-
     internal class AdtFile
     {
         public MpqFile File;
         public AdtInfo _info;
-        public List<Model> adtmodels = new List<Model>();
+        public List<M2> adtmodels = new List<M2>();
         public List<Wmo> wmo_models = new List<Wmo>();
         public int waterverticescount;
         
@@ -331,10 +192,10 @@ namespace WoWRenderTest
             foreach (var doodad in _info.Doodads)
             {
                 var model = models[doodad];
-                var vertices = Model.Parse(files[model.mmidEntry], model.position, model.rotation, model.Scale);
+                var vertices = M2.Parse(files[model.mmidEntry], model.position, model.rotation, model.Scale);
                 if (vertices.Any() == false)
                     continue;
-                adtmodels.Add(new Model(device, vertices));
+                adtmodels.Add(new M2(device, vertices));
             }
 
             var wmos = new MODF(GetChunkPosition("MODF"), _info);
@@ -480,170 +341,6 @@ namespace WoWRenderTest
         }
     }
 
-    public class Wmo
-    {
-        private static Buffer _vertexBuffer;
-        private int count;
-        private int index;
-        private static long vertexOffset;
-
-        public Wmo(Device device, Vector4[] vertices)
-        {
-            var context = device.ImmediateContext;
-            if (_vertexBuffer == null)
-            {
-                _vertexBuffer = new Buffer(device, Utilities.SizeOf<Vector4>() * 10000000, ResourceUsage.Dynamic, BindFlags.VertexBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, Utilities.SizeOf<Vector4>());
-                context.InputAssembler.SetVertexBuffers(2, new SharpDX.Direct3D11.VertexBufferBinding(_vertexBuffer, Utilities.SizeOf<Vector4>(), 0));
-            }
-
-            DataStream stream;
-            context.MapSubresource(_vertexBuffer, MapMode.WriteNoOverwrite, MapFlags.None, out stream);
-
-            stream.Seek(vertexOffset, SeekOrigin.Begin);
-
-            count = vertices.Length;
-            index = (int)stream.Position / 16;
-
-            stream.WriteRange(vertices);
-
-            vertexOffset = stream.Position;
-
-            context.UnmapSubresource(_vertexBuffer, 0);
-        }
-
-        public void Render(Device device)
-        {
-            var context = device.ImmediateContext;
-
-            context.Draw(count, index);
-        }
-
-        public static Vector4[] Parse(string s, Vector3 position, Vector3 rotation)
-        {
-            List<Vector4> vertices = new List<Vector4>();
-
-            var kuk = new RootWmo(s);
-            foreach (string hej in kuk.GroupFiles)
-            {
-                vertices.AddRange(GroupWmo.Parse(hej, position, rotation));
-            }
-
-            return vertices.ToArray();
-        }
-
-        private class RootWmo
-        {
-            public string[] GroupFiles;
-
-            public RootWmo(string s)
-            {
-                var file = new MpqFile(MpqArchive.Open(s));
-                file.Seek(file.GetChunkPosition("MOHD"), SeekOrigin.Begin);
-                var header = file.ReadStruct<ChunkHeader>();
-                var mohd = file.ReadStruct<MOHD>();
-
-                var root = s.Split(new[] { '.' })[0];
-
-                GroupFiles = new string[mohd.nGroups];
-                for (int i = 0; i < mohd.nGroups; i++)
-                {
-                    GroupFiles[i] = string.Format("{0}_{1:000}.WMO", root, i);
-                }
-
-                /*foreach (var group in GroupFiles)
-                {
-                    GroupWmo.Parse(group);
-                }*/
-            }
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct MOHD
-        {
-            private int nMaterials;
-            public int nGroups;
-            private int nPortals;
-            private int nLights;
-            private int nModels;
-            private int nDoodads;
-            private int nSets;
-            private int ambient_color;
-            private int WMO_ID;
-            public Vector3 upperBounds;
-            public Vector3 lowerBounds;
-            private int unknown;
-        }
-
-        private class GroupWmo
-        {
-            /*public GroupWmo(string s)
-            {
-
-            }*/
-
-            public static Vector4[] Parse(string s, Vector3 position, Vector3 rotation)
-            {
-                List<Vector4> vertices = new List<Vector4>();
-                var color = new[]
-                {
-                    new Color4(1, 1, 0, 1),
-                    new Color4(.8f, .8f, 0, 1)
-                };
-                var file = new MpqFile(MpqArchive.Open(s));
-
-                var offset = file.GetChunkPosition("MOGP");
-                offset += 0x4C;
-                file.Seek(file.GetChunkPosition("MOVT", offset), SeekOrigin.Begin);
-                var header = file.ReadStruct<ChunkHeader>();
-
-                var num = header.Size / Vector3.SizeInBytes;
-                float[] tmp = new float[3];
-                Vector4[] vertices2 = new Vector4[num];
-
-                for (int i = 0; i < num; i++)
-                {
-                    tmp[0] = file.ReadSingle();
-                    tmp[1] = file.ReadSingle();
-                    tmp[2] = file.ReadSingle();
-
-                    vertices2[i] = new Vector4(tmp[1], tmp[2], -tmp[0], 1);
-                }
-
-                Matrix m = Matrix.Identity;
-                float d = (float)(Math.PI / 180);
-                m *= Matrix.RotationX(rotation.X * d);
-                m *= Matrix.RotationY(-rotation.Y * d);
-                m *= Matrix.RotationZ(rotation.Z * d);
-                m *= Matrix.Translation(position);
-
-                Vector4.Transform(vertices2, ref m, vertices2);
-
-                file.Seek(file.GetChunkPosition("MOVI", offset), SeekOrigin.Begin);
-                header = file.ReadStruct<ChunkHeader>();
-                num = header.Size / sizeof(short);
-
-                short[] indices = new short[num];
-
-                for (int i = 0; i < num; i++)
-                {
-                    indices[i] = file.ReadInt16();
-                }
-
-                for (int i = 0; i < num; i += 3)
-                {
-                    vertices.AddRange(new[]
-                    {
-                        vertices2[indices[i + 2]],
-                        vertices2[indices[i + 1]],
-                        vertices2[indices[i]]
-                    });
-                }
-
-                return vertices.ToArray();
-            }
-        }
-    }
-
     internal class MDDF : AdtChunk, IEnumerable<MDDFEntry>
     {
         private readonly MDDFEntry[] _entries;
@@ -725,38 +422,6 @@ namespace WoWRenderTest
         }
 
         #endregion
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    struct MDDFEntry
-    {
-        public int mmidEntry;
-        public int uniqueId;
-        private Vector3 _position;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        private float[] _rotation;
-        private short _scale;
-        public short flags;
-
-        public Vector3 position
-        {
-            get
-            {
-                float step = 1600 / 3f * 32;
-                var ret = new Vector3(_position[0] - step, _position[1], -(_position[2] - step));
-                return ret;
-            }
-        }
-
-        public  Vector3 rotation
-        {
-            get
-            {
-                return new Vector3(_rotation);
-            }
-        }
-
-        public float Scale { get { return _scale / 1024f; } }
     }
 
     internal class MCNK : AdtChunk
@@ -1141,6 +806,38 @@ namespace WoWRenderTest
                 Layers[i] = info.File.ReadStruct<MCLYLayer>();
             }
         }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct MDDFEntry
+    {
+        public int mmidEntry;
+        public int uniqueId;
+        private Vector3 _position;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+        private float[] _rotation;
+        private short _scale;
+        public short flags;
+
+        public Vector3 position
+        {
+            get
+            {
+                float step = 1600 / 3f * 32;
+                var ret = new Vector3(_position[0] - step, _position[1], -(_position[2] - step));
+                return ret;
+            }
+        }
+
+        public Vector3 rotation
+        {
+            get
+            {
+                return new Vector3(_rotation);
+            }
+        }
+
+        public float Scale { get { return _scale / 1024f; } }
     }
 
     [StructLayout(LayoutKind.Sequential)]
