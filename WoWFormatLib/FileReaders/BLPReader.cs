@@ -5,8 +5,9 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SereniaBLPLib;
+//using SereniaBLPLib;
 using System.IO;
+using WoWFormatLib.SereniaBLPLib;
 
 namespace WoWFormatLib.FileReaders
 {
@@ -27,7 +28,7 @@ namespace WoWFormatLib.FileReaders
             {
                 using (var blp = new BlpFile(File.Open(filename, FileMode.Open)))
                 {
-                    bmp = blp.getBitmap(0);
+                    bmp = blp.GetBitmap(0);
                 }
             }
             else

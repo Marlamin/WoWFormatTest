@@ -33,9 +33,6 @@
     <Reference Include="CSDBCReader">
       <HintPath>..\CSDBCReader.dll</HintPath>
     </Reference>
-    <Reference Include="SereniaBLPLib">
-      <HintPath>..\SereniaBLPLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -53,6 +50,8 @@
     <Compile Include="FileReaders\WDTReader.cs" />
     <Compile Include="FileReaders\WMOReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SereniaBLPLib\BlpFile.cs" />
+    <Compile Include="SereniaBLPLib\DXTDecompression.cs" />
     <Compile Include="Utils\BlizzHeader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
