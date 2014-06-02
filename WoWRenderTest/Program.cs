@@ -93,25 +93,25 @@ namespace WoWRenderTest
 
             var shaders = new[]
             {
-                new Shader(device, "Color.fx", new[]
+                new Shader(device, "Shaders/Color.fx", new[]
                 {
                     new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
                 }),
-                new Shader(device, "Texture.fx", new[]
+                new Shader(device, "Shaders/Texture.fx", new[]
                 {
                     new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
                     new InputElement("TEXCOORD", 0, Format.R32G32_Float, 16, 0),
                     new InputElement("TEXCOORD", 1, Format.R32G32_Float, 24, 0)
                 }),
-                new Shader(device, "Color.fx", new[]
+                new Shader(device, "Shaders/Color.fx", new[]
                 {
                     new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 1)
                 }),
-                new Shader(device, "Color.fx", new[]
+                new Shader(device, "Shaders/Color.fx", new[]
                 {
                     new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 2)
                 }),
-                new Shader(device, "Color.fx", new[]
+                new Shader(device, "Shaders/Color.fx", new[]
                 {
                     new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 3)
                 })
@@ -275,7 +275,6 @@ namespace WoWRenderTest
             RenderTargetView renderView = null;
             Texture2D depthBuffer = null;
             DepthStencilView depthView = null;
-            /* SHARPDX UPDATES BROKE THIS */
             context.Rasterizer.SetViewport(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height));
 
             var resized = true;
@@ -323,7 +322,6 @@ namespace WoWRenderTest
                     });
 
                     depthView = new DepthStencilView(device, depthBuffer);
-                    /* SHARPDX UPDATES BROKE THIS */
                     context.Rasterizer.SetViewport(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height));
                     proj = Matrix.PerspectiveFovLH((float)Math.PI / 2.0f, form.ClientSize.Width / (float)form.ClientSize.Height, 0.1f, 1000.0f);
 

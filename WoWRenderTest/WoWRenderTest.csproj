@@ -45,12 +45,10 @@
     <Compile Include="WMO.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Alpha.png" />
-    <Content Include="Color.fx">
+    <Content Include="Shaders\Color.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Screenshot.png" />
-    <Content Include="Texture.fx">
+    <Content Include="Shaders\Texture.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
