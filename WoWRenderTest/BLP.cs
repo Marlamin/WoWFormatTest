@@ -1,40 +1,16 @@
-﻿using SharpDX.Direct3D11;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
-using System;
+using System.Text;
+using System.IO;
+using System.Threading.Tasks;
 using SharpDX.DXGI;
 using Resource = SharpDX.Direct3D11.Resource;
+using SharpDX.Direct3D11;
 
 namespace WoWRenderTest
 {
-    class MTEX : AdtChunk
-    {
-        private List<ShaderResourceView> _textures = new List<ShaderResourceView>();
-
-        public MTEX(long offset, AdtInfo info) : base(offset, info)
-        {
-            _info.File.Seek(offset, SeekOrigin.Begin);
-            var header = _info.File.ReadStruct<ChunkHeader>();
-
-            string[] textures = _info.File.ReadString(header.Size - 1).Split(new[ ] { '\0' });
-
-            foreach (var texture in textures)
-            {
-                var file = new MpqFile(MpqArchive.Open(texture));
-                var blp = new BLP(file);
-                _textures.Add(new ShaderResourceView(info.Device, Resource.FromMemory<Texture2D>(info.Device, blp.ToDDS())));
-            }
-        }
-
-        public ShaderResourceView[] Textures
-        {
-            get { return _textures.ToArray(); }
-        }
-    }
-
-
-
     [StructLayout(LayoutKind.Sequential)]
     struct BLP2Header
     {
