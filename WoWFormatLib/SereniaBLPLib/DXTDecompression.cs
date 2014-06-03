@@ -25,7 +25,7 @@ using System;
 
 namespace WoWFormatLib.SereniaBLPLib
 {
-    public static class DXTDecompression
+    public class DXTDecompression
     {
         public enum DXTFlags
         {
@@ -35,7 +35,7 @@ namespace WoWFormatLib.SereniaBLPLib
             // Additional Enums not implemented :o
         }
 
-        private static void Decompress(ref byte[] rgba, byte[] block, int flags)
+        private void Decompress(ref byte[] rgba, byte[] block, int flags)
         {
             // get the block locations
             byte[] colourBlock = new byte[8];
@@ -56,7 +56,7 @@ namespace WoWFormatLib.SereniaBLPLib
 
         }
 
-        private static void DecompressAlphaDxt3(ref byte[] rgba, byte[] block)
+        private void DecompressAlphaDxt3(ref byte[] rgba, byte[] block)
         {
             byte[] bytes = block;
 
@@ -75,7 +75,7 @@ namespace WoWFormatLib.SereniaBLPLib
             }
         }
 
-        private static void DecompressAlphaDxt5(ref byte[] rgba, byte[] block)
+        private void DecompressAlphaDxt5(ref byte[] rgba, byte[] block)
         {
             // Get the two alpha values
             byte[] bytes = block;
@@ -134,7 +134,7 @@ namespace WoWFormatLib.SereniaBLPLib
             }
         }
 
-        private static void DecompressColor(ref byte[] rgba, byte[] block, bool isDxt1)
+        private void DecompressColor(ref byte[] rgba, byte[] block, bool isDxt1)
         {
             byte[] bytes = block;
 
@@ -181,7 +181,7 @@ namespace WoWFormatLib.SereniaBLPLib
             DoRGBAstuff(rgba, codes, indices);
         }
 
-        private static void DoRGBAstuff(byte[] rgba, byte[] codes, byte[] indices)
+        private void DoRGBAstuff(byte[] rgba, byte[] codes, byte[] indices)
         {
             byte offset = (byte)(4 * indices[0]);
             rgba[0] = codes[offset++];
@@ -265,7 +265,7 @@ namespace WoWFormatLib.SereniaBLPLib
             rgba[63] = codes[offset];
         }
 
-        private static int Unpack565(byte[] packed, int packed_offset, ref byte[] colour, int colour_offset)
+        private int Unpack565(byte[] packed, int packed_offset, ref byte[] colour, int colour_offset)
         {
             // Build packed value
             int value = (int)packed[0 + packed_offset] | ((int)packed[1 + packed_offset] << 8);
@@ -284,7 +284,7 @@ namespace WoWFormatLib.SereniaBLPLib
             return value;
         }
 
-        public static byte[] DecompressImage(int width, int height, byte[] data, int flags)
+        public byte[] DecompressImage(int width, int height, byte[] data, int flags)
         {
             byte[] rgba = new byte[width * height * 4];
 

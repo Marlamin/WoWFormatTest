@@ -97,6 +97,7 @@ namespace WoWFormatLib.SereniaBLPLib
         ARGBColor8[] paletteBGRA = new ARGBColor8[256]; // The color-palette for non-compressed pictures
 
         Stream str; // Reference of the stream
+        private DXTDecompression fDXTDecompression;
 
         /// <summary>
         /// Extracts the palettized Image-Data from the given Mipmap and returns a byte-Array in the 32Bit RGBA-Format
@@ -174,6 +175,8 @@ namespace WoWFormatLib.SereniaBLPLib
         public BlpFile(Stream stream)
         {
             this.str = stream;
+            fDXTDecompression = new DXTDecompression();
+
             byte[] buffer = new byte[4];
             // Well, have to fix this... looks weird o.O
             this.str.Read(buffer, 0, 4);
@@ -246,7 +249,7 @@ namespace WoWFormatLib.SereniaBLPLib
                     break;
                 case 2:
                     int flag = (alphaDepth > 1) ? ((alphaEncoding == 7) ? (int)DXTDecompression.DXTFlags.DXT5 : (int)DXTDecompression.DXTFlags.DXT3) : (int)DXTDecompression.DXTFlags.DXT1;
-                    pic = DXTDecompression.DecompressImage(w, h, data, flag);
+                    pic = fDXTDecompression.DecompressImage(w, h, data, flag);
                     break;
                 case 3:
                     pic = data;
