@@ -5,12 +5,13 @@ Built from the ground up, but with lots of copy pasta from older projects.
 
 ## Requirements
 - [CSDBCReader](http://marlamin.com/u/CSDBCReader.dll)
-- [SereniaBLPLib](http://marlamin.com/u/SereniaBLPLib.dll)
+- [SharpDX 2.6.0](http://sharpdx.org/download/)
 
 ## Thanks
 - TOM_RUS
 - flippy84
 - JustMak
+- Xalcon
 - BoogieMan 
 - WoWDev wiki authors
 - ..and all the people the above people base their work on
