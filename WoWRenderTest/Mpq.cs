@@ -18,7 +18,7 @@ namespace WoWRenderTest
         {
             var basedir = ConfigurationManager.AppSettings["basedir"];
             var filename = Path.Combine(basedir, file);
-            if (File.Exists(Path.Combine(basedir, file)))
+            if (File.Exists(filename))
             {
                 return File.Open(filename, FileMode.Open);
             }else{
