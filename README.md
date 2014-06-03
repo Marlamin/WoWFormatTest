@@ -5,6 +5,7 @@ Built from the ground up, but with lots of copy pasta from older projects.
 
 ## Requirements
 - [CSDBCReader](http://marlamin.com/u/CSDBCReader.dll)
+- [SharpDX 2.6.0](http://sharpdx.org/download/)
 
 ## Thanks
 - TOM_RUS
