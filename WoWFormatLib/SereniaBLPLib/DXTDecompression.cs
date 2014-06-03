@@ -41,9 +41,9 @@ namespace WoWFormatLib.SereniaBLPLib
             byte[] colourBlock = new byte[8];
             byte[] alphaBlock = block;
             if ((flags & ((int)DXTFlags.DXT3 | (int)DXTFlags.DXT5)) != 0)
-                Array.Copy(block, 8, colourBlock, 0, 8);
+                Buffer.BlockCopy(block, 8, colourBlock, 0, 8);
             else
-                Array.Copy(block, 0, colourBlock, 0, 8);
+                Buffer.BlockCopy(block, 0, colourBlock, 0, 8);                
 
             // decompress color
             DecompressColor(ref rgba, colourBlock, ((flags & (int)DXTFlags.DXT1) != 0));
@@ -178,14 +178,91 @@ namespace WoWFormatLib.SereniaBLPLib
             }
 
             // store out the colours
-            for (int i = 0; i < 16; i++)
-            {
-                byte offset = (byte)(4 * indices[i]);
-                for (int j = 0; j < 4; j++)
-                {
-                    rgba[4 * i + j] = codes[offset + j];
-                }
-            }
+            DoRGBAstuff(rgba, codes, indices);
+        }
+
+        private static void DoRGBAstuff(byte[] rgba, byte[] codes, byte[] indices)
+        {
+            byte offset = (byte)(4 * indices[0]);
+            rgba[0] = codes[offset++];
+            rgba[1] = codes[offset++];
+            rgba[2] = codes[offset++];
+            rgba[3] = codes[offset];
+            offset = (byte)(4 * indices[1]);
+            rgba[4] = codes[offset++];
+            rgba[5] = codes[offset++];
+            rgba[6] = codes[offset++];
+            rgba[7] = codes[offset];
+            offset = (byte)(4 * indices[2]);
+            rgba[8] = codes[offset++];
+            rgba[9] = codes[offset++];
+            rgba[10] = codes[offset++];
+            rgba[11] = codes[offset];
+            offset = (byte)(4 * indices[3]);
+            rgba[12] = codes[offset++];
+            rgba[12] = codes[offset++];
+            rgba[14] = codes[offset++];
+            rgba[15] = codes[offset];
+            offset = (byte)(4 * indices[4]);
+            rgba[16] = codes[offset++];
+            rgba[17] = codes[offset++];
+            rgba[18] = codes[offset++];
+            rgba[19] = codes[offset];
+            offset = (byte)(4 * indices[5]);
+            rgba[20] = codes[offset++];
+            rgba[21] = codes[offset++];
+            rgba[22] = codes[offset++];
+            rgba[23] = codes[offset];
+            offset = (byte)(4 * indices[6]);
+            rgba[24] = codes[offset++];
+            rgba[25] = codes[offset++];
+            rgba[26] = codes[offset++];
+            rgba[27] = codes[offset];
+            offset = (byte)(4 * indices[7]);
+            rgba[28] = codes[offset++];
+            rgba[29] = codes[offset++];
+            rgba[30] = codes[offset++];
+            rgba[31] = codes[offset];
+            offset = (byte)(4 * indices[8]);
+            rgba[32] = codes[offset++];
+            rgba[33] = codes[offset++];
+            rgba[34] = codes[offset++];
+            rgba[35] = codes[offset];
+            offset = (byte)(4 * indices[9]);
+            rgba[36] = codes[offset++];
+            rgba[37] = codes[offset++];
+            rgba[38] = codes[offset++];
+            rgba[39] = codes[offset];
+            offset = (byte)(4 * indices[10]);
+            rgba[40] = codes[offset++];
+            rgba[41] = codes[offset++];
+            rgba[42] = codes[offset++];
+            rgba[43] = codes[offset];
+            offset = (byte)(4 * indices[11]);
+            rgba[44] = codes[offset++];
+            rgba[45] = codes[offset++];
+            rgba[46] = codes[offset++];
+            rgba[47] = codes[offset];
+            offset = (byte)(4 * indices[12]);
+            rgba[48] = codes[offset++];
+            rgba[49] = codes[offset++];
+            rgba[50] = codes[offset++];
+            rgba[51] = codes[offset];
+            offset = (byte)(4 * indices[13]);
+            rgba[52] = codes[offset++];
+            rgba[53] = codes[offset++];
+            rgba[54] = codes[offset++];
+            rgba[55] = codes[offset];
+            offset = (byte)(4 * indices[14]);
+            rgba[56] = codes[offset++];
+            rgba[57] = codes[offset++];
+            rgba[58] = codes[offset++];
+            rgba[59] = codes[offset];
+            offset = (byte)(4 * indices[15]);
+            rgba[60] = codes[offset++];
+            rgba[61] = codes[offset++];
+            rgba[62] = codes[offset++];
+            rgba[63] = codes[offset];
         }
 
         private static int Unpack565(byte[] packed, int packed_offset, ref byte[] colour, int colour_offset)
@@ -226,7 +303,7 @@ namespace WoWFormatLib.SereniaBLPLib
                     int targetRGBA_pos = 0;
                     byte[] sourceBlockBuffer = new byte[bytesPerBlock]; // größe korrekt?
                     if (sourceBlock.Length == sourceBlock_pos) continue;
-                    Array.Copy(sourceBlock, sourceBlock_pos, sourceBlockBuffer, 0, bytesPerBlock);
+                    Buffer.BlockCopy(sourceBlock, sourceBlock_pos, sourceBlockBuffer, 0, bytesPerBlock);
                     //sourceBlock.CopyTo(sourceBlockBuffer, sourceBlock_pos);
                     Decompress(ref targetRGBA, sourceBlockBuffer, flags);
 
@@ -244,7 +321,7 @@ namespace WoWFormatLib.SereniaBLPLib
                                 int targetPixel = 4 * (width * sy + sx);
 
                                 //targetRGBA.CopyTo(sourcePixel, targetRGBA_pos);
-                                Array.Copy(targetRGBA, targetRGBA_pos, sourcePixel, 0, 4);
+                                Buffer.BlockCopy(targetRGBA, targetRGBA_pos, sourcePixel, 0, 4);
                                 targetRGBA_pos += 4;
 
                                 for (int i = 0; i < 4; i++)
