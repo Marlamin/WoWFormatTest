@@ -13,6 +13,8 @@ namespace WoWFormatLib.FileReaders
     {
         private List<String> blpFiles;
         private List<String> m2Files;
+        private List<String> wmoGroups;
+
         private string basedir;
 
         public WMOReader(string basedir)
@@ -24,6 +26,7 @@ namespace WoWFormatLib.FileReaders
         {
             m2Files = new List<string>();
             blpFiles = new List<string>();
+            wmoGroups = new List<string>();
 
             using (FileStream wmoStream = File.Open(basedir + filename, FileMode.Open))
             {
@@ -53,21 +56,27 @@ namespace WoWFormatLib.FileReaders
                         }
                         continue;
                     case "MOTX":
-                    case "MODN":
                         ReadMOTXChunk(chunk, bin);
                         continue;
-                    case "MOMT":
+                    case "MOVV":
+                        ReadMOVVChunk(chunk, bin);
+                        continue;
+                    case "MOHD":
+                        ReadMOHDChunk(chunk, bin);
+                        continue;
                     case "MOGN":
+                        ReadMOGNChunk(chunk, bin);
+                        continue;
+                    case "MODN":
+                    case "MOMT":
                     case "MOGI":
                     case "MOSB":
                     case "MOPV":
                     case "MOPT":
                     case "MOPR":
-                    case "MOVV":
                     case "MOVB":
                     case "MOLT":
                     case "MODS":
-                    case "MOHD":
                     case "MODD":
                     case "MFOG":
                     case "MCVP":
@@ -76,6 +85,39 @@ namespace WoWFormatLib.FileReaders
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
                 }
             }
+        }
+
+        public void ReadMOGNChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of group names for the groups in this map object.
+            var wmoGroupsChunk = bin.ReadBytes((int)chunk.Size);
+
+            var str = new StringBuilder();
+
+            for (var i = 0; i < wmoGroupsChunk.Length; i++)
+            {
+                if (wmoGroupsChunk[i] == '\0')
+                {
+                    if (str.Length > 1)
+                    {
+                        wmoGroups.Add(str.ToString());
+                        //Console.WriteLine("         " + str.ToString());
+                    }
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)wmoGroupsChunk[i]);
+                }
+            }
+        }
+
+        public void ReadMOHDChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //Header for the map object. 64 bytes.
+            var MOHDChunk = bin.ReadBytes((int)chunk.Size);
+            
+            //Console.WriteLine(chunk.Size.ToString());
         }
 
         public void ReadMOTXChunk(BlizzHeader chunk, BinaryReader bin)
@@ -129,6 +171,11 @@ namespace WoWFormatLib.FileReaders
                     str.Append((char)m2FilesChunk[i]);
                 }
             }
+        }
+
+        public void ReadMOVVChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+
         }
     }
 }
