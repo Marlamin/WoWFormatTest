@@ -47,6 +47,7 @@
     <Compile Include="FileReaders\ADTReader.cs" />
     <Compile Include="FileReaders\BLPReader.cs" />
     <Compile Include="FileReaders\M2Reader.cs" />
+    <Compile Include="FileReaders\PM4Reader.cs" />
     <Compile Include="FileReaders\WDTReader.cs" />
     <Compile Include="FileReaders\WMOReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
