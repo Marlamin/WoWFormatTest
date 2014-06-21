@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatTest", "WoWFormatTest\WoWFormatTest.csproj", "{3ED7F6F2-5A92-496A-9D87-60F56638C2A7}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatLib", "WoWFormatLib\WoWFormatLib.csproj", "{5DB0FB8F-0EAA-490A-AA7D-28AE010186A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWRenderTest", "WoWRenderTest\WoWRenderTest.csproj", "{8E2FB3A5-F8D9-467D-ABA2-3A10E8BF9974}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PM4InfoDump", "PM4InfoDump\PM4InfoDump.csproj", "{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{8E2FB3A5-F8D9-467D-ABA2-3A10E8BF9974}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E2FB3A5-F8D9-467D-ABA2-3A10E8BF9974}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E2FB3A5-F8D9-467D-ABA2-3A10E8BF9974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
