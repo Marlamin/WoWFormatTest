@@ -35,11 +35,22 @@ namespace WoWFormatLib
             {
                 Console.WriteLine("Loading " + map + "...");
                 var wdtreader = new WDTReader(basedir);
-                wdtreader.LoadWDT(map);
+                try
+                {
+                    wdtreader.LoadWDT(map);
+                }
+                catch (FileNotFoundException e)
+                {
+                    using (StreamWriter sw = File.AppendText("C:\\Users\\Martin\\Desktop\\missingfiles.txt"))
+                    {
+                        sw.WriteLine(e.Message);
+                    }
+                }
+               
             }
             else
             {
-                Console.WriteLine("Map \"" + map + "\" DOES NOT EXIST!");
+                Console.WriteLine("Map \"" + map + "\" does not exist.");
             }
         }
 

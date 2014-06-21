@@ -26,9 +26,14 @@ namespace WoWFormatLib.FileReaders
             wmoFiles = new List<string>();
             blpFiles = new List<string>();
 
-            Console.WriteLine("Loading {0}_{1} ADT for map {2}", y, x, mapname);
+            var adtname = "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x;
+            var filename = Path.Combine(basedir, adtname); // x and y are flipped because blizzard
 
-            var filename = Path.Combine(basedir, "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x); // x and y are flipped because blizzard
+            if (!File.Exists(filename + ".adt")) { throw new FileNotFoundException(adtname + ".adt"); }
+            if (!File.Exists(filename + "_obj0.adt")) { throw new FileNotFoundException(adtname + "_obj0.adt"); }
+            if (!File.Exists(filename + "_obj1.adt")) { throw new FileNotFoundException(adtname + "_obj1.adt"); }
+            if (!File.Exists(filename + "_tex0.adt")) { throw new FileNotFoundException(adtname + "_tex0.adt"); }
+            if (!File.Exists(filename + "_tex1.adt")) { throw new FileNotFoundException(adtname + "_tex1.adt"); }
 
             var adt = File.Open(filename + ".adt", FileMode.Open);
 
@@ -54,6 +59,8 @@ namespace WoWFormatLib.FileReaders
                         ReadMCNKChunk(chunk, bin);
                         continue;
                     case "MHDR":
+                        ReadMHDRChunk(chunk, bin);
+                        continue;
                     case "MH2O":
                     case "MFBO":
                     //model.blob stuff
@@ -70,26 +77,36 @@ namespace WoWFormatLib.FileReaders
 
             using (var adtobj0 = File.Open(filename + "_obj0.adt", FileMode.Open))
             {
-                ReadObjHeader(mapname, x, y, filename, adtobj0, "OBJ0", ref chunk);
-            }
-
-            using (FileStream adtobj1 = File.Open(filename + "_obj1.adt", FileMode.Open))
-            {
-                ReadObjHeader(mapname, x, y, filename, adtobj1, "OBJ1", ref chunk);
+                ReadObjFile(mapname, x, y, filename, adtobj0, "OBJ0", ref chunk);
             }
 
             using (FileStream adttex0 = File.Open(filename + "_tex0.adt", FileMode.Open))
             {
-                ReadTexHeader(mapname, x, y, filename, adttex0, "TEX0", ref chunk);
-            }
-
-            using (FileStream adttex1 = File.Open(filename + "_tex1.adt", FileMode.Open))
-            {
-                ReadTexHeader(mapname, x, y, filename, adttex1, "TEX1", ref chunk);
+                ReadTexFile(mapname, x, y, filename, adttex0, "TEX0", ref chunk);
             }
         }
 
-        private void ReadObjHeader(string mapname, int x, int y, string filename, FileStream adtObjStream, string objName, ref BlizzHeader chunk)
+        private void ReadMHDRChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            var pad = bin.ReadUInt32();
+            var offsInfo = bin.ReadUInt32();
+            var offsTex = bin.ReadUInt32();
+            var offsModels = bin.ReadUInt32();
+            var offsModelsIds = bin.ReadUInt32();
+            var offsMapObejcts = bin.ReadUInt32();
+            var offsMapObejctsIds = bin.ReadUInt32();
+            var offsDoodsDef = bin.ReadUInt32();
+            var offsObjectsDef = bin.ReadUInt32();
+            var pad1 = bin.ReadUInt32();
+            var pad2 = bin.ReadUInt32();
+            var pad3 = bin.ReadUInt32();
+            var pad4 = bin.ReadUInt32();
+            var pad5 = bin.ReadUInt32();
+            var pad6 = bin.ReadUInt32();
+            var pad7 = bin.ReadUInt32();
+        }
+
+        private void ReadObjFile(string mapname, int x, int y, string filename, FileStream adtObjStream, string objName, ref BlizzHeader chunk)
         {
             var bin = new BinaryReader(adtObjStream);
             long position = 0;
@@ -116,7 +133,7 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadTexHeader(string mapname, int x, int y, string filename, FileStream adtTexStream, string texName, ref BlizzHeader chunk)
+        private void ReadTexFile(string mapname, int x, int y, string filename, FileStream adtTexStream, string texName, ref BlizzHeader chunk)
         {
             var bin = new BinaryReader(adtTexStream);
             long position = 0;
@@ -182,7 +199,6 @@ namespace WoWFormatLib.FileReaders
                         var m2reader = new M2Reader(basedir);
                         m2reader.LoadM2(str.ToString());
                         m2Files.Add(str.ToString());
-                        //Console.WriteLine("     " + str.ToString());
                     }
                     str = new StringBuilder();
                 }
@@ -207,7 +223,11 @@ namespace WoWFormatLib.FileReaders
                     if (str.Length > 1)
                     {
                         blpFiles.Add(str.ToString());
-                        //Console.WriteLine("     " + str.ToString());
+                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
+                        {
+                            Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
+                            throw new FileNotFoundException(str.ToString());
+                        }
                     }
                     str = new StringBuilder();
                 }
@@ -220,8 +240,6 @@ namespace WoWFormatLib.FileReaders
         public void ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //this will be called 256 times per adt, needs to be v optimized
-            var flags = bin.ReadUInt32();
-            var IndexX = bin.ReadUInt32();
         }
     }
 }

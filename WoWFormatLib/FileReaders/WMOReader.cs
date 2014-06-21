@@ -27,11 +27,18 @@ namespace WoWFormatLib.FileReaders
             m2Files = new List<string>();
             blpFiles = new List<string>();
             wmoGroups = new List<string>();
-
-            using (FileStream wmoStream = File.Open(basedir + filename, FileMode.Open))
+            if (File.Exists(Path.Combine(basedir + filename)))
             {
-                ReadWMO(filename, wmoStream);
+                using (FileStream wmoStream = File.Open(basedir + filename, FileMode.Open))
+                {
+                    ReadWMO(filename, wmoStream);
+                }
             }
+            else
+            {
+                throw new FileNotFoundException(filename);
+            }
+
         }
 
         private void ReadWMO(string filename, FileStream wmo)
@@ -50,9 +57,10 @@ namespace WoWFormatLib.FileReaders
                 switch (chunk.ToString())
                 {
                     case "MVER":
-                        if (bin.ReadUInt32() != 17)
+                        UInt32 wmover = bin.ReadUInt32();
+                        if (wmover != 17)
                         {
-                            throw new Exception("Unsupported WMO version!");
+                            throw new Exception("Unsupported WMO version! (" + wmover + ")");
                         }
                         continue;
                     case "MOTX":
@@ -62,10 +70,13 @@ namespace WoWFormatLib.FileReaders
                         ReadMOVVChunk(chunk, bin);
                         continue;
                     case "MOHD":
-                        ReadMOHDChunk(chunk, bin);
+                        ReadMOHDChunk(chunk, bin, filename);
                         continue;
                     case "MOGN":
                         ReadMOGNChunk(chunk, bin);
+                        continue;
+                    case "MOGP":
+                        ReadMOGPChunk(chunk, bin);
                         continue;
                     case "MODN":
                     case "MOMT":
@@ -87,12 +98,55 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
+        public void ReadMOGPChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            bin.ReadBytes(68); //read rest of header
+            MemoryStream stream = new MemoryStream(bin.ReadBytes((int)chunk.Size));
+            var subbin = new BinaryReader(stream);
+            BlizzHeader subchunk;
+            long position = 0;
+            while (position < stream.Length)
+            {
+                stream.Position = position;
+                subchunk = new BlizzHeader(subbin.ReadChars(4), subbin.ReadUInt32());
+                subchunk.Flip();
+                position = stream.Position + subchunk.Size;
+
+                switch (subchunk.ToString())
+                {
+                    case "MVER":
+                        UInt32 wmover = subbin.ReadUInt32();
+                        if (wmover != 17)
+                        {
+                            throw new Exception("Unsupported WMO version! (" + wmover + ")");
+                        }
+                        continue;
+                    case "MOPY": //Material info for triangles, two bytes per triangle. 
+                    case "MOVI": //Vertex indices for triangles
+                    case "MOVT": //Vertices chunk
+                    case "MONR": //Normals
+                    case "MOTV": //Texture coordinates
+                    case "MOBA": //Render batches
+                    case "MOBS": //Unk
+                    case "MODR": //Doodad references
+                    case "MOBN": //Array of t_BSP_NODE
+                    case "MOBR": //Face indices
+                    case "MOCV": //Vertex colors
+                    case "MDAL": //Unk (new in WoD?)
+                        continue;
+                    default:
+                        throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subchunk.ToString(), position.ToString()));
+                }
+            }
+        }
+
         public void ReadMOGNChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of group names for the groups in this map object.
             var wmoGroupsChunk = bin.ReadBytes((int)chunk.Size);
 
             var str = new StringBuilder();
+            int group = 0;
 
             for (var i = 0; i < wmoGroupsChunk.Length; i++)
             {
@@ -101,7 +155,8 @@ namespace WoWFormatLib.FileReaders
                     if (str.Length > 1)
                     {
                         wmoGroups.Add(str.ToString());
-                        //Console.WriteLine("         " + str.ToString());
+                        //Console.WriteLine("         " + str.ToString() + " (group file " + group.ToString() + ")");
+                        group++;
                     }
                     str = new StringBuilder();
                 }
@@ -112,12 +167,28 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void ReadMOHDChunk(BlizzHeader chunk, BinaryReader bin)
+        public void ReadMOHDChunk(BlizzHeader chunk, BinaryReader bin, string filename)
         {
             //Header for the map object. 64 bytes.
-            var MOHDChunk = bin.ReadBytes((int)chunk.Size);
+           // var MOHDChunk = bin.ReadBytes((int)chunk.Size);
+            var nMaterials = bin.ReadUInt32();
+            var nGroups = bin.ReadUInt32();
+            var nPortals = bin.ReadUInt32();
+            var nLights = bin.ReadUInt32();
+            var nModels = bin.ReadUInt32();
+        
+            //Console.WriteLine("         " + nGroups.ToString() + " group(s)");
             
-            //Console.WriteLine(chunk.Size.ToString());
+            for (int i = 0; i < nGroups; i++)
+            {
+                var groupfilename = filename.Replace(".WMO", "_" + i.ToString().PadLeft(3, '0') + ".WMO");
+                groupfilename = filename.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
+                if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, groupfilename)))
+                {
+                    Console.WriteLine("Sub WMO file does not exist!!! {0}", groupfilename);
+                    throw new FileNotFoundException(filename);
+                }
+            }
         }
 
         public void ReadMOTXChunk(BlizzHeader chunk, BinaryReader bin)
@@ -133,7 +204,18 @@ namespace WoWFormatLib.FileReaders
                 {
                     if (str.Length > 1)
                     {
+                        str.Replace("..", ".");
                         blpFiles.Add(str.ToString());
+                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
+                        {
+                            Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
+                            throw new FileNotFoundException(str.ToString());
+                        }
+                        else
+                        {
+                           // Console.WriteLine(str.ToString() + " exists!");
+                            // Console.ReadLine();
+                        }
                         //Console.WriteLine("         " + str.ToString());
                     }
                     str = new StringBuilder();
@@ -159,7 +241,6 @@ namespace WoWFormatLib.FileReaders
                     if (str.Length > 1)
                     {
                         m2Files.Add(str.ToString());
-                        //Console.WriteLine("         " + str.ToString());
                         var m2reader = new M2Reader(basedir);
                         m2reader.LoadM2(str.ToString());
                         

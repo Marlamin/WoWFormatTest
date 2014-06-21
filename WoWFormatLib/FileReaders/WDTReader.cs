@@ -81,8 +81,8 @@ namespace WoWFormatLib.FileReaders
                 }
                 var wmofilename = str.ToString();
 
-                //var wmoreader = new WMOReader(basedir);
-                //wmoreader.LoadWMO(wmofilename);
+                var wmoreader = new WMOReader(basedir);
+                wmoreader.LoadWMO(wmofilename);
             }
         }
 
@@ -102,8 +102,8 @@ namespace WoWFormatLib.FileReaders
                     if (flags == 1)
                     {
                         //ADT exists
-                       // var adtreader = new ADTReader(basedir);
-                      //  adtreader.LoadADT(map, x, y);
+                        var adtreader = new ADTReader(basedir);
+                        adtreader.LoadADT(map, x, y);
                         int[] xy = new int[] {y, x};
                         tiles.Add(xy);
                     }
