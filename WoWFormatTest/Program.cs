@@ -53,35 +53,42 @@ namespace WoWFormatLib
                         reader.LoadWDT(splitfilename[0]);
                          */
                     }
-                    else if (line.EndsWith(".adt", StringComparison.OrdinalIgnoreCase))
+                    else if (line.EndsWith(".tex", StringComparison.OrdinalIgnoreCase))
                     {
-                        //We don't need to load ADTs manually, they all get picked up via wdt
+                        Console.WriteLine("Loading TEX: " + line);
+                        TEXReader reader = new TEXReader(basedir);
+                        reader.LoadTEX(line);
+                    }
+                    else if (line.EndsWith(".wdl", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine("Loading WDL: " + line);
+                        WDLReader reader = new WDLReader(basedir);
+                        reader.LoadWDL(line);
                     }
                     else if (
-                        line.EndsWith(".blp", StringComparison.OrdinalIgnoreCase) || 
-                        line.EndsWith(".wdl", StringComparison.OrdinalIgnoreCase) || 
-                        line.EndsWith(".tex", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".skin", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".anim", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".lua", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".html", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".bls", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".sig", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".avi", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".sbt", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".zmp", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".toc", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".dbc", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".lst", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".phys", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".wtf", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".db2", StringComparison.OrdinalIgnoreCase) ||
-                        line.EndsWith(".xsd", StringComparison.OrdinalIgnoreCase)
+                        line.EndsWith(".blp", StringComparison.OrdinalIgnoreCase) || //Useless to read out for now
+                        line.EndsWith(".adt", StringComparison.OrdinalIgnoreCase) || //Terrain files, already get read in WDTreader
+                        line.EndsWith(".skin", StringComparison.OrdinalIgnoreCase) ||//Referenced in M2s, needs parser
+                        line.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase) || //Sounds, no reason to read out for now
+                        line.EndsWith(".anim", StringComparison.OrdinalIgnoreCase) ||//Referenced in M2s, needs parser
+                        line.EndsWith(".lua", StringComparison.OrdinalIgnoreCase) || //Interface file, useless
+                        line.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) || //Interface file, useless
+                        line.EndsWith(".html", StringComparison.OrdinalIgnoreCase) ||//Used in credits, useless
+                        line.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) || //component.wow-xxxx.txt where xxxx is locale, contains build no.
+                        line.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) || //Music, useless
+                        line.EndsWith(".bls", StringComparison.OrdinalIgnoreCase) || //Blizzard Shaders
+                        line.EndsWith(".sig", StringComparison.OrdinalIgnoreCase) || //Signature files
+                        line.EndsWith(".avi", StringComparison.OrdinalIgnoreCase) || //Cinematics
+                        line.EndsWith(".sbt", StringComparison.OrdinalIgnoreCase) || //Subtitles
+                        line.EndsWith(".zmp", StringComparison.OrdinalIgnoreCase) || //?
+                        line.EndsWith(".toc", StringComparison.OrdinalIgnoreCase) || //Table of Contents, addon manifest
+                        line.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase) || //Fonts
+                        line.EndsWith(".dbc", StringComparison.OrdinalIgnoreCase) || //Client database, but useless to read out all of them
+                        line.EndsWith(".lst", StringComparison.OrdinalIgnoreCase) || //.lst used in streaming
+                        line.EndsWith(".phys", StringComparison.OrdinalIgnoreCase) ||//Physics (used in belt items for example)
+                        line.EndsWith(".wtf", StringComparison.OrdinalIgnoreCase) || //Contain coordinates to worldport locations
+                        line.EndsWith(".db2", StringComparison.OrdinalIgnoreCase) || //Client database (v2), needs parser
+                        line.EndsWith(".xsd", StringComparison.OrdinalIgnoreCase)    //Inteface XML schema
                     )
                     {
                         //Not yet!

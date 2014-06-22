@@ -170,7 +170,6 @@ namespace WoWFormatLib.FileReaders
                     if (str.Length > 1)
                     {
                         wmoFiles.Add(str.ToString());
-                        //Console.WriteLine("     " + str.ToString());
                         var wmoreader = new WMOReader(basedir);
                         wmoreader.LoadWMO(str.ToString());
                     }

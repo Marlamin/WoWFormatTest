@@ -27,9 +27,9 @@ namespace WoWFormatLib.FileReaders
             m2Files = new List<string>();
             blpFiles = new List<string>();
             wmoGroups = new List<string>();
-            if (File.Exists(Path.Combine(basedir + filename)))
+            if (File.Exists(Path.Combine(basedir, filename)))
             {
-                using (FileStream wmoStream = File.Open(basedir + filename, FileMode.Open))
+                using (FileStream wmoStream = File.Open(Path.Combine(basedir, filename), FileMode.Open))
                 {
                     ReadWMO(filename, wmoStream);
                 }
