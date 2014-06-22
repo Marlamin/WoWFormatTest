@@ -131,8 +131,12 @@ namespace WoWFormatLib.FileReaders
                     case "MODR": //Doodad references
                     case "MOBN": //Array of t_BSP_NODE
                     case "MOBR": //Face indices
+                    case "MOLR": //Light references
                     case "MOCV": //Vertex colors
                     case "MDAL": //Unk (new in WoD?)
+                    case "MLIQ": //Liquids
+                    case "MOTA": //Unknown
+                    case "MOPL": //Unknown
                         continue;
                     default:
                         throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subchunk.ToString(), position.ToString()));
@@ -185,8 +189,8 @@ namespace WoWFormatLib.FileReaders
                 groupfilename = filename.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
                 if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, groupfilename)))
                 {
-                    Console.WriteLine("Sub WMO file does not exist!!! {0}", groupfilename);
-                    throw new FileNotFoundException(filename);
+                    Console.WriteLine("Sub WMO file does not exist!!! {0} Current file: {1}", groupfilename, filename);
+                    throw new FileNotFoundException(groupfilename);
                 }
             }
         }
