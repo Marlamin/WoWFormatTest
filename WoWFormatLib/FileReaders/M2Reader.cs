@@ -155,12 +155,15 @@ namespace WoWFormatLib.FileReaders
                     var preFilenamePosition = bin.BaseStream.Position; // probably a better way to do all this
                     bin.BaseStream.Position = ofsFilename;
                     var filename = new string(bin.ReadChars(int.Parse(lenFilename.ToString())));
-                    filename = filename.Replace("\0", ""); 
-                    blpFiles.Add(filename);
-                    if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, filename)))
+                    filename = filename.Replace("\0", "");
+                    if (!filename.Equals(""))
                     {
-                        Console.WriteLine("BLP file does not exist!!! {0}", filename);
-                        throw new FileNotFoundException(filename);
+                        blpFiles.Add(filename);
+                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, filename)))
+                        {
+                            Console.WriteLine("BLP file does not exist!!! {0}", filename);
+                            throw new FileNotFoundException(filename);
+                        }
                     }
                     bin.BaseStream.Position = preFilenamePosition;
                 }
