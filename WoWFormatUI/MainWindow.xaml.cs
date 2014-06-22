@@ -74,7 +74,7 @@ namespace WoWFormatUI
                     {
                         _SW.Start();
                         BackgroundWorker _Worker = o as BackgroundWorker;
-                        wdt.LoadWDT(_SelectedMapName);
+                        wdt.LoadWDT(System.IO.Path.Combine("World\\Maps\\", _SelectedMapName, _SelectedMapName + ".wdt"));
                         List<int[]> tiles = wdt.getTiles();
 
                         for (int i = 0; i < tiles.Count; i++)

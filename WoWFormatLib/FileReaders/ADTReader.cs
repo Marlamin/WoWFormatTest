@@ -20,22 +20,21 @@ namespace WoWFormatLib.FileReaders
             this.basedir = basedir;
         }
 
-        public void LoadADT(string mapname, int x, int y)
+        public void LoadADT(string filename)
         {
             m2Files = new List<string>();
             wmoFiles = new List<string>();
             blpFiles = new List<string>();
 
-            var adtname = "World\\Maps\\" + mapname + "\\" + mapname + "_" + y + "_" + x;
-            var filename = Path.Combine(basedir, adtname); // x and y are flipped because blizzard
+            filename = Path.ChangeExtension(filename, ".adt");
 
-            if (!File.Exists(filename + ".adt")) { throw new FileNotFoundException(adtname + ".adt"); }
-            if (!File.Exists(filename + "_obj0.adt")) { throw new FileNotFoundException(adtname + "_obj0.adt"); }
-            if (!File.Exists(filename + "_obj1.adt")) { throw new FileNotFoundException(adtname + "_obj1.adt"); }
-            if (!File.Exists(filename + "_tex0.adt")) { throw new FileNotFoundException(adtname + "_tex0.adt"); }
-            if (!File.Exists(filename + "_tex1.adt")) { throw new FileNotFoundException(adtname + "_tex1.adt"); }
+            if (!File.Exists(Path.Combine(basedir, filename))) { throw new FileNotFoundException(filename); }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { throw new FileNotFoundException(filename.Replace(".adt", "_obj0.adt")); }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { throw new FileNotFoundException(filename.Replace(".adt", "_obj1.adt")); }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { throw new FileNotFoundException(filename.Replace(".adt", "_tex0.adt")); }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { throw new FileNotFoundException(filename.Replace(".adt", "_tex1.adt")); }
 
-            var adt = File.Open(filename + ".adt", FileMode.Open);
+            var adt = File.Open(Path.Combine(basedir, filename), FileMode.Open);
 
             var bin = new BinaryReader(adt);
             BlizzHeader chunk = null;
@@ -75,14 +74,14 @@ namespace WoWFormatLib.FileReaders
 
             adt.Close();
 
-            using (var adtobj0 = File.Open(filename + "_obj0.adt", FileMode.Open))
+            using (var adtobj0 = File.Open(Path.Combine(basedir, filename).Replace(".adt", "_obj0.adt"), FileMode.Open))
             {
-                ReadObjFile(mapname, x, y, filename, adtobj0, "OBJ0", ref chunk);
+                ReadObjFile(filename, adtobj0, ref chunk);
             }
 
-            using (FileStream adttex0 = File.Open(filename + "_tex0.adt", FileMode.Open))
+            using (FileStream adttex0 = File.Open(Path.Combine(basedir, filename).Replace(".adt", "_tex0.adt"), FileMode.Open))
             {
-                ReadTexFile(mapname, x, y, filename, adttex0, "TEX0", ref chunk);
+                ReadTexFile(filename, adttex0, ref chunk);
             }
         }
 
@@ -106,12 +105,10 @@ namespace WoWFormatLib.FileReaders
             var pad7 = bin.ReadUInt32();
         }
 
-        private void ReadObjFile(string mapname, int x, int y, string filename, FileStream adtObjStream, string objName, ref BlizzHeader chunk)
+        private void ReadObjFile(string filename, FileStream adtObjStream, ref BlizzHeader chunk)
         {
             var bin = new BinaryReader(adtObjStream);
             long position = 0;
-
-            //Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, objName, mapname);
 
             while (position < adtObjStream.Length)
             {
@@ -133,11 +130,10 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadTexFile(string mapname, int x, int y, string filename, FileStream adtTexStream, string texName, ref BlizzHeader chunk)
+        private void ReadTexFile(string filename, FileStream adtTexStream, ref BlizzHeader chunk)
         {
             var bin = new BinaryReader(adtTexStream);
             long position = 0;
-            //Console.WriteLine("Loading {0}_{1} {2} ADT for map {3}", y, x, texName, mapname);
 
             while (position < adtTexStream.Length)
             {

@@ -19,15 +19,14 @@ namespace WoWFormatLib.FileReaders
         }
 
 
-        public void LoadWDT(string map)
+        public void LoadWDT(string filename)
         {
             tiles = new List<int[]>();
-            var filename = Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt");
-            if (File.Exists(filename))
+            if (File.Exists(Path.Combine(basedir, filename)))
             {
-                using (FileStream wdt = File.Open(filename, FileMode.Open))
+                using (FileStream wdt = File.Open(Path.Combine(basedir, filename), FileMode.Open))
                 {
-                    ReadWDT(map, filename, wdt);
+                    ReadWDT(filename, wdt);
                 }
             }
             else
@@ -37,8 +36,9 @@ namespace WoWFormatLib.FileReaders
 
         }
 
-        private void ReadWDT(string map, string filename, FileStream wdt)
+        private void ReadWDT(string filename, FileStream wdt)
         {
+            filename = Path.ChangeExtension(filename, "WDT");
             var bin = new BinaryReader(wdt);
             BlizzHeader chunk;
             long position = 0;
@@ -55,7 +55,7 @@ namespace WoWFormatLib.FileReaders
                 {
                     case "MVER": ReadMVERChunk(bin);
                         continue;
-                    case "MAIN": ReadMAINChunk(map, bin, chunk);
+                    case "MAIN": ReadMAINChunk(bin, chunk, filename);
                         continue;
                     case "MWMO": ReadMWMOChunk(bin);
                         continue;
@@ -86,7 +86,7 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadMAINChunk(string map, BinaryReader bin, BlizzHeader chunk)
+        private void ReadMAINChunk(BinaryReader bin, BlizzHeader chunk, String filename)
         {
             if (chunk.Size != 4096 * 8)
             {
@@ -103,7 +103,8 @@ namespace WoWFormatLib.FileReaders
                     {
                         //ADT exists
                         var adtreader = new ADTReader(basedir);
-                        adtreader.LoadADT(map, x, y);
+                        var adtfilename = filename.Replace(".WDT", "_" + y + "_" + x + ".adt"); //blizz flips these
+                        adtreader.LoadADT(adtfilename);
                         int[] xy = new int[] {y, x};
                         tiles.Add(xy);
                     }

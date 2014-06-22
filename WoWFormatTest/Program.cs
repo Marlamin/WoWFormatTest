@@ -32,36 +32,26 @@ namespace WoWFormatLib
                 {
                     if (line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
                     {
-                        //Console.WriteLine("Loading M2: " + line);
                         M2Reader reader = new M2Reader(basedir);
                         reader.LoadM2(line);
                     }
                     else if (line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase))
                     {
-                        //Console.WriteLine("Loading WMO: " + line);
                         WMOReader reader = new WMOReader(basedir);
                         reader.LoadWMO(line);
                     }
                     else if (line.EndsWith(".wdt", StringComparison.OrdinalIgnoreCase))
                     {
-                        //we do these with loadmaps
-                        /*
-                        Console.WriteLine("Loading WDT: " + line);
-                        var filename = line.Replace("World\\Maps\\", "");
-                        var splitfilename = filename.Split(new char[] { '\\' });
                         WDTReader reader = new WDTReader(basedir);
-                        reader.LoadWDT(splitfilename[0]);
-                         */
+                        reader.LoadWDT(line);
                     }
                     else if (line.EndsWith(".tex", StringComparison.OrdinalIgnoreCase))
                     {
-                        Console.WriteLine("Loading TEX: " + line);
                         TEXReader reader = new TEXReader(basedir);
                         reader.LoadTEX(line);
                     }
                     else if (line.EndsWith(".wdl", StringComparison.OrdinalIgnoreCase))
                     {
-                        Console.WriteLine("Loading WDL: " + line);
                         WDLReader reader = new WDLReader(basedir);
                         reader.LoadWDL(line);
                     }
@@ -88,6 +78,8 @@ namespace WoWFormatLib
                         line.EndsWith(".phys", StringComparison.OrdinalIgnoreCase) ||//Physics (used in belt items for example)
                         line.EndsWith(".wtf", StringComparison.OrdinalIgnoreCase) || //Contain coordinates to worldport locations
                         line.EndsWith(".db2", StringComparison.OrdinalIgnoreCase) || //Client database (v2), needs parser
+                        line.EndsWith(".wfx", StringComparison.OrdinalIgnoreCase) || //Shader effects
+                        line.EndsWith(".what", StringComparison.OrdinalIgnoreCase) ||//what (leftovers from new ADT version experimenting)
                         line.EndsWith(".xsd", StringComparison.OrdinalIgnoreCase)    //Inteface XML schema
                     )
                     {
