@@ -137,6 +137,7 @@ namespace WoWFormatLib.FileReaders
             var modelname = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
 
             readTextures(bin, nTextures, ofsTextures);
+            readSkins(nViews, filename);
 
             m2.Close();
         }
@@ -166,6 +167,19 @@ namespace WoWFormatLib.FileReaders
                         }
                     }
                     bin.BaseStream.Position = preFilenamePosition;
+                }
+            }
+        }
+
+        private void readSkins(UInt32 num, String filename)
+        {
+            for (int i = 0; i < num; i++)
+            {
+                var skinfilename = filename.Replace(".M2", i.ToString().PadLeft(2, '0') + ".skin");
+                if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, skinfilename)))
+                {
+                    Console.WriteLine(".skin file does not exist!!! {0}", skinfilename);
+                    throw new FileNotFoundException(skinfilename);
                 }
             }
         }
