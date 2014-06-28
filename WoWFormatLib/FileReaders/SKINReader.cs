@@ -34,52 +34,104 @@ namespace WoWFormatLib.FileReaders
             }
 
             var nIndices = bin.ReadUInt32();
-            //Console.WriteLine("Number of indices: " + nIndices);
             var ofsIndices = bin.ReadUInt32();
             var nTriangles = bin.ReadUInt32();
-            //Console.WriteLine("Number of triangles: " + nTriangles);
             var ofsTriangles = bin.ReadUInt32();
             var nProperties = bin.ReadUInt32();
-            //Console.WriteLine("Number of properties: " + nProperties);
             var ofsProperties = bin.ReadUInt32();
             var nSubmeshes = bin.ReadUInt32();
-            //Console.WriteLine("Number of submeshes: " + nSubmeshes);
             var ofsSubmeshes = bin.ReadUInt32();
             var nTextureUnits = bin.ReadUInt32();
             var ofsTextureUnits = bin.ReadUInt32();
             var bones = bin.ReadUInt32();
 
+            ReadIndices(nIndices, ofsIndices, bin);
+            ReadTriangles(nTriangles, ofsTriangles, bin);
+            ReadProperties(nProperties, ofsProperties, bin);
             ReadSubmeshes(nSubmeshes, ofsSubmeshes, bin);
+            ReadTextureUnits(nTextureUnits, ofsTextureUnits, bin);
 
             skin.Close();
         }
 
+        private void ReadIndices(uint nIndices, uint ofsIndices, BinaryReader bin)
+        {
+            bin.BaseStream.Position = ofsIndices;
+            for (int i = 0; i <= nIndices; i++)
+            {
+                var vertex = bin.ReadUInt16();
+                Console.WriteLine(vertex);
+            }
+        }
+        private void ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
+        {
+            bin.BaseStream.Position = ofsTriangles;
+            for (int i = 0; i <= (nTriangles / 3); i++)
+            {
+                ushort[] indices = new ushort[3];
+                indices[0] = bin.ReadUInt16();
+                indices[1] = bin.ReadUInt16();
+                indices[2] = bin.ReadUInt16();
+            }
+        }
+
+        private void ReadProperties(uint nProperties, uint ofsProperties, BinaryReader bin)
+        {
+            bin.BaseStream.Position = ofsProperties;
+            for (int i = 0; i <= nProperties; i++)
+            {
+                byte[] properties = new byte[4];
+                properties[0] = bin.ReadByte();
+                properties[1] = bin.ReadByte();
+                properties[2] = bin.ReadByte();
+                properties[3] = bin.ReadByte();
+            }
+        }
+
         private void ReadSubmeshes(uint nSubmeshes, uint ofsSubmeshes, BinaryReader bin)
         {
-           // Console.WriteLine("Reading " + nSubmeshes.ToString() + " submeshes at " + ofsSubmeshes.ToString() + " ");
             bin.BaseStream.Position = ofsSubmeshes;
             for (int i = 0; i <= nSubmeshes; i++)
             {
-                var submeshID = bin.ReadUInt16();
-                bin.ReadBytes(46);
-                //Console.WriteLine(submeshID);
-                /*
-                var unk1 = bin.ReadUInt16();
-                var ofsVertex = bin.ReadUInt16();
-                var nVertices = bin.ReadUInt16();
+                var submeshID = bin.ReadUInt16();  
+                var unk1 = bin.ReadUInt16();       
+                var ofsVertex = bin.ReadUInt16();  
+                var nVertices = bin.ReadUInt16();  
                 var ofsTriangle = bin.ReadUInt16();
-                var nTriangles = bin.ReadUInt16();
-                var nBones = bin.ReadUInt16();
-                var ofsBones = bin.ReadUInt16();
-                var unk2 = bin.ReadUInt16();
-                var rootBone = bin.ReadUInt16();
-                bin.ReadSingle();
-                bin.ReadSingle();
-                bin.ReadSingle();
-                bin.ReadSingle();
-                bin.ReadSingle();
-                bin.ReadSingle();
-                var radius = bin.ReadUInt16();*/
+                var nTriangles = bin.ReadUInt16(); 
+                var nBones = bin.ReadUInt16();     
+                var ofsBones = bin.ReadUInt16();   
+                var unk2 = bin.ReadUInt16();       
+                var rootBone = bin.ReadUInt16();   
+                var centerMass = new Single[3]; //actually a Vec3F
+                centerMass[0] = bin.ReadSingle();  
+                centerMass[1] = bin.ReadSingle();  
+                centerMass[2] = bin.ReadSingle();      
+                var centerBoundingBox = new Single[3]; //actually a Vec3F
+                centerBoundingBox[0] = bin.ReadSingle();
+                centerBoundingBox[0] = bin.ReadSingle();
+                centerBoundingBox[0] = bin.ReadSingle();
+                var radius = bin.ReadSingle();
+            }
+        }
+
+        private void ReadTextureUnits(uint nTextureUnits, uint ofsTextureUnits, BinaryReader bin)
+        {
+            bin.BaseStream.Position = ofsTextureUnits;
+            for (int i = 0; i <= nTextureUnits; i++)
+            {
+                var flags = bin.ReadUInt16();
+                var shading = bin.ReadUInt16();
+                var submeshIndex = bin.ReadUInt16();
+                var submeshIndex2 = bin.ReadUInt16();
+                var colorIndex = bin.ReadInt16();
+                var renderFlags = bin.ReadUInt16();
+                var texUnitNumber = bin.ReadUInt16();
+                var mode = bin.ReadUInt16();
+                var texture = bin.ReadUInt16();
+                var texUnitNumber2 = bin.ReadUInt16();
+                var transparency = bin.ReadUInt16();
+                var textureAnim = bin.ReadUInt16();
             }
         }
     }
