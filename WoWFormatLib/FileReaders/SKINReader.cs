@@ -60,7 +60,6 @@ namespace WoWFormatLib.FileReaders
             for (int i = 0; i <= nIndices; i++)
             {
                 var vertex = bin.ReadUInt16();
-                Console.WriteLine(vertex);
             }
         }
         private void ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
