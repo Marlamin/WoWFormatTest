@@ -80,7 +80,7 @@ namespace WoWFormatLib.FileReaders
                         if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
                         {
                             Console.WriteLine("WMO file does not exist!!! {0}", str.ToString());
-                            throw new FileNotFoundException(str.ToString());
+                            new WoWFormatLib.Utils.MissingFile(str.ToString());
                         }
                     }
                     str = new StringBuilder();

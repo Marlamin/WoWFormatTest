@@ -48,6 +48,7 @@
     <Compile Include="FileReaders\BLPReader.cs" />
     <Compile Include="FileReaders\M2Reader.cs" />
     <Compile Include="FileReaders\PM4Reader.cs" />
+    <Compile Include="FileReaders\SKINReader.cs" />
     <Compile Include="FileReaders\TEXReader.cs" />
     <Compile Include="FileReaders\WDLReader.cs" />
     <Compile Include="FileReaders\WDTReader.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="SereniaBLPLib\BlpFile.cs" />
     <Compile Include="SereniaBLPLib\DXTDecompression.cs" />
     <Compile Include="Utils\BlizzHeader.cs" />
+    <Compile Include="Utils\MissingFile.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

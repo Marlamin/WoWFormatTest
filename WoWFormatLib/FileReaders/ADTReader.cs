@@ -28,11 +28,11 @@ namespace WoWFormatLib.FileReaders
 
             filename = Path.ChangeExtension(filename, ".adt");
 
-            if (!File.Exists(Path.Combine(basedir, filename))) { throw new FileNotFoundException(filename); }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { throw new FileNotFoundException(filename.Replace(".adt", "_obj0.adt")); }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { throw new FileNotFoundException(filename.Replace(".adt", "_obj1.adt")); }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { throw new FileNotFoundException(filename.Replace(".adt", "_tex0.adt")); }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { throw new FileNotFoundException(filename.Replace(".adt", "_tex1.adt")); }
+            if (!File.Exists(Path.Combine(basedir, filename))) { new WoWFormatLib.Utils.MissingFile(filename); }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); }
 
             var adt = File.Open(Path.Combine(basedir, filename), FileMode.Open);
 
@@ -221,7 +221,7 @@ namespace WoWFormatLib.FileReaders
                         if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
-                            throw new FileNotFoundException(str.ToString());
+                            new WoWFormatLib.Utils.MissingFile(str.ToString());
                         }
                     }
                     str = new StringBuilder();

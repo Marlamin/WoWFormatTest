@@ -36,7 +36,7 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                throw new FileNotFoundException(filename);
+                new WoWFormatLib.Utils.MissingFile(filename);
             }
 
         }
@@ -190,7 +190,7 @@ namespace WoWFormatLib.FileReaders
                 if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, groupfilename)))
                 {
                     Console.WriteLine("Sub WMO file does not exist!!! {0} Current file: {1}", groupfilename, filename);
-                    throw new FileNotFoundException(groupfilename);
+                    new WoWFormatLib.Utils.MissingFile(groupfilename);
                 }
             }
         }
@@ -213,7 +213,7 @@ namespace WoWFormatLib.FileReaders
                         if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
-                            throw new FileNotFoundException(str.ToString());
+                            new WoWFormatLib.Utils.MissingFile(str.ToString());
                         }
                         else
                         {

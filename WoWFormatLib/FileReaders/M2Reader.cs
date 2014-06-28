@@ -32,7 +32,7 @@ namespace WoWFormatLib.FileReaders
             filename = Path.ChangeExtension(filename, "M2");
             if (!File.Exists(basedir + filename))
             {
-                throw new FileNotFoundException(filename);
+                new WoWFormatLib.Utils.MissingFile(filename);
             }
             
             blpFiles = new List<string>();
@@ -163,7 +163,7 @@ namespace WoWFormatLib.FileReaders
                         if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, filename)))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", filename);
-                            throw new FileNotFoundException(filename);
+                            new WoWFormatLib.Utils.MissingFile(filename);
                         }
                     }
                     bin.BaseStream.Position = preFilenamePosition;
@@ -179,7 +179,12 @@ namespace WoWFormatLib.FileReaders
                 if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, skinfilename)))
                 {
                     Console.WriteLine(".skin file does not exist!!! {0}", skinfilename);
-                    throw new FileNotFoundException(skinfilename);
+                    new WoWFormatLib.Utils.MissingFile(filename);
+                }
+                else
+                {
+                    SKINReader skinreader = new SKINReader(basedir);
+                    skinreader.LoadSKIN(skinfilename);
                 }
             }
         }

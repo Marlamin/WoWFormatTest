@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWRenderTest", "WoWRenderT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PM4InfoDump", "PM4InfoDump\PM4InfoDump.csproj", "{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubMeshDump", "SubMeshDump\SubMeshDump.csproj", "{1CE3955A-A66B-43AD-86EB-C3D07E33F3AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B413C2F-BFD4-4916-A841-D92BFFEF08D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CE3955A-A66B-43AD-86EB-C3D07E33F3AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CE3955A-A66B-43AD-86EB-C3D07E33F3AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CE3955A-A66B-43AD-86EB-C3D07E33F3AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CE3955A-A66B-43AD-86EB-C3D07E33F3AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
