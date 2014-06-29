@@ -227,15 +227,9 @@ namespace WoWFormatLib.FileReaders
                 var farClipping = bin.ReadSingle();
                 var nearClipping = bin.ReadSingle();
                 var translationPos = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var position = new Single[3];
-                position[0] = bin.ReadSingle();
-                position[1] = bin.ReadSingle();
-                position[2] = bin.ReadSingle();
+                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 var translationTar = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var target = new Single[3];
-                target[0] = bin.ReadSingle();
-                target[1] = bin.ReadSingle();
-                target[2] = bin.ReadSingle();
+                var target = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var unkABlock = bin.ReadBytes(20); //temp while ablock isnt implemented
             }
@@ -248,11 +242,7 @@ namespace WoWFormatLib.FileReaders
             {
                 var type = bin.ReadUInt16();
                 var bone = bin.ReadInt16();
-                var position = new Single[3];
-                position[0] = bin.ReadSingle();
-                position[1] = bin.ReadSingle();
-                position[2] = bin.ReadSingle();
-                
+                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 var ambientColor = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var ambientIntensity = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var diffuseColor = bin.ReadBytes(20); //temp while ablock isnt implemented
@@ -272,10 +262,7 @@ namespace WoWFormatLib.FileReaders
                 var identifier = Encoding.ASCII.GetString(bin.ReadBytes(4));
                 var data = bin.ReadUInt32();
                 var bone = bin.ReadUInt32();
-                var position = new Single[3];
-                position[0] = bin.ReadSingle();
-                position[1] = bin.ReadSingle();
-                position[2] = bin.ReadSingle();
+                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 var interpolationType = bin.ReadUInt16();
                 var globalSequence = bin.ReadUInt16();
                 var nTimestampEntries = bin.ReadUInt32();
@@ -299,10 +286,7 @@ namespace WoWFormatLib.FileReaders
             {
                 var id = bin.ReadUInt32();
                 var bone = bin.ReadUInt32();
-                var position = new Single[3];
-                position[0] = bin.ReadSingle();
-                position[1] = bin.ReadSingle();
-                position[2] = bin.ReadSingle();
+                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 var data = bin.ReadBytes(20); //temp while ablock isnt implemented
             }
         }
@@ -312,10 +296,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsBoundingNormals;
             for (int i = 0; i < nBoundingNormals; i++)
             {
-                Single[] normal = new Single[3];
-                normal[0] = bin.ReadSingle();
-                normal[1] = bin.ReadSingle();
-                normal[2] = bin.ReadSingle();
+                var normal = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
             }
         }
 
@@ -430,10 +411,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsVertices;
             for (int i = 0; i < nVertices; i++)
             {
-                Single[] position = new Single[3];
-                position[0] = bin.ReadSingle();
-                position[1] = bin.ReadSingle();
-                position[2] = bin.ReadSingle();
+                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 Byte[] boneWeight = new Byte[4];
                 boneWeight[0] = bin.ReadByte();
                 boneWeight[1] = bin.ReadByte();
@@ -444,10 +422,7 @@ namespace WoWFormatLib.FileReaders
                 boneIndices[1] = bin.ReadByte();
                 boneIndices[2] = bin.ReadByte();
                 boneIndices[3] = bin.ReadByte();
-                Single[] normal = new Single[3];
-                normal[0] = bin.ReadSingle();
-                normal[1] = bin.ReadSingle();
-                normal[2] = bin.ReadSingle();
+                var normal = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 Single[] textureCoords = new Single[2];
                 textureCoords[0] = bin.ReadSingle();
                 textureCoords[1] = bin.ReadSingle();
@@ -481,10 +456,7 @@ namespace WoWFormatLib.FileReaders
                 var translation = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var rotation = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented
-                Single[] pivotPoint = new Single[3];
-                pivotPoint[0] = bin.ReadSingle();
-                pivotPoint[1] = bin.ReadSingle();
-                pivotPoint[2] = bin.ReadSingle();
+                var pivotPoint = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
             }
         }
 
@@ -512,14 +484,8 @@ namespace WoWFormatLib.FileReaders
                 var unk1 = bin.ReadUInt32();
                 var unk2 = bin.ReadUInt32();
                 var playbackSpeed = bin.ReadUInt32();
-                Single[] MinimumExtent = new Single[3];
-                MinimumExtent[0] = bin.ReadSingle();
-                MinimumExtent[1] = bin.ReadSingle();
-                MinimumExtent[2] = bin.ReadSingle();
-                Single[] MaximumExtent = new Single[3];
-                MaximumExtent[0] = bin.ReadSingle();
-                MaximumExtent[1] = bin.ReadSingle();
-                MaximumExtent[2] = bin.ReadSingle();
+                var minimumExtent = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
+                var maximumExtent = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 var boundsRadius = bin.ReadSingle();
                 var nextAnimation = bin.ReadInt16();
                 var index = bin.ReadUInt16();

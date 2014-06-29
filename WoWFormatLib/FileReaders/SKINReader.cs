@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
 {
@@ -102,15 +103,9 @@ namespace WoWFormatLib.FileReaders
                 var nBones = bin.ReadUInt16();     
                 var ofsBones = bin.ReadUInt16();   
                 var unk2 = bin.ReadUInt16();       
-                var rootBone = bin.ReadUInt16();   
-                var centerMass = new Single[3]; //actually a Vec3F
-                centerMass[0] = bin.ReadSingle();  
-                centerMass[1] = bin.ReadSingle();  
-                centerMass[2] = bin.ReadSingle();      
-                var centerBoundingBox = new Single[3]; //actually a Vec3F
-                centerBoundingBox[0] = bin.ReadSingle();
-                centerBoundingBox[0] = bin.ReadSingle();
-                centerBoundingBox[0] = bin.ReadSingle();
+                var rootBone = bin.ReadUInt16();
+                var centerMass = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
+                var centerBoundingBox = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 var radius = bin.ReadSingle();
             }
         }
