@@ -171,7 +171,7 @@ namespace WoWFormatLib.FileReaders
         private void readParticleEmitters(uint nParticleEmitters, uint ofsParticleEmitters, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsParticleEmitters;
-            for (int i = 0; i <= nParticleEmitters; i++)
+            for (int i = 0; i < nParticleEmitters; i++)
             {
 
             }
@@ -180,7 +180,7 @@ namespace WoWFormatLib.FileReaders
         private void readRibbonEmitters(uint nRibbonEmitters, uint ofsRibbonEmitters, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsRibbonEmitters;
-            for (int i = 0; i <= nRibbonEmitters; i++)
+            for (int i = 0; i < nRibbonEmitters; i++)
             {
 
             }
@@ -189,7 +189,7 @@ namespace WoWFormatLib.FileReaders
         private void readCameraLookup(uint nCameraLookup, uint ofsCameraLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsCameraLookup;
-            for (int i = 0; i <= nCameraLookup; i++)
+            for (int i = 0; i < nCameraLookup; i++)
             {
 
             }
@@ -198,7 +198,7 @@ namespace WoWFormatLib.FileReaders
         private void readCameras(uint nCameras, uint ofsCameras, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsCameras;
-            for (int i = 0; i <= nCameras; i++)
+            for (int i = 0; i < nCameras; i++)
             {
 
             }
@@ -207,7 +207,7 @@ namespace WoWFormatLib.FileReaders
         private void readLights(uint nLights, uint ofsLights, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsLights;
-            for (int i = 0; i <= nLights; i++)
+            for (int i = 0; i < nLights; i++)
             {
 
             }
@@ -216,7 +216,7 @@ namespace WoWFormatLib.FileReaders
         private void readEvents(uint nEvents, uint ofsEvents, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsEvents;
-            for (int i = 0; i <= nEvents; i++)
+            for (int i = 0; i < nEvents; i++)
             {
 
             }
@@ -225,7 +225,7 @@ namespace WoWFormatLib.FileReaders
         private void readAttachLookup(uint nAttachLookup, uint ofsAttachLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsAttachLookup;
-            for (int i = 0; i <= nAttachLookup; i++)
+            for (int i = 0; i < nAttachLookup; i++)
             {
 
             }
@@ -234,7 +234,7 @@ namespace WoWFormatLib.FileReaders
         private void readAttachments(uint nAttachments, uint ofsAttachments, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsAttachments;
-            for (int i = 0; i <= nAttachments; i++)
+            for (int i = 0; i < nAttachments; i++)
             {
 
             }
@@ -243,7 +243,7 @@ namespace WoWFormatLib.FileReaders
         private void readBoundingNormals(uint nBoundingNormals, uint ofsBoundingNormals, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBoundingNormals;
-            for (int i = 0; i <= nBoundingNormals; i++)
+            for (int i = 0; i < nBoundingNormals; i++)
             {
 
             }
@@ -252,7 +252,7 @@ namespace WoWFormatLib.FileReaders
         private void readBoundingTriangles(uint nBoundingTriangles, uint ofsBoundingTriangles, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBoundingTriangles;
-            for (int i = 0; i <= nBoundingTriangles; i++)
+            for (int i = 0; i < nBoundingTriangles; i++)
             {
 
             }
@@ -261,7 +261,7 @@ namespace WoWFormatLib.FileReaders
         private void readUVAnimLookup(uint nUVAnimLookup, uint ofsUVAnimLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsUVAnimLookup;
-            for (int i = 0; i <= nUVAnimLookup; i++)
+            for (int i = 0; i < nUVAnimLookup; i++)
             {
 
             }
@@ -270,7 +270,7 @@ namespace WoWFormatLib.FileReaders
         private void readTransLookup(uint nTransLookup, uint ofsTranslookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTranslookup;
-            for (int i = 0; i <= nTransLookup; i++)
+            for (int i = 0; i < nTransLookup; i++)
             {
 
             }
@@ -279,7 +279,7 @@ namespace WoWFormatLib.FileReaders
         private void readUnk1(uint nUnk1, uint ofsUnk1, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsUnk1;
-            for (int i = 0; i <= nUnk1; i++)
+            for (int i = 0; i < nUnk1; i++)
             {
 
             }
@@ -288,7 +288,7 @@ namespace WoWFormatLib.FileReaders
         private void readTexLookup(uint nTexLookup, uint ofsTexLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTexLookup;
-            for (int i = 0; i <= nTexLookup; i++)
+            for (int i = 0; i < nTexLookup; i++)
             {
 
             }
@@ -297,7 +297,7 @@ namespace WoWFormatLib.FileReaders
         private void readBoneLookupTable(uint nBoneLookupTable, uint ofsBoneLookupTable, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBoneLookupTable;
-            for (int i = 0; i <= nBoneLookupTable; i++)
+            for (int i = 0; i < nBoneLookupTable; i++)
             {
 
             }
@@ -306,7 +306,7 @@ namespace WoWFormatLib.FileReaders
         private void readRenderFlags(uint nRenderFlags, uint ofsRenderFlags, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsRenderFlags;
-            for (int i = 0; i <= nRenderFlags; i++)
+            for (int i = 0; i < nRenderFlags; i++)
             {
 
             }
@@ -315,7 +315,7 @@ namespace WoWFormatLib.FileReaders
         private void readTexReplace(uint nTexReplace, uint ofsTexReplace, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTexReplace;
-            for (int i = 0; i <= nTexReplace; i++)
+            for (int i = 0; i < nTexReplace; i++)
             {
 
             }
@@ -324,7 +324,7 @@ namespace WoWFormatLib.FileReaders
         private void readUVAnimation(uint nUVAnimation, uint ofsUVAnimation, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsUVAnimation;
-            for (int i = 0; i <= nUVAnimation; i++)
+            for (int i = 0; i < nUVAnimation; i++)
             {
 
             }
@@ -333,7 +333,7 @@ namespace WoWFormatLib.FileReaders
         private void readTransparency(uint nTransparency, uint ofsTransparency, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTransparency;
-            for (int i = 0; i <= nTransparency; i++)
+            for (int i = 0; i < nTransparency; i++)
             {
 
             }
@@ -342,7 +342,7 @@ namespace WoWFormatLib.FileReaders
         private void readColors(uint nColors, uint ofsColors, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsColors;
-            for (int i = 0; i <= nColors; i++)
+            for (int i = 0; i < nColors; i++)
             {
 
             }
@@ -351,7 +351,7 @@ namespace WoWFormatLib.FileReaders
         private void readVertices(uint nVertices, uint ofsVertices, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsVertices;
-            for (int i = 0; i <= nVertices; i++)
+            for (int i = 0; i < nVertices; i++)
             {
                 Single[] position = new Single[3];
                 position[0] = bin.ReadSingle();
@@ -383,7 +383,7 @@ namespace WoWFormatLib.FileReaders
         private void readKeyboneLookup(uint nKeyboneLookup, uint ofsKeyboneLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsKeyboneLookup;
-            for (int i = 0; i <= nKeyboneLookup; i++)
+            for (int i = 0; i < nKeyboneLookup; i++)
             {
                 var bone = bin.ReadUInt16();
             }
@@ -392,7 +392,7 @@ namespace WoWFormatLib.FileReaders
         private void readBones(uint nBones, uint ofsBones, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBones;
-            for (int i = 0; i <= nBones; i++)
+            for (int i = 0; i < nBones; i++)
             {
                 var keyBoneID = bin.ReadInt32();
                 var flags = bin.ReadUInt32();
@@ -401,18 +401,9 @@ namespace WoWFormatLib.FileReaders
                 Unk[0] = bin.ReadUInt16();
                 Unk[1] = bin.ReadUInt16();
                 Unk[2] = bin.ReadUInt16();
-                Single[] translation = new Single[3]; //ablock???
-                translation[0] = bin.ReadSingle();
-                translation[1] = bin.ReadSingle();
-                translation[2] = bin.ReadSingle();
-                short[] rotation = new short[4]; //ablock???
-                rotation[0] = bin.ReadByte();
-                rotation[1] = bin.ReadByte();
-                rotation[2] = bin.ReadByte();
-                Single[] scaling = new Single[3]; //ablock???
-                scaling[0] = bin.ReadSingle();
-                scaling[1] = bin.ReadSingle();
-                scaling[2] = bin.ReadSingle();
+                var translation = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var rotation = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented
                 Single[] pivotPoint = new Single[3];
                 pivotPoint[0] = bin.ReadSingle();
                 pivotPoint[1] = bin.ReadSingle();
@@ -423,7 +414,7 @@ namespace WoWFormatLib.FileReaders
         private void readAnimationLookup(uint nAnimationLookup, uint ofsAnimationLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsAnimationLookup;
-            for (int i = 0; i <= nAnimationLookup; i++)
+            for (int i = 0; i < nAnimationLookup; i++)
             {
                 var animationID = bin.ReadUInt16();
             }
@@ -432,7 +423,7 @@ namespace WoWFormatLib.FileReaders
         private void readAnimations(uint nAnimations, uint ofsAnimations, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsAnimations;
-            for (int i = 0; i <= nAnimations; i++)
+            for (int i = 0; i < nAnimations; i++)
             {
                 var animationID = bin.ReadUInt16();
                 var subAnimationID = bin.ReadUInt16();
@@ -461,7 +452,7 @@ namespace WoWFormatLib.FileReaders
         private void readSequences(uint nSequences, uint ofsSequences, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsSequences;
-            for (int i = 0; i <= nSequences; i++)
+            for (int i = 0; i < nSequences; i++)
             {
                 var timestamp = bin.ReadUInt32();
             }
@@ -470,7 +461,7 @@ namespace WoWFormatLib.FileReaders
         private void readTextures(UInt32 num, UInt32 offset, BinaryReader bin)
         {
             bin.BaseStream.Position = offset;
-            for (int i = 0; i <= num; i++)
+            for (int i = 0; i < num; i++)
             {
                 var type = bin.ReadUInt32();
                 var flags = bin.ReadUInt32();

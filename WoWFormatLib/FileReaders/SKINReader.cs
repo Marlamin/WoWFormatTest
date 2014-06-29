@@ -50,6 +50,7 @@ namespace WoWFormatLib.FileReaders
             ReadProperties(nProperties, ofsProperties, bin);
             ReadSubmeshes(nSubmeshes, ofsSubmeshes, bin);
             ReadTextureUnits(nTextureUnits, ofsTextureUnits, bin);
+            
 
             skin.Close();
         }
@@ -57,7 +58,7 @@ namespace WoWFormatLib.FileReaders
         private void ReadIndices(uint nIndices, uint ofsIndices, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsIndices;
-            for (int i = 0; i <= nIndices; i++)
+            for (int i = 0; i < nIndices; i++)
             {
                 var vertex = bin.ReadUInt16();
             }
@@ -65,7 +66,7 @@ namespace WoWFormatLib.FileReaders
         private void ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTriangles;
-            for (int i = 0; i <= (nTriangles / 3); i++)
+            for (int i = 0; i < (nTriangles / 3); i++)
             {
                 ushort[] indices = new ushort[3];
                 indices[0] = bin.ReadUInt16();
@@ -77,7 +78,7 @@ namespace WoWFormatLib.FileReaders
         private void ReadProperties(uint nProperties, uint ofsProperties, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsProperties;
-            for (int i = 0; i <= nProperties; i++)
+            for (int i = 0; i < nProperties; i++)
             {
                 byte[] properties = new byte[4];
                 properties[0] = bin.ReadByte();
@@ -90,7 +91,7 @@ namespace WoWFormatLib.FileReaders
         private void ReadSubmeshes(uint nSubmeshes, uint ofsSubmeshes, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsSubmeshes;
-            for (int i = 0; i <= nSubmeshes; i++)
+            for (int i = 0; i < nSubmeshes; i++)
             {
                 var submeshID = bin.ReadUInt16();  
                 var unk1 = bin.ReadUInt16();       
@@ -117,7 +118,7 @@ namespace WoWFormatLib.FileReaders
         private void ReadTextureUnits(uint nTextureUnits, uint ofsTextureUnits, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTextureUnits;
-            for (int i = 0; i <= nTextureUnits; i++)
+            for (int i = 0; i < nTextureUnits; i++)
             {
                 var flags = bin.ReadUInt16();
                 var shading = bin.ReadUInt16();
