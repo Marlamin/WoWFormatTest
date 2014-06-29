@@ -87,25 +87,13 @@ namespace WoWFormatLib.FileReaders
             var ofsTranslookup = bin.ReadUInt32();
             var nUVAnimLookup = bin.ReadUInt32();
             var ofsUVAnimLookup = bin.ReadUInt32();
-            //vec3f[2] vertexbox
-            //1
-            bin.ReadSingle();
-            bin.ReadSingle();
-            bin.ReadSingle();
-            //2
-            bin.ReadSingle();
-            bin.ReadSingle();
-            bin.ReadSingle();
+            var vertexBox = new Vector3[2];
+            vertexBox[0] = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
+            vertexBox[1] = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
             var VertexRadius = bin.ReadSingle();
-            //vec3f[2] boundingbox
-            //1
-            bin.ReadSingle();
-            bin.ReadSingle();
-            bin.ReadSingle();
-            //2
-            bin.ReadSingle();
-            bin.ReadSingle();
-            bin.ReadSingle();
+            var boundingBox = new Vector3[2];
+            boundingBox[0] = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
+            boundingBox[1] = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
             var BoundingRadius = bin.ReadSingle();
             var nBoundingTriangles = bin.ReadUInt32();
             var ofsBoundingTriangles = bin.ReadUInt32();
@@ -187,10 +175,7 @@ namespace WoWFormatLib.FileReaders
             {
                 var unk = bin.ReadUInt32();
                 var boneID = bin.ReadUInt32();
-                var position = new Single[3];
-                position[0] = bin.ReadSingle();
-                position[1] = bin.ReadSingle();
-                position[2] = bin.ReadSingle();
+                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
                 var nTextures = bin.ReadInt32();
                 var ofsTextures = bin.ReadInt32();
                 var nBlendRef = bin.ReadInt32();
