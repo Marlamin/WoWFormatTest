@@ -173,7 +173,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsParticleEmitters;
             for (int i = 0; i < nParticleEmitters; i++)
             {
-
+                //Apparently really wrong.
             }
         }
 
@@ -182,7 +182,27 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsRibbonEmitters;
             for (int i = 0; i < nRibbonEmitters; i++)
             {
-
+                var unk = bin.ReadUInt32();
+                var boneID = bin.ReadUInt32();
+                var position = new Single[3];
+                position[0] = bin.ReadSingle();
+                position[1] = bin.ReadSingle();
+                position[2] = bin.ReadSingle();
+                var nTextures = bin.ReadInt32();
+                var ofsTextures = bin.ReadInt32();
+                var nBlendRef = bin.ReadInt32();
+                var ofsBlendRef = bin.ReadInt32();
+                var color = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var opacity = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var above = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var below = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var resolution = bin.ReadSingle();
+                var length = bin.ReadSingle();
+                var emissionAngle = bin.ReadSingle();
+                var renderFlags = bin.ReadInt16();
+                var unkABlock = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var unkABlock2 = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var unk2 = bin.ReadInt32();
             }
         }
 
@@ -191,7 +211,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsCameraLookup;
             for (int i = 0; i < nCameraLookup; i++)
             {
-
+                var cameraID = bin.ReadUInt16();
             }
         }
 
@@ -200,7 +220,21 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsCameras;
             for (int i = 0; i < nCameras; i++)
             {
-
+                var type = bin.ReadUInt32();
+                var farClipping = bin.ReadSingle();
+                var nearClipping = bin.ReadSingle();
+                var translationPos = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var position = new Single[3];
+                position[0] = bin.ReadSingle();
+                position[1] = bin.ReadSingle();
+                position[2] = bin.ReadSingle();
+                var translationTar = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var target = new Single[3];
+                target[0] = bin.ReadSingle();
+                target[1] = bin.ReadSingle();
+                target[2] = bin.ReadSingle();
+                var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var unkABlock = bin.ReadBytes(20); //temp while ablock isnt implemented
             }
         }
 
@@ -209,7 +243,19 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsLights;
             for (int i = 0; i < nLights; i++)
             {
-
+                var type = bin.ReadUInt16();
+                var bone = bin.ReadInt16();
+                var position = new Single[3];
+                position[0] = bin.ReadSingle();
+                position[1] = bin.ReadSingle();
+                position[2] = bin.ReadSingle();
+                var ambientColor = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var ambientIntensity = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var diffuseColor = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var diffuseIntensity = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var attenuationStart = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var attenuationEnd = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var unk = bin.ReadBytes(20); //temp while ablock isnt implemented
             }
         }
 
@@ -218,7 +264,18 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsEvents;
             for (int i = 0; i < nEvents; i++)
             {
-
+                //Isn't correct.
+                var identifier = Encoding.ASCII.GetString(bin.ReadBytes(4));
+                var data = bin.ReadUInt32();
+                var bone = bin.ReadUInt32();
+                var position = new Single[3];
+                position[0] = bin.ReadSingle();
+                position[1] = bin.ReadSingle();
+                position[2] = bin.ReadSingle();
+                var interpolationType = bin.ReadUInt16();
+                var globalSequence = bin.ReadUInt16();
+                var nTimestampEntries = bin.ReadUInt32();
+                var ofsTimestampList = bin.ReadUInt32();
             }
         }
 
@@ -227,7 +284,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsAttachLookup;
             for (int i = 0; i < nAttachLookup; i++)
             {
-
+                var attachment = bin.ReadUInt16();
             }
         }
 
@@ -236,7 +293,13 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsAttachments;
             for (int i = 0; i < nAttachments; i++)
             {
-
+                var id = bin.ReadUInt32();
+                var bone = bin.ReadUInt32();
+                var position = new Single[3];
+                position[0] = bin.ReadSingle();
+                position[1] = bin.ReadSingle();
+                position[2] = bin.ReadSingle();
+                var data = bin.ReadBytes(20); //temp while ablock isnt implemented
             }
         }
 
@@ -245,16 +308,22 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsBoundingNormals;
             for (int i = 0; i < nBoundingNormals; i++)
             {
-
+                Single[] normal = new Single[3];
+                normal[0] = bin.ReadSingle();
+                normal[1] = bin.ReadSingle();
+                normal[2] = bin.ReadSingle();
             }
         }
 
         private void readBoundingTriangles(uint nBoundingTriangles, uint ofsBoundingTriangles, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBoundingTriangles;
-            for (int i = 0; i < nBoundingTriangles; i++)
+            for (int i = 0; i < nBoundingTriangles / 3; i++)
             {
-
+                var index = new UInt16[3];
+                index[0] = bin.ReadUInt16();
+                index[1] = bin.ReadUInt16();
+                index[2] = bin.ReadUInt16();
             }
         }
 
@@ -263,7 +332,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsUVAnimLookup;
             for (int i = 0; i < nUVAnimLookup; i++)
             {
-
+                var animatedTextureID = bin.ReadUInt16();
             }
         }
 
@@ -272,7 +341,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsTranslookup;
             for (int i = 0; i < nTransLookup; i++)
             {
-
+                var transparencyID = bin.ReadUInt16();
             }
         }
 
@@ -290,7 +359,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsTexLookup;
             for (int i = 0; i < nTexLookup; i++)
             {
-
+                var textureID = bin.ReadUInt16();
             }
         }
 
@@ -299,7 +368,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsBoneLookupTable;
             for (int i = 0; i < nBoneLookupTable; i++)
             {
-
+                var bone = bin.ReadUInt16();
             }
         }
 
@@ -308,7 +377,8 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsRenderFlags;
             for (int i = 0; i < nRenderFlags; i++)
             {
-
+                var flags = bin.ReadUInt16();
+                var blendingMode = bin.ReadUInt16();
             }
         }
 
@@ -317,7 +387,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsTexReplace;
             for (int i = 0; i < nTexReplace; i++)
             {
-
+                var textureID = bin.ReadInt16();
             }
         }
 
@@ -326,7 +396,9 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsUVAnimation;
             for (int i = 0; i < nUVAnimation; i++)
             {
-
+                var translation = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var rotation = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented   
             }
         }
 
@@ -335,7 +407,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsTransparency;
             for (int i = 0; i < nTransparency; i++)
             {
-
+                var alpha = bin.ReadBytes(20); //temp while ablock isnt implemented
             }
         }
 
@@ -344,7 +416,8 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsColors;
             for (int i = 0; i < nColors; i++)
             {
-
+                var color = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var alpha = bin.ReadBytes(20); //temp while ablock isnt implemented
             }
         }
 
