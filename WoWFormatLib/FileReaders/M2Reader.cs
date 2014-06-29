@@ -108,6 +108,8 @@ namespace WoWFormatLib.FileReaders
             var BoundingRadius = bin.ReadSingle();
             var nBoundingTriangles = bin.ReadUInt32();
             var ofsBoundingTriangles = bin.ReadUInt32();
+            var nBoundingVertices = bin.ReadUInt32();
+            var ofsBoundingVertices = bin.ReadUInt32();
             var nBoundingNormals = bin.ReadUInt32();
             var ofsBoundingNormals = bin.ReadUInt32();
             var nAttachments = bin.ReadUInt32();
