@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
 {
@@ -175,7 +176,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsParticleEmitters;
             for (int i = 0; i < nParticleEmitters; i++)
             {
-                //Apparently really wrong.
+                //Apparently really wrong. Who needs particles, right? 
             }
         }
 
@@ -251,6 +252,7 @@ namespace WoWFormatLib.FileReaders
                 position[0] = bin.ReadSingle();
                 position[1] = bin.ReadSingle();
                 position[2] = bin.ReadSingle();
+                
                 var ambientColor = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var ambientIntensity = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var diffuseColor = bin.ReadBytes(20); //temp while ablock isnt implemented

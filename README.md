@@ -13,7 +13,8 @@ Built from the ground up, but with lots of copy pasta from older projects.
 - JustMak
 - Xalcon
 - BoogieMan 
-- WoWDev wiki authors
+- WoWDev wiki authors (especially schlumpf!!!!)
+- Miceiken
 - ..and all the people the above people base their work on
 - also Thoorium
 
