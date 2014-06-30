@@ -86,22 +86,5 @@ namespace WoWFormatLib.Utils
             return !a.Equals(b);
         }
 
-        public static Vector3 Invalid
-        {
-            get { return default(Vector3); }
-        }
-    }
-
-    public struct Blackspot
-    {
-        public Vector3 Location;
-        public float Radius;
-
-        public Blackspot(float x, float y, float z, float r)
-            : this()
-        {
-            Location = new Vector3(x, y, z);
-            Radius = r;
-        }
     }
 }
