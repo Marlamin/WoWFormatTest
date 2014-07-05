@@ -28,11 +28,11 @@ namespace WoWFormatLib.FileReaders
 
             filename = Path.ChangeExtension(filename, ".adt");
 
-            if (!File.Exists(Path.Combine(basedir, filename))) { new WoWFormatLib.Utils.MissingFile(filename); }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); }
+            if (!File.Exists(Path.Combine(basedir, filename))) { new WoWFormatLib.Utils.MissingFile(filename); return; }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_obj0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_obj1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
+            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; }
 
             var adt = File.Open(Path.Combine(basedir, filename), FileMode.Open);
 

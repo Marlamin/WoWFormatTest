@@ -28,7 +28,8 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                throw new Exception("WDL not found!");
+                new WoWFormatLib.Utils.MissingFile(filename);
+                return;
             }
 
         }

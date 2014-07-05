@@ -20,7 +20,7 @@ namespace WoWFormatLib
             string basedir = ConfigurationManager.AppSettings["basedir"];
             //LoadAllMaps(basedir);
 
-            LoadFromListfile("C:\\WoD\\18471listfile.txt", basedir);
+            LoadFromListfile("C:\\WoD\\18505listfile.txt", basedir);
 
         }
 
@@ -84,6 +84,10 @@ namespace WoWFormatLib
                 )
                 {
                     //Not yet!
+                    if (!File.Exists(basedir + line))
+                    {
+                        new WoWFormatLib.Utils.MissingFile(line);
+                    }
                 }
                 else
                 {

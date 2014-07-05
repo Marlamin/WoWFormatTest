@@ -28,7 +28,11 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                throw new Exception("TEX not found!");
+                if (!File.Exists(basedir + filename))
+                {
+                    new WoWFormatLib.Utils.MissingFile(filename);
+                    return;
+                }
             }
 
         }
@@ -78,7 +82,6 @@ namespace WoWFormatLib.FileReaders
                         str.Append(".blp"); //Filenames in TEX dont have have BLP extensions
                         if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
                         {
-                            Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
                             new WoWFormatLib.Utils.MissingFile(str.ToString());
                         }
                     }
