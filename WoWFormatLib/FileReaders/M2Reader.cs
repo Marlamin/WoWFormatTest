@@ -180,8 +180,7 @@ namespace WoWFormatLib.FileReaders
                 var ofsTextures = bin.ReadInt32();
                 var nBlendRef = bin.ReadInt32();
                 var ofsBlendRef = bin.ReadInt32();
-                //var color = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var color = bin.Read<Bone>();
+                var color = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var opacity = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var above = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var below = bin.ReadBytes(20); //temp while ablock isnt implemented
@@ -432,6 +431,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsBones;
             for (int i = 0; i < nBones; i++)
             {
+                /*
                 var keyBoneID = bin.ReadInt32();
                 var flags = bin.ReadUInt32();
                 var parentBone = bin.ReadInt16();
@@ -443,6 +443,8 @@ namespace WoWFormatLib.FileReaders
                 var rotation = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var pivotPoint = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
+                 */
+                var bone = bin.Read<Bone>();
             }
         }
 
