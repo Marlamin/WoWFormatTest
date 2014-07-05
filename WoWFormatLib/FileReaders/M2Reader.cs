@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WoWFormatLib.Structs;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -432,19 +433,6 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsBones;
             for (int i = 0; i < nBones; i++)
             {
-                /*
-                var keyBoneID = bin.ReadInt32();
-                var flags = bin.ReadUInt32();
-                var parentBone = bin.ReadInt16();
-                UInt16[] Unk = new UInt16[3];
-                Unk[0] = bin.ReadUInt16();
-                Unk[1] = bin.ReadUInt16();
-                Unk[2] = bin.ReadUInt16();
-                var translation = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var rotation = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var pivotPoint = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                 */
                 var bone = bin.Read<Bone>();
             }
         }

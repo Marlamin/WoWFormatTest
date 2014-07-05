@@ -27,18 +27,6 @@ namespace WoWFormatLib
         public ArrayReference<ArrayReference<T>> Values;
     }
 
-    public struct Bone
-    {
-        public int BoneId;
-        public uint Flags;
-        public short ParentBone;
-        private unsafe fixed ushort unk[3];
-        public ABlock<Vector3> Translation;
-        public ABlock<Quaternion> Rotation;
-        public ABlock<Vector3> Scale;
-        public Vector3 Pivot;
-    }
-
     // --------
 
     public static class Extensions
