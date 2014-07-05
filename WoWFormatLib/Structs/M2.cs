@@ -57,7 +57,7 @@ namespace WoWFormatLib.Structs.M2
 
     public struct Color
     {
-        public ABlock<Color> color;
+        public ABlock<RGBColor> color;
         public ABlock<short> alpha;
     }
 
@@ -128,9 +128,9 @@ namespace WoWFormatLib.Structs.M2
         public short type;
         public short bone;
         public Vector3 position;
-        public ABlock<Color> ambientColor;
+        public ABlock<RGBColor> ambientColor;
         public ABlock<float> ambientIntensity;
-        public ABlock<Color> diffuseColor;
+        public ABlock<RGBColor> diffuseColor;
         public ABlock<float> diffuseIntensity;
         public ABlock<int> attenuationStart;
         public ABlock<int> attenuationEnd;
@@ -175,7 +175,7 @@ namespace WoWFormatLib.Structs.M2
         public int ofsTextures;
         public int nBlendRef;
         public int ofsBlendRef;
-        public ABlock<Color> color;
+        public ABlock<RGBColor> color;
         public ABlock<short> opacity;
         public ABlock<int> above;
         public ABlock<int> below;

@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 
 namespace WoWFormatLib.Utils
 {
-    class Color
-    {
-    public struct Color
+    public struct RGBColor
     {
         public float R;
         public float G;
         public float B;
 
-        public Color(float r, float g, float b)
+        public RGBColor(float r, float g, float b)
             : this()
         {
             R = r;

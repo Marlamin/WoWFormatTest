@@ -60,6 +60,7 @@
     <Compile Include="SereniaBLPLib\DXTDecompression.cs" />
     <Compile Include="Structs\M2.cs" />
     <Compile Include="Utils\BlizzHeader.cs" />
+    <Compile Include="Utils\RGBColor.cs" />
     <Compile Include="Utils\MissingFile.cs" />
     <Compile Include="Utils\Quaternion.cs" />
     <Compile Include="Utils\Vector3.cs" />
