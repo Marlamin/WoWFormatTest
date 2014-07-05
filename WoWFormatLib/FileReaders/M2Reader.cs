@@ -34,6 +34,7 @@ namespace WoWFormatLib.FileReaders
             if (!File.Exists(basedir + filename))
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
+                return;
             }
             
             blpFiles = new List<string>();
