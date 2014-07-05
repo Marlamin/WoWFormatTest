@@ -180,7 +180,8 @@ namespace WoWFormatLib.FileReaders
                 var ofsTextures = bin.ReadInt32();
                 var nBlendRef = bin.ReadInt32();
                 var ofsBlendRef = bin.ReadInt32();
-                var color = bin.ReadBytes(20); //temp while ablock isnt implemented
+                //var color = bin.ReadBytes(20); //temp while ablock isnt implemented
+                var color = bin.Read<Bone>();
                 var opacity = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var above = bin.ReadBytes(20); //temp while ablock isnt implemented
                 var below = bin.ReadBytes(20); //temp while ablock isnt implemented
