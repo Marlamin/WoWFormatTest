@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoWFormatLib.Structs;
+using WoWFormatLib.Structs.M2;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -451,21 +451,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsAnimations;
             for (int i = 0; i < nAnimations; i++)
             {
-                var animationID = bin.ReadUInt16();
-                var subAnimationID = bin.ReadUInt16();
-                var length = bin.ReadUInt32();
-                var movingSpeed = bin.ReadSingle();
-                var flags = bin.ReadUInt32();
-                var probability = bin.ReadInt16();
-                var unused = bin.ReadUInt16();
-                var unk1 = bin.ReadUInt32();
-                var unk2 = bin.ReadUInt32();
-                var playbackSpeed = bin.ReadUInt32();
-                var minimumExtent = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var maximumExtent = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var boundsRadius = bin.ReadSingle();
-                var nextAnimation = bin.ReadInt16();
-                var index = bin.ReadUInt16();
+                bin.Read<Animation>();
             }
         }
 
