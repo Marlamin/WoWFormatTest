@@ -24,6 +24,12 @@ namespace WoWFormatLib.FileReaders
         private List<String> blpFiles;
         private string basedir;
 
+        public uint version;
+        public string modelName;
+        public GlobalModelFlags modelFlags;
+        public Sequence[] sequences;
+        public Animation[] animations;
+
         public M2Reader(string basedir)
         {
             this.basedir = basedir;
@@ -50,7 +56,7 @@ namespace WoWFormatLib.FileReaders
                 Console.ReadLine();
             }
 
-            var version = bin.ReadUInt32();
+            version = bin.ReadUInt32();
             var lenModelname = bin.ReadUInt32();
             var ofsModelname = bin.ReadUInt32();
             var modelFlags = (GlobalModelFlags) bin.ReadUInt32();
@@ -127,10 +133,10 @@ namespace WoWFormatLib.FileReaders
             }
 
             bin.BaseStream.Position = ofsModelname;
-            var modelname = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
+            modelName = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
 
-            readSequences(nSequences, ofsSequences, bin);
-            readAnimations(nAnimations, ofsAnimations, bin);
+            var sequences = readSequences(nSequences, ofsSequences, bin);
+            var animations = readAnimations(nAnimations, ofsAnimations, bin);
             readAnimationLookup(nAnimationLookup, ofsAnimationLookup, bin);
             readBones(nBones, ofsBones, bin);
             readKeyboneLookup(nKeyboneLookup, ofsKeyboneLookup, bin);
@@ -446,22 +452,26 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void readAnimations(uint nAnimations, uint ofsAnimations, BinaryReader bin)
+        private Animation[] readAnimations(uint nAnimations, uint ofsAnimations, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsAnimations;
+            var animations = new Animation[nAnimations];
             for (int i = 0; i < nAnimations; i++)
             {
-                bin.Read<Animation>();
+                animations[i] = bin.Read<Animation>();
             }
+            return animations;
         }
 
-        private void readSequences(uint nSequences, uint ofsSequences, BinaryReader bin)
+        private Sequence[] readSequences(uint nSequences, uint ofsSequences, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsSequences;
+            var sequences = new Sequence[nSequences];
             for (int i = 0; i < nSequences; i++)
             {
-                var timestamp = bin.ReadUInt32();
+                sequences[i] = bin.Read<Sequence>();
             }
+            return sequences;
         }
 
         private void readTextures(UInt32 num, UInt32 offset, BinaryReader bin)

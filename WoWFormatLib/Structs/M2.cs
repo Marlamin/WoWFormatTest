@@ -7,6 +7,11 @@ using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.Structs.M2
 {
+    public struct Sequence
+    {
+        public uint timestamp;
+    }
+
     public struct Animation
     {
         public ushort animationID;
