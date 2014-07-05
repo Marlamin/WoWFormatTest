@@ -23,12 +23,7 @@ namespace WoWFormatLib.FileReaders
     {
         private List<String> blpFiles;
         private string basedir;
-
-        public uint version;
         public string modelName;
-        public GlobalModelFlags modelFlags;
-        public Sequence[] sequences;
-        public Animation[] animations;
 
         public M2Reader(string basedir)
         {
@@ -56,7 +51,7 @@ namespace WoWFormatLib.FileReaders
                 Console.ReadLine();
             }
 
-            version = bin.ReadUInt32();
+            var version = bin.ReadUInt32();
             var lenModelname = bin.ReadUInt32();
             var ofsModelname = bin.ReadUInt32();
             var modelFlags = (GlobalModelFlags) bin.ReadUInt32();
@@ -176,151 +171,125 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void readRibbonEmitters(uint nRibbonEmitters, uint ofsRibbonEmitters, BinaryReader bin)
+        private RibbonEmitter[] readRibbonEmitters(uint nRibbonEmitters, uint ofsRibbonEmitters, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsRibbonEmitters;
+            var ribbonEmitters = new RibbonEmitter[nRibbonEmitters];
             for (int i = 0; i < nRibbonEmitters; i++)
             {
-                var unk = bin.ReadUInt32();
-                var boneID = bin.ReadUInt32();
-                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var nTextures = bin.ReadInt32();
-                var ofsTextures = bin.ReadInt32();
-                var nBlendRef = bin.ReadInt32();
-                var ofsBlendRef = bin.ReadInt32();
-                var color = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var opacity = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var above = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var below = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var resolution = bin.ReadSingle();
-                var length = bin.ReadSingle();
-                var emissionAngle = bin.ReadSingle();
-                var renderFlags = bin.ReadInt16();
-                var unkABlock = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var unkABlock2 = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var unk2 = bin.ReadInt32();
+                ribbonEmitters[i] = bin.Read<RibbonEmitter>();
             }
+            return ribbonEmitters;
         }
 
-        private void readCameraLookup(uint nCameraLookup, uint ofsCameraLookup, BinaryReader bin)
+        private CameraLookup[] readCameraLookup(uint nCameraLookup, uint ofsCameraLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsCameraLookup;
+            var cameraLookup = new CameraLookup[nCameraLookup];
             for (int i = 0; i < nCameraLookup; i++)
             {
-                var cameraID = bin.ReadUInt16();
+                cameraLookup[i] = bin.Read<CameraLookup>();
             }
+            return cameraLookup;
         }
 
-        private void readCameras(uint nCameras, uint ofsCameras, BinaryReader bin)
+        private Camera[] readCameras(uint nCameras, uint ofsCameras, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsCameras;
+            var cameras = new Camera[nCameras];
             for (int i = 0; i < nCameras; i++)
             {
-                var type = bin.ReadUInt32();
-                var farClipping = bin.ReadSingle();
-                var nearClipping = bin.ReadSingle();
-                var translationPos = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var translationTar = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var target = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var unkABlock = bin.ReadBytes(20); //temp while ablock isnt implemented
+                bin.Read<Camera>();
             }
+            return cameras;
         }
 
-        private void readLights(uint nLights, uint ofsLights, BinaryReader bin)
+        private Light[] readLights(uint nLights, uint ofsLights, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsLights;
+            var lights = new Light[nLights];
             for (int i = 0; i < nLights; i++)
             {
-                var type = bin.ReadUInt16();
-                var bone = bin.ReadInt16();
-                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var ambientColor = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var ambientIntensity = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var diffuseColor = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var diffuseIntensity = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var attenuationStart = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var attenuationEnd = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var unk = bin.ReadBytes(20); //temp while ablock isnt implemented
+                bin.Read<Light>();
             }
+            return lights;
         }
 
-        private void readEvents(uint nEvents, uint ofsEvents, BinaryReader bin)
+        private Event[] readEvents(uint nEvents, uint ofsEvents, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsEvents;
+            var events = new Event[nEvents];
             for (int i = 0; i < nEvents; i++)
             {
-                //Isn't correct.
-                var identifier = Encoding.ASCII.GetString(bin.ReadBytes(4));
-                var data = bin.ReadUInt32();
-                var bone = bin.ReadUInt32();
-                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var interpolationType = bin.ReadUInt16();
-                var globalSequence = bin.ReadUInt16();
-                var nTimestampEntries = bin.ReadUInt32();
-                var ofsTimestampList = bin.ReadUInt32();
+                events[i] = bin.Read<Event>();
             }
+            return events;
         }
 
-        private void readAttachLookup(uint nAttachLookup, uint ofsAttachLookup, BinaryReader bin)
+        private AttachLookup[] readAttachLookup(uint nAttachLookup, uint ofsAttachLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsAttachLookup;
+            var attachlookup = new AttachLookup[nAttachLookup];
             for (int i = 0; i < nAttachLookup; i++)
             {
-                var attachment = bin.ReadUInt16();
+                attachlookup[i] = bin.Read<AttachLookup>();
             }
+            return attachlookup;
         }
 
-        private void readAttachments(uint nAttachments, uint ofsAttachments, BinaryReader bin)
+        private Attachment[] readAttachments(uint nAttachments, uint ofsAttachments, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsAttachments;
+            var attachments = new Attachment[nAttachments];
             for (int i = 0; i < nAttachments; i++)
             {
-                var id = bin.ReadUInt32();
-                var bone = bin.ReadUInt32();
-                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var data = bin.ReadBytes(20); //temp while ablock isnt implemented
+                attachments[i] = bin.Read<Attachment>();
             }
+            return attachments;
         }
 
-        private void readBoundingNormals(uint nBoundingNormals, uint ofsBoundingNormals, BinaryReader bin)
+        private BoundingNormal[] readBoundingNormals(uint nBoundingNormals, uint ofsBoundingNormals, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBoundingNormals;
+            var boundingNormals = new BoundingNormal[nBoundingNormals];
             for (int i = 0; i < nBoundingNormals; i++)
             {
-                var normal = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
+                boundingNormals[i] = bin.Read<BoundingNormal>();
             }
+            return boundingNormals;
         }
 
-        private void readBoundingTriangles(uint nBoundingTriangles, uint ofsBoundingTriangles, BinaryReader bin)
+        private BoundingTriangle[] readBoundingTriangles(uint nBoundingTriangles, uint ofsBoundingTriangles, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBoundingTriangles;
+            var boundingTriangles = new BoundingTriangle[nBoundingTriangles / 3];
             for (int i = 0; i < nBoundingTriangles / 3; i++)
             {
-                var index = new UInt16[3];
-                index[0] = bin.ReadUInt16();
-                index[1] = bin.ReadUInt16();
-                index[2] = bin.ReadUInt16();
+                boundingTriangles[i] = bin.Read<BoundingTriangle>();
             }
+            return boundingTriangles;
         }
 
-        private void readUVAnimLookup(uint nUVAnimLookup, uint ofsUVAnimLookup, BinaryReader bin)
+        private UVAnimLookup[] readUVAnimLookup(uint nUVAnimLookup, uint ofsUVAnimLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsUVAnimLookup;
+            var uvanimlookup = new UVAnimLookup[nUVAnimLookup];
             for (int i = 0; i < nUVAnimLookup; i++)
             {
-                var animatedTextureID = bin.ReadUInt16();
+                uvanimlookup[i] = bin.Read<UVAnimLookup>();
             }
+            return uvanimlookup;
         }
 
-        private void readTransLookup(uint nTransLookup, uint ofsTranslookup, BinaryReader bin)
+        private TransLookup[] readTransLookup(uint nTransLookup, uint ofsTranslookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTranslookup;
+            var translookup = new TransLookup[nTransLookup];
             for (int i = 0; i < nTransLookup; i++)
             {
-                var transparencyID = bin.ReadUInt16();
+                bin.Read<TransLookup>();
             }
+            return translookup;
         }
 
         private void readUnk1(uint nUnk1, uint ofsUnk1, BinaryReader bin)
@@ -328,101 +297,96 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsUnk1;
             for (int i = 0; i < nUnk1; i++)
             {
-
+                //wot
             }
         }
 
-        private void readTexLookup(uint nTexLookup, uint ofsTexLookup, BinaryReader bin)
+        private TexLookup[] readTexLookup(uint nTexLookup, uint ofsTexLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTexLookup;
+            var texlookup = new TexLookup[nTexLookup];
             for (int i = 0; i < nTexLookup; i++)
             {
-                var textureID = bin.ReadUInt16();
+                texlookup[i] = bin.Read<TexLookup>();
             }
+            return texlookup;
         }
 
-        private void readBoneLookupTable(uint nBoneLookupTable, uint ofsBoneLookupTable, BinaryReader bin)
+        private BoneLookupTable[] readBoneLookupTable(uint nBoneLookupTable, uint ofsBoneLookupTable, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBoneLookupTable;
+            var bonelookuptable = new BoneLookupTable[nBoneLookupTable];
             for (int i = 0; i < nBoneLookupTable; i++)
             {
-                var bone = bin.ReadUInt16();
+                bonelookuptable[i] = bin.Read<BoneLookupTable>();
             }
+            return bonelookuptable;
         }
 
-        private void readRenderFlags(uint nRenderFlags, uint ofsRenderFlags, BinaryReader bin)
+        private RenderFlag[] readRenderFlags(uint nRenderFlags, uint ofsRenderFlags, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsRenderFlags;
+            var renderflags = new RenderFlag[nRenderFlags];
             for (int i = 0; i < nRenderFlags; i++)
             {
-                var flags = bin.ReadUInt16();
-                var blendingMode = bin.ReadUInt16();
+                renderflags[i] = bin.Read<RenderFlag>();
             }
+            return renderflags;
         }
 
-        private void readTexReplace(uint nTexReplace, uint ofsTexReplace, BinaryReader bin)
+        private TexReplace[] readTexReplace(uint nTexReplace, uint ofsTexReplace, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTexReplace;
+            var texreplace = new TexReplace[nTexReplace];
             for (int i = 0; i < nTexReplace; i++)
             {
-                var textureID = bin.ReadInt16();
+                bin.Read<TexReplace>();
             }
+            return texreplace;
         }
 
-        private void readUVAnimation(uint nUVAnimation, uint ofsUVAnimation, BinaryReader bin)
+        private UVAnimation[] readUVAnimation(uint nUVAnimation, uint ofsUVAnimation, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsUVAnimation;
+            var uvanimations = new UVAnimation[nUVAnimation];
             for (int i = 0; i < nUVAnimation; i++)
             {
-                var translation = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var rotation = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var scaling = bin.ReadBytes(20); //temp while ablock isnt implemented   
+                uvanimations[i] = bin.Read<UVAnimation>();
             }
+            return uvanimations;
         }
 
-        private void readTransparency(uint nTransparency, uint ofsTransparency, BinaryReader bin)
+        private Transparency[] readTransparency(uint nTransparency, uint ofsTransparency, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTransparency;
+            var transparency = new Transparency[nTransparency];
             for (int i = 0; i < nTransparency; i++)
             {
-                var alpha = bin.ReadBytes(20); //temp while ablock isnt implemented
+                transparency[i] = bin.Read<Transparency>();
             }
+            return transparency;
         }
 
-        private void readColors(uint nColors, uint ofsColors, BinaryReader bin)
+        private Color[] readColors(uint nColors, uint ofsColors, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsColors;
+            var colors = new Color[nColors];
             for (int i = 0; i < nColors; i++)
             {
-                var color = bin.ReadBytes(20); //temp while ablock isnt implemented
-                var alpha = bin.ReadBytes(20); //temp while ablock isnt implemented
+                bin.Read<Color>();
             }
+            return colors;
         }
 
-        private void readVertices(uint nVertices, uint ofsVertices, BinaryReader bin)
+        private Vertice[] readVertices(uint nVertices, uint ofsVertices, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsVertices;
+            var vertices = new Vertice[nVertices];
             for (int i = 0; i < nVertices; i++)
             {
-                var position = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                Byte[] boneWeight = new Byte[4];
-                boneWeight[0] = bin.ReadByte();
-                boneWeight[1] = bin.ReadByte();
-                boneWeight[2] = bin.ReadByte();
-                boneWeight[3] = bin.ReadByte();
-                Byte[] boneIndices = new Byte[4];
-                boneIndices[0] = bin.ReadByte();
-                boneIndices[1] = bin.ReadByte();
-                boneIndices[2] = bin.ReadByte();
-                boneIndices[3] = bin.ReadByte();
-                var normal = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                Single[] textureCoords = new Single[2];
-                textureCoords[0] = bin.ReadSingle();
-                textureCoords[1] = bin.ReadSingle();
-                Single[] unknown = new Single[2];
-                unknown[0] = bin.ReadSingle();
-                unknown[1] = bin.ReadSingle();
+                vertices[i] = bin.Read<Vertice>();
             }
+            return vertices;
         }
 
         private void readKeyboneLookup(uint nKeyboneLookup, uint ofsKeyboneLookup, BinaryReader bin)
@@ -434,13 +398,15 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void readBones(uint nBones, uint ofsBones, BinaryReader bin)
+        private Bone[] readBones(uint nBones, uint ofsBones, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsBones;
+            var bones = new Bone[nBones];
             for (int i = 0; i < nBones; i++)
             {
-                var bone = bin.Read<Bone>();
+                bones[i] = bin.Read<Bone>();
             }
+            return bones;
         }
 
         private void readAnimationLookup(uint nAnimationLookup, uint ofsAnimationLookup, BinaryReader bin)
