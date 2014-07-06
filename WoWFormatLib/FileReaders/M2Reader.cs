@@ -24,6 +24,7 @@ namespace WoWFormatLib.FileReaders
         private List<String> blpFiles;
         private string basedir;
         public string modelName;
+        public Vertice[] vertices;
 
         public M2Reader(string basedir)
         {
@@ -91,12 +92,12 @@ namespace WoWFormatLib.FileReaders
             var nUVAnimLookup = bin.ReadUInt32();
             var ofsUVAnimLookup = bin.ReadUInt32();
             var vertexBox = new Vector3[2];
-            vertexBox[0] = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-            vertexBox[1] = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
+            vertexBox[0] = bin.Read<Vector3>();
+            vertexBox[1] = bin.Read<Vector3>();
             var VertexRadius = bin.ReadSingle();
             var boundingBox = new Vector3[2];
-            boundingBox[0] = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-            boundingBox[1] = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
+            boundingBox[0] = bin.Read<Vector3>();
+            boundingBox[1] = bin.Read<Vector3>();
             var BoundingRadius = bin.ReadSingle();
             var nBoundingTriangles = bin.ReadUInt32();
             var ofsBoundingTriangles = bin.ReadUInt32();
@@ -130,12 +131,12 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsModelname;
             modelName = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
 
-            var sequences = readSequences(nSequences, ofsSequences, bin);
-            var animations = readAnimations(nAnimations, ofsAnimations, bin);
+            readSequences(nSequences, ofsSequences, bin);
+            readAnimations(nAnimations, ofsAnimations, bin);
             readAnimationLookup(nAnimationLookup, ofsAnimationLookup, bin);
             readBones(nBones, ofsBones, bin);
             readKeyboneLookup(nKeyboneLookup, ofsKeyboneLookup, bin);
-            readVertices(nVertices, ofsVertices, bin);
+            vertices = readVertices(nVertices, ofsVertices, bin);
             readSkins(nViews, filename);
             readColors(nColors, ofsColors, bin);
             readTextures(nTextures, ofsTextures, bin);
@@ -199,7 +200,7 @@ namespace WoWFormatLib.FileReaders
             var cameras = new Camera[nCameras];
             for (int i = 0; i < nCameras; i++)
             {
-                bin.Read<Camera>();
+                cameras[i] = bin.Read<Camera>();
             }
             return cameras;
         }
@@ -210,7 +211,7 @@ namespace WoWFormatLib.FileReaders
             var lights = new Light[nLights];
             for (int i = 0; i < nLights; i++)
             {
-                bin.Read<Light>();
+                lights[i] = bin.Read<Light>();
             }
             return lights;
         }
@@ -287,7 +288,7 @@ namespace WoWFormatLib.FileReaders
             var translookup = new TransLookup[nTransLookup];
             for (int i = 0; i < nTransLookup; i++)
             {
-                bin.Read<TransLookup>();
+                translookup[i] = bin.Read<TransLookup>();
             }
             return translookup;
         }
@@ -340,7 +341,7 @@ namespace WoWFormatLib.FileReaders
             var texreplace = new TexReplace[nTexReplace];
             for (int i = 0; i < nTexReplace; i++)
             {
-                bin.Read<TexReplace>();
+                texreplace[i] = bin.Read<TexReplace>();
             }
             return texreplace;
         }
@@ -373,7 +374,7 @@ namespace WoWFormatLib.FileReaders
             var colors = new Color[nColors];
             for (int i = 0; i < nColors; i++)
             {
-                bin.Read<Color>();
+                colors[i] = bin.Read<Color>();
             }
             return colors;
         }
@@ -389,13 +390,15 @@ namespace WoWFormatLib.FileReaders
             return vertices;
         }
 
-        private void readKeyboneLookup(uint nKeyboneLookup, uint ofsKeyboneLookup, BinaryReader bin)
+        private KeyBoneLookup[] readKeyboneLookup(uint nKeyboneLookup, uint ofsKeyboneLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsKeyboneLookup;
+            var keybonelookup = new KeyBoneLookup[nKeyboneLookup];
             for (int i = 0; i < nKeyboneLookup; i++)
             {
-                var bone = bin.ReadUInt16();
+                keybonelookup[i] = bin.Read<KeyBoneLookup>();
             }
+            return keybonelookup;
         }
 
         private Bone[] readBones(uint nBones, uint ofsBones, BinaryReader bin)
@@ -409,13 +412,15 @@ namespace WoWFormatLib.FileReaders
             return bones;
         }
 
-        private void readAnimationLookup(uint nAnimationLookup, uint ofsAnimationLookup, BinaryReader bin)
+        private AnimationLookup[] readAnimationLookup(uint nAnimationLookup, uint ofsAnimationLookup, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsAnimationLookup;
+            var animationlookup = new AnimationLookup[nAnimationLookup];
             for (int i = 0; i < nAnimationLookup; i++)
             {
-                var animationID = bin.ReadUInt16();
+                animationlookup[i] = bin.Read<AnimationLookup>();
             }
+            return animationlookup;
         }
 
         private Animation[] readAnimations(uint nAnimations, uint ofsAnimations, BinaryReader bin)

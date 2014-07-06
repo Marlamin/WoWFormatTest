@@ -31,6 +31,11 @@ namespace WoWFormatLib.Structs.M2
         public ushort index;
     }
 
+    public struct AnimationLookup
+    {
+        public ushort animationID;
+    }
+
     public struct Bone
     {
         public int boneId;
@@ -99,9 +104,9 @@ namespace WoWFormatLib.Structs.M2
         public uint type;
         public float farClipping;
         public float nearClipping;
-        public ABlock<float> translationPos; //3*3 floats
+        public ABlock<CameraPosition> translationPos;
         public Vector3 position;
-        public ABlock<float> translationTar; //3*3 floats
+        public ABlock<CameraPosition> translationTar;
         public Vector3 target;
         public ABlock<Vector3> scaling;
         public ABlock<float> unkABlock;
@@ -110,6 +115,11 @@ namespace WoWFormatLib.Structs.M2
     public struct CameraLookup
     {
         public ushort cameraID;
+    }
+
+    public struct CameraPosition
+    {
+        public unsafe fixed float CameraPos[9];
     }
 
     public struct Event
@@ -143,6 +153,11 @@ namespace WoWFormatLib.Structs.M2
     }
 
     public struct BoneLookupTable
+    {
+        public ushort bone;
+    }
+
+    public struct KeyBoneLookup
     {
         public ushort bone;
     }

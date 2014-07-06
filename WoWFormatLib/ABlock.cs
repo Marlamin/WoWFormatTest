@@ -27,8 +27,6 @@ namespace WoWFormatLib
         public ArrayReference<ArrayReference<T>> Values;
     }
 
-    // --------
-
     public static class Extensions
     {
         public static T Read<T>(this BinaryReader bin)
