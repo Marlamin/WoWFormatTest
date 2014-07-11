@@ -7,9 +7,63 @@ using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.Structs.M2
 {
+    public struct M2Model
+    {
+        public uint version;
+        public string name;
+        public GlobalModelFlags flags;
+        public Sequence[] sequences;
+        public Animation[] animations;
+        public AnimationLookup[] animationlookup;
+        public Bone[] bones;
+        public KeyBoneLookup[] keybonelookup;
+        public Vertice[] vertices;
+        public uint nViews;
+        public Color[] colors;
+        public List<String> textures;
+        public Transparency[] transparency;
+        public UVAnimation[] uvanimations;
+        public TexReplace[] texreplace;
+        public RenderFlag[] renderflags;
+        public BoneLookupTable[] bonelookuptable;
+        public TexLookup[] texlookup;
+        //unk1
+        public TransLookup[] translookup;
+        public UVAnimLookup[] uvanimlookup;
+        public Vector3[] vertexbox;
+        public float vertexradius;
+        public Vector3[] boundingbox;
+        public float boundingradius;
+        public BoundingTriangle[] boundingtriangles;
+        public BoundingNormal[] boundingnormals;
+        public Attachment[] attachments;
+        public AttachLookup[] attachlookup;
+        public Event[] events;
+        public Light[] lights;
+        public Camera[] cameras;
+        public CameraLookup[] cameralookup;
+        public RibbonEmitter[] ribbonemitters;
+        public ParticleEmitter[] particleemitters;
+    }
+
+    [Flags]
+    public enum GlobalModelFlags
+    {
+        Flag_0x1_TiltX = 0x1,
+        Flag_0x2_TiltY = 0x2,
+        Flag_0x4 = 0x4,
+        Flag_0x8_ExtraHeaderField = 0x8,
+        Flag_0x10 = 0x10,
+    }
+
     public struct Sequence
     {
         public uint timestamp;
+    }
+
+    public struct ParticleEmitter
+    {
+        //needs filling in
     }
 
     public struct Animation
@@ -129,7 +183,7 @@ namespace WoWFormatLib.Structs.M2
         public uint bone;
         public Vector3 position;
         public ushort interpolationType;
-        public ushort globalSequence;
+        public ushort GlobalSequence;
         public uint nTimestampEntries;
         public uint ofsTimestampList;
     }
