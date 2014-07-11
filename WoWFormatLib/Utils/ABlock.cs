@@ -9,13 +9,17 @@ namespace WoWFormatLib
     public struct ArrayReference<T> where T : struct
     {
         public uint Number;
-        private IntPtr _ElementsPtr;
+        private long elementsOffset;
 
-        public IEnumerable<T> GetElements()
+        public IEnumerable<T> GetElements(BinaryReader bin)
         {
             var type = typeof(T);
             for (int i = 0; i < Number; i++)
-                yield return (T)Marshal.PtrToStructure(IntPtr.Add(_ElementsPtr, i * Marshal.SizeOf(type)), type);
+            {
+                var offset = elementsOffset + (i * Marshal.SizeOf(type));
+                bin.BaseStream.Position += offset;
+                yield return (T)bin.Read<T>();
+            }
         }
     }
 
