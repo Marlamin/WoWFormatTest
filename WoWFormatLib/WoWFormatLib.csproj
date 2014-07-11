@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ABlock.cs" />
     <Compile Include="DBC\MapReader.cs" />
     <Compile Include="FileReaders\ADTReader.cs" />
     <Compile Include="FileReaders\BLPReader.cs" />
@@ -59,6 +58,7 @@
     <Compile Include="SereniaBLPLib\BlpFile.cs" />
     <Compile Include="SereniaBLPLib\DXTDecompression.cs" />
     <Compile Include="Structs\M2.cs" />
+    <Compile Include="Utils\ABlock.cs" />
     <Compile Include="Utils\BlizzHeader.cs" />
     <Compile Include="Utils\RGBColor.cs" />
     <Compile Include="Utils\MissingFile.cs" />
