@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WoWFormatLib.Structs.SKIN;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -10,6 +11,7 @@ namespace WoWFormatLib.FileReaders
     public class SKINReader
     {
         private string basedir;
+        public SKIN skin;
 
         public SKINReader(string basedir)
         {
@@ -25,8 +27,8 @@ namespace WoWFormatLib.FileReaders
             }
 
            // Console.WriteLine("Reading " + filename);
-            FileStream skin = File.Open(Path.Combine(basedir, filename), FileMode.Open);
-            BinaryReader bin = new BinaryReader(skin);
+            FileStream stream = File.Open(Path.Combine(basedir, filename), FileMode.Open);
+            BinaryReader bin = new BinaryReader(stream);
 
             var header = new string(bin.ReadChars(4));
             if (header != "SKIN")
@@ -44,90 +46,69 @@ namespace WoWFormatLib.FileReaders
             var ofsSubmeshes = bin.ReadUInt32();
             var nTextureUnits = bin.ReadUInt32();
             var ofsTextureUnits = bin.ReadUInt32();
-            var bones = bin.ReadUInt32();
+            skin.bones = bin.ReadUInt32();
 
-            ReadIndices(nIndices, ofsIndices, bin);
-            ReadTriangles(nTriangles, ofsTriangles, bin);
-            ReadProperties(nProperties, ofsProperties, bin);
-            ReadSubmeshes(nSubmeshes, ofsSubmeshes, bin);
-            ReadTextureUnits(nTextureUnits, ofsTextureUnits, bin);
-            
+            skin.indices = ReadIndices(nIndices, ofsIndices, bin);
+            skin.triangles = ReadTriangles(nTriangles, ofsTriangles, bin);
+            skin.properties = ReadProperties(nProperties, ofsProperties, bin);
+            skin.submeshes = ReadSubmeshes(nSubmeshes, ofsSubmeshes, bin);
+            skin.textureunit = ReadTextureUnits(nTextureUnits, ofsTextureUnits, bin);
 
-            skin.Close();
+            stream.Close();
         }
 
-        private void ReadIndices(uint nIndices, uint ofsIndices, BinaryReader bin)
+        private Indice[] ReadIndices(uint nIndices, uint ofsIndices, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsIndices;
+            var indices = new Indice[nIndices];
             for (int i = 0; i < nIndices; i++)
             {
-                var vertex = bin.ReadUInt16();
+                indices[i] = bin.Read<Indice>();
             }
+            return indices;
         }
-        private void ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
+        private Triangle[] ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTriangles;
-            for (int i = 0; i < (nTriangles / 3); i++)
+            var triangles = new Triangle[nTriangles];
+            for (int i = 0; i < nTriangles; i++)
             {
-                ushort[] indices = new ushort[3];
-                indices[0] = bin.ReadUInt16();
-                indices[1] = bin.ReadUInt16();
-                indices[2] = bin.ReadUInt16();
+                triangles[i] = bin.Read<Triangle>();
             }
+            return triangles;
         }
 
-        private void ReadProperties(uint nProperties, uint ofsProperties, BinaryReader bin)
+        private Property[] ReadProperties(uint nProperties, uint ofsProperties, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsProperties;
+            var properties = new Property[nProperties];
             for (int i = 0; i < nProperties; i++)
             {
-                byte[] properties = new byte[4];
-                properties[0] = bin.ReadByte();
-                properties[1] = bin.ReadByte();
-                properties[2] = bin.ReadByte();
-                properties[3] = bin.ReadByte();
+                properties[i] = bin.Read<Property>();
             }
+            return properties;
         }
 
-        private void ReadSubmeshes(uint nSubmeshes, uint ofsSubmeshes, BinaryReader bin)
+        private Submesh[] ReadSubmeshes(uint nSubmeshes, uint ofsSubmeshes, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsSubmeshes;
+            var submeshes = new Submesh[nSubmeshes];
             for (int i = 0; i < nSubmeshes; i++)
             {
-                var submeshID = bin.ReadUInt16();  
-                var unk1 = bin.ReadUInt16();       
-                var ofsVertex = bin.ReadUInt16();  
-                var nVertices = bin.ReadUInt16();  
-                var ofsTriangle = bin.ReadUInt16();
-                var nTriangles = bin.ReadUInt16(); 
-                var nBones = bin.ReadUInt16();     
-                var ofsBones = bin.ReadUInt16();   
-                var unk2 = bin.ReadUInt16();       
-                var rootBone = bin.ReadUInt16();
-                var centerMass = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var centerBoundingBox = new Vector3(bin.ReadSingle(), bin.ReadSingle(), bin.ReadSingle());
-                var radius = bin.ReadSingle();
+                submeshes[i] = bin.Read<Submesh>();
             }
+            return submeshes;
         }
 
-        private void ReadTextureUnits(uint nTextureUnits, uint ofsTextureUnits, BinaryReader bin)
+        private TextureUnit[] ReadTextureUnits(uint nTextureUnits, uint ofsTextureUnits, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTextureUnits;
+            var textureunits = new TextureUnit[nTextureUnits];
             for (int i = 0; i < nTextureUnits; i++)
             {
-                var flags = bin.ReadUInt16();
-                var shading = bin.ReadUInt16();
-                var submeshIndex = bin.ReadUInt16();
-                var submeshIndex2 = bin.ReadUInt16();
-                var colorIndex = bin.ReadInt16();
-                var renderFlags = bin.ReadUInt16();
-                var texUnitNumber = bin.ReadUInt16();
-                var mode = bin.ReadUInt16();
-                var texture = bin.ReadUInt16();
-                var texUnitNumber2 = bin.ReadUInt16();
-                var transparency = bin.ReadUInt16();
-                var textureAnim = bin.ReadUInt16();
+                textureunits[i] = bin.Read<TextureUnit>();
             }
+            return textureunits;
         }
     }
 }

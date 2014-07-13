@@ -19,6 +19,7 @@ namespace WoWFormatLib.Structs.M2
         public KeyBoneLookup[] keybonelookup;
         public Vertice[] vertices;
         public uint nViews;
+        public WoWFormatLib.Structs.SKIN.SKIN[] skins;
         public Color[] colors;
         public List<String> textures;
         public Transparency[] transparency;

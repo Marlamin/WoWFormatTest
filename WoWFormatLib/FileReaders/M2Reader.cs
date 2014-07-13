@@ -126,7 +126,7 @@ namespace WoWFormatLib.FileReaders
             model.bones = readBones(nBones, ofsBones, bin);
             model.keybonelookup = readKeyboneLookup(nKeyboneLookup, ofsKeyboneLookup, bin);
             model.vertices = readVertices(nVertices, ofsVertices, bin);
-            readSkins(model.nViews, filename);
+            model.skins = readSkins(model.nViews, filename);
             model.colors = readColors(nColors, ofsColors, bin);
             model.textures = readTextures(nTextures, ofsTextures, bin);
             model.transparency = readTransparency(nTransparency, ofsTransparency, bin);
@@ -467,8 +467,9 @@ namespace WoWFormatLib.FileReaders
             return textures;
         }
 
-        private void readSkins(UInt32 num, String filename)
+        private WoWFormatLib.Structs.SKIN.SKIN[] readSkins(UInt32 num, String filename)
         {
+            var skins = new WoWFormatLib.Structs.SKIN.SKIN[num];
             for (int i = 0; i < num; i++)
             {
                 var skinfilename = filename.Replace(".M2", i.ToString().PadLeft(2, '0') + ".skin");
@@ -481,8 +482,10 @@ namespace WoWFormatLib.FileReaders
                 {
                     SKINReader skinreader = new SKINReader(basedir);
                     skinreader.LoadSKIN(skinfilename);
+                    skins[i] = skinreader.skin;
                 }
             }
+            return skins;
         }
     }
 }

@@ -58,6 +58,7 @@
     <Compile Include="SereniaBLPLib\BlpFile.cs" />
     <Compile Include="SereniaBLPLib\DXTDecompression.cs" />
     <Compile Include="Structs\M2.cs" />
+    <Compile Include="Structs\SKIN.cs" />
     <Compile Include="Utils\ABlock.cs" />
     <Compile Include="Utils\BlizzHeader.cs" />
     <Compile Include="Utils\RGBColor.cs" />
