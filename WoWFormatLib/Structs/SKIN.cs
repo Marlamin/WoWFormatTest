@@ -10,6 +10,7 @@ namespace WoWFormatLib.Structs.SKIN
     public struct SKIN
     {
         public uint version;
+        public string filename;
         public Indice[] indices;
         public Triangle[] triangles;
         public Property[] properties;

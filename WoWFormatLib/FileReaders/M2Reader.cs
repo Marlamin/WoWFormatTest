@@ -119,7 +119,7 @@ namespace WoWFormatLib.FileReaders
 
             bin.BaseStream.Position = ofsModelname;
             model.name = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
-
+            model.filename = filename;
             model.sequences = readSequences(nSequences, ofsSequences, bin);
             model.animations = readAnimations(nAnimations, ofsAnimations, bin);
             model.animationlookup = readAnimationLookup(nAnimationLookup, ofsAnimationLookup, bin);

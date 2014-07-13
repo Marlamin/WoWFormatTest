@@ -36,6 +36,7 @@ namespace WoWFormatLib.FileReaders
                 Console.WriteLine("Invalid SKIN file!");
             }
 
+            skin.filename = filename;
             var nIndices = bin.ReadUInt32();
             var ofsIndices = bin.ReadUInt32();
             var nTriangles = bin.ReadUInt32();

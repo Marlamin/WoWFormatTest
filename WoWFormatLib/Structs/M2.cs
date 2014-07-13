@@ -10,6 +10,7 @@ namespace WoWFormatLib.Structs.M2
     public struct M2Model
     {
         public uint version;
+        public string filename;
         public string name;
         public GlobalModelFlags flags;
         public Sequence[] sequences;
