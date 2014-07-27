@@ -57,6 +57,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SereniaBLPLib\BlpFile.cs" />
     <Compile Include="SereniaBLPLib\DXTDecompression.cs" />
+    <Compile Include="Structs\ADT.cs" />
+    <Compile Include="Structs\ADTobj.cs" />
+    <Compile Include="Structs\ADTtex.cs" />
     <Compile Include="Structs\M2.cs" />
     <Compile Include="Structs\SKIN.cs" />
     <Compile Include="Utils\ABlock.cs" />
