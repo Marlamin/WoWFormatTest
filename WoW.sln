@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubMeshDump", "SubMeshDump\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWJSONDump", "WoWJSONDump\WoWJSONDump.csproj", "{9BDE8953-8BD5-4900-BE1C-7AAB56AE8D87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AxeRenderTest", "AxeRenderTest\AxeRenderTest.csproj", "{3177A431-E344-4395-A5E7-F54DE5A1D397}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{9BDE8953-8BD5-4900-BE1C-7AAB56AE8D87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BDE8953-8BD5-4900-BE1C-7AAB56AE8D87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BDE8953-8BD5-4900-BE1C-7AAB56AE8D87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3177A431-E344-4395-A5E7-F54DE5A1D397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3177A431-E344-4395-A5E7-F54DE5A1D397}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3177A431-E344-4395-A5E7-F54DE5A1D397}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3177A431-E344-4395-A5E7-F54DE5A1D397}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
