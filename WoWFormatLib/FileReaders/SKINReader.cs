@@ -71,8 +71,8 @@ namespace WoWFormatLib.FileReaders
         private Triangle[] ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTriangles;
-            var triangles = new Triangle[nTriangles];
-            for (int i = 0; i < nTriangles; i++)
+            var triangles = new Triangle[nTriangles / 3];
+            for (int i = 0; i < nTriangles / 3; i++)
             {
                 triangles[i] = bin.Read<Triangle>();
             }

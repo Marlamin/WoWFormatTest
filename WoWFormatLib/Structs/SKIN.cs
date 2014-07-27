@@ -26,7 +26,9 @@ namespace WoWFormatLib.Structs.SKIN
 
     public struct Triangle
     {
-        public unsafe fixed ushort indices[3];
+        public ushort pt1;
+        public ushort pt2;
+        public ushort pt3;
     }
 
     public struct Property

@@ -14,9 +14,23 @@ namespace WoWJSONDump
     {
         static void Main(string[] args)
         {
-            M2Reader reader = new M2Reader("Z:\\WoD\\18522_full\\");
-            reader.LoadM2(@"Creature\Alakir\AlAkir.m2");
-            File.WriteAllText(@"Z:\WoD\model.json", JsonConvert.SerializeObject(reader.model, Formatting.Indented));
+            M2Reader reader = new M2Reader("Z:\\18566_full\\");
+            reader.LoadM2(@"Creature\Deathwing\Deathwing.M2");
+
+            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            {
+                Console.WriteLine("v " + reader.model.vertices[i].position.X + " " + reader.model.vertices[i].position.Z * -1 + " " + reader.model.vertices[i].position.Y + " ");
+            }
+
+            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            {
+                Console.WriteLine("vn " + reader.model.vertices[i].normal.X + " " + reader.model.vertices[i].normal.Z * -1 + " " + reader.model.vertices[i].normal.Y + " ");
+            }
+
+            for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
+            {
+                Console.WriteLine("f " + (reader.model.skins[0].triangles[i].pt1 + 1) + " " + (reader.model.skins[0].triangles[i].pt2 + 1) + " " + (reader.model.skins[0].triangles[i].pt3 + 1));
+            }
         }
     }
 }
