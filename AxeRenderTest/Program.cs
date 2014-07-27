@@ -25,6 +25,8 @@ namespace AxeRenderTest
         private static void Main()
         {
             var form = new RenderForm("Axe Render Test HYPE");
+            form.Width = 1280;
+            form.Height = 720;
 
             // SwapChain description
             var desc = new SwapChainDescription()
