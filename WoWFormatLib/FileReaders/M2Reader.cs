@@ -119,6 +119,7 @@ namespace WoWFormatLib.FileReaders
 
             bin.BaseStream.Position = ofsModelname;
             model.name = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
+            model.name = model.name.Remove(model.name.Length - 1); //remove last char, empty
             model.filename = filename;
             model.sequences = readSequences(nSequences, ofsSequences, bin);
             model.animations = readAnimations(nAnimations, ofsAnimations, bin);
@@ -421,6 +422,16 @@ namespace WoWFormatLib.FileReaders
             for (int i = 0; i < nAnimations; i++)
             {
                 animations[i] = bin.Read<Animation>();
+                if (animations[i].flags == 0)
+                {
+                    //this check doesnt find all of them yet, needs actual flag parsing
+                    string animfilename = model.filename.Replace(".M2", animations[i].animationID.ToString().PadLeft(4, '0') + "-" + animations[i].subAnimationID.ToString().PadLeft(2, '0') + ".anim");
+                    if (!File.Exists(basedir + animfilename))
+                    {
+                        new WoWFormatLib.Utils.MissingFile(animfilename);
+                    }
+                }
+
             }
             return animations;
         }
