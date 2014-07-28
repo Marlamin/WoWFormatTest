@@ -6,6 +6,7 @@ using SharpDX.DXGI;
 using SharpDX.WPF;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
@@ -22,21 +23,26 @@ namespace WoWFormatUI
         private PixelShader m_pPixelShader;
 
         private VertexShader m_pVertexShader;
+
+        private bool modelLoaded = false;
         
         public Render()
         {
-            Go(@"World\ArtTest\Boxtest\xyz.m2");
+            //Go(@"World\ArtTest\Boxtest\xyz.m2");
         }
 
         public Render(string ModelPath)
         {
             Go(ModelPath);
+            modelLoaded = true;
         }
 
         private void Go(string ModelPath)
         {
             using (var dg = new DisposeGroup())
             {
+                string _BaseDir = ConfigurationManager.AppSettings["basedir"];
+
                 //Load Shaders
                 var pVSBlob = dg.Add(ShaderBytecode.CompileFromFile("RenderWithCam.fx", "VS", "vs_4_0"));
                 var inputSignature = dg.Add(ShaderSignature.GetInputSignature(pVSBlob));
@@ -52,7 +58,7 @@ namespace WoWFormatUI
                 }));
 
                 //Load model
-                M2Reader reader = new M2Reader("Z:\\18566_full\\");
+                M2Reader reader = new M2Reader(_BaseDir);
                 string filename = ModelPath;
                 reader.LoadM2(filename);
 
@@ -95,8 +101,8 @@ namespace WoWFormatUI
                 Device.ImmediateContext.InputAssembler.PrimitiveTopology = (PrimitiveTopology.TriangleList);
 
                 //Get texture, what a mess this could be much better
-                var blp = new BLPReader("Z:\\18566_full\\");
-                if (File.Exists(Path.Combine("Z:\\18566_full\\", reader.model.filename.Replace("M2", "blp"))))
+                var blp = new BLPReader(_BaseDir);
+                if (File.Exists(Path.Combine(_BaseDir, reader.model.filename.Replace("M2", "blp"))))
                 {
                     blp.LoadBLP(reader.model.filename.Replace("M2", "blp"));
                 }
@@ -149,6 +155,9 @@ namespace WoWFormatUI
 
         public override void RenderScene(DrawEventArgs args)
         {
+            if (!modelLoaded)
+                return;
+
             float t = 1f;
 
             Device.ImmediateContext.ClearRenderTargetView(this.RenderTargetView, Color.White);
