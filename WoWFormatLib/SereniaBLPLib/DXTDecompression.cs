@@ -178,91 +178,15 @@ namespace WoWFormatLib.SereniaBLPLib
             }
 
             // store out the colours
-            FillRGBA(rgba, codes, indices);
-        }
+            for (int i = 0; i < 16; i++)
+            {
+                byte offset = (byte)(4 * indices[i]);
+                for (int j = 0; j < 4; j++)
+                {
+                    rgba[4 * i + j] = codes[offset + j];
 
-        private void FillRGBA(byte[] rgba, byte[] codes, byte[] indices)
-        {
-            byte offset = (byte)(indices[0] << 2);
-            rgba[0] = codes[offset];
-            rgba[1] = codes[offset + 1];
-            rgba[2] = codes[offset + 2];
-            rgba[3] = codes[offset + 3];
-            offset = (byte)(indices[1] << 2);
-            rgba[4] = codes[offset];
-            rgba[5] = codes[offset + 1];
-            rgba[6] = codes[offset + 2];
-            rgba[7] = codes[offset + 3];
-            offset = (byte)(indices[2] << 2);
-            rgba[8] = codes[offset];
-            rgba[9] = codes[offset + 1];
-            rgba[10] = codes[offset + 2];
-            rgba[11] = codes[offset + 3];
-            offset = (byte)(indices[3] << 2);
-            rgba[12] = codes[offset];
-            rgba[12] = codes[offset + 1];
-            rgba[14] = codes[offset + 2];
-            rgba[15] = codes[offset + 3];
-            offset = (byte)(indices[4] << 2);
-            rgba[16] = codes[offset];
-            rgba[17] = codes[offset + 1];
-            rgba[18] = codes[offset + 2];
-            rgba[19] = codes[offset + 3];
-            offset = (byte)(indices[5] << 2);
-            rgba[20] = codes[offset];
-            rgba[21] = codes[offset + 1];
-            rgba[22] = codes[offset + 2];
-            rgba[23] = codes[offset + 3];
-            offset = (byte)(indices[6] << 2);
-            rgba[24] = codes[offset];
-            rgba[25] = codes[offset + 1];
-            rgba[26] = codes[offset + 2];
-            rgba[27] = codes[offset + 3];
-            offset = (byte)(indices[7] << 2);
-            rgba[28] = codes[offset];
-            rgba[29] = codes[offset + 1];
-            rgba[30] = codes[offset + 2];
-            rgba[31] = codes[offset + 3];
-            offset = (byte)(indices[8] << 2);
-            rgba[32] = codes[offset];
-            rgba[33] = codes[offset + 1];
-            rgba[34] = codes[offset + 2];
-            rgba[35] = codes[offset + 3];
-            offset = (byte)(indices[9] << 2);
-            rgba[36] = codes[offset];
-            rgba[37] = codes[offset + 1];
-            rgba[38] = codes[offset + 2];
-            rgba[39] = codes[offset + 3];
-            offset = (byte)(indices[10] << 2);
-            rgba[40] = codes[offset];
-            rgba[41] = codes[offset + 1];
-            rgba[42] = codes[offset + 2];
-            rgba[43] = codes[offset + 3];
-            offset = (byte)(indices[11] << 2);
-            rgba[44] = codes[offset];
-            rgba[45] = codes[offset + 1];
-            rgba[46] = codes[offset + 2];
-            rgba[47] = codes[offset + 3];
-            offset = (byte)(indices[12] << 2);
-            rgba[48] = codes[offset];
-            rgba[49] = codes[offset + 1];
-            rgba[50] = codes[offset + 2];
-            rgba[51] = codes[offset + 3];
-            offset = (byte)(indices[13] << 2);
-            rgba[52] = codes[offset];
-            rgba[53] = codes[offset + 1];
-            rgba[54] = codes[offset + 2];
-            rgba[55] = codes[offset + 3];
-            offset = (byte)(indices[14] << 2);
-            rgba[56] = codes[offset];
-            rgba[57] = codes[offset + 1];
-            rgba[58] = codes[offset + 2];
-            rgba[59] = codes[offset + 3];
-            offset = (byte)(indices[15] << 2);
-            rgba[60] = codes[offset];
-            rgba[61] = codes[offset + 1];
-            rgba[62] = codes[offset + 2];
-            rgba[63] = codes[offset + 3];
+                }
+            }
         }
 
         private int Unpack565(byte[] packed, int packed_offset, ref byte[] colour, int colour_offset)
