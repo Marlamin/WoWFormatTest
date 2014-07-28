@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Configuration;
 using WoWFormatLib.Utils;
+using WoWFormatLib.Structs.WMO;
 
 namespace WoWFormatLib.FileReaders
 {
     public class WMOReader
     {
+        public WMO wmo; 
         private List<String> blpFiles;
         private List<String> m2Files;
         private List<String> wmoGroups;
@@ -67,7 +69,7 @@ namespace WoWFormatLib.FileReaders
                         ReadMOTXChunk(chunk, bin);
                         continue;
                     case "MOVV":
-                        ReadMOVVChunk(chunk, bin);
+                       // ReadMOVVChunk(chunk, bin);
                         continue;
                     case "MOHD":
                         ReadMOHDChunk(chunk, bin, filename);
@@ -124,6 +126,7 @@ namespace WoWFormatLib.FileReaders
                     case "MOPY": //Material info for triangles, two bytes per triangle. 
                     case "MOVI": //Vertex indices for triangles
                     case "MOVT": //Vertices chunk
+                       // ReadMOVTChunk();
                     case "MONR": //Normals
                     case "MOTV": //Texture coordinates
                     case "MOBA": //Render batches
@@ -143,7 +146,10 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
+        public void ReadMOVTChunk(BlizzHeader chunk, BinaryReader bin)
+        {
 
+        }
         public void ReadMOGNChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of group names for the groups in this map object.
@@ -256,9 +262,6 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void ReadMOVVChunk(BlizzHeader chunk, BinaryReader bin)
-        {
 
-        }
     }
 }

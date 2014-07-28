@@ -48,7 +48,6 @@
     <Compile Include="FileReaders\ADTReader.cs" />
     <Compile Include="FileReaders\BLPReader.cs" />
     <Compile Include="FileReaders\M2Reader.cs" />
-    <Compile Include="FileReaders\PM4Reader.cs" />
     <Compile Include="FileReaders\SKINReader.cs" />
     <Compile Include="FileReaders\TEXReader.cs" />
     <Compile Include="FileReaders\WDLReader.cs" />
@@ -62,6 +61,7 @@
     <Compile Include="Structs\ADTtex.cs" />
     <Compile Include="Structs\M2.cs" />
     <Compile Include="Structs\SKIN.cs" />
+    <Compile Include="Structs\WMO.cs" />
     <Compile Include="Utils\ABlock.cs" />
     <Compile Include="Utils\BlizzHeader.cs" />
     <Compile Include="Utils\RGBColor.cs" />
