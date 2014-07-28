@@ -163,5 +163,10 @@ namespace WoWFormatUI
             rw.Show();
             this.Close();
         }
+
+        private void ModelListBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            
+        }
     }
 }

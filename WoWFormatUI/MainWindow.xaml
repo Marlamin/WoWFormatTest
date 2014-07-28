@@ -1,9 +1,10 @@
 ﻿<Window x:Class="WoWFormatUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dxc="clr-namespace:SharpDX.WPF;assembly=SharpDX.WPF"
+        xmlns:local="clr-namespace:WoWFormatUI"
         Title="WoW Format Test UI" Height="777" Width="942.5" ResizeMode="NoResize" Background="White">
     <Grid Margin="0,0,4,5">
-
         <TabControl HorizontalAlignment="Left" Height="728" Margin="10,5,0,0" VerticalAlignment="Top" Width="912">
             <TabItem Header="Maps">
                 <Grid>
@@ -18,8 +19,16 @@
             </TabItem>
             <TabItem Header="Models">
                 <Grid>
-                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="640" Margin="10,10,0,0" VerticalAlignment="Top" Width="231">
+                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="680" Margin="10,10,0,0" VerticalAlignment="Top" Width="231" PreviewMouseUp="ModelListBox_PreviewMouseUp">
+                        <ListBoxItem Content="World\ArtTest\Boxtest\xyz.m2"/>
+                        <ListBoxItem Content="Item\Objectcomponents\weapon\Axe_1H_BWDRaid_D_01.M2"/>
+                        <ListBoxItem Content="Item\Objectcomponents\weapon\axe_1h_blacksmithing_d_02.M2"/>
                     </ListBox>
+                    <dxc:DXElement Margin="246,0,0,0">
+                        <dxc:DXElement.Renderer>
+                            <local:Render/>
+                        </dxc:DXElement.Renderer>
+                    </dxc:DXElement>
                 </Grid>
             </TabItem>
         </TabControl>
