@@ -47,7 +47,8 @@
     <Reference Include="SharpDX.DXGI">
       <HintPath>$(SharpDXPackageBinDir)\SharpDX.DXGI.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.WPF">
+    <Reference Include="SharpDX.WPF, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SharpDX.WPF\SharpDX.WPF\bin\Debug\SharpDX.WPF.dll</HintPath>
     </Reference>
     <Reference Include="System" />

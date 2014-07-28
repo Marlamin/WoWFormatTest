@@ -10,6 +10,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatLib", "WoWFormatLib\WoWFormatLib.csproj", "{5DB0FB8F-0EAA-490A-AA7D-28AE010186A9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenderTestWPF", "RenderTestWPF\RenderTestWPF.csproj", "{339A8EBD-E27B-4765-9C4C-CF6D349D3F81}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5DB0FB8F-0EAA-490A-AA7D-28AE010186A9} = {5DB0FB8F-0EAA-490A-AA7D-28AE010186A9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

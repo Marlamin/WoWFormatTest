@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -164,9 +165,16 @@ namespace WoWFormatUI
             this.Close();
         }
 
-        private void ModelListBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            
+        private void ModelListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {            
+            ListBoxItem item = ModelListBox.SelectedValue as ListBoxItem;
+
+            if (item == null)//wtf happened
+                return;
+
+            rRender = new Render(item.Content.ToString());
+            rModelRenderWindow.Renderer = rRender;
+            rModelRenderWindow.Focus();
         }
     }
 }

@@ -19,14 +19,14 @@
             </TabItem>
             <TabItem Header="Models">
                 <Grid>
-                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="680" Margin="10,10,0,0" VerticalAlignment="Top" Width="231" PreviewMouseUp="ModelListBox_PreviewMouseUp">
+                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="680" Margin="10,10,0,0" VerticalAlignment="Top" Width="231" SelectionChanged="ModelListBox_SelectionChanged">
                         <ListBoxItem Content="World\ArtTest\Boxtest\xyz.m2"/>
                         <ListBoxItem Content="Item\Objectcomponents\weapon\Axe_1H_BWDRaid_D_01.M2"/>
                         <ListBoxItem Content="Item\Objectcomponents\weapon\axe_1h_blacksmithing_d_02.M2"/>
                     </ListBox>
-                    <dxc:DXElement Margin="246,0,0,0">
+                    <dxc:DXElement x:Name="rModelRenderWindow" Margin="246,0,0,0">
                         <dxc:DXElement.Renderer>
-                            <local:Render/>
+                            <local:Render x:Name="rRender"/>
                         </dxc:DXElement.Renderer>
                     </dxc:DXElement>
                 </Grid>

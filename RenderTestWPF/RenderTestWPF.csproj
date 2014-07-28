@@ -96,7 +96,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WoWFormatLib">
-      <HintPath>..\..\..\Martin\Documents\Visual Studio 2013\Projects\WoWFormatTest\WoWFormatLib\bin\Debug\WoWFormatLib.dll</HintPath>
+      <HintPath>..\WoWFormatLib\obj\Debug\WoWFormatLib.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

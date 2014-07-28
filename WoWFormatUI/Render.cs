@@ -25,6 +25,16 @@ namespace WoWFormatUI
         
         public Render()
         {
+            Go(@"World\ArtTest\Boxtest\xyz.m2");
+        }
+
+        public Render(string ModelPath)
+        {
+            Go(ModelPath);
+        }
+
+        private void Go(string ModelPath)
+        {
             using (var dg = new DisposeGroup())
             {
                 //Load Shaders
@@ -43,7 +53,7 @@ namespace WoWFormatUI
 
                 //Load model
                 M2Reader reader = new M2Reader("Z:\\18566_full\\");
-                string filename = @"World\ArtTest\Boxtest\xyz.m2";
+                string filename = ModelPath;
                 reader.LoadM2(filename);
 
                 //Load vertices
