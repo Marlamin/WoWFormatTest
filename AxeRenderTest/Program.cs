@@ -49,7 +49,7 @@ namespace AxeRenderTest
 
             //Load M2
             M2Reader reader = new M2Reader("Z:\\18566_full\\");
-            reader.LoadM2(@"Item\Objectcomponents\weapon\Axe_1H_BWDRaid_D_01.M2");
+            reader.LoadM2(@"World\ArtTest\Boxtest\xyz.m2");
             
             // Create Device and SwapChain
             Device device;
@@ -128,8 +128,20 @@ namespace AxeRenderTest
             var depthView = new DepthStencilView(device, depthBuffer);
 
             var blp = new BLPReader("Z:\\18566_full\\");
-            blp.LoadBLP(reader.model.filename.Replace("M2", "blp"));
-            
+           
+            if (File.Exists(Path.Combine("Z:\\18566_full\\", reader.model.filename.Replace("M2", "blp"))))
+            {
+                 blp.LoadBLP(reader.model.filename.Replace("M2", "blp"));
+            }
+            else
+            {
+                if(reader.model.textures.Count() > 0){       
+                    blp.LoadBLP(reader.model.textures[0]);
+                }else{
+                    throw new Exception("No forking textures, mate.");
+                }
+            }
+
             MemoryStream s = new MemoryStream();
             blp.bmp.Save(s, System.Drawing.Imaging.ImageFormat.Png);
             blp.bmp.Save("test.bmp", System.Drawing.Imaging.ImageFormat.Png);
@@ -169,7 +181,7 @@ namespace AxeRenderTest
 
             // Prepare matrices
             var view = Matrix.LookAtLH(new Vector3(0, 0, -2), new Vector3(0, 0, 0), Vector3.UnitY);
-            var proj = Matrix.PerspectiveFovLH((float)Math.PI / 6.0f, form.ClientSize.Width / (float)form.ClientSize.Height, 0.1f, 100.0f);
+            var proj = Matrix.PerspectiveFovLH((float)Math.PI / 2.0f, form.ClientSize.Width / (float)form.ClientSize.Height, 0.1f, 100.0f);
             var viewProj = Matrix.Multiply(view, proj);
 
             // Initialize DirectInput
@@ -184,8 +196,8 @@ namespace AxeRenderTest
             keyboard.Acquire();
 
             float camx = 0;
-            float camy = 0;
-            float camz = 0;
+            float camy = 1.6f;
+            float camz = 15.6f;
             // Main loop
             RenderLoop.Run(form, () =>
                 {
