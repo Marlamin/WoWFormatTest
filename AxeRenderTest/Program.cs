@@ -62,39 +62,46 @@ namespace AxeRenderTest
             var renderView = new RenderTargetView(device, backBuffer);
 
             // Compile Vertex and Pixel shaders
-            var vertexShaderByteCode = ShaderBytecode.CompileFromFile("RenderTest.fx", "VS", "vs_4_0");
+            var vertexShaderByteCode = ShaderBytecode.CompileFromFile("RenderTestTexture.fx", "VS", "vs_4_0");
             var vertexShader = new VertexShader(device, vertexShaderByteCode);
 
-            var pixelShaderByteCode = ShaderBytecode.CompileFromFile("RenderTest.fx", "PS", "ps_4_0");
+            var pixelShaderByteCode = ShaderBytecode.CompileFromFile("RenderTestTexture.fx", "PS", "ps_4_0");
             var pixelShader = new PixelShader(device, pixelShaderByteCode);
 
             // Layout from VertexShader input signature
             var layout = new InputLayout(device, ShaderSignature.GetInputSignature(vertexShaderByteCode), new[]
                     {
                         new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
-                        new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 16, 0)
+                        new InputElement("TEXCOORD", 0, Format.R32G32_Float, 16, 0)
                     });
 
             // Instantiate Vertex buiffer from vertex data
-            var data = new Vector4[reader.model.vertices.Count()];
+            List<float> verticelist = new List<float>();
             for (int i = 0; i < reader.model.vertices.Count(); i++)
             {
-                data[i] = new Vector4(reader.model.vertices[i].position.X, reader.model.vertices[i].position.Z * -1, -reader.model.vertices[i].position.Y, 1.0f);
+                verticelist.Add(reader.model.vertices[i].position.X);
+                verticelist.Add(reader.model.vertices[i].position.Z * -1);
+                verticelist.Add(reader.model.vertices[i].position.Y);
+                verticelist.Add(1.0f);
+                verticelist.Add(reader.model.vertices[i].textureCoordX);
+                verticelist.Add(reader.model.vertices[i].textureCoordY);
             }
 
-            List<int> list = new List<int>();
+            float[] data = verticelist.ToArray();
+
+            List<int> indicelist = new List<int>();
             for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
             {
-                list.Add(reader.model.skins[0].triangles[i].pt1);
-                list.Add(reader.model.skins[0].triangles[i].pt2);
-                list.Add(reader.model.skins[0].triangles[i].pt3);
+                indicelist.Add(reader.model.skins[0].triangles[i].pt1);
+                indicelist.Add(reader.model.skins[0].triangles[i].pt2);
+                indicelist.Add(reader.model.skins[0].triangles[i].pt3);
             }
 
-            int[] indices = list.ToArray();
+            int[] indices = indicelist.ToArray();
 
             var indexBuffer = SharpDX.Direct3D10.Buffer.Create(device, BindFlags.IndexBuffer, indices);
             var vertices = Buffer.Create(device, BindFlags.VertexBuffer, data);
-            var vertexBufferBinding = new VertexBufferBinding(vertices, Utilities.SizeOf<Vector4>(), 0);
+            var vertexBufferBinding = new VertexBufferBinding(vertices, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector2>(), 0);
 
             // Create Constant Buffer
             var contantBuffer = new Buffer(device, Utilities.SizeOf<Matrix>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None);
@@ -116,6 +123,24 @@ namespace AxeRenderTest
 
             var depthView = new DepthStencilView(device, depthBuffer);
 
+            // Load texture and create sampler
+            var texture = Texture2D.FromFile<Texture2D>(device, "AXE_1H_BLACKSMITHING_D_01.jpg");
+            var textureView = new ShaderResourceView(device, texture);
+
+            var sampler = new SamplerState(device, new SamplerStateDescription()
+            {
+                Filter = Filter.MinMagMipLinear,
+                AddressU = TextureAddressMode.Wrap,
+                AddressV = TextureAddressMode.Wrap,
+                AddressW = TextureAddressMode.Wrap,
+                BorderColor = Color.Black,
+                ComparisonFunction = Comparison.Never,
+                MaximumAnisotropy = 16,
+                MipLodBias = 0,
+                MinimumLod = 0,
+                MaximumLod = 16,
+            });
+
             // Prepare All the stages
             context.InputAssembler.InputLayout = layout;
             context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
@@ -126,6 +151,9 @@ namespace AxeRenderTest
             context.VertexShader.Set(vertexShader);
             context.Rasterizer.SetViewports(new Viewport(0, 0, form.ClientSize.Width, form.ClientSize.Height, 0.0f, 1.0f));
             context.PixelShader.Set(pixelShader);
+            context.PixelShader.SetSampler(0, sampler);
+            context.PixelShader.SetShaderResource(0, textureView);
+            context.OutputMerger.SetTargets(depthView, renderView);
 
             // Prepare matrices
             var view = Matrix.LookAtLH(new Vector3(0, 0, -2), new Vector3(0, 0, 0), Vector3.UnitY);

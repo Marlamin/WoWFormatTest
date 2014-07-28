@@ -128,7 +128,8 @@ namespace WoWFormatLib.Structs.M2
         public unsafe fixed byte boneWeight[4];
         public unsafe fixed byte boneIndices[4];
         public Vector3 normal;
-        public unsafe fixed float textureCoords[2];
+        public float textureCoordX;
+        public float textureCoordY;
         public unsafe fixed float unknown[2];
     }
 
