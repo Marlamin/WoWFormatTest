@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using WoWFormatLib.Structs.SKIN;
-using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
 {
@@ -26,7 +22,7 @@ namespace WoWFormatLib.FileReaders
                 new WoWFormatLib.Utils.MissingFile(filename);
             }
 
-           // Console.WriteLine("Reading " + filename);
+            // Console.WriteLine("Reading " + filename);
             FileStream stream = File.Open(Path.Combine(basedir, filename), FileMode.Open);
             BinaryReader bin = new BinaryReader(stream);
 
@@ -68,6 +64,7 @@ namespace WoWFormatLib.FileReaders
             }
             return indices;
         }
+
         private Triangle[] ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTriangles;

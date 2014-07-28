@@ -4,19 +4,19 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.WPF;
-using Buffer = SharpDX.Direct3D11.Buffer;
-using System.Runtime.InteropServices;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using WoWFormatLib.FileReaders;
 using System.IO;
+using System.Linq;
+using WoWFormatLib.FileReaders;
+using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace RenderTestWPF
 {
     public class Render : D3D11
     {
         public int indicecount;
+
         public Render()
         {
             using (var dg = new DisposeGroup())
@@ -118,7 +118,7 @@ namespace RenderTestWPF
 
                 Device.ImmediateContext.PixelShader.SetSampler(0, sampler);
                 Device.ImmediateContext.PixelShader.SetShaderResource(0, textureView);
-                //End of texture stuff, 
+                //End of texture stuff,
 
                 Set(ref m_pConstantBuffer, new ConstantBuffer<Projections>(Device));
                 Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
@@ -132,12 +132,11 @@ namespace RenderTestWPF
 
         public override void RenderScene(DrawEventArgs args)
         {
-
             float t = 1f;
 
             Device.ImmediateContext.ClearRenderTargetView(this.RenderTargetView, Color.White);
             Device.ImmediateContext.ClearDepthStencilView(this.DepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
-            
+
             var matWorld = Matrix.RotationX(t);
 
             m_pConstantBuffer.Value = new Projections
@@ -153,7 +152,7 @@ namespace RenderTestWPF
             Device.ImmediateContext.PixelShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
             Device.ImmediateContext.DrawIndexed(indicecount, 0, 0);
         }
-               
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -161,7 +160,7 @@ namespace RenderTestWPF
             Set(ref m_pPixelShader, null);
             Set(ref m_pConstantBuffer, null);
         }
-        
+
         private VertexShader m_pVertexShader;
         private PixelShader m_pPixelShader;
         private ConstantBuffer<Projections> m_pConstantBuffer;

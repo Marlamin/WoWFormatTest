@@ -1,25 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using System.Diagnostics;
 using System.IO;
-using System.Drawing.Imaging;
-using System.Windows.Controls;
-using System.Windows.Data;
+using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WoWFormatLib.DBC;
 using WoWFormatLib.FileReaders;
-using System.Threading;
-using System.ComponentModel;
-using System.Diagnostics;
 
 namespace WoWFormatUI
 {
@@ -44,7 +36,6 @@ namespace WoWFormatUI
                 MapListBox.Items.Add(map);
             }
             MapListBox.DisplayMemberPath = "Value";
-            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -61,14 +52,14 @@ namespace WoWFormatUI
             string _SelectedMapName = ((KeyValuePair<int, string>)MapListBox.SelectedValue).Value;
             WDTGrid.Children.Clear();
             pbLoadMap.Value = 0d;
-            
+
             var wdt = new WDTReader(basedir);
             if (File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", _SelectedMapName, _SelectedMapName + ".wdt")))
             {
                 Stopwatch _SW = new Stopwatch();
                 BackgroundWorker _BackgroundWorker = new BackgroundWorker();
                 _BackgroundWorker.WorkerReportsProgress = true;
-                
+
                 _BackgroundWorker.DoWork += new DoWorkEventHandler(
                     (object o, DoWorkEventArgs args) =>
                     {
@@ -82,19 +73,18 @@ namespace WoWFormatUI
                             if (fCancelMapLoading)
                                 break;
 
-                            Action _LoadTileAction = delegate() { LoadTile(basedir, tiles[i]);};
+                            Action _LoadTileAction = delegate() { LoadTile(basedir, tiles[i]); };
                             this.Dispatcher.Invoke(_LoadTileAction);
                             _Worker.ReportProgress((i * 100) / tiles.Count);
                         }
 
                         _Worker.ReportProgress(100);
-
                     });
 
                 _BackgroundWorker.ProgressChanged += new ProgressChangedEventHandler(
                     (object o, ProgressChangedEventArgs args) =>
                     {
-                        pbLoadMap.Value = args.ProgressPercentage;                        
+                        pbLoadMap.Value = args.ProgressPercentage;
                     });
 
                 _BackgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -105,9 +95,8 @@ namespace WoWFormatUI
                     Console.WriteLine("Loading {0} took {1} seconds", _SelectedMapName, _SW.Elapsed.TotalSeconds, _SW.ElapsedMilliseconds);
                 });
 
-
                 _BackgroundWorker.RunWorkerAsync();
-            }            
+            }
         }
 
         private void LoadTile(string basedir, int[] tile)
@@ -123,7 +112,7 @@ namespace WoWFormatUI
             rect.HorizontalAlignment = HorizontalAlignment.Left;
 
             if (File.Exists(basedir + "World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
-            {                
+            {
                 rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
                 var xmargin = x * rect.Width;
                 var ymargin = y * rect.Height;
@@ -153,7 +142,8 @@ namespace WoWFormatUI
             WDTGrid.Children.Add(rect);
         }
 
-        private void Rectangle_Mousedown(object sender, RoutedEventArgs e) {
+        private void Rectangle_Mousedown(object sender, RoutedEventArgs e)
+        {
             fCancelMapLoading = true;
             string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
             Console.WriteLine("Detected mouse event on " + name + "!");

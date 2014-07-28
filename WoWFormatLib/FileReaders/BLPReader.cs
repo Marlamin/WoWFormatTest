@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 //using SereniaBLPLib;
 using System.IO;
 using WoWFormatLib.SereniaBLPLib;
@@ -35,7 +31,6 @@ namespace WoWFormatLib.FileReaders
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
             }
-
         }
 
         public MemoryStream asBitmapStream()

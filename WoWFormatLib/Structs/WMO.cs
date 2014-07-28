@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WoWFormatLib.Utils;
+﻿using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.Structs.WMO
 {
@@ -17,6 +12,7 @@ namespace WoWFormatLib.Structs.WMO
     {
         public uint version;
     }
+
     public struct MOHD
     {
         public uint nMaterials;
@@ -35,18 +31,13 @@ namespace WoWFormatLib.Structs.WMO
 
     public struct MOTX
     {
-
     }
 
     public struct MOMT
     {
-
     }
 
     public struct MOGN
     {
-
     }
-
-
 }

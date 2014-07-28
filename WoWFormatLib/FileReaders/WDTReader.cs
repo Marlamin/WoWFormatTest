@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Text;
 using WoWFormatLib.Utils;
 
@@ -17,7 +15,6 @@ namespace WoWFormatLib.FileReaders
         {
             this.basedir = basedir;
         }
-
 
         public void LoadWDT(string filename)
         {
@@ -34,7 +31,6 @@ namespace WoWFormatLib.FileReaders
                 new WoWFormatLib.Utils.MissingFile(filename);
                 return;
             }
-
         }
 
         private void ReadWDT(string filename, FileStream wdt)
@@ -106,7 +102,7 @@ namespace WoWFormatLib.FileReaders
                         var adtreader = new ADTReader(basedir);
                         var adtfilename = filename.Replace(".WDT", "_" + y + "_" + x + ".adt"); //blizz flips these
                         adtreader.LoadADT(adtfilename);
-                        int[] xy = new int[] {y, x};
+                        int[] xy = new int[] { y, x };
                         tiles.Add(xy);
                     }
                 }

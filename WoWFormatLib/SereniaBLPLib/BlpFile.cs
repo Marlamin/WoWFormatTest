@@ -6,10 +6,10 @@
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -19,9 +19,9 @@
  */
 
 using System;
-using System.Text;
-using System.IO;
 using System.Drawing;
+using System.IO;
+using System.Text;
 
 namespace WoWFormatLib.SereniaBLPLib
 {
@@ -84,19 +84,19 @@ namespace WoWFormatLib.SereniaBLPLib
 
     public class BlpFile : IDisposable
     {
-        uint type; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
-        byte encoding; // 1 = Uncompressed, 2 = DirectX Compressed
-        byte alphaDepth; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
-        byte alphaEncoding; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
-        byte hasMipmaps; // If true (1), then there are Mipmaps
-        int width; // X Resolution of the biggest Mipmap
-        int height; // Y Resolution of the biggest Mipmap
+        private uint type; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
+        private byte encoding; // 1 = Uncompressed, 2 = DirectX Compressed
+        private byte alphaDepth; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
+        private byte alphaEncoding; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
+        private byte hasMipmaps; // If true (1), then there are Mipmaps
+        private int width; // X Resolution of the biggest Mipmap
+        private int height; // Y Resolution of the biggest Mipmap
 
-        uint[] mipmapOffsets = new uint[16]; // Offset for every Mipmap level. If 0 = no more mitmap level
-        uint[] mippmapSize = new uint[16]; // Size for every level
-        ARGBColor8[] paletteBGRA = new ARGBColor8[256]; // The color-palette for non-compressed pictures
+        private uint[] mipmapOffsets = new uint[16]; // Offset for every Mipmap level. If 0 = no more mitmap level
+        private uint[] mippmapSize = new uint[16]; // Size for every level
+        private ARGBColor8[] paletteBGRA = new ARGBColor8[256]; // The color-palette for non-compressed pictures
 
-        Stream str; // Reference of the stream
+        private Stream str; // Reference of the stream
         private DXTDecompression fDXTDecompression;
 
         /// <summary>
@@ -127,6 +127,7 @@ namespace WoWFormatLib.SereniaBLPLib
             {
                 default:
                     return 0xFF;
+
                 case 1:
                     {
                         byte b = data[alphaStart + (index / 8)];
@@ -247,13 +248,16 @@ namespace WoWFormatLib.SereniaBLPLib
                 case 1:
                     pic = GetPictureUncompressedByteArray(w, h, data);
                     break;
+
                 case 2:
                     int flag = (alphaDepth > 1) ? ((alphaEncoding == 7) ? (int)DXTDecompression.DXTFlags.DXT5 : (int)DXTDecompression.DXTFlags.DXT3) : (int)DXTDecompression.DXTFlags.DXT1;
                     pic = fDXTDecompression.DecompressImage(w, h, data, flag);
                     break;
+
                 case 3:
                     pic = data;
                     break;
+
                 default:
                     pic = new byte[0];
                     break;

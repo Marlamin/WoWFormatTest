@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Configuration;
-using WoWFormatLib.Utils;
+using System.Text;
 using WoWFormatLib.Structs.WMO;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
 {
     public class WMOReader
     {
-        public WMO wmo; 
+        public WMO wmo;
         private List<String> blpFiles;
         private List<String> m2Files;
         private List<String> wmoGroups;
@@ -40,7 +37,6 @@ namespace WoWFormatLib.FileReaders
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
             }
-
         }
 
         private void ReadWMO(string filename, FileStream wmo)
@@ -69,7 +65,7 @@ namespace WoWFormatLib.FileReaders
                         ReadMOTXChunk(chunk, bin);
                         continue;
                     case "MOVV":
-                       // ReadMOVVChunk(chunk, bin);
+                        // ReadMOVVChunk(chunk, bin);
                         continue;
                     case "MOHD":
                         ReadMOHDChunk(chunk, bin, filename);
@@ -123,10 +119,10 @@ namespace WoWFormatLib.FileReaders
                             throw new Exception("Unsupported WMO version! (" + wmover + ")");
                         }
                         continue;
-                    case "MOPY": //Material info for triangles, two bytes per triangle. 
+                    case "MOPY": //Material info for triangles, two bytes per triangle.
                     case "MOVI": //Vertex indices for triangles
                     case "MOVT": //Vertices chunk
-                       // ReadMOVTChunk();
+                    // ReadMOVTChunk();
                     case "MONR": //Normals
                     case "MOTV": //Texture coordinates
                     case "MOBA": //Render batches
@@ -146,10 +142,11 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
+
         public void ReadMOVTChunk(BlizzHeader chunk, BinaryReader bin)
         {
-
         }
+
         public void ReadMOGNChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of group names for the groups in this map object.
@@ -180,15 +177,15 @@ namespace WoWFormatLib.FileReaders
         public void ReadMOHDChunk(BlizzHeader chunk, BinaryReader bin, string filename)
         {
             //Header for the map object. 64 bytes.
-           // var MOHDChunk = bin.ReadBytes((int)chunk.Size);
+            // var MOHDChunk = bin.ReadBytes((int)chunk.Size);
             var nMaterials = bin.ReadUInt32();
             var nGroups = bin.ReadUInt32();
             var nPortals = bin.ReadUInt32();
             var nLights = bin.ReadUInt32();
             var nModels = bin.ReadUInt32();
-        
+
             //Console.WriteLine("         " + nGroups.ToString() + " group(s)");
-            
+
             for (int i = 0; i < nGroups; i++)
             {
                 var groupfilename = filename.Replace(".WMO", "_" + i.ToString().PadLeft(3, '0') + ".WMO");
@@ -221,7 +218,7 @@ namespace WoWFormatLib.FileReaders
                         }
                         else
                         {
-                           // Console.WriteLine(str.ToString() + " exists!");
+                            // Console.WriteLine(str.ToString() + " exists!");
                             // Console.ReadLine();
                         }
                         //Console.WriteLine("         " + str.ToString());
@@ -251,7 +248,6 @@ namespace WoWFormatLib.FileReaders
                         m2Files.Add(str.ToString());
                         var m2reader = new M2Reader(basedir);
                         m2reader.LoadM2(str.ToString());
-                        
                     }
                     str = new StringBuilder();
                 }
@@ -261,7 +257,5 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
-
-
     }
 }

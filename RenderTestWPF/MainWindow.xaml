@@ -4,18 +4,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:dxc="clr-namespace:SharpDX.WPF;assembly=SharpDX.WPF"
 		xmlns:local="clr-namespace:RenderTestWPF"
-        Title="RenderTest" 
+        Title="RenderTest"
 		Height="500" Width="600">
     <Grid>
         <Grid Margin="170,0,0,0">
             <dxc:DXElement>
                 <dxc:DXElement.Renderer>
-                    <local:Render/>
+                    <local:Render />
                 </dxc:DXElement.Renderer>
             </dxc:DXElement>
         </Grid>
         <ListBox HorizontalAlignment="Left" Height="459" VerticalAlignment="Top" Width="170">
-            <ListBoxItem Content="Model"/>
+            <ListBoxItem Content="Model" />
         </ListBox>
     </Grid>
 </Window>

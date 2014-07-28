@@ -4,8 +4,7 @@
         Title="RenderWindow" Height="600" Width="790" Background="Red">
     <Grid>
         <Canvas HorizontalAlignment="Left" Height="569" VerticalAlignment="Top" Width="784" Background="Black">
-            <Label x:Name="RenderLabel" Content="Label" Canvas.Left="357" Canvas.Top="164" Foreground="White" Background="{x:Null}"/>
+            <Label x:Name="RenderLabel" Content="Label" Canvas.Left="357" Canvas.Top="164" Foreground="White" Background="{x:Null}" />
         </Canvas>
-
     </Grid>
 </Window>

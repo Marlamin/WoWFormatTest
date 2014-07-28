@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.Structs.M2
@@ -29,8 +26,10 @@ namespace WoWFormatLib.Structs.M2
         public RenderFlag[] renderflags;
         public BoneLookupTable[] bonelookuptable;
         public TexLookup[] texlookup;
+
         //unk1
         public TransLookup[] translookup;
+
         public UVAnimLookup[] uvanimlookup;
         public Vector3[] vertexbox;
         public float vertexradius;
@@ -190,6 +189,7 @@ namespace WoWFormatLib.Structs.M2
         public uint nTimestampEntries;
         public uint ofsTimestampList;
     }
+
     public struct Light
     {
         public short type;
@@ -219,7 +219,8 @@ namespace WoWFormatLib.Structs.M2
         public ushort bone;
     }
 
-    public struct TexLookup{
+    public struct TexLookup
+    {
         public ushort textureID;
     }
 
@@ -227,6 +228,7 @@ namespace WoWFormatLib.Structs.M2
     {
         public ushort transparencyID;
     }
+
     public struct UVAnimLookup
     {
         public ushort animatedTextureID;

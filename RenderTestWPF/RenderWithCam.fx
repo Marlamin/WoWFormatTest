@@ -37,4 +37,3 @@ float4 PS(PS_INPUT input) : SV_Target
 {
 	return picture.Sample(pictureSampler, input.tex);
 }
-

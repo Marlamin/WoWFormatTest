@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WoWFormatLib.Structs.M2;
 using WoWFormatLib.Utils;
 
@@ -15,6 +11,7 @@ namespace WoWFormatLib.FileReaders
         private List<String> blpFiles;
         private string basedir;
         public M2Model model;
+
         public M2Reader(string basedir)
         {
             this.basedir = basedir;
@@ -28,9 +25,9 @@ namespace WoWFormatLib.FileReaders
                 new WoWFormatLib.Utils.MissingFile(filename);
                 return;
             }
-            
+
             blpFiles = new List<string>();
-            
+
             FileStream m2 = File.Open(basedir + filename, FileMode.Open);
             BinaryReader bin = new BinaryReader(m2);
 
@@ -44,7 +41,7 @@ namespace WoWFormatLib.FileReaders
             model.version = bin.ReadUInt32();
             var lenModelname = bin.ReadUInt32();
             var ofsModelname = bin.ReadUInt32();
-            model.flags = (GlobalModelFlags) bin.ReadUInt32();
+            model.flags = (GlobalModelFlags)bin.ReadUInt32();
             var nSequences = bin.ReadUInt32();
             var ofsSequences = bin.ReadUInt32();
             var nAnimations = bin.ReadUInt32();
@@ -159,7 +156,7 @@ namespace WoWFormatLib.FileReaders
             var particleEmitters = new ParticleEmitter[nParticleEmitters];
             for (int i = 0; i < nParticleEmitters; i++)
             {
-                //Apparently really wrong. Who needs particles, right? 
+                //Apparently really wrong. Who needs particles, right?
             }
             return particleEmitters;
         }
@@ -431,7 +428,6 @@ namespace WoWFormatLib.FileReaders
                         new WoWFormatLib.Utils.MissingFile(animfilename);
                     }
                 }
-
             }
             return animations;
         }

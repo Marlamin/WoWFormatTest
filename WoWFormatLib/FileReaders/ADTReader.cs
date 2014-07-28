@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Text;
-using WoWFormatLib.Structs.ADT;
-using WoWFormatLib.Structs.ADTobj;
-using WoWFormatLib.Structs.ADTtex;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -51,11 +46,11 @@ namespace WoWFormatLib.FileReaders
 
                 switch (chunk.ToString())
                 {
-                    case "MVER": 
+                    case "MVER":
                         if (bin.ReadUInt32() != 18)
                         {
                             throw new Exception("Unsupported ADT version!");
-                        } 
+                        }
                         continue;
                     case "MCNK":
                         ReadMCNKChunk(chunk, bin);
@@ -235,6 +230,7 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
+
         public void ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //this will be called 256 times per adt, needs to be v optimized

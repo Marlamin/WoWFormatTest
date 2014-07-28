@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Text;
 using WoWFormatLib.Utils;
 
@@ -34,7 +31,6 @@ namespace WoWFormatLib.FileReaders
                     return;
                 }
             }
-
         }
 
         private void ReadTEX(string filename, FileStream tex)
@@ -101,6 +97,5 @@ namespace WoWFormatLib.FileReaders
                 throw new Exception("Unsupported TEX version!");
             }
         }
-
     }
 }

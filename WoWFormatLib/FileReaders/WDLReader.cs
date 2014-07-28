@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Text;
 using WoWFormatLib.Utils;
 
@@ -19,9 +16,9 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadWDL(string filename)
         {
-            if (File.Exists(Path.Combine(basedir,filename)))
+            if (File.Exists(Path.Combine(basedir, filename)))
             {
-                using (FileStream wdl = File.Open(Path.Combine(basedir,filename), FileMode.Open))
+                using (FileStream wdl = File.Open(Path.Combine(basedir, filename), FileMode.Open))
                 {
                     ReadWDL(filename, wdl);
                 }
@@ -31,7 +28,6 @@ namespace WoWFormatLib.FileReaders
                 new WoWFormatLib.Utils.MissingFile(filename);
                 return;
             }
-
         }
 
         private void ReadWDL(string filename, FileStream wdl)
@@ -100,6 +96,5 @@ namespace WoWFormatLib.FileReaders
                 throw new Exception("Unsupported WDL version!");
             }
         }
-
     }
 }

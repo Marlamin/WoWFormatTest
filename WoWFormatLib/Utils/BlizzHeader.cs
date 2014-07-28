@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WoWFormatLib.Utils
 {
     public class BlizzHeader
     {
         private char[] header;
-        UInt32 size;
+        private UInt32 size;
 
         public BlizzHeader()
         {
@@ -34,7 +31,10 @@ namespace WoWFormatLib.Utils
             return string.Join(string.Empty, header).Equals(name, StringComparison.InvariantCulture);
         }
 
-        public override String ToString() { return new String(header); }
+        public override String ToString()
+        {
+            return new String(header);
+        }
 
         public char[] Header
         {

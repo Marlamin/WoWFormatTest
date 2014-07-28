@@ -1,30 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CSDBCReader;
-using System.IO;
 using System.Configuration;
+using System.IO;
 using WoWFormatLib.DBC;
 using WoWFormatLib.FileReaders;
-using WoWFormatLib.Utils;
-using System.Reflection;
 
 namespace WoWFormatLib
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             string basedir = ConfigurationManager.AppSettings["basedir"];
             //LoadAllMaps(basedir);
 
             LoadFromListfile("C:\\WoD\\18566listfile.txt", basedir);
-
         }
 
-        static void LoadFromListfile(string listfile, string basedir)
+        private static void LoadFromListfile(string listfile, string basedir)
         {
             string line;
             StreamReader file = new System.IO.StreamReader(listfile);
@@ -99,7 +92,7 @@ namespace WoWFormatLib
             Console.ReadLine();
         }
 
-        static void LoadAllMaps(string basedir)
+        private static void LoadAllMaps(string basedir)
         {
             var reader = new MapReader(basedir);
             Dictionary<int, string> maps = reader.GetMaps();
@@ -108,9 +101,9 @@ namespace WoWFormatLib
                 LoadMap(map.Value, basedir);
             }
         }
-        static void LoadMap(string map, string basedir)
+
+        private static void LoadMap(string map, string basedir)
         {
-            
             if (File.Exists(Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt")))
             {
                 Console.WriteLine("Loading " + map + "...");
@@ -122,6 +115,5 @@ namespace WoWFormatLib
                 Console.WriteLine("Map \"" + map + "\" does not exist.");
             }
         }
-
     }
 }

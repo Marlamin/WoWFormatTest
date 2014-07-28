@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CSDBCReader;
-using System.Configuration;
 using System.IO;
 
 namespace WoWFormatLib.DBC
@@ -18,7 +13,6 @@ namespace WoWFormatLib.DBC
             this.basedir = basedir;
         }
 
-
         public Dictionary<int, string> GetMaps()
         {
             var maps = new Dictionary<int, string>();
@@ -26,7 +20,8 @@ namespace WoWFormatLib.DBC
             var Map = new CSDBCReader.DBCFile(Path.Combine(basedir, "DBFilesClient\\Map.dbc"));
             Map.Read(false);
             var dbc = Map.GetDataTable();
-            for (var i = 0; i < dbc.Rows.Length; i++){
+            for (var i = 0; i < dbc.Rows.Length; i++)
+            {
                 var row = dbc.Rows[i];
                 var mapid = 0;
                 var mapname = "";
@@ -42,7 +37,7 @@ namespace WoWFormatLib.DBC
                     {
                         var stringoffset = BitConverter.ToInt32(field.Value, 0);
                         mapname = Map.Reader.ReadString(stringoffset);
-                    }       
+                    }
                 }
                 maps.Add(mapid, mapname);
             }

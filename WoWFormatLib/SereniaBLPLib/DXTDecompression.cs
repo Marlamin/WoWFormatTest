@@ -6,10 +6,10 @@
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -43,7 +43,7 @@ namespace WoWFormatLib.SereniaBLPLib
             if ((flags & ((int)DXTFlags.DXT3 | (int)DXTFlags.DXT5)) != 0)
                 Buffer.BlockCopy(block, 8, colourBlock, 0, 8);
             else
-                Buffer.BlockCopy(block, 0, colourBlock, 0, 8);                
+                Buffer.BlockCopy(block, 0, colourBlock, 0, 8);
 
             // decompress color
             DecompressColor(ref rgba, colourBlock, ((flags & (int)DXTFlags.DXT1) != 0));
@@ -53,7 +53,6 @@ namespace WoWFormatLib.SereniaBLPLib
                 DecompressAlphaDxt3(ref rgba, alphaBlock);
             else if ((flags & (int)DXTFlags.DXT5) != 0)
                 DecompressAlphaDxt5(ref rgba, alphaBlock);
-
         }
 
         private void DecompressAlphaDxt3(ref byte[] rgba, byte[] block)
@@ -184,7 +183,6 @@ namespace WoWFormatLib.SereniaBLPLib
                 for (int j = 0; j < 4; j++)
                 {
                     rgba[4 * i + j] = codes[offset + j];
-
                 }
             }
         }
