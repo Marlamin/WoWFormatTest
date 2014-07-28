@@ -49,7 +49,7 @@ namespace AxeRenderTest
 
             //Load M2
             M2Reader reader = new M2Reader("Z:\\18566_full\\");
-            reader.LoadM2(@"Item\Objectcomponents\weapon\axe_1h_blacksmithing_d_02.M2");
+            reader.LoadM2(@"Item\Objectcomponents\weapon\Axe_1H_BWDRaid_D_01.M2");
             
             // Create Device and SwapChain
             Device device;
@@ -169,7 +169,7 @@ namespace AxeRenderTest
 
             // Prepare matrices
             var view = Matrix.LookAtLH(new Vector3(0, 0, -2), new Vector3(0, 0, 0), Vector3.UnitY);
-            var proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, form.ClientSize.Width / (float)form.ClientSize.Height, 0.1f, 100.0f);
+            var proj = Matrix.PerspectiveFovLH((float)Math.PI / 6.0f, form.ClientSize.Width / (float)form.ClientSize.Height, 0.1f, 100.0f);
             var viewProj = Matrix.Multiply(view, proj);
 
             // Initialize DirectInput
