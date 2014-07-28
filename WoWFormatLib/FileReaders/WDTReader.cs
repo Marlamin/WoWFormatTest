@@ -101,7 +101,7 @@ namespace WoWFormatLib.FileReaders
                         //ADT exists
                         var adtreader = new ADTReader(basedir);
                         var adtfilename = filename.Replace(".WDT", "_" + y + "_" + x + ".adt"); //blizz flips these
-                        adtreader.LoadADT(adtfilename);
+                        //adtreader.LoadADT(adtfilename);
                         int[] xy = new int[] { y, x };
                         tiles.Add(xy);
                     }
