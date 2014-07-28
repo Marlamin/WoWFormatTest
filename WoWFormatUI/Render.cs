@@ -25,19 +25,53 @@ namespace WoWFormatUI
         private VertexShader m_pVertexShader;
 
         private bool modelLoaded = false;
-        
+
         public Render()
         {
-            //Go(@"World\ArtTest\Boxtest\xyz.m2");
+            //RenderModel(@"World\ArtTest\Boxtest\xyz.m2");
         }
 
         public Render(string ModelPath)
         {
-            Go(ModelPath);
+            RenderModel(ModelPath);
             modelLoaded = true;
         }
 
-        private void Go(string ModelPath)
+        public override void RenderScene(DrawEventArgs args)
+        {
+            if (!modelLoaded)
+                return;
+
+            float t = 1f;
+
+            Device.ImmediateContext.ClearRenderTargetView(this.RenderTargetView, Color.White);
+            Device.ImmediateContext.ClearDepthStencilView(this.DepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
+
+            var matWorld = Matrix.RotationX(t);
+
+            m_pConstantBuffer.Value = new Projections
+            {
+                Projection = Matrix.Transpose(Camera.Projection),
+                View = Matrix.Transpose(Camera.View),
+                World = Matrix.Transpose(matWorld),
+            };
+
+            Device.ImmediateContext.VertexShader.Set(m_pVertexShader);
+            Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
+            Device.ImmediateContext.PixelShader.Set(m_pPixelShader);
+            Device.ImmediateContext.PixelShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
+            Device.ImmediateContext.DrawIndexed(indicecount, 0, 0);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            Set(ref m_pVertexShader, null);
+            Set(ref m_pPixelShader, null);
+            Set(ref m_pConstantBuffer, null);
+        }
+
+        private void RenderModel(string ModelPath)
         {
             using (var dg = new DisposeGroup())
             {
@@ -151,40 +185,6 @@ namespace WoWFormatUI
             Camera = new FirstPersonCamera();
             Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 100.0f);
             Camera.SetViewParams(new Vector3(0.0f, 0.0f, -5.0f), new Vector3(0.0f, 1.0f, 0.0f));
-        }
-
-        public override void RenderScene(DrawEventArgs args)
-        {
-            if (!modelLoaded)
-                return;
-
-            float t = 1f;
-
-            Device.ImmediateContext.ClearRenderTargetView(this.RenderTargetView, Color.White);
-            Device.ImmediateContext.ClearDepthStencilView(this.DepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
-
-            var matWorld = Matrix.RotationX(t);
-
-            m_pConstantBuffer.Value = new Projections
-            {
-                Projection = Matrix.Transpose(Camera.Projection),
-                View = Matrix.Transpose(Camera.View),
-                World = Matrix.Transpose(matWorld),
-            };
-
-            Device.ImmediateContext.VertexShader.Set(m_pVertexShader);
-            Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
-            Device.ImmediateContext.PixelShader.Set(m_pPixelShader);
-            Device.ImmediateContext.PixelShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
-            Device.ImmediateContext.DrawIndexed(indicecount, 0, 0);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            Set(ref m_pVertexShader, null);
-            Set(ref m_pPixelShader, null);
-            Set(ref m_pConstantBuffer, null);
         }
     }
 }
