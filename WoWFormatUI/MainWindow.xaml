@@ -1,14 +1,27 @@
 ﻿<Window x:Class="WoWFormatUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WoW Format Test UI" Height="745" Width="913.5" ResizeMode="NoResize" Background="White">
+        Title="WoW Format Test UI" Height="777" Width="942.5" ResizeMode="NoResize" Background="White">
     <Grid Margin="0,0,4,5">
-        <ListBox x:Name="MapListBox" HorizontalAlignment="Left" Height="640" Margin="10,10,0,0" VerticalAlignment="Top" Width="231">
-        </ListBox>
-        <Button x:Name="btnLoadMap" Content="Load Map" HorizontalAlignment="Left" Margin="246,663,0,0" VerticalAlignment="Top" Width="640" Click="Button_Click" Height="32" />
-        <Grid x:Name="WDTGrid" HorizontalAlignment="Left" Height="640" Margin="246,10,0,0" VerticalAlignment="Top" Width="640" />
-        <ProgressBar x:Name="pbLoadMap" HorizontalAlignment="Left" Height="11" Margin="10,684,0,0" VerticalAlignment="Top" Width="231" />
-        <RadioButton x:Name="rbSortMapId" Content="Sort by Map Id" HorizontalAlignment="Left" Margin="10,655,0,0" VerticalAlignment="Top" GroupName="MapListSort" IsChecked="True" Checked="rbSortMapId_Checked" />
-        <RadioButton x:Name="rbSortName" Content="Sort by Name" HorizontalAlignment="Left" Margin="110,655,0,0" VerticalAlignment="Top" GroupName="MapListSort" Checked="rbSortName_Checked" />
+
+        <TabControl HorizontalAlignment="Left" Height="728" Margin="10,5,0,0" VerticalAlignment="Top" Width="912">
+            <TabItem Header="Maps">
+                <Grid>
+                    <ListBox x:Name="MapListBox" HorizontalAlignment="Left" Height="640" Margin="10,10,0,0" VerticalAlignment="Top" Width="231">
+                    </ListBox>
+                    <Button x:Name="btnLoadMap" Content="Load Map" HorizontalAlignment="Left" Margin="246,663,0,0" VerticalAlignment="Top" Width="640" Click="Button_Click" Height="32" />
+                    <Grid x:Name="WDTGrid" HorizontalAlignment="Left" Height="640" Margin="246,10,0,0" VerticalAlignment="Top" Width="640" />
+                    <ProgressBar x:Name="pbLoadMap" HorizontalAlignment="Left" Height="11" Margin="10,684,0,0" VerticalAlignment="Top" Width="231" />
+                    <RadioButton x:Name="rbSortMapId" Content="Sort by Map Id" HorizontalAlignment="Left" Margin="10,655,0,0" VerticalAlignment="Top" GroupName="MapListSort" IsChecked="True" Checked="rbSortMapId_Checked" />
+                    <RadioButton x:Name="rbSortName" Content="Sort by Name" HorizontalAlignment="Left" Margin="110,655,0,0" VerticalAlignment="Top" GroupName="MapListSort" Checked="rbSortName_Checked" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Models">
+                <Grid>
+                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="640" Margin="10,10,0,0" VerticalAlignment="Top" Width="231">
+                    </ListBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

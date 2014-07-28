@@ -8,10 +8,10 @@ namespace WoWFormatLib.FileReaders
 {
     public class ADTReader
     {
+        private string basedir;
+        private List<String> blpFiles;
         private List<String> m2Files;
         private List<String> wmoFiles;
-        private List<String> blpFiles;
-        private string basedir;
 
         public ADTReader(string basedir)
         {
@@ -83,6 +83,92 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
+        public void ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //this will be called 256 times per adt, needs to be v optimized
+        }
+
+        public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
+            var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
+
+            var str = new StringBuilder();
+
+            for (var i = 0; i < m2FilesChunk.Length; i++)
+            {
+                if (m2FilesChunk[i] == '\0')
+                {
+                    if (str.Length > 1)
+                    {
+                        var m2reader = new M2Reader(basedir);
+                        m2reader.LoadM2(str.ToString());
+                        m2Files.Add(str.ToString());
+                    }
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)m2FilesChunk[i]);
+                }
+            }
+        }
+
+        public void ReadMTEXChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of BLP filenames
+            var blpFilesChunk = bin.ReadBytes((int)chunk.Size);
+
+            var str = new StringBuilder();
+
+            for (var i = 0; i < blpFilesChunk.Length; i++)
+            {
+                if (blpFilesChunk[i] == '\0')
+                {
+                    if (str.Length > 1)
+                    {
+                        blpFiles.Add(str.ToString());
+                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
+                        {
+                            Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
+                            new WoWFormatLib.Utils.MissingFile(str.ToString());
+                        }
+                    }
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)blpFilesChunk[i]);
+                }
+            }
+        }
+
+        public void ReadMWMOChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of WMO filenames
+            var wmoFilesChunk = bin.ReadBytes((int)chunk.Size);
+
+            var str = new StringBuilder();
+
+            for (int i = 0; i < wmoFilesChunk.Length; i++)
+            {
+                if (wmoFilesChunk[i] == '\0')
+                {
+                    if (str.Length > 1)
+                    {
+                        wmoFiles.Add(str.ToString());
+                        var wmoreader = new WMOReader(basedir);
+                        wmoreader.LoadWMO(str.ToString());
+                    }
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)wmoFilesChunk[i]);
+                }
+            }
+        }
+
         private void ReadMHDRChunk(BlizzHeader chunk, BinaryReader bin)
         {
             var pad = bin.ReadUInt32();
@@ -148,92 +234,6 @@ namespace WoWFormatLib.FileReaders
 
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
-        }
-
-        public void ReadMWMOChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-            //List of WMO filenames
-            var wmoFilesChunk = bin.ReadBytes((int)chunk.Size);
-
-            var str = new StringBuilder();
-
-            for (int i = 0; i < wmoFilesChunk.Length; i++)
-            {
-                if (wmoFilesChunk[i] == '\0')
-                {
-                    if (str.Length > 1)
-                    {
-                        wmoFiles.Add(str.ToString());
-                        var wmoreader = new WMOReader(basedir);
-                        wmoreader.LoadWMO(str.ToString());
-                    }
-                    str = new StringBuilder();
-                }
-                else
-                {
-                    str.Append((char)wmoFilesChunk[i]);
-                }
-            }
-        }
-
-        public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
-            var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
-
-            var str = new StringBuilder();
-
-            for (var i = 0; i < m2FilesChunk.Length; i++)
-            {
-                if (m2FilesChunk[i] == '\0')
-                {
-                    if (str.Length > 1)
-                    {
-                        var m2reader = new M2Reader(basedir);
-                        m2reader.LoadM2(str.ToString());
-                        m2Files.Add(str.ToString());
-                    }
-                    str = new StringBuilder();
-                }
-                else
-                {
-                    str.Append((char)m2FilesChunk[i]);
-                }
-            }
-        }
-
-        public void ReadMTEXChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-            //List of BLP filenames
-            var blpFilesChunk = bin.ReadBytes((int)chunk.Size);
-
-            var str = new StringBuilder();
-
-            for (var i = 0; i < blpFilesChunk.Length; i++)
-            {
-                if (blpFilesChunk[i] == '\0')
-                {
-                    if (str.Length > 1)
-                    {
-                        blpFiles.Add(str.ToString());
-                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
-                        {
-                            Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
-                            new WoWFormatLib.Utils.MissingFile(str.ToString());
-                        }
-                    }
-                    str = new StringBuilder();
-                }
-                else
-                {
-                    str.Append((char)blpFilesChunk[i]);
-                }
-            }
-        }
-
-        public void ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-            //this will be called 256 times per adt, needs to be v optimized
         }
     }
 }

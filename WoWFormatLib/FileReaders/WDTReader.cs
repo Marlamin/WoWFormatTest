@@ -8,12 +8,18 @@ namespace WoWFormatLib.FileReaders
 {
     public class WDTReader
     {
-        private string basedir;
         public List<int[]> tiles;
+        private string basedir;
 
         public WDTReader(string basedir)
         {
             this.basedir = basedir;
+        }
+
+        //TODO there's probably a better way to do this
+        public List<int[]> getTiles()
+        {
+            return tiles;
         }
 
         public void LoadWDT(string filename)
@@ -30,56 +36,6 @@ namespace WoWFormatLib.FileReaders
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
                 return;
-            }
-        }
-
-        private void ReadWDT(string filename, FileStream wdt)
-        {
-            filename = Path.ChangeExtension(filename, "WDT");
-            var bin = new BinaryReader(wdt);
-            BlizzHeader chunk;
-            long position = 0;
-            while (position < wdt.Length)
-            {
-                wdt.Position = position;
-
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
-
-                position = wdt.Position + chunk.Size;
-
-                switch (chunk.ToString())
-                {
-                    case "MVER": ReadMVERChunk(bin);
-                        continue;
-                    case "MAIN": ReadMAINChunk(bin, chunk, filename);
-                        continue;
-                    case "MWMO": ReadMWMOChunk(bin);
-                        continue;
-                    case "MPHD":
-                    case "MODF": continue;
-                    default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
-                }
-            }
-        }
-
-        private void ReadMWMOChunk(BinaryReader bin)
-        {
-            if (bin.ReadByte() != 0)
-            {
-                bin.BaseStream.Position = bin.BaseStream.Position - 1;
-
-                var str = new StringBuilder();
-                char c;
-                while ((c = bin.ReadChar()) != '\0')
-                {
-                    str.Append(c);
-                }
-                var wmofilename = str.ToString();
-
-                var wmoreader = new WMOReader(basedir);
-                wmoreader.LoadWMO(wmofilename);
             }
         }
 
@@ -117,10 +73,54 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        //TODO there's probably a better way to do this
-        public List<int[]> getTiles()
+        private void ReadMWMOChunk(BinaryReader bin)
         {
-            return tiles;
+            if (bin.ReadByte() != 0)
+            {
+                bin.BaseStream.Position = bin.BaseStream.Position - 1;
+
+                var str = new StringBuilder();
+                char c;
+                while ((c = bin.ReadChar()) != '\0')
+                {
+                    str.Append(c);
+                }
+                var wmofilename = str.ToString();
+
+                var wmoreader = new WMOReader(basedir);
+                wmoreader.LoadWMO(wmofilename);
+            }
+        }
+
+        private void ReadWDT(string filename, FileStream wdt)
+        {
+            filename = Path.ChangeExtension(filename, "WDT");
+            var bin = new BinaryReader(wdt);
+            BlizzHeader chunk;
+            long position = 0;
+            while (position < wdt.Length)
+            {
+                wdt.Position = position;
+
+                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
+                chunk.Flip();
+
+                position = wdt.Position + chunk.Size;
+
+                switch (chunk.ToString())
+                {
+                    case "MVER": ReadMVERChunk(bin);
+                        continue;
+                    case "MAIN": ReadMAINChunk(bin, chunk, filename);
+                        continue;
+                    case "MWMO": ReadMWMOChunk(bin);
+                        continue;
+                    case "MPHD":
+                    case "MODF": continue;
+                    default:
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                }
+            }
         }
     }
 }

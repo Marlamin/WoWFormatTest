@@ -35,6 +35,62 @@ namespace WoWFormatLib.SereniaBLPLib
             // Additional Enums not implemented :o
         }
 
+        public byte[] DecompressImage(int width, int height, byte[] data, int flags)
+        {
+            byte[] rgba = new byte[width * height * 4];
+
+            // initialise the block input
+            byte[] sourceBlock = data;
+            int sourceBlock_pos = 0;
+            int bytesPerBlock = ((flags & (int)DXTFlags.DXT1) != 0) ? 8 : 16;
+
+            // loop over blocks
+            for (int y = 0; y < height; y += 4)
+            {
+                for (int x = 0; x < width; x += 4)
+                {
+                    // decompress the block
+                    byte[] targetRGBA = new byte[4 * 16];
+                    int targetRGBA_pos = 0;
+                    byte[] sourceBlockBuffer = new byte[bytesPerBlock]; // größe korrekt?
+                    if (sourceBlock.Length == sourceBlock_pos) continue;
+                    Buffer.BlockCopy(sourceBlock, sourceBlock_pos, sourceBlockBuffer, 0, bytesPerBlock);
+                    //sourceBlock.CopyTo(sourceBlockBuffer, sourceBlock_pos);
+                    Decompress(ref targetRGBA, sourceBlockBuffer, flags);
+
+                    // Write the decompressed pixels to the correct image locations
+                    byte[] sourcePixel = new byte[4];
+
+                    for (int py = 0; py < 4; py++)
+                    {
+                        for (int px = 0; px < 4; px++)
+                        {
+                            int sx = x + px;
+                            int sy = y + py;
+                            if (sx < width && sy < height)
+                            {
+                                int targetPixel = 4 * (width * sy + sx);
+
+                                //targetRGBA.CopyTo(sourcePixel, targetRGBA_pos);
+                                Buffer.BlockCopy(targetRGBA, targetRGBA_pos, sourcePixel, 0, 4);
+                                targetRGBA_pos += 4;
+
+                                for (int i = 0; i < 4; i++)
+                                    rgba[targetPixel + i] = sourcePixel[i];
+                            }
+                            else
+                            {
+                                // Ignore that pixel
+                                targetRGBA_pos += 4;
+                            }
+                        }
+                    }
+                    sourceBlock_pos += bytesPerBlock;
+                }
+            }
+            return rgba;
+        }
+
         private void Decompress(ref byte[] rgba, byte[] block, int flags)
         {
             // get the block locations
@@ -204,62 +260,6 @@ namespace WoWFormatLib.SereniaBLPLib
             colour[3 + colour_offset] = 255;
 
             return value;
-        }
-
-        public byte[] DecompressImage(int width, int height, byte[] data, int flags)
-        {
-            byte[] rgba = new byte[width * height * 4];
-
-            // initialise the block input
-            byte[] sourceBlock = data;
-            int sourceBlock_pos = 0;
-            int bytesPerBlock = ((flags & (int)DXTFlags.DXT1) != 0) ? 8 : 16;
-
-            // loop over blocks
-            for (int y = 0; y < height; y += 4)
-            {
-                for (int x = 0; x < width; x += 4)
-                {
-                    // decompress the block
-                    byte[] targetRGBA = new byte[4 * 16];
-                    int targetRGBA_pos = 0;
-                    byte[] sourceBlockBuffer = new byte[bytesPerBlock]; // größe korrekt?
-                    if (sourceBlock.Length == sourceBlock_pos) continue;
-                    Buffer.BlockCopy(sourceBlock, sourceBlock_pos, sourceBlockBuffer, 0, bytesPerBlock);
-                    //sourceBlock.CopyTo(sourceBlockBuffer, sourceBlock_pos);
-                    Decompress(ref targetRGBA, sourceBlockBuffer, flags);
-
-                    // Write the decompressed pixels to the correct image locations
-                    byte[] sourcePixel = new byte[4];
-
-                    for (int py = 0; py < 4; py++)
-                    {
-                        for (int px = 0; px < 4; px++)
-                        {
-                            int sx = x + px;
-                            int sy = y + py;
-                            if (sx < width && sy < height)
-                            {
-                                int targetPixel = 4 * (width * sy + sx);
-
-                                //targetRGBA.CopyTo(sourcePixel, targetRGBA_pos);
-                                Buffer.BlockCopy(targetRGBA, targetRGBA_pos, sourcePixel, 0, 4);
-                                targetRGBA_pos += 4;
-
-                                for (int i = 0; i < 4; i++)
-                                    rgba[targetPixel + i] = sourcePixel[i];
-                            }
-                            else
-                            {
-                                // Ignore that pixel
-                                targetRGBA_pos += 4;
-                            }
-                        }
-                    }
-                    sourceBlock_pos += bytesPerBlock;
-                }
-            }
-            return rgba;
         }
     }
 }

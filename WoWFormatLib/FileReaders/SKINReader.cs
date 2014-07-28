@@ -6,8 +6,8 @@ namespace WoWFormatLib.FileReaders
 {
     public class SKINReader
     {
-        private string basedir;
         public SKIN skin;
+        private string basedir;
 
         public SKINReader(string basedir)
         {
@@ -65,17 +65,6 @@ namespace WoWFormatLib.FileReaders
             return indices;
         }
 
-        private Triangle[] ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
-        {
-            bin.BaseStream.Position = ofsTriangles;
-            var triangles = new Triangle[nTriangles / 3];
-            for (int i = 0; i < nTriangles / 3; i++)
-            {
-                triangles[i] = bin.Read<Triangle>();
-            }
-            return triangles;
-        }
-
         private Property[] ReadProperties(uint nProperties, uint ofsProperties, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsProperties;
@@ -107,6 +96,17 @@ namespace WoWFormatLib.FileReaders
                 textureunits[i] = bin.Read<TextureUnit>();
             }
             return textureunits;
+        }
+
+        private Triangle[] ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
+        {
+            bin.BaseStream.Position = ofsTriangles;
+            var triangles = new Triangle[nTriangles / 3];
+            for (int i = 0; i < nTriangles / 3; i++)
+            {
+                triangles[i] = bin.Read<Triangle>();
+            }
+            return triangles;
         }
     }
 }

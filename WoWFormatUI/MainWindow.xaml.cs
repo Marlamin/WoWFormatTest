@@ -23,8 +23,6 @@ namespace WoWFormatUI
         private volatile bool fCancelMapLoading = false;
         private bool fLoading = false;
 
-        private delegate void LoadMapDelegate(string basedir, WDTReader wdt);
-
         public MainWindow()
         {
             InitializeComponent();
@@ -37,6 +35,8 @@ namespace WoWFormatUI
             }
             MapListBox.DisplayMemberPath = "Value";
         }
+
+        private delegate void LoadMapDelegate(string basedir, WDTReader wdt);
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -142,14 +142,10 @@ namespace WoWFormatUI
             WDTGrid.Children.Add(rect);
         }
 
-        private void Rectangle_Mousedown(object sender, RoutedEventArgs e)
+        private void rbSortMapId_Checked(object sender, RoutedEventArgs e)
         {
-            fCancelMapLoading = true;
-            string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
-            Console.WriteLine("Detected mouse event on " + name + "!");
-            var rw = new RenderWindow(name);
-            rw.Show();
-            this.Close();
+            MapListBox.Items.SortDescriptions.Clear();
+            MapListBox.Items.SortDescriptions.Add(new SortDescription("Key", ListSortDirection.Ascending));
         }
 
         private void rbSortName_Checked(object sender, RoutedEventArgs e)
@@ -158,10 +154,14 @@ namespace WoWFormatUI
             MapListBox.Items.SortDescriptions.Add(new SortDescription("Value", ListSortDirection.Ascending));
         }
 
-        private void rbSortMapId_Checked(object sender, RoutedEventArgs e)
+        private void Rectangle_Mousedown(object sender, RoutedEventArgs e)
         {
-            MapListBox.Items.SortDescriptions.Clear();
-            MapListBox.Items.SortDescriptions.Add(new SortDescription("Key", ListSortDirection.Ascending));
+            fCancelMapLoading = true;
+            string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
+            Console.WriteLine("Detected mouse event on " + name + "!");
+            var rw = new RenderWindow(name);
+            rw.Show();
+            this.Close();
         }
     }
 }

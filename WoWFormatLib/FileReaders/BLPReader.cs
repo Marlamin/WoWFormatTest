@@ -9,12 +9,19 @@ namespace WoWFormatLib.FileReaders
 {
     public class BLPReader
     {
-        private string basedir;
         public Bitmap bmp;
+        private string basedir;
 
         public BLPReader(string basedir)
         {
             this.basedir = basedir;
+        }
+
+        public MemoryStream asBitmapStream()
+        {
+            MemoryStream bitmapstream = new MemoryStream();
+            bmp.Save(bitmapstream, ImageFormat.Bmp);
+            return bitmapstream;
         }
 
         public void LoadBLP(string filename)
@@ -31,13 +38,6 @@ namespace WoWFormatLib.FileReaders
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
             }
-        }
-
-        public MemoryStream asBitmapStream()
-        {
-            MemoryStream bitmapstream = new MemoryStream();
-            bmp.Save(bitmapstream, ImageFormat.Bmp);
-            return bitmapstream;
         }
     }
 }

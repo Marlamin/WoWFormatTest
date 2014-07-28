@@ -10,11 +10,10 @@ namespace WoWFormatLib.FileReaders
     public class WMOReader
     {
         public WMO wmo;
+        private string basedir;
         private List<String> blpFiles;
         private List<String> m2Files;
         private List<String> wmoGroups;
-
-        private string basedir;
 
         public WMOReader(string basedir)
         {
@@ -39,59 +38,55 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadWMO(string filename, FileStream wmo)
+        public void ReadMODNChunk(BlizzHeader chunk, BinaryReader bin)
         {
-            var bin = new BinaryReader(wmo);
-            BlizzHeader chunk;
+            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
+            var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
 
-            long position = 0;
-            while (position < wmo.Length)
+            var str = new StringBuilder();
+
+            for (var i = 0; i < m2FilesChunk.Length; i++)
             {
-                wmo.Position = position;
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
-                position = wmo.Position + chunk.Size;
-
-                switch (chunk.ToString())
+                if (m2FilesChunk[i] == '\0')
                 {
-                    case "MVER":
-                        UInt32 wmover = bin.ReadUInt32();
-                        if (wmover != 17)
-                        {
-                            throw new Exception("Unsupported WMO version! (" + wmover + ")");
-                        }
-                        continue;
-                    case "MOTX":
-                        ReadMOTXChunk(chunk, bin);
-                        continue;
-                    case "MOVV":
-                        // ReadMOVVChunk(chunk, bin);
-                        continue;
-                    case "MOHD":
-                        ReadMOHDChunk(chunk, bin, filename);
-                        continue;
-                    case "MOGN":
-                        ReadMOGNChunk(chunk, bin);
-                        continue;
-                    case "MOGP":
-                        ReadMOGPChunk(chunk, bin);
-                        continue;
-                    case "MODN":
-                    case "MOMT":
-                    case "MOGI":
-                    case "MOSB":
-                    case "MOPV":
-                    case "MOPT":
-                    case "MOPR":
-                    case "MOVB":
-                    case "MOLT":
-                    case "MODS":
-                    case "MODD":
-                    case "MFOG":
-                    case "MCVP":
-                        continue;
-                    default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                    if (str.Length > 1)
+                    {
+                        m2Files.Add(str.ToString());
+                        var m2reader = new M2Reader(basedir);
+                        m2reader.LoadM2(str.ToString());
+                    }
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)m2FilesChunk[i]);
+                }
+            }
+        }
+
+        public void ReadMOGNChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of group names for the groups in this map object.
+            var wmoGroupsChunk = bin.ReadBytes((int)chunk.Size);
+
+            var str = new StringBuilder();
+            int group = 0;
+
+            for (var i = 0; i < wmoGroupsChunk.Length; i++)
+            {
+                if (wmoGroupsChunk[i] == '\0')
+                {
+                    if (str.Length > 1)
+                    {
+                        wmoGroups.Add(str.ToString());
+                        //Console.WriteLine("         " + str.ToString() + " (group file " + group.ToString() + ")");
+                        group++;
+                    }
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)wmoGroupsChunk[i]);
                 }
             }
         }
@@ -139,37 +134,6 @@ namespace WoWFormatLib.FileReaders
                         continue;
                     default:
                         throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subchunk.ToString(), position.ToString()));
-                }
-            }
-        }
-
-        public void ReadMOVTChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-        }
-
-        public void ReadMOGNChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-            //List of group names for the groups in this map object.
-            var wmoGroupsChunk = bin.ReadBytes((int)chunk.Size);
-
-            var str = new StringBuilder();
-            int group = 0;
-
-            for (var i = 0; i < wmoGroupsChunk.Length; i++)
-            {
-                if (wmoGroupsChunk[i] == '\0')
-                {
-                    if (str.Length > 1)
-                    {
-                        wmoGroups.Add(str.ToString());
-                        //Console.WriteLine("         " + str.ToString() + " (group file " + group.ToString() + ")");
-                        group++;
-                    }
-                    str = new StringBuilder();
-                }
-                else
-                {
-                    str.Append((char)wmoGroupsChunk[i]);
                 }
             }
         }
@@ -232,28 +196,63 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void ReadMODNChunk(BlizzHeader chunk, BinaryReader bin)
+        public void ReadMOVTChunk(BlizzHeader chunk, BinaryReader bin)
         {
-            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
-            var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
+        }
 
-            var str = new StringBuilder();
+        private void ReadWMO(string filename, FileStream wmo)
+        {
+            var bin = new BinaryReader(wmo);
+            BlizzHeader chunk;
 
-            for (var i = 0; i < m2FilesChunk.Length; i++)
+            long position = 0;
+            while (position < wmo.Length)
             {
-                if (m2FilesChunk[i] == '\0')
+                wmo.Position = position;
+                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
+                chunk.Flip();
+                position = wmo.Position + chunk.Size;
+
+                switch (chunk.ToString())
                 {
-                    if (str.Length > 1)
-                    {
-                        m2Files.Add(str.ToString());
-                        var m2reader = new M2Reader(basedir);
-                        m2reader.LoadM2(str.ToString());
-                    }
-                    str = new StringBuilder();
-                }
-                else
-                {
-                    str.Append((char)m2FilesChunk[i]);
+                    case "MVER":
+                        UInt32 wmover = bin.ReadUInt32();
+                        if (wmover != 17)
+                        {
+                            throw new Exception("Unsupported WMO version! (" + wmover + ")");
+                        }
+                        continue;
+                    case "MOTX":
+                        ReadMOTXChunk(chunk, bin);
+                        continue;
+                    case "MOVV":
+                        // ReadMOVVChunk(chunk, bin);
+                        continue;
+                    case "MOHD":
+                        ReadMOHDChunk(chunk, bin, filename);
+                        continue;
+                    case "MOGN":
+                        ReadMOGNChunk(chunk, bin);
+                        continue;
+                    case "MOGP":
+                        ReadMOGPChunk(chunk, bin);
+                        continue;
+                    case "MODN":
+                    case "MOMT":
+                    case "MOGI":
+                    case "MOSB":
+                    case "MOPV":
+                    case "MOPT":
+                    case "MOPR":
+                    case "MOVB":
+                    case "MOLT":
+                    case "MODS":
+                    case "MODD":
+                    case "MFOG":
+                    case "MCVP":
+                        continue;
+                    default:
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
                 }
             }
         }

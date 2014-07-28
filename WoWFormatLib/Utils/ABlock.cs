@@ -4,6 +4,14 @@ using System.Runtime.InteropServices;
 
 namespace WoWFormatLib
 {
+    public struct ABlock<T> where T : struct
+    {
+        public ushort GlobalSequence;
+        public ushort InterpolationType;
+        public ArrayReference<ArrayReference<uint>> Timestamps;
+        public ArrayReference<ArrayReference<T>> Values;
+    }
+
     public struct ArrayReference<T> where T : struct
     {
         public uint Number;
@@ -19,14 +27,6 @@ namespace WoWFormatLib
                 yield return (T)bin.Read<T>();
             }
         }
-    }
-
-    public struct ABlock<T> where T : struct
-    {
-        public ushort InterpolationType;
-        public ushort GlobalSequence;
-        public ArrayReference<ArrayReference<uint>> Timestamps;
-        public ArrayReference<ArrayReference<T>> Values;
     }
 
     public static class Extensions

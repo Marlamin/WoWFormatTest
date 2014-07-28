@@ -17,6 +17,12 @@ namespace RenderTestWPF
     {
         public int indicecount;
 
+        private ConstantBuffer<Projections> m_pConstantBuffer;
+
+        private PixelShader m_pPixelShader;
+
+        private VertexShader m_pVertexShader;
+
         public Render()
         {
             using (var dg = new DisposeGroup())
@@ -160,9 +166,5 @@ namespace RenderTestWPF
             Set(ref m_pPixelShader, null);
             Set(ref m_pConstantBuffer, null);
         }
-
-        private VertexShader m_pVertexShader;
-        private PixelShader m_pPixelShader;
-        private ConstantBuffer<Projections> m_pConstantBuffer;
     }
 }

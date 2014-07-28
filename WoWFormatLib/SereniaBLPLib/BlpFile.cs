@@ -28,10 +28,10 @@ namespace WoWFormatLib.SereniaBLPLib
     // Some Helper Struct to store Color-Data
     public struct ARGBColor8
     {
-        public byte red;
-        public byte green;
-        public byte blue;
         public byte alpha;
+        public byte blue;
+        public byte green;
+        public byte red;
 
         public ARGBColor8(int r, int g, int b)
         {
@@ -84,94 +84,36 @@ namespace WoWFormatLib.SereniaBLPLib
 
     public class BlpFile : IDisposable
     {
-        private uint type; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
-        private byte encoding; // 1 = Uncompressed, 2 = DirectX Compressed
-        private byte alphaDepth; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
-        private byte alphaEncoding; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
-        private byte hasMipmaps; // If true (1), then there are Mipmaps
-        private int width; // X Resolution of the biggest Mipmap
-        private int height; // Y Resolution of the biggest Mipmap
+        private byte alphaDepth;
 
-        private uint[] mipmapOffsets = new uint[16]; // Offset for every Mipmap level. If 0 = no more mitmap level
-        private uint[] mippmapSize = new uint[16]; // Size for every level
-        private ARGBColor8[] paletteBGRA = new ARGBColor8[256]; // The color-palette for non-compressed pictures
+        // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
+        private byte alphaEncoding;
 
-        private Stream str; // Reference of the stream
+        private byte encoding;
         private DXTDecompression fDXTDecompression;
 
-        /// <summary>
-        /// Extracts the palettized Image-Data from the given Mipmap and returns a byte-Array in the 32Bit RGBA-Format
-        /// </summary>
-        /// <param name="mipmap">The desired Mipmap-Level. If the given level is invalid, the smallest available level is choosen</param>
-        /// <param name="w"></param>
-        /// <param name="h"></param>
-        /// <param name="data"></param>
-        /// <returns>Pixel-data</returns>
-        private byte[] GetPictureUncompressedByteArray(int w, int h, byte[] data)
-        {
-            int length = w * h;
-            byte[] pic = new byte[length * 4];
-            for (int i = 0; i < length; i++)
-            {
-                pic[i * 4] = paletteBGRA[data[i]].red;
-                pic[i * 4 + 1] = paletteBGRA[data[i]].green;
-                pic[i * 4 + 2] = paletteBGRA[data[i]].blue;
-                pic[i * 4 + 3] = GetAlpha(data, i, length);
-            }
-            return pic;
-        }
+        // 1 = Uncompressed, 2 = DirectX Compressed
+        // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
+        private byte hasMipmaps;
 
-        private byte GetAlpha(byte[] data, int index, int alphaStart)
-        {
-            switch (alphaDepth)
-            {
-                default:
-                    return 0xFF;
+        private int height;
+        private uint[] mipmapOffsets = new uint[16];
 
-                case 1:
-                    {
-                        byte b = data[alphaStart + (index / 8)];
-                        return (byte)((b & (0x01 << (index % 8))) == 0 ? 0x00 : 0xff);
-                    }
-                case 4:
-                    {
-                        byte b = data[alphaStart + (index / 2)];
-                        return (byte)(index % 2 == 0 ? (b & 0x0F) << 4 : b & 0xF0);
-                    }
-                case 8:
-                    return data[alphaStart + index];
-            }
-        }
+        // Offset for every Mipmap level. If 0 = no more mitmap level
+        private uint[] mippmapSize = new uint[16];
 
-        /// <summary>
-        /// Returns the raw Mipmap-Image Data. This data can either be compressed or uncompressed, depending on the Header-Data
-        /// </summary>
-        /// <param name="mipmapLevel"></param>
-        /// <returns></returns>
-        private byte[] GetPictureData(int mipmapLevel)
-        {
-            if (this.str != null)
-            {
-                byte[] data = new byte[this.mippmapSize[mipmapLevel]];
-                this.str.Position = (int)this.mipmapOffsets[mipmapLevel];
-                this.str.Read(data, 0, data.Length);
-                return data;
-            }
-            return null;
-        }
+        // Size for every level
+        private ARGBColor8[] paletteBGRA = new ARGBColor8[256];
 
-        /// <summary>
-        /// Returns the amount of Mipmaps in this BLP-File
-        /// </summary>
-        public int MipMapCount
-        {
-            get
-            {
-                int i = 0;
-                while (this.mipmapOffsets[i] != 0) i++;
-                return i;
-            }
-        }
+        private Stream str;
+        private uint type; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
+
+        // If true (1), then there are Mipmaps
+        private int width; // X Resolution of the biggest Mipmap
+
+        // Y Resolution of the biggest Mipmap
+
+        // The color-palette for non-compressed pictures
 
         public BlpFile(Stream stream)
         {
@@ -238,32 +180,36 @@ namespace WoWFormatLib.SereniaBLPLib
         }
 
         /// <summary>
-        /// Returns the uncompressed image as a bytarray in the 32pppRGBA-Format
+        /// Returns the amount of Mipmaps in this BLP-File
         /// </summary>
-        private byte[] GetImageBytes(int w, int h, byte[] data)
+        public int MipMapCount
         {
-            byte[] pic;
-            switch (encoding)
+            get
             {
-                case 1:
-                    pic = GetPictureUncompressedByteArray(w, h, data);
-                    break;
-
-                case 2:
-                    int flag = (alphaDepth > 1) ? ((alphaEncoding == 7) ? (int)DXTDecompression.DXTFlags.DXT5 : (int)DXTDecompression.DXTFlags.DXT3) : (int)DXTDecompression.DXTFlags.DXT1;
-                    pic = fDXTDecompression.DecompressImage(w, h, data, flag);
-                    break;
-
-                case 3:
-                    pic = data;
-                    break;
-
-                default:
-                    pic = new byte[0];
-                    break;
+                int i = 0;
+                while (this.mipmapOffsets[i] != 0) i++;
+                return i;
             }
+        }
 
-            return pic;
+        /// <summary>
+        /// Closes the Memorystream
+        /// </summary>
+        public void Close()
+        {
+            if (this.str != null)
+            {
+                this.str.Close();
+                this.str = null;
+            }
+        }
+
+        /// <summary>
+        /// Runs close()
+        /// </summary>
+        public void Dispose()
+        {
+            this.Close();
         }
 
         /// <summary>
@@ -296,24 +242,95 @@ namespace WoWFormatLib.SereniaBLPLib
             return bmp;
         }
 
-        /// <summary>
-        /// Runs close()
-        /// </summary>
-        public void Dispose()
+        private byte GetAlpha(byte[] data, int index, int alphaStart)
         {
-            this.Close();
+            switch (alphaDepth)
+            {
+                default:
+                    return 0xFF;
+
+                case 1:
+                    {
+                        byte b = data[alphaStart + (index / 8)];
+                        return (byte)((b & (0x01 << (index % 8))) == 0 ? 0x00 : 0xff);
+                    }
+                case 4:
+                    {
+                        byte b = data[alphaStart + (index / 2)];
+                        return (byte)(index % 2 == 0 ? (b & 0x0F) << 4 : b & 0xF0);
+                    }
+                case 8:
+                    return data[alphaStart + index];
+            }
         }
 
         /// <summary>
-        /// Closes the Memorystream
+        /// Returns the uncompressed image as a bytarray in the 32pppRGBA-Format
         /// </summary>
-        public void Close()
+        private byte[] GetImageBytes(int w, int h, byte[] data)
+        {
+            byte[] pic;
+            switch (encoding)
+            {
+                case 1:
+                    pic = GetPictureUncompressedByteArray(w, h, data);
+                    break;
+
+                case 2:
+                    int flag = (alphaDepth > 1) ? ((alphaEncoding == 7) ? (int)DXTDecompression.DXTFlags.DXT5 : (int)DXTDecompression.DXTFlags.DXT3) : (int)DXTDecompression.DXTFlags.DXT1;
+                    pic = fDXTDecompression.DecompressImage(w, h, data, flag);
+                    break;
+
+                case 3:
+                    pic = data;
+                    break;
+
+                default:
+                    pic = new byte[0];
+                    break;
+            }
+
+            return pic;
+        }
+
+        /// <summary>
+        /// Returns the raw Mipmap-Image Data. This data can either be compressed or uncompressed, depending on the Header-Data
+        /// </summary>
+        /// <param name="mipmapLevel"></param>
+        /// <returns></returns>
+        private byte[] GetPictureData(int mipmapLevel)
         {
             if (this.str != null)
             {
-                this.str.Close();
-                this.str = null;
+                byte[] data = new byte[this.mippmapSize[mipmapLevel]];
+                this.str.Position = (int)this.mipmapOffsets[mipmapLevel];
+                this.str.Read(data, 0, data.Length);
+                return data;
             }
+            return null;
+        }
+
+        // Reference of the stream
+        /// <summary>
+        /// Extracts the palettized Image-Data from the given Mipmap and returns a byte-Array in the 32Bit RGBA-Format
+        /// </summary>
+        /// <param name="mipmap">The desired Mipmap-Level. If the given level is invalid, the smallest available level is choosen</param>
+        /// <param name="w"></param>
+        /// <param name="h"></param>
+        /// <param name="data"></param>
+        /// <returns>Pixel-data</returns>
+        private byte[] GetPictureUncompressedByteArray(int w, int h, byte[] data)
+        {
+            int length = w * h;
+            byte[] pic = new byte[length * 4];
+            for (int i = 0; i < length; i++)
+            {
+                pic[i * 4] = paletteBGRA[data[i]].red;
+                pic[i * 4 + 1] = paletteBGRA[data[i]].green;
+                pic[i * 4 + 2] = paletteBGRA[data[i]].blue;
+                pic[i * 4 + 3] = GetAlpha(data, i, length);
+            }
+            return pic;
         }
     }
 }

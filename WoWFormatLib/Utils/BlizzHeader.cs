@@ -21,6 +21,18 @@ namespace WoWFormatLib.Utils
             size = s;
         }
 
+        public char[] Header
+        {
+            get { return header; }
+            set { header = value; }
+        }
+
+        public UInt32 Size
+        {
+            get { return size; }
+            set { size = value; }
+        }
+
         public void Flip()
         {
             header = header.Reverse().ToArray();
@@ -34,18 +46,6 @@ namespace WoWFormatLib.Utils
         public override String ToString()
         {
             return new String(header);
-        }
-
-        public char[] Header
-        {
-            get { return header; }
-            set { header = value; }
-        }
-
-        public UInt32 Size
-        {
-            get { return size; }
-            set { size = value; }
         }
     }
 }

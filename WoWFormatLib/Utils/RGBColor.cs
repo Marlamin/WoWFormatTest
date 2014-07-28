@@ -2,9 +2,9 @@
 {
     public struct RGBColor
     {
-        public float R;
-        public float G;
         public float B;
+        public float G;
+        public float R;
 
         public RGBColor(float r, float g, float b)
             : this()

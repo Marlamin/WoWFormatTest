@@ -30,35 +30,11 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadWDL(string filename, FileStream wdl)
+        private void ReadMVERChunk(BinaryReader bin)
         {
-            var bin = new BinaryReader(wdl);
-            BlizzHeader chunk;
-            long position = 0;
-            while (position < wdl.Length)
+            if (bin.ReadUInt32() != 18)
             {
-                wdl.Position = position;
-
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
-
-                position = wdl.Position + chunk.Size;
-
-                switch (chunk.ToString())
-                {
-                    case "MVER": ReadMVERChunk(bin);
-                        continue;
-                    case "MWMO": ReadMWMOChunk(bin, chunk);
-                        continue;
-                    case "MWID":
-                    case "MAOC": //New in WoD?!
-                    case "MAOF": //contains MARE and MAHO subchunks
-                    case "MARE":
-                    case "MAHO":
-                    case "MODF": continue;
-                    default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
-                }
+                throw new Exception("Unsupported WDL version!");
             }
         }
 
@@ -89,11 +65,35 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadMVERChunk(BinaryReader bin)
+        private void ReadWDL(string filename, FileStream wdl)
         {
-            if (bin.ReadUInt32() != 18)
+            var bin = new BinaryReader(wdl);
+            BlizzHeader chunk;
+            long position = 0;
+            while (position < wdl.Length)
             {
-                throw new Exception("Unsupported WDL version!");
+                wdl.Position = position;
+
+                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
+                chunk.Flip();
+
+                position = wdl.Position + chunk.Size;
+
+                switch (chunk.ToString())
+                {
+                    case "MVER": ReadMVERChunk(bin);
+                        continue;
+                    case "MWMO": ReadMWMOChunk(bin, chunk);
+                        continue;
+                    case "MWID":
+                    case "MAOC": //New in WoD?!
+                    case "MAOF": //contains MARE and MAHO subchunks
+                    case "MARE":
+                    case "MAHO":
+                    case "MODF": continue;
+                    default:
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                }
             }
         }
     }
