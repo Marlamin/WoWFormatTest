@@ -16,6 +16,7 @@ using Device = SharpDX.Direct3D10.Device;
 using DriverType = SharpDX.Direct3D10.DriverType;
 using WoWFormatLib;
 using WoWFormatLib.FileReaders;
+using SharpDX.DirectInput;
 
 namespace AxeRenderTest
 {
@@ -131,20 +132,51 @@ namespace AxeRenderTest
             var proj = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, form.ClientSize.Width / (float)form.ClientSize.Height, 0.1f, 100.0f);
             var viewProj = Matrix.Multiply(view, proj);
 
-            // Use clock
-            var clock = new Stopwatch();
-            clock.Start();
+            // Initialize DirectInput
+            var directInput = new DirectInput();
 
+            // Instantiate the keyboard
+            var keyboard = new Keyboard(directInput);
+
+            // Acquire the keyboard
+            keyboard.Properties.BufferSize = 128;
+
+            keyboard.Acquire();
+
+            float camx = 0;
+            float camy = 0;
+            float camz = 0;
             // Main loop
             RenderLoop.Run(form, () =>
                 {
-                    var time = clock.ElapsedMilliseconds / 1000.0f;
+                    keyboard.Poll();
+                    var datas = keyboard.GetBufferedData();
+
+                    foreach (KeyboardUpdate update in datas)
+                    {
+                        if (update.Key == Key.W)
+                        {
+                            camz = camz + .025f;
+                        }
+                        if (update.Key == Key.D)
+                        {
+                            camy = camy + .025f;
+                        }
+                        if (update.Key == Key.A)
+                        {
+                            camy = camy - .025f;
+                        }
+                        if (update.Key == Key.S)
+                        {
+                            camz = camz - .025f;
+                        }
+                    }
                     context.OutputMerger.SetTargets(depthView, renderView);
 
                     context.ClearDepthStencilView(depthView, DepthStencilClearFlags.Depth, 1.0f, 0);
                     context.ClearRenderTargetView(renderView, Color.White);
 
-                    var worldViewProj = Matrix.RotationX(time) * Matrix.RotationY(time) * Matrix.RotationZ(time * .2f) * viewProj;
+                    var worldViewProj = Matrix.RotationX(camx) * Matrix.RotationY(camy) * Matrix.RotationZ(camz * .2f) * viewProj;
                     worldViewProj.Transpose();
                     context.UpdateSubresource(ref worldViewProj, contantBuffer);
 

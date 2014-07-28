@@ -62,6 +62,9 @@
     <Reference Include="SharpDX.Direct3D10">
       <HintPath>..\WoWRenderTest\SharpDX\SharpDX.Direct3D10.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX.DirectInput">
+      <HintPath>..\WoWRenderTest\SharpDX\SharpDX.DirectInput.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX.DXGI">
       <HintPath>..\WoWRenderTest\SharpDX\SharpDX.DXGI.dll</HintPath>
     </Reference>
