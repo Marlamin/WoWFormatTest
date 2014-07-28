@@ -53,6 +53,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="SharpDX">
       <HintPath>..\WoWRenderTest\SharpDX\SharpDX.dll</HintPath>
     </Reference>

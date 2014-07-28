@@ -33,7 +33,7 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                new Exception("BLP file " + filename + " does not exist!");
+                new WoWFormatLib.Utils.MissingFile(filename);
             }
 
         }

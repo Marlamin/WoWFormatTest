@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,11 +18,14 @@ using DriverType = SharpDX.Direct3D10.DriverType;
 using WoWFormatLib;
 using WoWFormatLib.FileReaders;
 using SharpDX.DirectInput;
+using System.Windows.Media.Imaging;
+using System.Drawing;
 
 namespace AxeRenderTest
 {
     internal static class Program
     {
+
         [STAThread]
         private static void Main()
         {
@@ -45,7 +49,7 @@ namespace AxeRenderTest
 
             //Load M2
             M2Reader reader = new M2Reader("Z:\\18566_full\\");
-            reader.LoadM2(@"Item\Objectcomponents\weapon\axe_1h_blacksmithing_d_01.M2");
+            reader.LoadM2(@"Item\Objectcomponents\weapon\axe_1h_blacksmithing_d_02.M2");
             
             // Create Device and SwapChain
             Device device;
@@ -123,8 +127,16 @@ namespace AxeRenderTest
 
             var depthView = new DepthStencilView(device, depthBuffer);
 
-            // Load texture and create sampler
-            var texture = Texture2D.FromFile<Texture2D>(device, "AXE_1H_BLACKSMITHING_D_01.jpg");
+            var blp = new BLPReader("Z:\\18566_full\\");
+            blp.LoadBLP(reader.model.filename.Replace("M2", "blp"));
+            
+            MemoryStream s = new MemoryStream();
+            blp.bmp.Save(s, System.Drawing.Imaging.ImageFormat.Png);
+            blp.bmp.Save("test.bmp", System.Drawing.Imaging.ImageFormat.Png);
+            s.Seek(0, SeekOrigin.Begin);
+            Texture2D texture = Texture2D.FromMemory<Texture2D>(device, s.ToArray());
+            
+            //var texture = Texture2D.FromFile<Texture2D>(device, "AXE_1H_BLACKSMITHING_D_01.jpg");
             var textureView = new ShaderResourceView(device, texture);
 
             var sampler = new SamplerState(device, new SamplerStateDescription()
@@ -133,7 +145,7 @@ namespace AxeRenderTest
                 AddressU = TextureAddressMode.Wrap,
                 AddressV = TextureAddressMode.Wrap,
                 AddressW = TextureAddressMode.Wrap,
-                BorderColor = Color.Black,
+                BorderColor = SharpDX.Color.Black,
                 ComparisonFunction = Comparison.Never,
                 MaximumAnisotropy = 16,
                 MipLodBias = 0,
@@ -202,7 +214,7 @@ namespace AxeRenderTest
                     context.OutputMerger.SetTargets(depthView, renderView);
 
                     context.ClearDepthStencilView(depthView, DepthStencilClearFlags.Depth, 1.0f, 0);
-                    context.ClearRenderTargetView(renderView, Color.White);
+                    context.ClearRenderTargetView(renderView, SharpDX.Color.White);
 
                     var worldViewProj = Matrix.RotationX(camx) * Matrix.RotationY(camy) * Matrix.RotationZ(camz * .2f) * viewProj;
                     worldViewProj.Transpose();
