@@ -33,8 +33,16 @@ namespace WoWFormatUI
 
         public Render(string ModelPath)
         {
-            RenderModel(ModelPath);
-            modelLoaded = true;
+            if (ModelPath.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+            {
+                RenderM2(ModelPath);
+                modelLoaded = true;
+            }
+            else if (ModelPath.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase))
+            {
+                RenderWMO(ModelPath);
+                modelLoaded = true;
+            }
         }
 
         public override void RenderScene(DrawEventArgs args)
@@ -71,7 +79,7 @@ namespace WoWFormatUI
             Set(ref m_pConstantBuffer, null);
         }
 
-        private void RenderModel(string ModelPath)
+        private void RenderM2(string ModelPath)
         {
             using (var dg = new DisposeGroup())
             {
@@ -142,20 +150,28 @@ namespace WoWFormatUI
                 }
                 else
                 {
-                    if (reader.model.textures.Count() > 0)
+                    for (int i = 0; i < reader.model.textures.Count(); i++)
                     {
-                        blp.LoadBLP(reader.model.textures[0]);
-                    }
-                    else
-                    {
-                        throw new Exception("No forking textures, mate.");
+                        if (reader.model.textures[i].flags == 0 && reader.model.textures[i].filename != null)
+                        {
+                            blp.LoadBLP(reader.model.textures[i].filename);
+                        }
                     }
                 }
 
-                MemoryStream s = new MemoryStream();
-                blp.bmp.Save(s, System.Drawing.Imaging.ImageFormat.Png);
-                s.Seek(0, SeekOrigin.Begin);
-                Texture2D texture = Texture2D.FromMemory<Texture2D>(Device, s.ToArray());
+                Texture2D texture;
+
+                if (blp.bmp == null)
+                {
+                    texture = Texture2D.FromFile<Texture2D>(Device, "missingtexture.jpg");
+                }
+                else
+                {
+                    MemoryStream s = new MemoryStream();
+                    blp.bmp.Save(s, System.Drawing.Imaging.ImageFormat.Png);
+                    s.Seek(0, SeekOrigin.Begin);
+                    texture = Texture2D.FromMemory<Texture2D>(Device, s.ToArray());
+                }
 
                 var textureView = new ShaderResourceView(Device, texture);
 
@@ -185,6 +201,10 @@ namespace WoWFormatUI
             Camera = new FirstPersonCamera();
             Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 100.0f);
             Camera.SetViewParams(new Vector3(0.0f, 0.0f, -5.0f), new Vector3(0.0f, 1.0f, 0.0f));
+        }
+
+        private void RenderWMO(string ModelPath)
+        {
         }
     }
 }

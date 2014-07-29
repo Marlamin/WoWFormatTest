@@ -147,8 +147,15 @@ namespace WoWFormatUI
         private void ModelListBox_Loaded(object sender, RoutedEventArgs e)
         {
             var basedir = ConfigurationManager.AppSettings["basedir"];
-            List<string> M2s = Directory.EnumerateFiles(basedir, "*.m2", SearchOption.AllDirectories).ToList();
-
+            //List<string> M2s = Directory.EnumerateFiles(basedir, "*.m2", SearchOption.AllDirectories).ToList();
+            List<string> M2s = new List<String>();
+            M2s.Add(@"Creature\Serpent\Serpent.M2");
+            M2s.Add(@"Creature\Serpent\SerpentRuby.M2");
+            M2s.Add(@"Creature\Deathwing\Deathwing.M2");
+            M2s.Add(@"World\Generic\Gnome\Passive Doodads\GnomeMachine\GnomeSubwayGlass.m2");
+            M2s.Add(@"Item\ObjectComponents\Weapon\Sword_1H_PVPPandariaS2_C_01.M2");
+            M2s.Add(@"Item\ObjectComponents\Weapon\Sword_1h_PVPPandariaS2_C_02.M2");
+            M2s.Add(@"Test\IGC_CartTest.M2");
             for (int i = 0; i < M2s.Count; i++)
             {
                 M2s[i] = M2s[i].Replace(basedir, string.Empty);

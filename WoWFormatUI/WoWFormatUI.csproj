@@ -132,6 +132,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="missingtexture.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="RenderWithCam.fx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

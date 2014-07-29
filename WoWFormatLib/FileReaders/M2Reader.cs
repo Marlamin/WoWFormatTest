@@ -400,15 +400,16 @@ namespace WoWFormatLib.FileReaders
             return texreplace;
         }
 
-        private List<string> readTextures(UInt32 num, UInt32 offset, BinaryReader bin)
+        private Texture[] readTextures(UInt32 num, UInt32 offset, BinaryReader bin)
         {
             bin.BaseStream.Position = offset;
-            var textures = new List<String>();
+            var textures = new Texture[num];
             for (int i = 0; i < num; i++)
             {
-                var type = bin.ReadUInt32();
-                var flags = bin.ReadUInt32();
-                if (flags == 0)
+                textures[i].type = bin.ReadUInt32();
+                textures[i].flags = bin.ReadUInt32();
+
+                if (textures[i].type == 0)
                 {
                     var lenFilename = bin.ReadUInt32();
                     var ofsFilename = bin.ReadUInt32();
@@ -418,7 +419,7 @@ namespace WoWFormatLib.FileReaders
                     filename = filename.Replace("\0", "");
                     if (!filename.Equals(""))
                     {
-                        textures.Add(filename);
+                        textures[i].filename = filename;
                         if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, filename)))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", filename);

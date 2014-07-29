@@ -19,7 +19,7 @@ namespace WoWFormatLib.Structs.M2
         public uint nViews;
         public WoWFormatLib.Structs.SKIN.SKIN[] skins;
         public Color[] colors;
-        public List<String> textures;
+        public Texture[] textures;
         public Transparency[] transparency;
         public UVAnimation[] uvanimations;
         public TexReplace[] texreplace;
@@ -260,5 +260,12 @@ namespace WoWFormatLib.Structs.M2
         public ABlock<short> unkABlock;
         public ABlock<bool> unkABlock2;
         public int unk2;
+    }
+
+    public struct Texture
+    {
+        public uint type;
+        public uint flags;
+        public string filename;
     }
 }
