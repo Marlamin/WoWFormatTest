@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -156,6 +155,8 @@ namespace WoWFormatUI
             M2s.Add(@"Item\ObjectComponents\Weapon\Sword_1H_PVPPandariaS2_C_01.M2");
             M2s.Add(@"Item\ObjectComponents\Weapon\Sword_1h_PVPPandariaS2_C_02.M2");
             M2s.Add(@"Test\IGC_CartTest.M2");
+            M2s.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
+            M2s.Add(@"World\WMO\Test\QATestWMO1.wmo");
             for (int i = 0; i < M2s.Count; i++)
             {
                 M2s[i] = M2s[i].Replace(basedir, string.Empty);

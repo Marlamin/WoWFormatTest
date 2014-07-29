@@ -57,6 +57,12 @@ namespace WoWFormatLib.Structs.M2
         Flag_0x10 = 0x10,
     }
 
+    [Flags]
+    public enum TextureFlags
+    {
+        Flag_0x1_WrapX = 0x1,
+        Flag_0x2_WrapY = 0x2,
+    }
     public struct Sequence
     {
         public uint timestamp;
@@ -265,7 +271,9 @@ namespace WoWFormatLib.Structs.M2
     public struct Texture
     {
         public uint type;
-        public uint flags;
+        public TextureFlags flags;
         public string filename;
     }
+
+
 }

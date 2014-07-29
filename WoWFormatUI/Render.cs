@@ -10,6 +10,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
+using WoWFormatLib.Structs.M2;
 using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace WoWFormatUI
@@ -52,7 +53,7 @@ namespace WoWFormatUI
 
             float t = 1f;
 
-            Device.ImmediateContext.ClearRenderTargetView(this.RenderTargetView, Color.White);
+            Device.ImmediateContext.ClearRenderTargetView(this.RenderTargetView, SharpDX.Color.White);
             Device.ImmediateContext.ClearDepthStencilView(this.DepthStencilView, DepthStencilClearFlags.Depth, 1.0f, 0);
 
             var matWorld = Matrix.RotationX(t);
@@ -152,7 +153,7 @@ namespace WoWFormatUI
                 {
                     for (int i = 0; i < reader.model.textures.Count(); i++)
                     {
-                        if (reader.model.textures[i].flags == 0 && reader.model.textures[i].filename != null)
+                        if (reader.model.textures[i].filename != null)
                         {
                             blp.LoadBLP(reader.model.textures[i].filename);
                         }
@@ -205,6 +206,76 @@ namespace WoWFormatUI
 
         private void RenderWMO(string ModelPath)
         {
+            using (var dg = new DisposeGroup())
+            {
+                string _BaseDir = ConfigurationManager.AppSettings["basedir"];
+
+                //Load Shaders
+                var pVSBlob = dg.Add(ShaderBytecode.CompileFromFile("RenderWithCam.fx", "VS", "vs_4_0"));
+                var inputSignature = dg.Add(ShaderSignature.GetInputSignature(pVSBlob));
+                m_pVertexShader = new VertexShader(Device, pVSBlob);
+
+                var pPSBlob = dg.Add(ShaderBytecode.CompileFromFile("RenderWithCam.fx", "PS", "ps_4_0"));
+                m_pPixelShader = new PixelShader(Device, pPSBlob);
+
+                //Define layout
+                var layout = dg.Add(new InputLayout(Device, inputSignature, new[]{
+                        new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
+                        new InputElement("TEXCOORD", 0, Format.R32G32_Float, 16, 0)
+                }));
+
+                //Load model
+                WMOReader reader = new WMOReader(_BaseDir);
+                string filename = ModelPath;
+                reader.LoadWMO(filename);
+
+                //Load vertices
+                List<float> verticelist = new List<float>();
+                for (int i = 0; i < reader.wmofile.group[0].mogp.vertices.Count(); i++)
+                {
+                    verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.X);
+                    verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Z * -1);
+                    verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Y);
+                    verticelist.Add(1.0f);
+                    //temp texcoords
+                    verticelist.Add(1.0f);
+                    verticelist.Add(1.0f);
+                    //verticelist.Add(reader.wmofile.group[0].vertices[i].textureCoordX);
+                    //verticelist.Add(reader.wmofile.group[0].vertices[i].textureCoordY);
+                }
+
+                //Load indices
+                List<ushort> indicelist = new List<ushort>();
+                for (int i = 0; i < reader.wmofile.group[0].mogp.indices.Count(); i++)
+                {
+                    indicelist.Add(reader.wmofile.group[0].mogp.indices[i].indice);
+                }
+
+                //Convert to array
+                ushort[] indices = indicelist.ToArray();
+                float[] vertices = verticelist.ToArray();
+
+                //Set count for use in draw later on
+                indicecount = indices.Count();
+                Console.WriteLine("model has " + indicecount + " indices!");
+                //Create buffers
+                var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, vertices));
+                var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector2>(), 0);
+                var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, indices));
+
+                Device.ImmediateContext.InputAssembler.InputLayout = (layout);
+                Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
+                Device.ImmediateContext.InputAssembler.SetIndexBuffer(indexBuffer, Format.R16_UInt, 0);
+                Device.ImmediateContext.InputAssembler.PrimitiveTopology = (PrimitiveTopology.TriangleList);
+
+                Set(ref m_pConstantBuffer, new ConstantBuffer<Projections>(Device));
+                Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
+            }
+
+            //Make camera
+            Camera = new FirstPersonCamera();
+            Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 100.0f);
+            Camera.SetViewParams(new Vector3(0.0f, 0.0f, -5.0f), new Vector3(0.0f, 1.0f, 0.0f));
         }
     }
 }

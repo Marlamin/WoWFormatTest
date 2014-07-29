@@ -408,7 +408,7 @@ namespace WoWFormatLib.FileReaders
             for (int i = 0; i < num; i++)
             {
                 textures[i].type = bin.ReadUInt32();
-                textures[i].flags = bin.ReadUInt32();
+                textures[i].flags = (TextureFlags)bin.ReadUInt32();
 
                 if (textures[i].type == 0)
                 {
