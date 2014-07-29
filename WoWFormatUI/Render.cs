@@ -151,13 +151,7 @@ namespace WoWFormatUI
                 }
                 else
                 {
-                    for (int i = 0; i < reader.model.textures.Count(); i++)
-                    {
-                        if (reader.model.textures[i].filename != null)
-                        {
-                            blp.LoadBLP(reader.model.textures[i].filename);
-                        }
-                    }
+                    blp.LoadBLP(reader.model.textures.Select(s => s.filename).ToArray());
                 }
 
                 Texture2D texture;

@@ -1,6 +1,7 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-
 //using SereniaBLPLib;
 using System.IO;
 using WoWFormatLib.SereniaBLPLib;
@@ -37,6 +38,29 @@ namespace WoWFormatLib.FileReaders
             else
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
+            }
+        }
+
+        public void LoadBLP(string[] filenames)
+        {
+            LoadBLP(filenames[0]);
+
+            using (var canvas = Graphics.FromImage(bmp))
+            {
+                canvas.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+                for (int i = 1; i < filenames.Length; i++)
+                {
+                    if (!File.Exists(filenames[i]))
+                        continue;
+
+                    using (var blp = new BlpFile(File.Open(filenames[i], FileMode.Open)))
+                    {
+                        bmp = blp.GetBitmap(0);
+                        canvas.DrawImage(bmp, 0, 0);
+                    }
+                }
+                canvas.Save();
             }
         }
     }
