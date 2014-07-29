@@ -20,7 +20,8 @@ namespace WoWFormatLib.FileReaders
         public void LoadM2(string filename)
         {
             filename = Path.ChangeExtension(filename, "M2");
-            if (!File.Exists(basedir + filename))
+            string fullPath = Path.Combine(basedir, filename);
+            if (!File.Exists(fullPath))
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
                 return;
@@ -28,7 +29,7 @@ namespace WoWFormatLib.FileReaders
 
             blpFiles = new List<string>();
 
-            FileStream m2 = File.Open(basedir + filename, FileMode.Open);
+            FileStream m2 = File.Open(fullPath, FileMode.Open);
             BinaryReader bin = new BinaryReader(m2);
 
             var header = new string(bin.ReadChars(4));
@@ -172,7 +173,7 @@ namespace WoWFormatLib.FileReaders
                 {
                     //this check doesnt find all of them yet, needs actual flag parsing
                     string animfilename = model.filename.Replace(".M2", animations[i].animationID.ToString().PadLeft(4, '0') + "-" + animations[i].subAnimationID.ToString().PadLeft(2, '0') + ".anim");
-                    if (!File.Exists(basedir + animfilename))
+                    if (!File.Exists(Path.Combine(basedir, animfilename)))
                     {
                         new WoWFormatLib.Utils.MissingFile(animfilename);
                     }
@@ -363,7 +364,7 @@ namespace WoWFormatLib.FileReaders
             for (int i = 0; i < num; i++)
             {
                 var skinfilename = filename.Replace(".M2", i.ToString().PadLeft(2, '0') + ".skin");
-                if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, skinfilename)))
+                if (!File.Exists(Path.Combine(basedir, skinfilename)))
                 {
                     Console.WriteLine(".skin file does not exist!!! {0}", skinfilename);
                     new WoWFormatLib.Utils.MissingFile(filename);
@@ -420,7 +421,7 @@ namespace WoWFormatLib.FileReaders
                     if (!filename.Equals(""))
                     {
                         textures[i].filename = filename;
-                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, filename)))
+                        if (!File.Exists(Path.Combine(basedir, filename)))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", filename);
                             new WoWFormatLib.Utils.MissingFile(filename);
