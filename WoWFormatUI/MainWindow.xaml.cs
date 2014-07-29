@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -143,6 +144,37 @@ namespace WoWFormatUI
             WDTGrid.Children.Add(rect);
         }
 
+        private void ModelListBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            var basedir = ConfigurationManager.AppSettings["basedir"];
+            List<string> M2s = Directory.EnumerateFiles(basedir, "*.m2", SearchOption.AllDirectories).ToList();
+
+            for (int i = 0; i < M2s.Count; i++)
+            {
+                M2s[i] = M2s[i].Replace(basedir, string.Empty);
+            }
+            //ModelListBox.Items.Clear();
+            ModelListBox.DataContext = M2s;
+        }
+
+        private void ModelListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            ListBoxItem item = ModelListBox.SelectedValue as ListBoxItem;
+
+            if (item == null)//Let's assume its a string
+            {
+                rRender = new Render(ModelListBox.SelectedValue.ToString());
+                rModelRenderWindow.Renderer = rRender;
+                rModelRenderWindow.Focus();
+            }
+            else
+            {
+                rRender = new Render(item.Content.ToString());
+                rModelRenderWindow.Renderer = rRender;
+                rModelRenderWindow.Focus();
+            }
+        }
+
         private void rbSortMapId_Checked(object sender, RoutedEventArgs e)
         {
             MapListBox.Items.SortDescriptions.Clear();
@@ -163,18 +195,6 @@ namespace WoWFormatUI
             var rw = new RenderWindow(name);
             rw.Show();
             this.Close();
-        }
-
-        private void ModelListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {            
-            ListBoxItem item = ModelListBox.SelectedValue as ListBoxItem;
-
-            if (item == null)//wtf happened
-                return;
-
-            rRender = new Render(item.Content.ToString());
-            rModelRenderWindow.Renderer = rRender;
-            rModelRenderWindow.Focus();
         }
     }
 }
