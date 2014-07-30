@@ -193,9 +193,10 @@ namespace WoWFormatUI
             }
 
             //Make camera
-            Camera = new FirstPersonCamera();
+            Camera = new ModelViewerCamera();
             Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 100.0f);
-            Camera.SetViewParams(new Vector3(0.0f, 0.0f, -5.0f), new Vector3(0.0f, 1.0f, 0.0f));
+            Camera.SetViewParams(new Vector3(10.0f, 10.0f, -10.0f), new Vector3(0.0f, 1.0f, 0.0f));
+            Camera.Roll(-4f);
         }
 
         private void RenderWMO(string ModelPath)
