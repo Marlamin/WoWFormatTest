@@ -134,9 +134,13 @@ namespace WoWFormatLib.FileReaders
                         mogp.vertices = ReadMOVTChunk(subchunk, subbin);
                         break;
 
+                    case "MOTV": //Texture coordinates
+                        mogp.textureCoords = ReadMOTVChunk(subchunk, subbin);
+                        break;
+
                     case "MOPY": //Material info for triangles, two bytes per triangle.
                     case "MONR": //Normals
-                    case "MOTV": //Texture coordinates
+
                     case "MOBA": //Render batches
                     case "MOBS": //Unk
                     case "MODR": //Doodad references
@@ -223,6 +227,19 @@ namespace WoWFormatLib.FileReaders
                 vertices[i].vector = bin.Read<Vector3>();
             }
             return vertices;
+        }
+
+        private MOTV[] ReadMOTVChunk(BlizzHeader subchunk, BinaryReader subbin)
+        {
+            var numCoords = subchunk.Size / (sizeof(float) * 2);
+            Console.WriteLine(numCoords + " texturecords!");
+            var textureCoords = new MOTV[numCoords];
+            for (var i = 0; i < numCoords; i++)
+            {
+                textureCoords[i].X = subbin.ReadSingle();
+                textureCoords[i].Y = subbin.ReadSingle();
+            }
+            return textureCoords;
         }
 
         private MOVI[] ReadMOVIChunk(BlizzHeader chunk, BinaryReader bin)

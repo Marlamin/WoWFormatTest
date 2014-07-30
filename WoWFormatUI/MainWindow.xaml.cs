@@ -157,6 +157,7 @@ namespace WoWFormatUI
             M2s.Add(@"Test\IGC_CartTest.M2");
             M2s.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
             M2s.Add(@"World\WMO\Test\QATestWMO1.wmo");
+            M2s.Add(@"World\WMO\transports\Icebreaker\Transport_Icebreaker_ship_stationary.wmo");
             for (int i = 0; i < M2s.Count; i++)
             {
                 M2s[i] = M2s[i].Replace(basedir, string.Empty);

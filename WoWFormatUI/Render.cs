@@ -232,9 +232,8 @@ namespace WoWFormatUI
                     verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Z * -1);
                     verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Y);
                     verticelist.Add(1.0f);
-                    //temp texcoords
-                    verticelist.Add(1.0f);
-                    verticelist.Add(1.0f);
+                    verticelist.Add(reader.wmofile.group[0].mogp.textureCoords[i].X);
+                    verticelist.Add(reader.wmofile.group[0].mogp.textureCoords[i].Y);
                     //verticelist.Add(reader.wmofile.group[0].vertices[i].textureCoordX);
                     //verticelist.Add(reader.wmofile.group[0].vertices[i].textureCoordY);
                 }
@@ -263,6 +262,43 @@ namespace WoWFormatUI
                 Device.ImmediateContext.InputAssembler.SetIndexBuffer(indexBuffer, Format.R16_UInt, 0);
                 Device.ImmediateContext.InputAssembler.PrimitiveTopology = (PrimitiveTopology.TriangleList);
 
+                //Get texture, what a mess this could be much better
+                var blp = new BLPReader(_BaseDir);
+                blp.LoadBLP(reader.wmofile.textures.Where(w => !string.IsNullOrWhiteSpace(w.filename)).Select(s => s.filename).ToArray());
+
+                Texture2D texture;
+
+                if (blp.bmp == null)
+                {
+                    texture = Texture2D.FromFile<Texture2D>(Device, "missingtexture.jpg");
+                }
+                else
+                {
+                    MemoryStream s = new MemoryStream();
+                    blp.bmp.Save(s, System.Drawing.Imaging.ImageFormat.Png);
+                    s.Seek(0, SeekOrigin.Begin);
+                    texture = Texture2D.FromMemory<Texture2D>(Device, s.ToArray());
+                }
+
+                var textureView = new ShaderResourceView(Device, texture);
+
+                var sampler = new SamplerState(Device, new SamplerStateDescription()
+                {
+                    Filter = Filter.MinMagMipLinear,
+                    AddressU = TextureAddressMode.Wrap,
+                    AddressV = TextureAddressMode.Wrap,
+                    AddressW = TextureAddressMode.Wrap,
+                    BorderColor = SharpDX.Color.Black,
+                    ComparisonFunction = Comparison.Never,
+                    MaximumAnisotropy = 16,
+                    MipLodBias = 0,
+                    MinimumLod = 0,
+                    MaximumLod = 16,
+                });
+
+                Device.ImmediateContext.PixelShader.SetSampler(0, sampler);
+                Device.ImmediateContext.PixelShader.SetShaderResource(0, textureView);
+                //End of texture stuff,
                 Set(ref m_pConstantBuffer, new ConstantBuffer<Projections>(Device));
                 Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
             }
