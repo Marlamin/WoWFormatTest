@@ -97,7 +97,8 @@ namespace WoWFormatUI
                 //Define layout
                 var layout = dg.Add(new InputLayout(Device, inputSignature, new[]{
                         new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
-                        new InputElement("TEXCOORD", 0, Format.R32G32_Float, 16, 0)
+                        new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0),
+                        new InputElement("TEXCOORD", 0, Format.R32G32_Float, 28, 0)
                 }));
 
                 //Load model
@@ -113,6 +114,9 @@ namespace WoWFormatUI
                     verticelist.Add(reader.model.vertices[i].position.Z * -1);
                     verticelist.Add(reader.model.vertices[i].position.Y);
                     verticelist.Add(1.0f);
+                    verticelist.Add(reader.model.vertices[i].normal.X);
+                    verticelist.Add(reader.model.vertices[i].normal.Z * -1);
+                    verticelist.Add(reader.model.vertices[i].normal.Y);
                     verticelist.Add(reader.model.vertices[i].textureCoordX);
                     verticelist.Add(reader.model.vertices[i].textureCoordY);
                 }
@@ -135,7 +139,7 @@ namespace WoWFormatUI
 
                 //Create buffers
                 var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, vertices));
-                var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector2>(), 0);
+                var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector3>() + Utilities.SizeOf<Vector2>(), 0);
                 var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, indices));
 
                 Device.ImmediateContext.InputAssembler.InputLayout = (layout);
@@ -216,7 +220,8 @@ namespace WoWFormatUI
                 //Define layout
                 var layout = dg.Add(new InputLayout(Device, inputSignature, new[]{
                         new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0),
-                        new InputElement("TEXCOORD", 0, Format.R32G32_Float, 16, 0)
+                        new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0),
+                        new InputElement("TEXCOORD", 0, Format.R32G32_Float, 28, 0)
                 }));
 
                 //Load model
@@ -232,10 +237,11 @@ namespace WoWFormatUI
                     verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Z * -1);
                     verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Y);
                     verticelist.Add(1.0f);
+                    verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.X);
+                    verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.Z * -1);
+                    verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.Y);
                     verticelist.Add(reader.wmofile.group[0].mogp.textureCoords[i].X);
                     verticelist.Add(reader.wmofile.group[0].mogp.textureCoords[i].Y);
-                    //verticelist.Add(reader.wmofile.group[0].vertices[i].textureCoordX);
-                    //verticelist.Add(reader.wmofile.group[0].vertices[i].textureCoordY);
                 }
 
                 //Load indices
@@ -254,7 +260,7 @@ namespace WoWFormatUI
                 Console.WriteLine("model has " + indicecount + " indices!");
                 //Create buffers
                 var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, vertices));
-                var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector2>(), 0);
+                var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector3>() + Utilities.SizeOf<Vector2>(), 0);
                 var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, indices));
 
                 Device.ImmediateContext.InputAssembler.InputLayout = (layout);

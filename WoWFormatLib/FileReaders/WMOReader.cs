@@ -138,9 +138,11 @@ namespace WoWFormatLib.FileReaders
                         mogp.textureCoords = ReadMOTVChunk(subchunk, subbin);
                         break;
 
-                    case "MOPY": //Material info for triangles, two bytes per triangle.
                     case "MONR": //Normals
+                        mogp.normals = ReadMONRChunk(subchunk, subbin);
+                        break;
 
+                    case "MOPY": //Material info for triangles, two bytes per triangle.
                     case "MOBA": //Render batches
                     case "MOBS": //Unk
                     case "MODR": //Doodad references
@@ -174,6 +176,18 @@ namespace WoWFormatLib.FileReaders
             //Console.WriteLine("         " + nGroups.ToString() + " group(s)");
 
             return header;
+        }
+
+        public MONR[] ReadMONRChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            var numNormals = chunk.Size / (sizeof(float) * 3);
+            Console.WriteLine(numNormals + " normals!");
+            var normals = new MONR[numNormals];
+            for (var i = 0; i < numNormals; i++)
+            {
+                normals[i].normal = bin.Read<Vector3>();
+            }
+            return normals;
         }
 
         public MOTX[] ReadMOTXChunk(BlizzHeader chunk, BinaryReader bin)

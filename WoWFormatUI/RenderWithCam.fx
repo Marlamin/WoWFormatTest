@@ -7,13 +7,15 @@
 
 struct VS_INPUT
 {
-	float4 pos : POSITION;
+	float3 pos : POSITION;
+	float3 nor : NORMAL;
 	float2 tex : TEXCOORD;
 };
 
 struct PS_INPUT
 {
-	float4 pos : SV_POSITION;
+	float3 pos : SV_POSITION;
+	float3 nor : NORMAL;
 	float2 tex : TEXCOORD;
 };
 

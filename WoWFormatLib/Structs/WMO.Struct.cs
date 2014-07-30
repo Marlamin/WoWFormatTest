@@ -85,7 +85,6 @@ namespace WoWFormatLib.Structs.WMO
         Flag_0x800000 = 0x800000,
         Flag_0x1000000 = 0x1000000, //SMOGroup::CVERTS2: Has two MOCV chunks: Just add two or don't set 0x4 to only use cverts2.
         Flag_0x2000000 = 0x2000000, //SMOGroup::TVERTS2: Has two MOTV chunks: Just add two.
-
     }
 
     public struct WMOGroupFile
@@ -111,9 +110,12 @@ namespace WoWFormatLib.Structs.WMO
         public uint unk0;
         public uint unk1;
         //public MOBR[] faceIndices;
+        public MOPY[] materialInfo;
         public MOVI[] indices;
         public MOVT[] vertices;
+        public MONR[] normals;
         public MOTV[] textureCoords;
+        public MOBA[] renderBatches;
     }
 
     public struct MOVI
@@ -126,9 +128,51 @@ namespace WoWFormatLib.Structs.WMO
         public Vector3 vector;
     }
 
+    public struct MONR
+    {
+        public Vector3 normal;
+    }
+
     public struct MOTV
     {
         public float X;
         public float Y;
     }
+
+    public struct MOPY
+    {
+        public byte flags;
+        public byte materialID;
+    }
+
+    public enum MOPYFlags
+    {
+        /*
+        bool isNoCamCollide (uint8 flags) { return flags & 2; }
+        bool isDetailFace (uint8 flags) { return flags & 4; }
+        bool isCollisionFace (uint8 flags) { return flags & 8; }
+        bool isColor (uint8 flags) { return !(flags & 8); }
+        bool isRenderFace (uint8 flags) { return (flags & 0x24) == 0x20; }
+        bool isTransFace (uint8 flags) { return (flags & 1) && (flags & 0x24); }
+        bool isCollidable (uint8 flags) { return isCollisionFace (flags) || isRenderFace (flags); }
+         */
+        Flag_0x1 = 0x1,
+        Flag_0x2_NoCamCollide = 0x2,
+        Flag_0x4_NoCollide = 0x4,
+        Flag_0x8_IsCollisionFace = 0x8, //If it's not set it's isColor apparently
+    }
+
+    public struct MOBA
+    {
+        public Vector3 possibleBox1;
+        public Vector3 possibleBox2;
+        public uint firstFace;
+        public ushort numFaces;
+        public ushort firstVertex;
+        public ushort lastVertex;
+        public byte unused;
+        public byte materialID;
+    }
+
+
 }
