@@ -151,7 +151,7 @@ namespace WoWFormatUI
                 }
                 else
                 {
-                    blp.LoadBLP(reader.model.textures.Select(s => s.filename).ToArray());
+                    blp.LoadBLP(reader.model.textures.Where(w => !string.IsNullOrWhiteSpace(w.filename)).Select(s => s.filename).ToArray());
                 }
 
                 Texture2D texture;

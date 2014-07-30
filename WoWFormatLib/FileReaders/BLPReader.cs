@@ -43,6 +43,9 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadBLP(string[] filenames)
         {
+            if (filenames.Length == 0)
+                return;
+
             LoadBLP(filenames[0]);
 
             using (var canvas = Graphics.FromImage(bmp))
