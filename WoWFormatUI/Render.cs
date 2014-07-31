@@ -4,6 +4,7 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.WPF;
+using SharpDX.WPF.Cameras;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
