@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatTest", "WoWFormatTest\WoWFormatTest.csproj", "{3ED7F6F2-5A92-496A-9D87-60F56638C2A7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatUI", "WoWFormatUI\WoWFormatUI.csproj", "{AC8DAD3D-689F-437D-B471-AB41C7366B2B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{57271A6C-A992-4F83-A6C5-8EEEA32C7960} = {57271A6C-A992-4F83-A6C5-8EEEA32C7960}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatLib", "WoWFormatLib\WoWFormatLib.csproj", "{5DB0FB8F-0EAA-490A-AA7D-28AE010186A9}"
 EndProject
@@ -13,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenderTestWPF", "RenderTest
 	ProjectSection(ProjectDependencies) = postProject
 		{5DB0FB8F-0EAA-490A-AA7D-28AE010186A9} = {5DB0FB8F-0EAA-490A-AA7D-28AE010186A9}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWRenderLib", "WoWRenderLib\WoWRenderLib.csproj", "{57271A6C-A992-4F83-A6C5-8EEEA32C7960}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +41,10 @@ Global
 		{339A8EBD-E27B-4765-9C4C-CF6D349D3F81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{339A8EBD-E27B-4765-9C4C-CF6D349D3F81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{339A8EBD-E27B-4765-9C4C-CF6D349D3F81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57271A6C-A992-4F83-A6C5-8EEEA32C7960}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57271A6C-A992-4F83-A6C5-8EEEA32C7960}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57271A6C-A992-4F83-A6C5-8EEEA32C7960}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57271A6C-A992-4F83-A6C5-8EEEA32C7960}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
