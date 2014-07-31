@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
 using WoWFormatLib.Structs.M2;
+using WoWRenderLib.Cameras;
 using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace WoWFormatUI
@@ -198,7 +199,7 @@ namespace WoWFormatUI
             }
 
             //Make camera
-            Camera = new ModelViewerCamera();
+            Camera = new WoWModelViewerCamera();
             Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 100.0f);
             Camera.SetViewParams(new Vector3(10.0f, 10.0f, -10.0f), new Vector3(0.0f, 1.0f, 0.0f));
             Camera.Roll(-4f);

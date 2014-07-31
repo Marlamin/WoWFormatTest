@@ -130,6 +130,10 @@
       <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>
       <Name>WoWFormatLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WoWRenderLib\WoWRenderLib.csproj">
+      <Project>{57271a6c-a992-4f83-a6c5-8eeea32c7960}</Project>
+      <Name>WoWRenderLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="missingtexture.jpg">
