@@ -40,7 +40,7 @@ namespace WoWFormatLib.Structs.ADT
     {
         public uint flags;
         public uint indexX;
-        public uint indexX;
+        public uint indexY;
         public uint nLayers;
         public uint nDoodadRefs;
         public uint ofsMCVT;
