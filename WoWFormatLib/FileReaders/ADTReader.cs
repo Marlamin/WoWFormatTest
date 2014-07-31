@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using WoWFormatLib.Structs.ADT;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -85,7 +86,8 @@ namespace WoWFormatLib.FileReaders
 
         public void ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
         {
-            //this will be called 256 times per adt, needs to be v optimized
+            //Has subchunks :(
+            //MCVT subchunk has 145 floats
         }
 
         public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)

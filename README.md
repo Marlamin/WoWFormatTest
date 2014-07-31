@@ -3,8 +3,11 @@ Messing around with parsing WoW file formats for educational purposes.
 Built from the ground up, but with lots of copy pasta from older projects (noted in thanks paragraph).
 
 ## Supported expansions
-Built for (latest) Warlords of Draenor files. Backwards compatibility with Mists of Pandaria not guaranteed. Cataclysm and lower probably won't work at all. 
-Files need to be extracted to the HDD with intact folder structures. MPQ support is currently not planned. Support for the new CASC file format introduced in Warlords of Draenor might be included in the future. 
+Built for (latest) Warlords of Draenor files. Backwards compatibility with Mists of Pandaria not guaranteed. Cataclysm and lower probably won't work at all.
+ 
+Files need to be extracted to the HDD with intact folder structures. 
+
+MPQ support is currently not planned. Support for the new CASC file format introduced in Warlords of Draenor might be included in the future. 
 
 ## Configuration
 The App.config file in the WoWFormatUI project must be edited to point to the location of the extracted files.
