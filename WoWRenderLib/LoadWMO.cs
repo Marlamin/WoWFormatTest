@@ -76,7 +76,6 @@ namespace WoWRenderLib
             WMOMaterial[] materials = new WMOMaterial[reader.wmofile.materials.Count()];
             for (int i = 0; i < reader.wmofile.materials.Count(); i++)
             {
-                materials[i].materialID = reader.wmofile.group[0].mogp.materialInfo[i].materialID;
                 Console.WriteLine(reader.wmofile.group[0].mogp.materialInfo[i].materialID);
                 for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
                 {
@@ -97,6 +96,8 @@ namespace WoWRenderLib
                             texture = Texture2D.FromMemory<Texture2D>(device, s.ToArray());
                             s.Dispose();
                         }
+                        materials[i].materialID = (uint)i;
+                        materials[i].filename = reader.wmofile.textures[ti].filename;
                         materials[i].texture = texture;
                     }
                 }

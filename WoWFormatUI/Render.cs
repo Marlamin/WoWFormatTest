@@ -78,9 +78,7 @@ namespace WoWFormatUI
             {
                 for (int i = 0; i < renderBatches.Count(); i++)
                 {
-                    Console.WriteLine(renderBatches[i].materialID);
                     var textureView = new ShaderResourceView(Device, materials[renderBatches[i].materialID].texture);
-
                     var sampler = new SamplerState(Device, new SamplerStateDescription()
                     {
                         Filter = Filter.MinMagMipLinear,
@@ -98,7 +96,7 @@ namespace WoWFormatUI
                     Device.ImmediateContext.PixelShader.SetSampler(0, sampler);
                     Device.ImmediateContext.PixelShader.SetShaderResource(0, textureView);
 
-                    Device.ImmediateContext.DrawIndexed((int)renderBatches[i].numFaces * 3, (int)renderBatches[i].firstFace * 3, 0);
+                    Device.ImmediateContext.DrawIndexed((int)renderBatches[i].numFaces, (int)renderBatches[i].firstFace, 0);
                 }
             }
             else

@@ -29,6 +29,7 @@ namespace WoWRenderLib.Structs
     public struct WMOMaterial
     {
         public uint materialID;
+        public string filename;
         public Texture2D texture;
     }
 
