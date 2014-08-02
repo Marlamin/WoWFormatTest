@@ -149,15 +149,12 @@ namespace WoWFormatUI
             //List<string> M2s = Directory.EnumerateFiles(basedir, "*.m2", SearchOption.AllDirectories).ToList();
             List<string> M2s = new List<String>();
             M2s.Add(@"Creature\Serpent\Serpent.M2");
-            M2s.Add(@"Creature\Serpent\SerpentRuby.M2");
             M2s.Add(@"Creature\Deathwing\Deathwing.M2");
-            M2s.Add(@"World\Generic\Gnome\Passive Doodads\GnomeMachine\GnomeSubwayGlass.m2");
+            M2s.Add(@"Creature\Anduin\Anduin.M2");
             M2s.Add(@"Item\ObjectComponents\Weapon\Sword_1H_PVPPandariaS2_C_01.M2");
-            M2s.Add(@"Item\ObjectComponents\Weapon\Sword_1h_PVPPandariaS2_C_02.M2");
-            M2s.Add(@"Test\IGC_CartTest.M2");
             M2s.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
-            M2s.Add(@"World\WMO\Test\QATestWMO1.wmo");
             M2s.Add(@"World\WMO\transports\Icebreaker\Transport_Icebreaker_ship_stationary.wmo");
+            M2s.Add(@"World\WMO\Azeroth\Buildings\TownHall\TownHall.wmo");
             for (int i = 0; i < M2s.Count; i++)
             {
                 M2s[i] = M2s[i].Replace(basedir, string.Empty);

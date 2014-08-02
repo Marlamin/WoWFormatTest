@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoWFormatLib.FileReaders;
-using WoWRenderLib.Structs;
+using WoWRenderLib.Structs.WoWWMO;
 
 namespace WoWRenderLib
 {
@@ -57,7 +57,7 @@ namespace WoWRenderLib
                 indicelist.Add(reader.wmofile.group[0].mogp.indices[i].indice);
             }
 
-            RenderBatch[] renderBatches = new RenderBatch[reader.wmofile.group[0].mogp.renderBatches.Count()];
+            WMORenderBatch[] renderBatches = new WMORenderBatch[reader.wmofile.group[0].mogp.renderBatches.Count()];
 
             for (int i = 0; i < reader.wmofile.group[0].mogp.renderBatches.Count(); i++)
             {

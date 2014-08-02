@@ -427,7 +427,15 @@ namespace WoWFormatLib.FileReaders
                             new WoWFormatLib.Utils.MissingFile(filename);
                         }
                     }
+                    else
+                    {
+                        textures[i].filename = @"Test\QA_TEST_BLP_1.blp";
+                    }
                     bin.BaseStream.Position = preFilenamePosition;
+                }
+                else
+                {
+                    textures[i].filename = @"Test\QA_TEST_BLP_1.blp";
                 }
             }
             return textures;

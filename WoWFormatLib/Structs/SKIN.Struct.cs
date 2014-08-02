@@ -35,12 +35,12 @@ namespace WoWFormatLib.Structs.SKIN
     {
         public ushort submeshID;
         public ushort unk1;
-        public ushort ofsVertex;
+        public ushort startVertex;
         public ushort nVertices;
-        public ushort ofsTriangle;
+        public ushort startTriangle;
         public ushort nTriangles;
         public ushort nBones;
-        public ushort ofsBones;
+        public ushort startBones;
         public ushort unk2;
         public ushort rootBone;
         public Vector3 centerMas;

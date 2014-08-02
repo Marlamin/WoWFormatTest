@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
 
-namespace WoWRenderLib.Structs
+namespace WoWRenderLib.Structs.WoWWMO
 {
     public struct WoWWMO
     {
@@ -16,10 +16,10 @@ namespace WoWRenderLib.Structs
         public Texture2D[] textures;
         public WMOMaterial[] materials;
         public MaterialInfo[] materialInfo;
-        public RenderBatch[] renderBatches;
+        public WMORenderBatch[] renderBatches;
     }
 
-    public struct RenderBatch
+    public struct WMORenderBatch
     {
         public uint numFaces;
         public uint firstFace;

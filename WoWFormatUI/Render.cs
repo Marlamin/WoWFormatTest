@@ -14,7 +14,8 @@ using WoWFormatLib.FileReaders;
 using WoWFormatLib.Structs.M2;
 using WoWRenderLib;
 using WoWRenderLib.Cameras;
-using WoWRenderLib.Structs;
+using WoWRenderLib.Structs.WoWM2;
+using WoWRenderLib.Structs.WoWWMO;
 using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace WoWFormatUI
@@ -25,11 +26,11 @@ namespace WoWFormatUI
         private ConstantBuffer<Projections> m_pConstantBuffer;
         private PixelShader m_pPixelShader;
         private VertexShader m_pVertexShader;
-        private MaterialInfo[] materialInfo;
+        private M2Material[] m2materials;
+        private M2RenderBatch[] M2renderBatches;
         private WMOMaterial[] materials;
         private bool modelLoaded = false;
-        private List<uint> numFaces;
-        private RenderBatch[] renderBatches;
+        private WMORenderBatch[] WMOrenderBatches;
 
         public Render()
         {
@@ -74,11 +75,11 @@ namespace WoWFormatUI
             Device.ImmediateContext.PixelShader.Set(m_pPixelShader);
             Device.ImmediateContext.PixelShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
 
-            if (renderBatches != null)
+            if (WMOrenderBatches != null)
             {
-                for (int i = 0; i < renderBatches.Count(); i++)
+                for (int i = 0; i < WMOrenderBatches.Count(); i++)
                 {
-                    var textureView = new ShaderResourceView(Device, materials[renderBatches[i].materialID].texture);
+                    var textureView = new ShaderResourceView(Device, materials[WMOrenderBatches[i].materialID].texture);
                     var sampler = new SamplerState(Device, new SamplerStateDescription()
                     {
                         Filter = Filter.MinMagMipLinear,
@@ -96,12 +97,41 @@ namespace WoWFormatUI
                     Device.ImmediateContext.PixelShader.SetSampler(0, sampler);
                     Device.ImmediateContext.PixelShader.SetShaderResource(0, textureView);
 
-                    Device.ImmediateContext.DrawIndexed((int)renderBatches[i].numFaces, (int)renderBatches[i].firstFace, 0);
+                    Device.ImmediateContext.DrawIndexed((int)WMOrenderBatches[i].numFaces, (int)WMOrenderBatches[i].firstFace, 0);
                 }
             }
-            else
+            /*else
             {
                 Device.ImmediateContext.DrawIndexed(indicecount, 0, 0);
+            }*/
+            if (M2renderBatches != null)
+            {
+                for (int i = 0; i < M2renderBatches.Count(); i++)
+                {
+                    if (M2renderBatches[i].materialID > m2materials.Count())
+                    {
+                        continue;
+                    }
+                    var textureView = new ShaderResourceView(Device, m2materials[M2renderBatches[i].materialID].texture);
+                    var sampler = new SamplerState(Device, new SamplerStateDescription()
+                    {
+                        Filter = Filter.MinMagMipLinear,
+                        AddressU = TextureAddressMode.Wrap,
+                        AddressV = TextureAddressMode.Wrap,
+                        AddressW = TextureAddressMode.Wrap,
+                        BorderColor = SharpDX.Color.Black,
+                        ComparisonFunction = Comparison.Never,
+                        MaximumAnisotropy = 16,
+                        MipLodBias = 0,
+                        MinimumLod = 0,
+                        MaximumLod = 16,
+                    });
+
+                    Device.ImmediateContext.PixelShader.SetSampler(0, sampler);
+                    Device.ImmediateContext.PixelShader.SetShaderResource(0, textureView);
+
+                    Device.ImmediateContext.DrawIndexed((int)M2renderBatches[i].numFaces, (int)M2renderBatches[i].firstFace, 0);
+                }
             }
         }
 
@@ -134,96 +164,25 @@ namespace WoWFormatUI
                         new InputElement("TEXCOORD", 0, Format.R32G32_Float, 28, 0)
                 }));
 
-                //Load model
-                M2Reader reader = new M2Reader(_BaseDir);
-                string filename = ModelPath;
-                reader.LoadM2(filename);
-
-                //Load vertices
-                List<float> verticelist = new List<float>();
-                for (int i = 0; i < reader.model.vertices.Count(); i++)
-                {
-                    verticelist.Add(reader.model.vertices[i].position.X);
-                    verticelist.Add(reader.model.vertices[i].position.Z * -1);
-                    verticelist.Add(reader.model.vertices[i].position.Y);
-                    verticelist.Add(1.0f);
-                    verticelist.Add(reader.model.vertices[i].normal.X);
-                    verticelist.Add(reader.model.vertices[i].normal.Z * -1);
-                    verticelist.Add(reader.model.vertices[i].normal.Y);
-                    verticelist.Add(reader.model.vertices[i].textureCoordX);
-                    verticelist.Add(reader.model.vertices[i].textureCoordY);
-                }
-
-                //Load indices
-                List<ushort> indicelist = new List<ushort>();
-                for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
-                {
-                    indicelist.Add(reader.model.skins[0].triangles[i].pt1);
-                    indicelist.Add(reader.model.skins[0].triangles[i].pt2);
-                    indicelist.Add(reader.model.skins[0].triangles[i].pt3);
-                }
-
-                //Convert to array
-                ushort[] indices = indicelist.ToArray();
-                float[] vertices = verticelist.ToArray();
+                M2Loader model = new M2Loader(_BaseDir, ModelPath, Device);
+                model.LoadM2();
+                WoWM2 m2 = model.m2;
 
                 //Set count for use in draw later on
-                indicecount = indices.Count();
+                indicecount = m2.indices.Count();
 
                 //Create buffers
-                var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, vertices));
+                var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, m2.vertices));
                 var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector3>() + Utilities.SizeOf<Vector2>(), 0);
-                var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, indices));
+                var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, m2.indices));
 
                 Device.ImmediateContext.InputAssembler.InputLayout = (layout);
                 Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
                 Device.ImmediateContext.InputAssembler.SetIndexBuffer(indexBuffer, Format.R16_UInt, 0);
                 Device.ImmediateContext.InputAssembler.PrimitiveTopology = (PrimitiveTopology.TriangleList);
 
-                //Get texture, what a mess this could be much better
-                var blp = new BLPReader(_BaseDir);
-                if (File.Exists(Path.Combine(_BaseDir, reader.model.filename.Replace("M2", "blp"))))
-                {
-                    blp.LoadBLP(reader.model.filename.Replace("M2", "blp"));
-                }
-                else
-                {
-                    blp.LoadBLP(reader.model.textures.Where(w => !string.IsNullOrWhiteSpace(w.filename)).Select(s => s.filename).ToArray());
-                }
-
-                Texture2D texture;
-
-                if (blp.bmp == null)
-                {
-                    texture = Texture2D.FromFile<Texture2D>(Device, "missingtexture.jpg");
-                }
-                else
-                {
-                    MemoryStream s = new MemoryStream();
-                    blp.bmp.Save(s, System.Drawing.Imaging.ImageFormat.Png);
-                    s.Seek(0, SeekOrigin.Begin);
-                    texture = Texture2D.FromMemory<Texture2D>(Device, s.ToArray());
-                }
-
-                var textureView = new ShaderResourceView(Device, texture);
-
-                var sampler = new SamplerState(Device, new SamplerStateDescription()
-                {
-                    Filter = Filter.MinMagMipLinear,
-                    AddressU = TextureAddressMode.Wrap,
-                    AddressV = TextureAddressMode.Wrap,
-                    AddressW = TextureAddressMode.Wrap,
-                    BorderColor = SharpDX.Color.Black,
-                    ComparisonFunction = Comparison.Never,
-                    MaximumAnisotropy = 16,
-                    MipLodBias = 0,
-                    MinimumLod = 0,
-                    MaximumLod = 16,
-                });
-
-                Device.ImmediateContext.PixelShader.SetSampler(0, sampler);
-                Device.ImmediateContext.PixelShader.SetShaderResource(0, textureView);
-                //End of texture stuff,
+                M2renderBatches = m2.renderBatches;
+                m2materials = m2.materials;
 
                 Set(ref m_pConstantBuffer, new ConstantBuffer<Projections>(Device));
                 Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
@@ -272,9 +231,8 @@ namespace WoWFormatUI
                 Device.ImmediateContext.InputAssembler.SetIndexBuffer(indexBuffer, Format.R16_UInt, 0);
                 Device.ImmediateContext.InputAssembler.PrimitiveTopology = (PrimitiveTopology.TriangleList);
 
-                renderBatches = wmo.renderBatches;
+                WMOrenderBatches = wmo.renderBatches;
                 materials = wmo.materials;
-                //materialInfo = wmo.materialInfo;
 
                 Set(ref m_pConstantBuffer, new ConstantBuffer<Projections>(Device));
                 Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);

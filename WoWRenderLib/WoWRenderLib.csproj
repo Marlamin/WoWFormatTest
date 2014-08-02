@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cameras\WoWModelViewerCamera.cs" />
+    <Compile Include="LoadM2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Structs\WoWM2.Struct.cs" />
     <Compile Include="Structs\WoWWMO.Struct.cs" />
