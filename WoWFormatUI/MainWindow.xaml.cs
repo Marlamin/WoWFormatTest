@@ -151,10 +151,13 @@ namespace WoWFormatUI
             M2s.Add(@"Creature\Serpent\Serpent.M2");
             M2s.Add(@"Creature\Deathwing\Deathwing.M2");
             M2s.Add(@"Creature\Anduin\Anduin.M2");
+            M2s.Add(@"Creature\Arthas\Arthas.M2");
+            M2s.Add(@"Creature\Garrosh\Garrosh.M2");
             M2s.Add(@"Item\ObjectComponents\Weapon\Sword_1H_PVPPandariaS2_C_01.M2");
             M2s.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
             M2s.Add(@"World\WMO\transports\Icebreaker\Transport_Icebreaker_ship_stationary.wmo");
             M2s.Add(@"World\WMO\Azeroth\Buildings\TownHall\TownHall.wmo");
+            M2s.Add(@"World\WMO\transports\passengership\transportship_A.wmo");
             for (int i = 0; i < M2s.Count; i++)
             {
                 M2s[i] = M2s[i].Replace(basedir, string.Empty);

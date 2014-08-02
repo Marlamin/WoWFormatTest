@@ -38,6 +38,7 @@ namespace WoWRenderLib
             WMOReader reader = new WMOReader(basedir);
             reader.LoadWMO(modelPath);
             List<float> verticelist = new List<float>();
+
             for (int i = 0; i < reader.wmofile.group[0].mogp.vertices.Count(); i++)
             {
                 verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.X);
@@ -76,7 +77,7 @@ namespace WoWRenderLib
             WMOMaterial[] materials = new WMOMaterial[reader.wmofile.materials.Count()];
             for (int i = 0; i < reader.wmofile.materials.Count(); i++)
             {
-                Console.WriteLine(reader.wmofile.group[0].mogp.materialInfo[i].materialID);
+                //Console.WriteLine(reader.wmofile.group[0].mogp.materialInfo[i].materialID);
                 for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
                 {
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)

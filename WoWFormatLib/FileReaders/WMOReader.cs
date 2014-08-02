@@ -96,7 +96,7 @@ namespace WoWFormatLib.FileReaders
             var groupNames = new MOGN[num];
             for (var i = 0; i < nameList.Count; i++)
             {
-                Console.WriteLine(nameList[i]);
+                //Console.WriteLine(nameList[i]);
                 groupNames[i].name = nameList[i];
             }
             return groupNames;
@@ -116,7 +116,7 @@ namespace WoWFormatLib.FileReaders
                 subchunk = new BlizzHeader(subbin.ReadChars(4), subbin.ReadUInt32());
                 subchunk.Flip();
                 position = stream.Position + subchunk.Size;
-                Console.WriteLine(subchunk.ToString());
+                //Console.WriteLine(subchunk.ToString());
                 switch (subchunk.ToString())
                 {
                     case "MOVI": //Vertex indices for triangles
