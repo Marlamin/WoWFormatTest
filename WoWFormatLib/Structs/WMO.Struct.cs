@@ -2,11 +2,13 @@
 
 namespace WoWFormatLib.Structs.WMO
 {
+
     public struct WMO
     {
         public MOHD header;
         public MVER version;
         public MOTX[] textures;
+        public MOMT[] materials;
         public MOGN[] groupNames;
         public MOGI[] groupInfo;
         public WMOGroupFile[] group;
@@ -37,10 +39,25 @@ namespace WoWFormatLib.Structs.WMO
     public struct MOTX
     {
         public string filename;
+        public uint startOffset;
     }
 
     public struct MOMT
     {
+        public uint flags;
+        public uint shader;
+        public uint blendMode;
+        public uint texture1;
+        public uint color1;
+        public uint flags1;
+        public uint texture2;
+        public uint color2;
+        public uint flags2;
+        public uint texture3;
+        public uint color3;
+        public uint flags3;
+        //public unsafe fixed uint unk[3];
+        //public unsafe fixed uint runTimeData[4];
     }
 
     //Group names
@@ -164,8 +181,12 @@ namespace WoWFormatLib.Structs.WMO
 
     public struct MOBA
     {
-        public Vector3 possibleBox1;
-        public Vector3 possibleBox2;
+        public short possibleBox1_1;
+        public short possibleBox1_2;
+        public short possibleBox1_3;
+        public short possibleBox2_1;
+        public short possibleBox2_2;
+        public short possibleBox2_3;
         public uint firstFace;
         public ushort numFaces;
         public ushort firstVertex;

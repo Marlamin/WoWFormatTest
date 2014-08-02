@@ -12,9 +12,6 @@ namespace WoWFormatLib.FileReaders
         public WMO wmofile;
         private string basedir;
 
-        private List<String> m2Files;
-        private List<String> wmoGroups;
-
         public WMOReader(string basedir)
         {
             this.basedir = basedir;
@@ -22,9 +19,6 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadWMO(string filename)
         {
-            m2Files = new List<string>();
-            wmoGroups = new List<string>();
-
             if (File.Exists(Path.Combine(basedir, filename)))
             {
                 using (FileStream wmoStream = File.Open(Path.Combine(basedir, filename), FileMode.Open))
@@ -51,9 +45,9 @@ namespace WoWFormatLib.FileReaders
                 {
                     if (str.Length > 1)
                     {
-                        m2Files.Add(str.ToString());
-                        var m2reader = new M2Reader(basedir);
-                        m2reader.LoadM2(str.ToString());
+                        //m2Files.Add(str.ToString());
+                        //var m2reader = new M2Reader(basedir);
+                        //m2reader.LoadM2(str.ToString());
                     }
                     str = new StringBuilder();
                 }
@@ -127,7 +121,7 @@ namespace WoWFormatLib.FileReaders
                 {
                     case "MOVI": //Vertex indices for triangles
                         mogp.indices = ReadMOVIChunk(subchunk, subbin);
-                        Console.WriteLine("Read " + mogp.indices.Length + " indices!");
+                        //Console.WriteLine("Read " + mogp.indices.Length + " indices!");
                         break;
 
                     case "MOVT": //Vertices chunk
@@ -142,8 +136,14 @@ namespace WoWFormatLib.FileReaders
                         mogp.normals = ReadMONRChunk(subchunk, subbin);
                         break;
 
-                    case "MOPY": //Material info for triangles, two bytes per triangle.
                     case "MOBA": //Render batches
+                        mogp.renderBatches = ReadMOBAChunk(subchunk, subbin);
+                        break;
+
+                    case "MOPY": //Material info for triangles, two bytes per triangle.
+                        mogp.materialInfo = ReadMOPYChunk(subchunk, subbin);
+                        break;
+
                     case "MOBS": //Unk
                     case "MODR": //Doodad references
                     case "MOBN": //Array of t_BSP_NODE
@@ -181,7 +181,7 @@ namespace WoWFormatLib.FileReaders
         public MONR[] ReadMONRChunk(BlizzHeader chunk, BinaryReader bin)
         {
             var numNormals = chunk.Size / (sizeof(float) * 3);
-            Console.WriteLine(numNormals + " normals!");
+            //Console.WriteLine(numNormals + " normals!");
             var normals = new MONR[numNormals];
             for (var i = 0; i < numNormals; i++)
             {
@@ -195,6 +195,7 @@ namespace WoWFormatLib.FileReaders
             //List of BLP filenames
             var blpFilesChunk = bin.ReadBytes((int)chunk.Size);
             List<String> blpFiles = new List<string>();
+            List<int> blpOffset = new List<int>();
             var str = new StringBuilder();
 
             for (var i = 0; i < blpFilesChunk.Length; i++)
@@ -205,6 +206,7 @@ namespace WoWFormatLib.FileReaders
                     {
                         str.Replace("..", ".");
                         blpFiles.Add(str.ToString());
+                        blpOffset.Add(i - str.ToString().Length);
                         if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
                         {
                             new WoWFormatLib.Utils.MissingFile(str.ToString());
@@ -227,6 +229,7 @@ namespace WoWFormatLib.FileReaders
             for (var i = 0; i < blpFiles.Count; i++)
             {
                 textures[i].filename = blpFiles[i];
+                textures[i].startOffset = (uint)blpOffset[i];
             }
             return textures;
         }
@@ -234,7 +237,7 @@ namespace WoWFormatLib.FileReaders
         public MOVT[] ReadMOVTChunk(BlizzHeader chunk, BinaryReader bin)
         {
             var numVerts = chunk.Size / (sizeof(float) * 3);
-            Console.WriteLine(numVerts + " vertices!");
+            //Console.WriteLine(numVerts + " vertices!");
             var vertices = new MOVT[numVerts];
             for (var i = 0; i < numVerts; i++)
             {
@@ -243,10 +246,46 @@ namespace WoWFormatLib.FileReaders
             return vertices;
         }
 
+        private MOBA[] ReadMOBAChunk(BlizzHeader subchunk, BinaryReader subbin)
+        {
+            var numBatches = subchunk.Size / 24; //24 bytes per MOBA
+            //Console.WriteLine(numBatches + " batches!");
+            var batches = new MOBA[numBatches];
+            for (var i = 0; i < numBatches; i++)
+            {
+                batches[i] = subbin.Read<MOBA>();
+            }
+            return batches;
+        }
+
+        private MOMT[] ReadMOMTChunk(BlizzHeader chunk, BinaryReader bin, uint num)
+        {
+            var materials = new MOMT[num];
+            //Console.WriteLine(num + " materials!");
+            for (var i = 0; i < num; i++)
+            {
+                materials[i] = bin.Read<MOMT>();
+                bin.ReadBytes(16);
+            }
+            return materials;
+        }
+
+        private MOPY[] ReadMOPYChunk(BlizzHeader subchunk, BinaryReader subbin)
+        {
+            var numMaterials = subchunk.Size / 2;
+            //Console.WriteLine(numMaterials + " material infos!");
+            var materials = new MOPY[numMaterials];
+            for (var i = 0; i < numMaterials; i++)
+            {
+                materials[i] = subbin.Read<MOPY>();
+            }
+            return materials;
+        }
+
         private MOTV[] ReadMOTVChunk(BlizzHeader subchunk, BinaryReader subbin)
         {
             var numCoords = subchunk.Size / (sizeof(float) * 2);
-            Console.WriteLine(numCoords + " texturecords!");
+            //Console.WriteLine(numCoords + " texturecords!");
             var textureCoords = new MOTV[numCoords];
             for (var i = 0; i < numCoords; i++)
             {
@@ -259,7 +298,7 @@ namespace WoWFormatLib.FileReaders
         private MOVI[] ReadMOVIChunk(BlizzHeader chunk, BinaryReader bin)
         {
             var numIndices = chunk.Size / sizeof(ushort);
-            Console.WriteLine(numIndices + " indices!");
+            //Console.WriteLine(numIndices + " indices!");
             var indices = new MOVI[numIndices];
             for (var i = 0; i < numIndices; i++)
             {
@@ -307,11 +346,13 @@ namespace WoWFormatLib.FileReaders
                     case "MOGI":
                         wmofile.groupInfo = ReadMOGIChunk(chunk, bin, wmofile.header.nGroups);
                         continue;
+                    case "MOMT":
+                        wmofile.materials = ReadMOMTChunk(chunk, bin, wmofile.header.nMaterials);
+                        continue;
                     case "MOGP":
                     //ReadMOGPChunk(chunk, bin);
                     //continue;
                     case "MODN":
-                    case "MOMT":
                     case "MOSB":
                     case "MOPV":
                     case "MOPT":

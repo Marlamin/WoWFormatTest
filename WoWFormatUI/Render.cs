@@ -12,22 +12,24 @@ using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
 using WoWFormatLib.Structs.M2;
+using WoWRenderLib;
 using WoWRenderLib.Cameras;
+using WoWRenderLib.Structs;
 using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace WoWFormatUI
 {
     public class Render : D3D11
     {
-        public int indicecount;
-
+        private int indicecount;
         private ConstantBuffer<Projections> m_pConstantBuffer;
-
         private PixelShader m_pPixelShader;
-
         private VertexShader m_pVertexShader;
-
+        private MaterialInfo[] materialInfo;
+        private WMOMaterial[] materials;
         private bool modelLoaded = false;
+        private List<uint> numFaces;
+        private RenderBatch[] renderBatches;
 
         public Render()
         {
@@ -71,7 +73,38 @@ namespace WoWFormatUI
             Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
             Device.ImmediateContext.PixelShader.Set(m_pPixelShader);
             Device.ImmediateContext.PixelShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
-            Device.ImmediateContext.DrawIndexed(indicecount, 0, 0);
+
+            if (renderBatches != null)
+            {
+                for (int i = 0; i < renderBatches.Count(); i++)
+                {
+                    Console.WriteLine(renderBatches[i].materialID);
+                    var textureView = new ShaderResourceView(Device, materials[renderBatches[i].materialID].texture);
+
+                    var sampler = new SamplerState(Device, new SamplerStateDescription()
+                    {
+                        Filter = Filter.MinMagMipLinear,
+                        AddressU = TextureAddressMode.Wrap,
+                        AddressV = TextureAddressMode.Wrap,
+                        AddressW = TextureAddressMode.Wrap,
+                        BorderColor = SharpDX.Color.Black,
+                        ComparisonFunction = Comparison.Never,
+                        MaximumAnisotropy = 16,
+                        MipLodBias = 0,
+                        MinimumLod = 0,
+                        MaximumLod = 16,
+                    });
+
+                    Device.ImmediateContext.PixelShader.SetSampler(0, sampler);
+                    Device.ImmediateContext.PixelShader.SetShaderResource(0, textureView);
+
+                    Device.ImmediateContext.DrawIndexed((int)renderBatches[i].numFaces * 3, (int)renderBatches[i].firstFace * 3, 0);
+                }
+            }
+            else
+            {
+                Device.ImmediateContext.DrawIndexed(indicecount, 0, 0);
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -226,87 +259,25 @@ namespace WoWFormatUI
                         new InputElement("TEXCOORD", 0, Format.R32G32_Float, 28, 0)
                 }));
 
-                //Load model
-                WMOReader reader = new WMOReader(_BaseDir);
-                string filename = ModelPath;
-                reader.LoadWMO(filename);
+                WMOLoader model = new WMOLoader(_BaseDir, ModelPath, Device);
+                model.LoadWMO();
+                WoWWMO wmo = model.wmo;
 
-                //Load vertices
-                List<float> verticelist = new List<float>();
-                for (int i = 0; i < reader.wmofile.group[0].mogp.vertices.Count(); i++)
-                {
-                    verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.X);
-                    verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Z * -1);
-                    verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Y);
-                    verticelist.Add(1.0f);
-                    verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.X);
-                    verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.Z * -1);
-                    verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.Y);
-                    verticelist.Add(reader.wmofile.group[0].mogp.textureCoords[i].X);
-                    verticelist.Add(reader.wmofile.group[0].mogp.textureCoords[i].Y);
-                }
+                indicecount = wmo.indices.Count();
 
-                //Load indices
-                List<ushort> indicelist = new List<ushort>();
-                for (int i = 0; i < reader.wmofile.group[0].mogp.indices.Count(); i++)
-                {
-                    indicelist.Add(reader.wmofile.group[0].mogp.indices[i].indice);
-                }
-
-                //Convert to array
-                ushort[] indices = indicelist.ToArray();
-                float[] vertices = verticelist.ToArray();
-
-                //Set count for use in draw later on
-                indicecount = indices.Count();
-                Console.WriteLine("model has " + indicecount + " indices!");
-                //Create buffers
-                var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, vertices));
+                var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, wmo.vertices));
                 var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector3>() + Utilities.SizeOf<Vector2>(), 0);
-                var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, indices));
+                var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, wmo.indices));
 
                 Device.ImmediateContext.InputAssembler.InputLayout = (layout);
                 Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
                 Device.ImmediateContext.InputAssembler.SetIndexBuffer(indexBuffer, Format.R16_UInt, 0);
                 Device.ImmediateContext.InputAssembler.PrimitiveTopology = (PrimitiveTopology.TriangleList);
 
-                //Get texture, what a mess this could be much better
-                var blp = new BLPReader(_BaseDir);
-                blp.LoadBLP(reader.wmofile.textures.Where(w => !string.IsNullOrWhiteSpace(w.filename)).Select(s => s.filename).ToArray());
+                renderBatches = wmo.renderBatches;
+                materials = wmo.materials;
+                //materialInfo = wmo.materialInfo;
 
-                Texture2D texture;
-
-                if (blp.bmp == null)
-                {
-                    texture = Texture2D.FromFile<Texture2D>(Device, "missingtexture.jpg");
-                }
-                else
-                {
-                    MemoryStream s = new MemoryStream();
-                    blp.bmp.Save(s, System.Drawing.Imaging.ImageFormat.Png);
-                    s.Seek(0, SeekOrigin.Begin);
-                    texture = Texture2D.FromMemory<Texture2D>(Device, s.ToArray());
-                }
-
-                var textureView = new ShaderResourceView(Device, texture);
-
-                var sampler = new SamplerState(Device, new SamplerStateDescription()
-                {
-                    Filter = Filter.MinMagMipLinear,
-                    AddressU = TextureAddressMode.Wrap,
-                    AddressV = TextureAddressMode.Wrap,
-                    AddressW = TextureAddressMode.Wrap,
-                    BorderColor = SharpDX.Color.Black,
-                    ComparisonFunction = Comparison.Never,
-                    MaximumAnisotropy = 16,
-                    MipLodBias = 0,
-                    MinimumLod = 0,
-                    MaximumLod = 16,
-                });
-
-                Device.ImmediateContext.PixelShader.SetSampler(0, sampler);
-                Device.ImmediateContext.PixelShader.SetShaderResource(0, textureView);
-                //End of texture stuff,
                 Set(ref m_pConstantBuffer, new ConstantBuffer<Projections>(Device));
                 Device.ImmediateContext.VertexShader.SetConstantBuffer(0, m_pConstantBuffer.Buffer);
             }
