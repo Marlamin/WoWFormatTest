@@ -91,9 +91,9 @@ namespace WoWFormatLib.FileReaders
 
             if (nameList.Count != num)
             {
-                throw new Exception("List of group names does not equal number of groups");
+                //throw new Exception("List of group names does not equal number of groups");
             }
-            var groupNames = new MOGN[num];
+            var groupNames = new MOGN[nameList.Count];
             for (var i = 0; i < nameList.Count; i++)
             {
                 //Console.WriteLine(nameList[i]);

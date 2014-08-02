@@ -152,12 +152,32 @@ namespace WoWFormatUI
             M2s.Add(@"Creature\Deathwing\Deathwing.M2");
             M2s.Add(@"Creature\Anduin\Anduin.M2");
             M2s.Add(@"Creature\Arthas\Arthas.M2");
+            M2s.Add(@"Creature\Etherial\Etherial.M2");
+            M2s.Add(@"Creature\Arakkoa2\Arakkoa2.m2");
             M2s.Add(@"Creature\Garrosh\Garrosh.M2");
             M2s.Add(@"Item\ObjectComponents\Weapon\Sword_1H_PVPPandariaS2_C_01.M2");
             M2s.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
             M2s.Add(@"World\WMO\transports\Icebreaker\Transport_Icebreaker_ship_stationary.wmo");
             M2s.Add(@"World\WMO\Azeroth\Buildings\TownHall\TownHall.wmo");
             M2s.Add(@"World\WMO\transports\passengership\transportship_A.wmo");
+            M2s.Add(@"World\WMO\Azeroth\Buildings\AltarOfStorms\AltarOfStorms.wmo");
+            M2s.Add(@"World\WMO\Northrend\Dalaran\ND_Dalaran.wmo");
+            M2s.Add(@"World\WMO\Northrend\HowlingFjord\RadioTower\RadioTower.wmo");
+            M2s.Add(@"World\WMO\Outland\DarkPortal\DarkPortal.wmo");
+            M2s.Add(@"World\WMO\transports\Alliance_Battleship\Transport_Alliance_Battleship.wmo");
+            if (File.Exists("listfile.txt"))
+            {
+                string line;
+                StreamReader file = new System.IO.StreamReader("listfile.txt");
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase) || (line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) && !line.Contains("_0") && !line.Contains("_1")))
+                    {
+                        M2s.Add(line);
+                    }
+                }
+            }
+
             for (int i = 0; i < M2s.Count; i++)
             {
                 M2s[i] = M2s[i].Replace(basedir, string.Empty);

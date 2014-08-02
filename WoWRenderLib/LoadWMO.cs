@@ -33,51 +33,64 @@ namespace WoWRenderLib
             //}
         }
 
+        public WoWWMOGroup LoadGroupWMO(WoWFormatLib.Structs.WMO.WMOGroupFile group)
+        {
+            List<float> verticelist = new List<float>();
+
+            for (int i = 0; i < group.mogp.vertices.Count(); i++)
+            {
+                verticelist.Add(group.mogp.vertices[i].vector.X);
+                verticelist.Add(group.mogp.vertices[i].vector.Z * -1);
+                verticelist.Add(group.mogp.vertices[i].vector.Y);
+                verticelist.Add(1.0f);
+                verticelist.Add(group.mogp.normals[i].normal.X);
+                verticelist.Add(group.mogp.normals[i].normal.Z * -1);
+                verticelist.Add(group.mogp.normals[i].normal.Y);
+                verticelist.Add(group.mogp.textureCoords[i].X);
+                verticelist.Add(group.mogp.textureCoords[i].Y);
+            }
+
+            List<ushort> indicelist = new List<ushort>();
+
+            for (int i = 0; i < group.mogp.indices.Count(); i++)
+            {
+                indicelist.Add(group.mogp.indices[i].indice);
+            }
+
+            WMORenderBatch[] renderBatches = new WMORenderBatch[group.mogp.renderBatches.Count()];
+
+            for (int i = 0; i < group.mogp.renderBatches.Count(); i++)
+            {
+                renderBatches[i].firstFace = group.mogp.renderBatches[i].firstFace;
+                renderBatches[i].numFaces = group.mogp.renderBatches[i].numFaces;
+                renderBatches[i].materialID = group.mogp.renderBatches[i].materialID;
+            }
+
+            MaterialInfo[] materialInfo = new MaterialInfo[group.mogp.materialInfo.Count()];
+            for (int i = 0; i < group.mogp.materialInfo.Count(); i++)
+            {
+                materialInfo[i].flags = group.mogp.materialInfo[i].flags;
+                materialInfo[i].materialID = group.mogp.materialInfo[i].materialID;
+            }
+
+            WoWWMOGroup result = new WoWWMOGroup();
+
+            result.indices = indicelist.ToArray();
+            result.vertices = verticelist.ToArray();
+            result.renderBatches = renderBatches;
+            result.materialInfo = materialInfo;
+
+            return result;
+        }
+
         public void LoadWMO()
         {
             WMOReader reader = new WMOReader(basedir);
             reader.LoadWMO(modelPath);
-            List<float> verticelist = new List<float>();
-
-            for (int i = 0; i < reader.wmofile.group[0].mogp.vertices.Count(); i++)
-            {
-                verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.X);
-                verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Z * -1);
-                verticelist.Add(reader.wmofile.group[0].mogp.vertices[i].vector.Y);
-                verticelist.Add(1.0f);
-                verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.X);
-                verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.Z * -1);
-                verticelist.Add(reader.wmofile.group[0].mogp.normals[i].normal.Y);
-                verticelist.Add(reader.wmofile.group[0].mogp.textureCoords[i].X);
-                verticelist.Add(reader.wmofile.group[0].mogp.textureCoords[i].Y);
-            }
-
-            List<ushort> indicelist = new List<ushort>();
-            for (int i = 0; i < reader.wmofile.group[0].mogp.indices.Count(); i++)
-            {
-                indicelist.Add(reader.wmofile.group[0].mogp.indices[i].indice);
-            }
-
-            WMORenderBatch[] renderBatches = new WMORenderBatch[reader.wmofile.group[0].mogp.renderBatches.Count()];
-
-            for (int i = 0; i < reader.wmofile.group[0].mogp.renderBatches.Count(); i++)
-            {
-                renderBatches[i].firstFace = reader.wmofile.group[0].mogp.renderBatches[i].firstFace;
-                renderBatches[i].numFaces = reader.wmofile.group[0].mogp.renderBatches[i].numFaces;
-                renderBatches[i].materialID = reader.wmofile.group[0].mogp.renderBatches[i].materialID;
-            }
-
-            MaterialInfo[] materialInfo = new MaterialInfo[reader.wmofile.group[0].mogp.materialInfo.Count()];
-            for (int i = 0; i < reader.wmofile.group[0].mogp.materialInfo.Count(); i++)
-            {
-                materialInfo[i].flags = reader.wmofile.group[0].mogp.materialInfo[i].flags;
-                materialInfo[i].materialID = reader.wmofile.group[0].mogp.materialInfo[i].materialID;
-            }
 
             WMOMaterial[] materials = new WMOMaterial[reader.wmofile.materials.Count()];
             for (int i = 0; i < reader.wmofile.materials.Count(); i++)
             {
-                //Console.WriteLine(reader.wmofile.group[0].mogp.materialInfo[i].materialID);
                 for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
                 {
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
@@ -104,11 +117,15 @@ namespace WoWRenderLib
                 }
             }
 
-            wmo.indices = indicelist.ToArray();
-            wmo.vertices = verticelist.ToArray();
-            wmo.renderBatches = renderBatches;
-            wmo.materialInfo = materialInfo;
+            WoWWMOGroup[] groups = new WoWWMOGroup[reader.wmofile.header.nGroups];
+
+            for (int i = 0; i < reader.wmofile.header.nGroups; i++)
+            {
+                groups[i] = LoadGroupWMO(reader.wmofile.group[i]);
+            }
+
             wmo.materials = materials;
+            wmo.groups = groups;
         }
     }
 }

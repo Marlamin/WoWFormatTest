@@ -11,12 +11,17 @@ namespace WoWRenderLib.Structs.WoWWMO
     public struct WoWWMO
     {
         public string name;
+        public WMOMaterial[] materials;
+        public WoWWMOGroup[] groups;
+    }
+
+    public struct WoWWMOGroup
+    {
+        public string groupName;
         public float[] vertices;
         public ushort[] indices;
-        public Texture2D[] textures;
-        public WMOMaterial[] materials;
-        public MaterialInfo[] materialInfo;
         public WMORenderBatch[] renderBatches;
+        public MaterialInfo[] materialInfo;
     }
 
     public struct WMORenderBatch

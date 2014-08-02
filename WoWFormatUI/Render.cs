@@ -108,10 +108,11 @@ namespace WoWFormatUI
             {
                 for (int i = 0; i < M2renderBatches.Count(); i++)
                 {
-                    if (M2renderBatches[i].materialID > m2materials.Count())
+                    if (M2renderBatches[i].materialID > m2materials.Count() - 1) //temp hackfix
                     {
                         continue;
                     }
+
                     var textureView = new ShaderResourceView(Device, m2materials[M2renderBatches[i].materialID].texture);
                     var sampler = new SamplerState(Device, new SamplerStateDescription()
                     {
@@ -190,7 +191,7 @@ namespace WoWFormatUI
 
             //Make camera
             Camera = new WoWModelViewerCamera();
-            Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 100.0f);
+            Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 50.0f);
             Camera.SetViewParams(new Vector3(10.0f, 10.0f, -10.0f), new Vector3(0.0f, 1.0f, 0.0f));
             Camera.Roll(-4f);
         }
@@ -220,18 +221,18 @@ namespace WoWFormatUI
                 model.LoadWMO();
                 WoWWMO wmo = model.wmo;
 
-                indicecount = wmo.indices.Count();
+                indicecount = wmo.groups[0].indices.Count();
 
-                var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, wmo.vertices));
+                var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, wmo.groups[0].vertices));
                 var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector3>() + Utilities.SizeOf<Vector2>(), 0);
-                var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, wmo.indices));
+                var indexBuffer = dg.Add(Buffer.Create(Device, BindFlags.IndexBuffer, wmo.groups[0].indices));
 
                 Device.ImmediateContext.InputAssembler.InputLayout = (layout);
                 Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
                 Device.ImmediateContext.InputAssembler.SetIndexBuffer(indexBuffer, Format.R16_UInt, 0);
                 Device.ImmediateContext.InputAssembler.PrimitiveTopology = (PrimitiveTopology.TriangleList);
 
-                WMOrenderBatches = wmo.renderBatches;
+                WMOrenderBatches = wmo.groups[0].renderBatches;
                 materials = wmo.materials;
 
                 Set(ref m_pConstantBuffer, new ConstantBuffer<Projections>(Device));
@@ -240,7 +241,7 @@ namespace WoWFormatUI
 
             //Make camera
             Camera = new WoWModelViewerCamera();
-            Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 100.0f);
+            Camera.SetProjParams((float)Math.PI / 2, 1, 0.01f, 4000.0f);
             Camera.SetViewParams(new Vector3(10.0f, 10.0f, -10.0f), new Vector3(0.0f, 1.0f, 0.0f));
             Camera.Roll(-4f);
         }
