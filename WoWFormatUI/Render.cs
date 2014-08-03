@@ -41,8 +41,8 @@ namespace WoWFormatUI
         {
             if (ModelPath.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
             {
-                RenderM2(ModelPath);
                 modelLoaded = true;
+                RenderM2(ModelPath);
             }
             else if (ModelPath.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase))
             {
@@ -172,6 +172,11 @@ namespace WoWFormatUI
                 //Set count for use in draw later on
                 indicecount = m2.indices.Count();
 
+                if (m2.vertices.Count() == 0)
+                {
+                    modelLoaded = false;
+                    return;
+                }
                 //Create buffers
                 var vertexBuffer = dg.Add(Buffer.Create(Device, BindFlags.VertexBuffer, m2.vertices));
                 var vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<Vector4>() + Utilities.SizeOf<Vector3>() + Utilities.SizeOf<Vector2>(), 0);
