@@ -61,6 +61,7 @@
     <Compile Include="Structs\ADTtex.Struct.cs" />
     <Compile Include="Structs\M2.Struct.cs" />
     <Compile Include="Structs\SKIN.Struct.cs" />
+    <Compile Include="Structs\WDL.Struct.cs" />
     <Compile Include="Structs\WMO.Struct.cs" />
     <Compile Include="Utils\ABlock.cs" />
     <Compile Include="Utils\BlizzHeader.cs" />

@@ -9,12 +9,14 @@ namespace WoWFormatLib
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void LoadAllMaps(string basedir)
         {
-            string basedir = ConfigurationManager.AppSettings["basedir"];
-            //LoadAllMaps(basedir);
-
-            LoadFromListfile("C:\\WoD\\18566listfile.txt", basedir);
+            var reader = new MapReader(basedir);
+            Dictionary<int, string> maps = reader.GetMaps();
+            foreach (KeyValuePair<int, string> map in maps)
+            {
+                LoadMap(map.Value, basedir);
+            }
         }
 
         private static void LoadFromListfile(string listfile, string basedir)
@@ -89,17 +91,6 @@ namespace WoWFormatLib
             }
             file.Close();
             Console.WriteLine("Done.");
-            Console.ReadLine();
-        }
-
-        private static void LoadAllMaps(string basedir)
-        {
-            var reader = new MapReader(basedir);
-            Dictionary<int, string> maps = reader.GetMaps();
-            foreach (KeyValuePair<int, string> map in maps)
-            {
-                LoadMap(map.Value, basedir);
-            }
         }
 
         private static void LoadMap(string map, string basedir)
@@ -114,6 +105,16 @@ namespace WoWFormatLib
             {
                 Console.WriteLine("Map \"" + map + "\" does not exist.");
             }
+        }
+
+        private static void Main(string[] args)
+        {
+            string basedir = ConfigurationManager.AppSettings["basedir"];
+            //LoadAllMaps(basedir);
+
+            //LoadFromListfile("C:\\WoD\\18663listfile.txt", basedir);
+            var wdtreader = new WDTReader(basedir);
+            wdtreader.LoadWDT(@"World\Maps\BlackrockFoundryTrainDepot\BlackrockFoundryTrainDepot.wdt");
         }
     }
 }

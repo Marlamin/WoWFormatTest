@@ -24,6 +24,7 @@ namespace WoWFormatLib.FileReaders
                 using (FileStream wmoStream = File.Open(Path.Combine(basedir, filename), FileMode.Open))
                 {
                     ReadWMO(filename, wmoStream);
+                    wmoStream.Close();
                 }
             }
             else
@@ -374,7 +375,7 @@ namespace WoWFormatLib.FileReaders
             for (int i = 0; i < wmofile.header.nGroups; i++)
             {
                 var groupfilename = filename.Replace(".WMO", "_" + i.ToString().PadLeft(3, '0') + ".WMO");
-                groupfilename = filename.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
+                groupfilename = groupfilename.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
                 if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, groupfilename)))
                 {
                     new WoWFormatLib.Utils.MissingFile(groupfilename);

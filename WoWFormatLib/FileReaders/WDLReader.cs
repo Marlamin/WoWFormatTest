@@ -86,11 +86,11 @@ namespace WoWFormatLib.FileReaders
                     case "MWMO": ReadMWMOChunk(bin, chunk);
                         continue;
                     case "MWID":
-                    case "MAOC": //New in WoD?!
+                    case "MODF":
                     case "MAOF": //contains MARE and MAHO subchunks
                     case "MARE":
-                    case "MAHO":
-                    case "MODF": continue;
+                    case "MAOC": //New in WoD
+                    case "MAHO": continue;
                     default:
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
                 }

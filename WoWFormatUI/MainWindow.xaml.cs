@@ -165,6 +165,7 @@ namespace WoWFormatUI
             M2s.Add(@"World\WMO\Northrend\HowlingFjord\RadioTower\RadioTower.wmo");
             M2s.Add(@"World\WMO\Outland\DarkPortal\DarkPortal.wmo");
             M2s.Add(@"World\WMO\transports\Alliance_Battleship\Transport_Alliance_Battleship.wmo");
+            M2s.Add(@"World\WMO\Draenor\TanaanJungle\6TJ_DarkPortal_Broken.wmo");
             if (File.Exists("listfile.txt"))
             {
                 string line;
