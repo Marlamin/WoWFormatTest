@@ -225,6 +225,11 @@ namespace WoWOpenGL
             ModelListBox.DataContext = M2s;
         }
 
+        private void ModelListBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+
         private void ModelListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             ListBoxItem item = ModelListBox.SelectedValue as ListBoxItem;

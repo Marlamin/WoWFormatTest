@@ -15,6 +15,10 @@ namespace WoWOpenGL
 {
     public class Render : GameWindow
     {
+        Camera ActiveCamera;
+        float mouseScale = 0.001f;
+        bool mouseDragging = false;
+
         private static float angle = 0.0f;
         private string basedir;
         private GLControl glControl;
@@ -23,7 +27,9 @@ namespace WoWOpenGL
         private bool modelLoaded;
         private RenderBatch[] renderbatches;
         private uint[] VBOid;
-
+        private float dragX;
+        private float dragY;
+        private float dragZ;
 
         public Render()
         {
@@ -33,6 +39,15 @@ namespace WoWOpenGL
         public Render(string ModelPath)
         {
             basedir = ConfigurationManager.AppSettings["basedir"];
+
+            dragX = 0.0f;
+            dragY = 0.0f;
+            dragZ = -7.5f;
+
+            System.Windows.Forms.Integration.WindowsFormsHost wfc = MainWindow.winFormControl;
+
+            ActiveCamera = new Camera((int)wfc.ActualWidth, (int)wfc.ActualHeight);
+            ActiveCamera.Pos = new Vector3(0, 0, -7.5f);
             Console.WriteLine(ModelPath);
 
             if (ModelPath.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
@@ -49,12 +64,12 @@ namespace WoWOpenGL
             {
                 modelLoaded = false;
             }
-
-            System.Windows.Forms.Integration.WindowsFormsHost wfc = MainWindow.winFormControl;
+            
+            
             glControl = new GLControl(OpenTK.Graphics.GraphicsMode.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default);
 
-            glControl.Width = 800;
-            glControl.Height = 600;
+            glControl.Width = (int)wfc.ActualWidth;
+            glControl.Height = (int)wfc.ActualHeight;
             glControl.Left = 0;
             glControl.Top = 0;
 
@@ -70,7 +85,28 @@ namespace WoWOpenGL
 
             wfc.Child = glControl;
 
+
             Console.WriteLine(glControl.Width + "x" + glControl.Height);
+        }
+
+        public void DrawAxes()
+        {
+            GL.Begin(PrimitiveType.Lines);
+
+            GL.Color3(Color.DarkRed);  // x axis
+            GL.Vertex3(-10, 0, 0);
+            GL.Vertex3(10, 0, 0);
+
+            GL.Color3(Color.ForestGreen);  // y axis
+            GL.Vertex3(0, -10, 0);
+            GL.Vertex3(0, 10, 0);
+
+            GL.Color3(Color.LightBlue);  // z axis
+            GL.Vertex3(0, 0, -10);
+            GL.Vertex3(0, 0, 10);
+
+            GL.End();
+
         }
 
         private void glControl_Load(object sender, EventArgs e)
@@ -81,17 +117,7 @@ namespace WoWOpenGL
             GL.ClearColor(OpenTK.Graphics.Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             gLoaded = true;
-
-            GL.Viewport(0, 0, glControl.Width, glControl.Height);
-
-            float aspect_ratio = glControl.Width / glControl.Height;
-
-            Console.WriteLine("Creating perspective for " + aspect_ratio.ToString());
-            Matrix4 perpective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspect_ratio, 1, 128);
-            GL.Ortho(0, glControl.Width, 0, glControl.Height, -1, 1);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref perpective);
-
+            ActiveCamera.setupGLRenderMatrix();
 
         }
 
@@ -272,19 +298,44 @@ namespace WoWOpenGL
 
         private void RenderFrame(object sender, EventArgs e) //This is called every frame
         {
-            glControl.MakeCurrent();
-
-            var mouse = OpenTK.Input.Mouse.GetState();
             
+            glControl.MakeCurrent();
+            
+            OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
+            OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
+            
+
+            if (keyboardState.IsKeyDown(Key.Left))
+            {
+                dragX = dragX + 0.1f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.Right))
+            {
+                dragX = dragX - 0.1f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.Up))
+            {
+                dragY = dragY + 0.1f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.Down))
+            {
+                dragY = dragY - 0.1f;
+            }
+
+            dragZ = (mouseState.WheelPrecise / 10) - 7.5f; //Startzoom is at -7.5f 
+
+            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
+
+           // ActiveCamera.OrbitXY(dragX, dragY);
+            ActiveCamera.setupGLRenderMatrix();
+
+            Console.WriteLine(dragZ);
             if (!gLoaded) return;
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            Matrix4 lookat = Matrix4.LookAt(0, 5, 5, 0, 0, 0, 0, 5, 0);
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref lookat);
-
-            GL.Rotate(angle, 0.0f, 1.0f, mouse.Wheel / 0.1f);
-            angle += 0.25f;
             GL.Enable(EnableCap.Texture2D);
             //GL.EnableClientState(ArrayCap.VertexArray);
             // GL.VertexPointer(8, VertexPointerType.Float, 0, vertices);
@@ -304,8 +355,8 @@ namespace WoWOpenGL
                 //    continue;
                 //}
                 //GL.BindTexture(TextureTarget.Texture2D, materials[renderbatches[i].materialID].textureID);
-                //Console.WriteLine("Rendering batch " + i + " Face: " + renderbatches[i].firstFace);
-                GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, renderbatches[i].firstFace + renderbatches[i].numFaces, (int)renderbatches[i].numFaces + 20, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                //Console.WriteLine("Rendering batch " + i + " First face: " + renderbatches[i].firstFace + "," + " Last face: "+ ((int)renderbatches[i].firstFace + (int)renderbatches[i].numFaces) + " Num faces: " + renderbatches[i].numFaces);
+                GL.DrawRangeElements(PrimitiveType.Triangles, (int)renderbatches[i].firstFace, ((int)renderbatches[i].firstFace + (int)renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedShort, IntPtr.Zero);
                 //Console.WriteLine(GL.GetError().ToString());
             }
 
@@ -320,6 +371,7 @@ namespace WoWOpenGL
             }
             GL.End();
             */
+            DrawAxes();
             glControl.SwapBuffers();
             glControl.Invalidate();
         }

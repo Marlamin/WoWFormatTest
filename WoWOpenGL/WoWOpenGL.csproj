@@ -70,6 +70,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Camera.cs" />
     <Compile Include="RenderTerrain.cs" />
     <Compile Include="Render.cs" />
     <Compile Include="RenderWindow.xaml.cs">

@@ -25,7 +25,7 @@
             </TabItem>
             <TabItem Header="Models">
                 <Grid>
-                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="835" Margin="10,10,0,0" VerticalAlignment="Top" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
+                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="835" Margin="10,10,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
                     <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0">
                         <WF:Label Text="Soup" ForeColor="White"></WF:Label>
                     </WindowsFormsHost>

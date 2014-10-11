@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 
 namespace WoWOpenGL
 {
@@ -25,6 +26,7 @@ namespace WoWOpenGL
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            
             winFormControl = wfContainer;
             new RenderTerrain(loadmap);
         }
