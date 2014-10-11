@@ -105,12 +105,28 @@ namespace WoWFormatLib.FileReaders
 
         public MOGP ReadMOGPChunk(BlizzHeader chunk, BinaryReader bin)
         {
-            bin.ReadBytes(68); //read rest of header
+            MOGP mogp = new MOGP();
+            mogp.nameOffset = bin.ReadUInt32();
+            mogp.descriptiveNameOffset = bin.ReadUInt32();
+            mogp.flags = bin.ReadUInt32();
+            mogp.boundingBox1 = bin.Read<Vector3>();
+            mogp.boundingBox2 = bin.Read<Vector3>();
+            mogp.ofsPortals = bin.ReadUInt16();
+            mogp.numPortals = bin.ReadUInt16();
+            mogp.numBatchesA = bin.ReadUInt16();
+            mogp.numBatchesB = bin.ReadUInt16();
+            mogp.numBatchesC = bin.ReadUInt32();
+            //mogp.fogIndices = bin.ReadBytes(4);
+            bin.ReadBytes(4);
+            mogp.liquidType = bin.ReadUInt32();
+            mogp.groupID = bin.ReadUInt32();
+            mogp.unk0 = bin.ReadUInt32();
+            mogp.unk1 = bin.ReadUInt32();
             MemoryStream stream = new MemoryStream(bin.ReadBytes((int)chunk.Size));
             var subbin = new BinaryReader(stream);
             BlizzHeader subchunk;
             long position = 0;
-            MOGP mogp = new MOGP();
+
             while (position < stream.Length)
             {
                 stream.Position = position;
