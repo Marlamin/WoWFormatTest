@@ -30,7 +30,7 @@ namespace WoWOpenGL
         private float dragX;
         private float dragY;
         private float dragZ;
-
+        private bool isWMO = false;
         public Render()
         {
             //RenderModel(@"World\ArtTest\Boxtest\xyz.m2");
@@ -66,8 +66,7 @@ namespace WoWOpenGL
             }
             
             
-            glControl = new GLControl(OpenTK.Graphics.GraphicsMode.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default);
-
+            glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default);
             glControl.Width = (int)wfc.ActualWidth;
             glControl.Height = (int)wfc.ActualHeight;
             glControl.Left = 0;
@@ -244,16 +243,6 @@ namespace WoWOpenGL
 
             //Load WMO
             reader.LoadWMO(filename);
-            
-            //Set up buffer IDs
-            VBOid = new uint[2];
-            GL.GenBuffers(2, VBOid);
-
-            //Bind Vertex buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
-            
-            //Bind Index buffer
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
 
             //Enable Vertex Arrays
             GL.EnableClientState(ArrayCap.VertexArray);
@@ -261,49 +250,56 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.NormalArray);
             //Enable TexCoord arrays
             GL.EnableClientState(ArrayCap.TextureCoordArray);
+           
+            //Set up buffer IDs
+            VBOid = new uint[(reader.wmofile.group.Count() * 2) + 2];
+            GL.GenBuffers((reader.wmofile.group.Count() * 2) + 2, VBOid);
 
-            //Switch to Index buffer
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
-
-            List<ushort> indicelist = new List<ushort>();
-            for (int i = 0; i < reader.wmofile.group[0].mogp.indices.Count(); i++)
+            for (int g = 0; g < reader.wmofile.group.Count(); g++)
             {
-                indicelist.Add(reader.wmofile.group[0].mogp.indices[i].indice);
+                //Switch to Vertex buffer
+                GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[g * 2]);
+
+                Vertex[] vertices = new Vertex[reader.wmofile.group[g].mogp.vertices.Count()];
+
+                for (int i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                {
+                    vertices[i].Position = new Vector3(reader.wmofile.group[g].mogp.vertices[i].vector.X, reader.wmofile.group[g].mogp.vertices[i].vector.Z, reader.wmofile.group[g].mogp.vertices[i].vector.Y);
+                    vertices[i].Normal = new Vector3(reader.wmofile.group[g].mogp.normals[i].normal.X, reader.wmofile.group[g].mogp.normals[i].normal.Z, reader.wmofile.group[g].mogp.normals[i].normal.Y);
+                    vertices[i].TexCoord = new Vector2(reader.wmofile.group[g].mogp.textureCoords[i].X, reader.wmofile.group[g].mogp.textureCoords[i].Y);
+                }
+
+                //Push to buffer
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 8 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
+
+                //Switch to Index buffer
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[(g * 2) + 1]);
+
+                List<ushort> indicelist = new List<ushort>();
+                for (int i = 0; i < reader.wmofile.group[g].mogp.indices.Count(); i++)
+                {
+                    indicelist.Add(reader.wmofile.group[g].mogp.indices[i].indice);
+                }
+
+                ushort[] indices = indicelist.ToArray();
+
+                //Push to buffer
+                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(ushort)), indices, BufferUsageHint.StaticDraw);
             }
 
-            ushort[] indices = indicelist.ToArray();
-
-            //Push to buffer
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(ushort)), indices, BufferUsageHint.StaticDraw);
-
-            //Switch to Vertex buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
-
-            Vertex[] vertices = new Vertex[reader.wmofile.group[0].mogp.vertices.Count()];
-
-            for (int i = 0; i < reader.wmofile.group[0].mogp.vertices.Count(); i++)
-            {
-                vertices[i].Position = new Vector3(reader.wmofile.group[0].mogp.vertices[i].vector.X, reader.wmofile.group[0].mogp.vertices[i].vector.Z, reader.wmofile.group[0].mogp.vertices[i].vector.Y);
-                vertices[i].Normal = new Vector3(reader.wmofile.group[0].mogp.normals[i].normal.X, reader.wmofile.group[0].mogp.normals[i].normal.Z, reader.wmofile.group[0].mogp.normals[i].normal.Y);
-                vertices[i].TexCoord = new Vector2(reader.wmofile.group[0].mogp.textureCoords[i].X, reader.wmofile.group[0].mogp.textureCoords[i].Y);
-            }
-
-            //Push to buffer
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 8 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
-            
-            int numRenderbatches = 0;
-            //Get total amount of render batches
-            for (int i = 0; i < reader.wmofile.group.Count(); i++){
-                numRenderbatches = numRenderbatches + reader.wmofile.group[i].mogp.renderBatches.Count();
-            }
+            GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             materials = new Material[reader.wmofile.materials.Count()];
             for (int i = 0; i < reader.wmofile.materials.Count(); i++)
             {
                 for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
                 {
+                    
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
                     {
+                        materials[i].textureID = GL.GenTexture();
                         var blp = new BLPReader(basedir);
                         blp.LoadBLP(reader.wmofile.textures[ti].filename);
                         if (blp.bmp == null)
@@ -320,15 +316,20 @@ namespace WoWOpenGL
                             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
                             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 
-                            DebugLog("Created texture \"" + reader.wmofile.textures[ti].filename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
+                            DebugLog("Created texture \"" + reader.wmofile.textures[ti].filename + "\" (ID "+materials[i].textureID+") of " + bmp_data.Width + "x" + bmp_data.Height);
                             blp.bmp.UnlockBits(bmp_data);
                         }
-                        materials[i].textureID = i;
                         materials[i].filename = reader.wmofile.textures[ti].filename;
                     }
                 }
             }
 
+            int numRenderbatches = 0;
+            //Get total amount of render batches
+            for (int i = 0; i < reader.wmofile.group.Count(); i++)
+            {
+                numRenderbatches = numRenderbatches + reader.wmofile.group[i].mogp.renderBatches.Count();
+            }
 
             renderbatches = new RenderBatch[numRenderbatches];
 
@@ -341,6 +342,8 @@ namespace WoWOpenGL
                     renderbatches[rb].firstFace = group.mogp.renderBatches[i].firstFace;
                     renderbatches[rb].numFaces = group.mogp.renderBatches[i].numFaces;
                     renderbatches[rb].materialID = group.mogp.renderBatches[i].materialID;
+                    renderbatches[rb].groupID = (uint)g;
+                    rb++;
                 }
             }
 
@@ -351,6 +354,7 @@ namespace WoWOpenGL
             DebugLog("Done loading WMO file!");
             
             gLoaded = true;
+            isWMO = true;
         }
 
         private void RenderFrame(object sender, EventArgs e) //This is called every frame
@@ -398,14 +402,29 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
-            GL.VertexPointer(3, VertexPointerType.Float, 32, 0);
-            GL.NormalPointer(NormalPointerType.Float, 32, 12);
-            GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, 24);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
+
             GL.Rotate(angle, 0.0, 1.0, 0.0);
+
             for (int i = 0; i < renderbatches.Count(); i++)
             {
+                if (!isWMO)
+                {
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
+                    GL.VertexPointer(3, VertexPointerType.Float, 32, 0);
+                    GL.NormalPointer(NormalPointerType.Float, 32, 12);
+                    GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, 24);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
+                }
+                else
+                {
+                    //DebugLog("Switching to buffer " + renderbatches[i].groupID * 2);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[renderbatches[i].groupID * 2]);
+                    GL.VertexPointer(3, VertexPointerType.Float, 32, 0);
+                    GL.NormalPointer(NormalPointerType.Float, 32, 12);
+                    GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, 24);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[(renderbatches[i].groupID * 2) + 1]);
+                }
+                
                 if (renderbatches[i].materialID > materials.Count() - 1) //temp hackfix
                 {
                     DebugLog("[ERROR] Material ID encountered which is lower than material count!!!");
@@ -433,6 +452,7 @@ namespace WoWOpenGL
             public uint firstFace;
             public uint materialID;
             public uint numFaces;
+            public uint groupID;
         }
 
         private struct Vertex
