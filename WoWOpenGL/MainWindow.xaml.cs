@@ -195,6 +195,8 @@ namespace WoWOpenGL
             M2s.Add(@"Creature\Garrosh\Garrosh.M2");
             M2s.Add(@"Item\ObjectComponents\Weapon\sword_1h_garrison_a_01.m2");
             M2s.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
+            M2s.Add(@"World\WMO\Kalimdor\Ogrimmar\Ogrimmar.wmo");
+            M2s.Add(@"World\WMO\Azeroth\Buildings\StormWind\Stormwind2.wmo");
             M2s.Add(@"World\WMO\Draenor\IronHorde\6ih_ironhorde_tower01.wmo");
             M2s.Add(@"World\WMO\transports\Icebreaker\Transport_Icebreaker_ship_stationary.wmo");
             M2s.Add(@"World\WMO\Azeroth\Buildings\TownHall\TownHall.wmo");
