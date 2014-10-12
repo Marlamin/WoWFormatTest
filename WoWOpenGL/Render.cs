@@ -20,7 +20,7 @@ namespace WoWOpenGL
         bool mouseDragging = false;
 
         
-        private static float angle = 0.0f;
+        private static float angle = 90.0f;
         private string basedir;
         private GLControl glControl;
         private bool gLoaded = false;
@@ -142,7 +142,7 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
 
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
+           
 
             List<ushort> indicelist = new List<ushort>();
             for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
@@ -154,6 +154,7 @@ namespace WoWOpenGL
 
             ushort[] indices = indicelist.ToArray();
 
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(ushort)), indices, BufferUsageHint.StaticDraw);
             
             Vertex[] vertices = new Vertex[reader.model.vertices.Count()];
@@ -167,9 +168,6 @@ namespace WoWOpenGL
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 8 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
-            int buffersize;
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
-            GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out buffersize);
             /*GL.Enable(EnableCap.Texture2D);
             
             materials = new Material[reader.model.textures.Count()];
@@ -223,7 +221,9 @@ namespace WoWOpenGL
             }
             DebugLog("  " + reader.model.skins.Count() + " skins");
             DebugLog("  " + renderbatches.Count() + " renderbatches");
+            DebugLog("  " + reader.model.vertices.Count() + " vertices");
             DebugLog("Done loading M2 file!");
+            System.Threading.Thread.Sleep(100);
             gLoaded = true;
         }
 
@@ -274,8 +274,8 @@ namespace WoWOpenGL
             for (int i = 0; i < reader.wmofile.group[0].mogp.vertices.Count(); i++)
             {
                 vertices[i].Position = new Vector3(reader.wmofile.group[0].mogp.vertices[i].vector.X, reader.wmofile.group[0].mogp.vertices[i].vector.Z, reader.wmofile.group[0].mogp.vertices[i].vector.Y);
-                vertices[i].Normal = new Vector3(reader.wmofile.group[0].mogp.normals[i].normal.X, reader.wmofile.group[0].mogp.normals[i].normal.X, reader.wmofile.group[0].mogp.normals[i].normal.Y);
-                vertices[i].TexCoord = new Vector2(reader.wmofile.group[0].mogp.textureCoords[i].X, reader.wmofile.group[0].mogp.textureCoords[i].X);
+                vertices[i].Normal = new Vector3(reader.wmofile.group[0].mogp.normals[i].normal.X, reader.wmofile.group[0].mogp.normals[i].normal.Z, reader.wmofile.group[0].mogp.normals[i].normal.Y);
+                vertices[i].TexCoord = new Vector2(reader.wmofile.group[0].mogp.textureCoords[i].X, reader.wmofile.group[0].mogp.textureCoords[i].Y);
             }
 
             //Push to buffer
@@ -314,12 +314,13 @@ namespace WoWOpenGL
 
             if (keyboardState.IsKeyDown(Key.Left))
             {
-                dragX = dragX + 0.1f;
+                angle = angle + 1.0f;
+
             }
 
             if (keyboardState.IsKeyDown(Key.Right))
             {
-                dragX = dragX - 0.1f;
+                angle = angle - 1.0f;
             }
 
             if (keyboardState.IsKeyDown(Key.Up))
@@ -332,6 +333,7 @@ namespace WoWOpenGL
                 dragY = dragY - 0.1f;
             }
 
+            
             dragZ = (mouseState.WheelPrecise / 10) - 7.5f; //Startzoom is at -7.5f 
 
             ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
@@ -351,7 +353,7 @@ namespace WoWOpenGL
             GL.NormalPointer(NormalPointerType.Float, 32, 12);
             GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, 24);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
-            GL.Rotate(90.0, 0.0, 1.0, 0.0);
+            GL.Rotate(angle, 0.0, 1.0, 0.0);
             for (int i = 0; i < renderbatches.Count(); i++)
             {
                 //if (renderbatches[i].materialID > materials.Count() - 1) //temp hackfix
