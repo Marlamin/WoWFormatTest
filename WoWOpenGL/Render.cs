@@ -19,6 +19,7 @@ namespace WoWOpenGL
         float mouseScale = 0.001f;
         bool mouseDragging = false;
 
+        
         private static float angle = 0.0f;
         private string basedir;
         private GLControl glControl;
@@ -47,7 +48,7 @@ namespace WoWOpenGL
             System.Windows.Forms.Integration.WindowsFormsHost wfc = MainWindow.winFormControl;
 
             ActiveCamera = new Camera((int)wfc.ActualWidth, (int)wfc.ActualHeight);
-            ActiveCamera.Pos = new Vector3(0, 0, -7.5f);
+            ActiveCamera.Pos = new Vector3(10.0f, -10.0f, -7.5f);
             Console.WriteLine(ModelPath);
 
             if (ModelPath.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
@@ -111,13 +112,14 @@ namespace WoWOpenGL
 
         private void glControl_Load(object sender, EventArgs e)
         {
-            Console.WriteLine("Loaded!");
+            DebugLog("Loading GLcontrol..");
             glControl.MakeCurrent();
             GL.Enable(EnableCap.Texture2D);
             GL.ClearColor(OpenTK.Graphics.Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            gLoaded = true;
+            
             ActiveCamera.setupGLRenderMatrix();
+            DebugLog("GLcontrol is done loading!");
 
         }
 
@@ -127,6 +129,7 @@ namespace WoWOpenGL
 
         private void LoadM2(string modelpath)
         {
+            DebugLog("Loading M2 file ("+modelpath+")..");
             M2Reader reader = new M2Reader(basedir);
             string filename = modelpath;
             reader.LoadM2(filename);
@@ -167,8 +170,8 @@ namespace WoWOpenGL
             int buffersize;
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out buffersize);
-            GL.Enable(EnableCap.Texture2D);
-
+            /*GL.Enable(EnableCap.Texture2D);
+            
             materials = new Material[reader.model.textures.Count()];
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
@@ -204,7 +207,7 @@ namespace WoWOpenGL
                     blp.bmp.UnlockBits(bmp_data);
                 }
             }
-
+            */
             renderbatches = new RenderBatch[reader.model.skins[0].submeshes.Count()];
             for (int i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
             {
@@ -218,6 +221,10 @@ namespace WoWOpenGL
                     }
                 }
             }
+            DebugLog("  " + reader.model.skins.Count() + " skins");
+            DebugLog("  " + renderbatches.Count() + " renderbatches");
+            DebugLog("Done loading M2 file!");
+            gLoaded = true;
         }
 
         private void LoadWMO(string modelpath)
@@ -298,7 +305,7 @@ namespace WoWOpenGL
 
         private void RenderFrame(object sender, EventArgs e) //This is called every frame
         {
-            
+            if (!gLoaded) { return; }
             glControl.MakeCurrent();
             
             OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
@@ -332,22 +339,19 @@ namespace WoWOpenGL
            // ActiveCamera.OrbitXY(dragX, dragY);
             ActiveCamera.setupGLRenderMatrix();
 
-            Console.WriteLine(dragZ);
             if (!gLoaded) return;
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.Enable(EnableCap.Texture2D);
-            //GL.EnableClientState(ArrayCap.VertexArray);
-            // GL.VertexPointer(8, VertexPointerType.Float, 0, vertices);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
             GL.EnableClientState(ArrayCap.VertexArray);
-            GL.VertexPointer(3, VertexPointerType.Float, 32, 0);
             GL.EnableClientState(ArrayCap.NormalArray);
-            GL.NormalPointer(NormalPointerType.Float, 32, 12);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
+            GL.VertexPointer(3, VertexPointerType.Float, 32, 0);
+            GL.NormalPointer(NormalPointerType.Float, 32, 12);
             GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, 24);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
-
+            GL.Rotate(90.0, 0.0, 1.0, 0.0);
             for (int i = 0; i < renderbatches.Count(); i++)
             {
                 //if (renderbatches[i].materialID > materials.Count() - 1) //temp hackfix
@@ -355,9 +359,11 @@ namespace WoWOpenGL
                 //    continue;
                 //}
                 //GL.BindTexture(TextureTarget.Texture2D, materials[renderbatches[i].materialID].textureID);
-                //Console.WriteLine("Rendering batch " + i + " First face: " + renderbatches[i].firstFace + "," + " Last face: "+ ((int)renderbatches[i].firstFace + (int)renderbatches[i].numFaces) + " Num faces: " + renderbatches[i].numFaces);
-                GL.DrawRangeElements(PrimitiveType.Triangles, (int)renderbatches[i].firstFace, ((int)renderbatches[i].firstFace + (int)renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedShort, IntPtr.Zero);
-                //Console.WriteLine(GL.GetError().ToString());
+                GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, (renderbatches[i].firstFace + renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedShort, new IntPtr(renderbatches[i].firstFace * 3));
+                if (GL.GetError().ToString() != "NoError")
+                {
+                    DebugLog(GL.GetError().ToString());
+                }
             }
 
             //GL.DisableClientState(ArrayCap.VertexArray);
@@ -395,6 +401,13 @@ namespace WoWOpenGL
             public string filename;
             public WoWFormatLib.Structs.M2.TextureFlags flags;
             public int textureID;
+        }
+
+        public void DebugLog(string log)
+        {
+            MainWindow.curlogentry = MainWindow.curlogentry + 1;
+            MainWindow.debugList.Items.Add("[" + MainWindow.curlogentry + "] " + log);
+            MainWindow.debugList.ScrollIntoView(MainWindow.debugList.Items[MainWindow.debugList.Items.Count - 1]);
         }
     }
 }

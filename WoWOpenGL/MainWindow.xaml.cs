@@ -31,9 +31,10 @@ namespace WoWOpenGL
     {
         public static GLControl glc;
         public static System.Windows.Forms.Integration.WindowsFormsHost winFormControl;
-
+        public static ListView debugList;
         private volatile bool fCancelMapLoading = false;
         private bool loaded = false;
+        public static int curlogentry = 0;
 
         public MainWindow()
         {
@@ -251,7 +252,9 @@ namespace WoWOpenGL
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            debugList = DebugListBox;
             winFormControl = wfContainer;
         }
+
     }
 }
