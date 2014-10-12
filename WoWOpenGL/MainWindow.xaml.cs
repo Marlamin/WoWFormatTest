@@ -211,7 +211,7 @@ namespace WoWOpenGL
                 StreamReader file = new System.IO.StreamReader("listfile.txt");
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase) || (line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) && !line.Contains("_0") && !line.Contains("_1")))
+                    if (line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
                     {
                         M2s.Add(line);
                     }

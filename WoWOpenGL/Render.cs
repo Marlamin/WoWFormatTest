@@ -18,7 +18,6 @@ namespace WoWOpenGL
         Camera ActiveCamera;
         float mouseScale = 0.001f;
         bool mouseDragging = false;
-
         
         private static float angle = 90.0f;
         private string basedir;
@@ -115,6 +114,7 @@ namespace WoWOpenGL
             DebugLog("Loading GLcontrol..");
             glControl.MakeCurrent();
             GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.DepthTest);
             GL.ClearColor(OpenTK.Graphics.Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
@@ -142,8 +142,6 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
 
-           
-
             List<ushort> indicelist = new List<ushort>();
             for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
             {
@@ -168,12 +166,22 @@ namespace WoWOpenGL
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 8 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
-            /*GL.Enable(EnableCap.Texture2D);
-            
+            GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+
             materials = new Material[reader.model.textures.Count()];
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
                 materials[i].flags = reader.model.textures[i].flags;
+                if (reader.model.textures[i].type == 0)
+                {
+                    DebugLog("Texture given in file!");
+                }
+                else
+                {
+                    DebugLog("Requires external texture! Type " + reader.model.textures[i].type);
+                }
                 materials[i].textureID = GL.GenTexture();
                 
                 var blp = new BLPReader(basedir);
@@ -194,18 +202,19 @@ namespace WoWOpenGL
                 }
                 else
                 {
-                    GL.BindTexture(TextureTarget.Texture2D, materials[i].textureID - 1);
+                    GL.BindTexture(TextureTarget.Texture2D, materials[i].textureID);
                     BitmapData bmp_data = blp.bmp.LockBits(new Rectangle(0, 0, blp.bmp.Width, blp.bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                     GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat); 
-                    Console.WriteLine("Created texture \"" + reader.model.textures[i].filename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
+                    
+                    DebugLog("Created texture \"" + reader.model.textures[i].filename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
                     blp.bmp.UnlockBits(bmp_data);
                 }
             }
-            */
+            
             renderbatches = new RenderBatch[reader.model.skins[0].submeshes.Count()];
             for (int i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
             {
@@ -215,7 +224,7 @@ namespace WoWOpenGL
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
-                        renderbatches[i].materialID = reader.model.skins[0].textureunit[tu].texture;
+                        renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
                     }
                 }
             }
@@ -223,12 +232,13 @@ namespace WoWOpenGL
             DebugLog("  " + renderbatches.Count() + " renderbatches");
             DebugLog("  " + reader.model.vertices.Count() + " vertices");
             DebugLog("Done loading M2 file!");
-            System.Threading.Thread.Sleep(100);
+            
             gLoaded = true;
         }
 
         private void LoadWMO(string modelpath)
         {
+            DebugLog("Loading WMO file..");
             WMOReader reader = new WMOReader(basedir);
             string filename = modelpath;
 
@@ -287,6 +297,39 @@ namespace WoWOpenGL
                 numRenderbatches = numRenderbatches + reader.wmofile.group[i].mogp.renderBatches.Count();
             }
 
+            materials = new Material[reader.wmofile.materials.Count()];
+            for (int i = 0; i < reader.wmofile.materials.Count(); i++)
+            {
+                for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
+                {
+                    if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
+                    {
+                        var blp = new BLPReader(basedir);
+                        blp.LoadBLP(reader.wmofile.textures[ti].filename);
+                        if (blp.bmp == null)
+                        {
+                            throw new Exception("BMP is null!");
+                        }
+                        else
+                        {
+                            GL.BindTexture(TextureTarget.Texture2D, materials[i].textureID);
+                            BitmapData bmp_data = blp.bmp.LockBits(new Rectangle(0, 0, blp.bmp.Width, blp.bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+
+                            DebugLog("Created texture \"" + reader.wmofile.textures[ti].filename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
+                            blp.bmp.UnlockBits(bmp_data);
+                        }
+                        materials[i].textureID = i;
+                        materials[i].filename = reader.wmofile.textures[ti].filename;
+                    }
+                }
+            }
+
+
             renderbatches = new RenderBatch[numRenderbatches];
 
             int rb = 0;
@@ -300,7 +343,14 @@ namespace WoWOpenGL
                     renderbatches[rb].materialID = group.mogp.renderBatches[i].materialID;
                 }
             }
+
+            DebugLog("  " + reader.wmofile.group.Count() + " skins");
+            DebugLog("  " + materials.Count() + " materials");
+            DebugLog("  " + renderbatches.Count() + " renderbatches");
+            DebugLog("  " + reader.wmofile.group[0].mogp.vertices.Count() + " vertices");
+            DebugLog("Done loading WMO file!");
             
+            gLoaded = true;
         }
 
         private void RenderFrame(object sender, EventArgs e) //This is called every frame
@@ -343,7 +393,7 @@ namespace WoWOpenGL
 
             if (!gLoaded) return;
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
             GL.Enable(EnableCap.Texture2D);
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
@@ -356,29 +406,23 @@ namespace WoWOpenGL
             GL.Rotate(angle, 0.0, 1.0, 0.0);
             for (int i = 0; i < renderbatches.Count(); i++)
             {
-                //if (renderbatches[i].materialID > materials.Count() - 1) //temp hackfix
-                //{
-                //    continue;
-                //}
-                //GL.BindTexture(TextureTarget.Texture2D, materials[renderbatches[i].materialID].textureID);
-                GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, (renderbatches[i].firstFace + renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedShort, new IntPtr(renderbatches[i].firstFace * 3));
+                if (renderbatches[i].materialID > materials.Count() - 1) //temp hackfix
+                {
+                    DebugLog("[ERROR] Material ID encountered which is lower than material count!!!");
+                    //continue;
+                }
+                else
+                {
+                    GL.BindTexture(TextureTarget.Texture2D, materials[renderbatches[i].materialID].textureID);
+                }
+                
+                GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, (renderbatches[i].firstFace + renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedShort, new IntPtr(renderbatches[i].firstFace * 2));
                 if (GL.GetError().ToString() != "NoError")
                 {
                     DebugLog(GL.GetError().ToString());
                 }
             }
 
-            //GL.DisableClientState(ArrayCap.VertexArray);
-            /*
-            GL.Begin(PrimitiveType.Triangles);
-            for (uint i = 0; i < indices.Length; i++)
-            {
-                GL.TexCoord2(vertices[indices[i]].TexCoord);
-                GL.Normal3(vertices[indices[i]].Normal);
-                GL.Vertex3(vertices[indices[i]].Position);
-            }
-            GL.End();
-            */
             DrawAxes();
             glControl.SwapBuffers();
             glControl.Invalidate();
