@@ -27,7 +27,7 @@ namespace WoWOpenGL
             this.Width = viewportWidth;
             this.Height = viewportHeight;
             float aspectRatio = Width / (float)Height;
-            projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 1.0f, 128.0f);
+            projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 1.0f, 4096.0f);
         }
 
         public void setupGLRenderMatrix()
