@@ -8,9 +8,9 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using WoWFormatLib.FileReaders;
 using OpenTK.Input;
+using System.Timers;
 namespace WoWOpenGL
 {
     public class Render : GameWindow
@@ -27,10 +27,13 @@ namespace WoWOpenGL
         private bool modelLoaded;
         private RenderBatch[] renderbatches;
         private uint[] VBOid;
-        private float dragX;
-        private float dragY;
-        private float dragZ;
+        private static float dragX;
+        private static float dragY;
+        private static float dragZ;
         private bool isWMO = false;
+
+        private int inputwait = 30; //temp hackfix to deal with high fps making impossible input
+        private int curinputwait = 0; //temp hackfix to deal with high fps making impossible input
         public Render()
         {
             //RenderModel(@"World\ArtTest\Boxtest\xyz.m2");
@@ -83,7 +86,7 @@ namespace WoWOpenGL
             glControl.MakeCurrent();
 
             wfc.Child = glControl;
-
+            
 
             Console.WriteLine(glControl.Width + "x" + glControl.Height);
         }
@@ -116,7 +119,7 @@ namespace WoWOpenGL
             GL.Enable(EnableCap.DepthTest);
             GL.ClearColor(OpenTK.Graphics.Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            
+            InitializeInputTick();
             ActiveCamera.setupGLRenderMatrix();
             DebugLog("GLcontrol is done loading!");
 
@@ -130,6 +133,8 @@ namespace WoWOpenGL
         {
             DebugLog("Loading M2 file ("+modelpath+")..");
             M2Reader reader = new M2Reader(basedir);
+            reader.useCASC = MainWindow.useCASC;
+
             string filename = modelpath;
             reader.LoadM2(filename);
             VBOid = new uint[2];
@@ -184,6 +189,8 @@ namespace WoWOpenGL
                 materials[i].textureID = GL.GenTexture();
                 
                 var blp = new BLPReader(basedir);
+                blp.useCASC = MainWindow.useCASC;
+
                // if (File.Exists(System.IO.Path.Combine(basedir, reader.model.filename.Replace("M2", "BLP"))))
                // {
                //     materials[i].filename = reader.model.filename.Replace("M2", "BLP");
@@ -240,7 +247,7 @@ namespace WoWOpenGL
             DebugLog("Loading WMO file..");
             WMOReader reader = new WMOReader(basedir);
             string filename = modelpath;
-
+            reader.useCASC = MainWindow.useCASC;
             //Load WMO
             reader.LoadWMO(filename);
 
@@ -301,6 +308,7 @@ namespace WoWOpenGL
                     {
                         materials[i].textureID = GL.GenTexture();
                         var blp = new BLPReader(basedir);
+                        blp.useCASC = MainWindow.useCASC;
                         blp.LoadBLP(reader.wmofile.textures[ti].filename);
                         if (blp.bmp == null)
                         {
@@ -357,19 +365,23 @@ namespace WoWOpenGL
             isWMO = true;
         }
 
-        private void RenderFrame(object sender, EventArgs e) //This is called every frame
+        private static void InitializeInputTick()
         {
-            if (!gLoaded) { return; }
-            glControl.MakeCurrent();
-            
+            var timer = new Timer();
+            timer.Enabled = true;
+            timer.Interval = 1000 / 60;
+            timer.Elapsed += new ElapsedEventHandler(InputTick);
+            timer.Start();
+        }
+
+        private static void InputTick(object sender, EventArgs e)
+        {
             OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
             OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
-            
 
             if (keyboardState.IsKeyDown(Key.Left))
             {
                 angle = angle + 1.0f;
-
             }
 
             if (keyboardState.IsKeyDown(Key.Right))
@@ -379,16 +391,21 @@ namespace WoWOpenGL
 
             if (keyboardState.IsKeyDown(Key.Up))
             {
-                dragY = dragY + 0.1f;
+                dragY = dragY + 0.01f;
             }
 
             if (keyboardState.IsKeyDown(Key.Down))
             {
-                dragY = dragY - 0.1f;
+                dragY = dragY - 0.01f;
             }
 
-            
             dragZ = (mouseState.WheelPrecise / 10) - 7.5f; //Startzoom is at -7.5f 
+        }
+
+        private void RenderFrame(object sender, EventArgs e) //This is called every frame
+        {
+            if (!gLoaded) { return; }
+            glControl.MakeCurrent();
 
             ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
 
