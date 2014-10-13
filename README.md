@@ -12,7 +12,7 @@ Should be no configuration neccesary at the time of writing.
 
 ## Requirements
 - [CSDBCReader](http://marlamin.com/u/CSDBCReader.dll)
-- [OpenTK](http://www.opentk.com/)
+- [OpenTK](http://www.opentk.com/) (recent version already included)
 
 ## Thanks
 - TOM_RUS
