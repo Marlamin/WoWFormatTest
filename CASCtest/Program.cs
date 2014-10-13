@@ -11,29 +11,29 @@ namespace CASCtest
     class Program
     {
         private static string programcode = "wow_beta";
-        public static string buildconfighash;
-        public static string cdnconfighash;
-        public static string buildid;
-        public static string versionsname;
+        public static string buildConfigHash;
+        public static string cdnConfigHash;
+        public static string buildID;
+        public static string versionsName;
         
         // CDN configuration values
-        public static string archivegroup;
+        public static string archiveGroup;
         public static string[] archives;
 
         // Build configuration values
-        public static string roothash;
-        public static string downloadhash;
-        public static string installhash;
-        public static string[] encodinghashes;
-        public static string[] encodingsizes;
+        public static string rootHash;
+        public static string downloadHash;
+        public static string installHash;
+        public static string[] encodingHashes;
+        public static string[] encodingSizes;
 
         static void Main(string[] args)
         {
             LoadVersions();
-            Console.WriteLine("Loading patch " + versionsname);
-            LoadCDNconfig(cdnconfighash);
+            Console.WriteLine("Loading patch " + versionsName);
+            LoadCDNconfig(cdnConfigHash);
             Console.WriteLine("Retrieved config file, " + archives.Count() +" archives listed!");
-            LoadBuildConfig(buildconfighash);
+            LoadBuildConfig(buildConfigHash);
             Console.WriteLine("Retrieved build file!");
             Console.WriteLine("Downloading indexes..");
             if (!Directory.Exists("indexes")) { Directory.CreateDirectory("indexes"); }
@@ -42,19 +42,19 @@ namespace CASCtest
                 if (!File.Exists("indexes/" + archives[i] + ".index"))
                 {
                     Console.Write("Downloading " + archives[i] + ".index..");
-                    DownloadFileFromCDN("data/" + archives[i][0] + archives[i][1] + "/" + archives[i][2] + archives[i][3] + "/" + archives[i] + ".index", "indexes/" + archives[i] + ".index");
+                    CascUtils.DownloadFileFromCDN("data/" + archives[i][0] + archives[i][1] + "/" + archives[i][2] + archives[i][3] + "/" + archives[i] + ".index", "indexes/" + archives[i] + ".index");
                     Console.Write(" done!\n");
                 }
             }
             Console.WriteLine("Indexes downloaded!");
             if (!Directory.Exists("data")) { Directory.CreateDirectory("data"); }
             
-            for (int i = 0; i < encodinghashes.Count(); i++)
+            for (int i = 0; i < encodingHashes.Count(); i++)
             {
                 Console.Write("Downloading encoding #" + i + "..");
-                if(!File.Exists("data/" + encodinghashes[i])){
-                    
-                    DownloadFileFromCDN("data/" + encodinghashes[i][0] + encodinghashes[i][1] + "/" + encodinghashes[i][2] + encodinghashes[i][3] + "/" + encodinghashes[i], "data/" + encodinghashes[i]);
+                if(!File.Exists("data/" + encodingHashes[i])){
+
+                    CascUtils.DownloadFileFromCDN("data/" + encodingHashes[i][0] + encodingHashes[i][1] + "/" + encodingHashes[i][2] + encodingHashes[i][3] + "/" + encodingHashes[i], "data/" + encodingHashes[i]);
                     Console.Write(" done!\n");
                 }
                 else
@@ -65,27 +65,24 @@ namespace CASCtest
             Console.ReadLine();
         }
 
-        private static void LoadCDNconfig(string confighash)
+        private static void LoadCDNconfig(string configHash)
         {
             //TODO Patch archives
-            byte[] cdnconfig = DownloadFileFromCDN("config/" + confighash[0] + confighash[1] + "/" + confighash[2] + confighash[3] + "/" + confighash);
+            byte[] cdnconfig = CascUtils.DownloadFileFromCDN("config/" + configHash[0] + configHash[1] + "/" + configHash[2] + configHash[3] + "/" + configHash);
             StreamReader file = new StreamReader(new MemoryStream(cdnconfig));
             if (file.ReadLine() != "# CDN Configuration") {
                 throw new Exception("CDN configuration has invalid header!");
             }
             else
             {
-                archivegroup = file.ReadLine().Replace("archive-group = ", "");
-                var archivelist = file.ReadLine().Replace("archives = ","").Split(' ');
-                archives = new string[archivelist.Count()];
-                archives = archivelist;
+                archiveGroup = file.ReadLine().Replace("archive-group = ", "");
+                archives = file.ReadLine().Replace("archives = ","").Split(' ');
             }
         }
 
         private static void LoadBuildConfig(string confighash)
         {
-            //TODO Patch archives
-            byte[] cdnconfig = DownloadFileFromCDN("config/" + confighash[0] + confighash[1] + "/" + confighash[2] + confighash[3] + "/" + confighash);
+            byte[] cdnconfig = CascUtils.DownloadFileFromCDN("config/" + confighash[0] + confighash[1] + "/" + confighash[2] + confighash[3] + "/" + confighash);
             StreamReader file = new StreamReader(new MemoryStream(cdnconfig));
 
             if (file.ReadLine() != "# Build Configuration")
@@ -95,11 +92,11 @@ namespace CASCtest
             else
             {
                 file.ReadLine(); //empty line
-                roothash = file.ReadLine().Replace("root = ", "");
-                downloadhash = file.ReadLine().Replace("download = ", "");
-                installhash = file.ReadLine().Replace("install = ","");
-                encodinghashes = file.ReadLine().Replace("encoding = ", "").Split(' ');
-                encodingsizes = file.ReadLine().Replace("encoding-size = ", "").Split(' ');
+                rootHash = file.ReadLine().Replace("root = ", "");
+                downloadHash = file.ReadLine().Replace("download = ", "");
+                installHash = file.ReadLine().Replace("install = ","");
+                encodingHashes = file.ReadLine().Replace("encoding = ", "").Split(' ');
+                encodingSizes = file.ReadLine().Replace("encoding-size = ", "").Split(' ');
             }
         }
 
@@ -124,48 +121,12 @@ namespace CASCtest
                     //Just read the first entry for now, it's probably US
                     line = file.ReadLine();
                     values = line.Split('|');
-                    buildconfighash = values[1];
-                    cdnconfighash = values[2];
-                    buildid = values[3];
-                    versionsname = values[4];
+                    buildConfigHash = values[1];
+                    cdnConfigHash = values[2];
+                    buildID = values[3];
+                    versionsName = values[4];
                 }
             }
-        }
-
-        private static byte[] DownloadFileFromCDN(string path, string outputpath = "")
-        {
-            byte[] arr;
-            //TODO path starts with data, check if file is present in local archives first, THEN web client
-            using (WebClient client = new WebClient())
-            {
-                
-                client.Headers["User-Agent"] = "Marlamin's CASC thing";
-                if (outputpath.Count() > 0)
-                {
-                    try
-                    {
-                        client.DownloadFile("http://dist.blizzard.com.edgesuite.net/tpr/wow/" + path, outputpath);
-                    }
-                    catch (System.Net.WebException e)
-                    {
-                        Console.WriteLine("[ERROR] 404 not found (" + "http://dist.blizzard.com.edgesuite.net/tpr/wow/" + path + ")");
-                    }
-                    arr = new Byte[1];
-                }
-                else
-                {
-                    try
-                    {
-                        arr = client.DownloadData("http://dist.blizzard.com.edgesuite.net/tpr/wow/" + path);
-                    }
-                    catch (System.Net.WebException e)
-                    {
-                        Console.WriteLine("[ERROR] 404 not found (" + "http://dist.blizzard.com.edgesuite.net/tpr/wow/" + path + ")");
-                        arr = new Byte[1];
-                    }
-                }
-            }
-            return arr;
         }
     }
 }
