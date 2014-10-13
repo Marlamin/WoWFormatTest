@@ -14,13 +14,6 @@ namespace CASCtest
         //wow_beta for WoD Beta, wowt for 6.0 PTR, wow for live/preload
         private static string programcode = "wow_beta";
 
-        static void Main(string[] args)
-        {
-            CASCHandler CASC = CASCHandler.OpenOnlineStorage("wow_beta");
-            CASC.Root.SetFlags(LocaleFlags.enUS, ContentFlags.None);
-            CASC.SaveFileTo("DBFilesClient\\Spell.dbc", ".", LocaleFlags.enUS, ContentFlags.None);
-        }
-        /*
         //Versions values
         public static string buildConfigHash;
         public static string cdnConfigHash;
@@ -79,7 +72,7 @@ namespace CASCtest
             Console.WriteLine("Loaded encoding!");
 
             Console.ReadLine();
-         *
+         
         } 
 
         private static void LoadCDNconfig(string configHash)
@@ -144,6 +137,6 @@ namespace CASCtest
                     versionsName = values[4];
                 }
             }
-        }*/
+        }
     }
 }
