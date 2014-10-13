@@ -11,6 +11,7 @@ namespace WoWFormatLib.FileReaders
         public M2Model model;
         private string basedir;
         private List<String> blpFiles;
+        public Boolean useCASC = false;
 
         public M2Reader(string basedir)
         {
@@ -21,6 +22,19 @@ namespace WoWFormatLib.FileReaders
         {
             filename = Path.ChangeExtension(filename, "M2");
             string fullPath = Path.Combine(basedir, filename);
+            if (useCASC)
+            {
+                CASC.DownloadFile(filename);
+                if (!File.Exists("data/" + filename))
+                {
+                    throw new Exception("CASC file not downloaded!");
+                }
+                else
+                {
+                    fullPath = "data/" + filename;
+                }
+            }
+
             if (!File.Exists(fullPath))
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
@@ -173,7 +187,8 @@ namespace WoWFormatLib.FileReaders
                 {
                     //this check doesnt find all of them yet, needs actual flag parsing
                     string animfilename = model.filename.Replace(".M2", animations[i].animationID.ToString().PadLeft(4, '0') + "-" + animations[i].subAnimationID.ToString().PadLeft(2, '0') + ".anim");
-                    if (!File.Exists(Path.Combine(basedir, animfilename)))
+                    if (useCASC){ CASC.DownloadFile(animfilename); }
+                    if (!File.Exists(Path.Combine(basedir, animfilename)) && !File.Exists(Path.Combine("data", animfilename)))
                     {
                         new WoWFormatLib.Utils.MissingFile(animfilename);
                     }
@@ -364,7 +379,8 @@ namespace WoWFormatLib.FileReaders
             for (int i = 0; i < num; i++)
             {
                 var skinfilename = filename.Replace(".M2", i.ToString().PadLeft(2, '0') + ".skin");
-                if (!File.Exists(Path.Combine(basedir, skinfilename)))
+                if (useCASC) { CASC.DownloadFile(skinfilename); }
+                if (!File.Exists(Path.Combine(basedir, skinfilename)) && !File.Exists(Path.Combine("data", skinfilename)))
                 {
                     Console.WriteLine(".skin file does not exist!!! {0}", skinfilename);
                     new WoWFormatLib.Utils.MissingFile(filename);
@@ -421,7 +437,8 @@ namespace WoWFormatLib.FileReaders
                     if (!filename.Equals(""))
                     {
                         textures[i].filename = filename;
-                        if (!File.Exists(Path.Combine(basedir, filename)))
+                        if (useCASC) { CASC.DownloadFile(filename); }
+                        if (!File.Exists(Path.Combine(basedir, filename)) && !File.Exists(Path.Combine("data", filename)))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", filename);
                             new WoWFormatLib.Utils.MissingFile(filename);

@@ -3,12 +3,10 @@ namespace WoWFormatLib.Structs.ADT
 {
     public struct ADT
     {
-        public MVER mver;
-    }
-
-    public struct MVER
-    {
         public uint version;
+        public MHDR header;
+        public MCNK[] chunks;
+        public MCVT[] vertices;
     }
 
     public enum MHDRFlags{

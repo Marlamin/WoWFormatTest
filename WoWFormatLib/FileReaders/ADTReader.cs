@@ -10,13 +10,15 @@ namespace WoWFormatLib.FileReaders
     public class ADTReader
     {
         private string basedir;
+        public ADT adtfile;
         private List<String> blpFiles;
         private List<String> m2Files;
         private List<String> wmoFiles;
-
-        public ADTReader(string basedir)
+        private Boolean useCASC = false;
+        public ADTReader(string basedir, bool CASC = false)
         {
             this.basedir = basedir;
+            this.useCASC = CASC;
         }
 
         public void LoadADT(string filename)
@@ -26,8 +28,8 @@ namespace WoWFormatLib.FileReaders
             blpFiles = new List<string>();
 
             filename = Path.ChangeExtension(filename, ".adt");
-
-            if (!File.Exists(Path.Combine(basedir, filename))) { new WoWFormatLib.Utils.MissingFile(filename); return; }
+            //Console.WriteLine(filename);
+            if (!File.Exists(Path.Combine(basedir, filename))) { CASC.DownloadFile(filename);  new WoWFormatLib.Utils.MissingFile(filename); return; }
             if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_obj0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
             if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_obj1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
             if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
@@ -48,9 +50,14 @@ namespace WoWFormatLib.FileReaders
                 switch (chunk.ToString())
                 {
                     case "MVER":
-                        if (bin.ReadUInt32() != 18)
+                        uint version = bin.ReadUInt32();
+                        if (version != 18)
                         {
                             throw new Exception("Unsupported ADT version!");
+                        }
+                        else
+                        {
+                            adtfile.version = version;
                         }
                         continue;
                     case "MCNK":
@@ -73,6 +80,7 @@ namespace WoWFormatLib.FileReaders
 
             adt.Close();
 
+            //OBJ1 and TEX1 are ignored atm
             using (var adtobj0 = File.Open(Path.Combine(basedir, filename).Replace(".adt", "_obj0.adt"), FileMode.Open))
             {
                 ReadObjFile(filename, adtobj0, ref chunk);
@@ -86,8 +94,13 @@ namespace WoWFormatLib.FileReaders
 
         public void ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
         {
-            //Has subchunks :(
+            //256 of these chunks per file
+            
+            //Read header
+
             //MCVT subchunk has 145 floats
+            MCNK mcnk = bin.Read<MCNK>();
+            
         }
 
         public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)

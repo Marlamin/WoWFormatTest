@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CascLib">
-      <HintPath>..\CASCtest\CascLib.dll</HintPath>
-    </Reference>
     <Reference Include="CSDBCReader">
       <HintPath>..\CSDBCReader.dll</HintPath>
     </Reference>
@@ -73,6 +70,12 @@
     <Compile Include="Utils\MissingFile.cs" />
     <Compile Include="Utils\Quaternion.cs" />
     <Compile Include="Utils\Vector3.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\GitHub\CASCExplorer\CascLib\CascLib.csproj">
+      <Project>{e08e1e48-6585-4137-8405-661c62c10713}</Project>
+      <Name>CascLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

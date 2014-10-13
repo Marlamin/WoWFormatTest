@@ -12,6 +12,7 @@ namespace WoWFormatLib.FileReaders
     {
         public Bitmap bmp;
         private string basedir;
+        public bool useCASC;
 
         public BLPReader(string basedir)
         {
@@ -27,17 +28,33 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadBLP(string filename)
         {
-            filename = Path.Combine(basedir, filename);
-            if (File.Exists(filename))
+            string fullpath = Path.Combine(basedir, filename);
+            if (File.Exists(fullpath))
             {
-                using (var blp = new BlpFile(File.Open(filename, FileMode.Open)))
+                using (var blp = new BlpFile(File.Open(fullpath, FileMode.Open)))
                 {
                     bmp = blp.GetBitmap(0);
                 }
             }
             else
             {
-                new WoWFormatLib.Utils.MissingFile(filename);
+                if (useCASC)
+                {
+                    Utils.CASC.DownloadFile(filename);
+                    fullpath = Path.Combine("data", filename);
+                }
+
+                if (!File.Exists(fullpath))
+                {
+                    new WoWFormatLib.Utils.MissingFile(filename);
+                }
+                else
+                {
+                    using (var blp = new BlpFile(File.Open(fullpath, FileMode.Open)))
+                    {
+                        bmp = blp.GetBitmap(0);
+                    }
+                }
             }
         }
 

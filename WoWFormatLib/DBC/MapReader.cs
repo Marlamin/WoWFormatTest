@@ -7,6 +7,7 @@ namespace WoWFormatLib.DBC
     public class MapReader
     {
         private string basedir;
+        public bool useCASC = false;
 
         public MapReader(string basedir)
         {
@@ -16,8 +17,35 @@ namespace WoWFormatLib.DBC
         public Dictionary<int, string> GetMaps()
         {
             var maps = new Dictionary<int, string>();
+            string fullpath;
+            if (useCASC)
+            {
+                Utils.CASC.DownloadFile(@"DBFilesClient\Map.dbc");
+                if (!File.Exists(Path.Combine("data", @"DBFilesClient\Map.dbc")))
+                {
+                    new WoWFormatLib.Utils.MissingFile(@"DBFilesClient\Map.dbc");
+                    return maps;
+                }
+                else
+                {
+                    fullpath = Path.Combine("data", @"DBFilesClient\Map.dbc");
+                }
+            }
+            else
+            {
+                if (!File.Exists(Path.Combine(basedir, @"DBFilesClient\Map.dbc")))
+                {
+                    new WoWFormatLib.Utils.MissingFile(@"DBFilesClient\Map.dbc");
+                    return maps;
+                }
+                else
+                {
+                    fullpath = Path.Combine(basedir, @"DBFilesClient\Map.dbc");
+                }
+            }
 
-            var Map = new CSDBCReader.DBCFile(Path.Combine(basedir, "DBFilesClient\\Map.dbc"));
+            var Map = new CSDBCReader.DBCFile(fullpath);
+
             Map.Read(false);
             var dbc = Map.GetDataTable();
             for (var i = 0; i < dbc.Rows.Length; i++)

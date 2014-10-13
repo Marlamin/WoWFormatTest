@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,12 +36,14 @@ namespace WoWOpenGL
         private volatile bool fCancelMapLoading = false;
         private bool loaded = false;
         public static int curlogentry = 0;
-
+        public static bool useCASC = false;
+        public static bool CASCinitialized = false;
         public MainWindow()
         {
             InitializeComponent();
             var basedir = ConfigurationManager.AppSettings["basedir"];
             var reader = new MapReader(basedir);
+
             Dictionary<int, string> maps = reader.GetMaps();
             foreach (KeyValuePair<int, string> map in maps)
             {
@@ -183,49 +186,43 @@ namespace WoWOpenGL
         /* MODEL STUFF */
         private void ModelListBox_Loaded(object sender, RoutedEventArgs e)
         {
-            var basedir = ConfigurationManager.AppSettings["basedir"];
-            //List<string> M2s = Directory.EnumerateFiles(basedir, "*.m2", SearchOption.AllDirectories).ToList();
-            List<string> M2s = new List<String>();
-            M2s.Add(@"Creature\Serpent\Serpent.M2");
-            M2s.Add(@"Creature\Deathwing\Deathwing.M2");
-            M2s.Add(@"Creature\Anduin\Anduin.M2");
-            M2s.Add(@"Creature\Arthas\Arthas.M2");
-            M2s.Add(@"Creature\Etherial\Etherial.M2");
-            M2s.Add(@"Creature\Arakkoa2\Arakkoa2.m2");
-            M2s.Add(@"Creature\Garrosh\Garrosh.M2");
-            M2s.Add(@"Item\ObjectComponents\Weapon\sword_1h_garrison_a_01.m2");
-            M2s.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
-            M2s.Add(@"World\WMO\Kalimdor\Ogrimmar\Ogrimmar.wmo");
-            M2s.Add(@"World\WMO\Azeroth\Buildings\StormWind\Stormwind2.wmo");
-            M2s.Add(@"World\WMO\Draenor\IronHorde\6ih_ironhorde_tower01.wmo");
-            M2s.Add(@"World\WMO\transports\Icebreaker\Transport_Icebreaker_ship_stationary.wmo");
-            M2s.Add(@"World\WMO\Azeroth\Buildings\TownHall\TownHall.wmo");
-            M2s.Add(@"World\WMO\transports\passengership\transportship_A.wmo");
-            M2s.Add(@"World\WMO\Azeroth\Buildings\AltarOfStorms\AltarOfStorms.wmo");
-            M2s.Add(@"World\WMO\Northrend\Dalaran\ND_Dalaran.wmo");
-            M2s.Add(@"World\WMO\Northrend\HowlingFjord\RadioTower\RadioTower.wmo");
-            M2s.Add(@"World\WMO\Outland\DarkPortal\DarkPortal.wmo");
-            M2s.Add(@"World\WMO\transports\Alliance_Battleship\Transport_Alliance_Battleship.wmo");
-            M2s.Add(@"World\WMO\Draenor\TanaanJungle\6TJ_DarkPortal_Broken.wmo");
+            List<string> models = new List<String>();
+            models.Add(@"Creature\Serpent\Serpent.M2");
+            models.Add(@"Creature\Deathwing\Deathwing.M2");
+            models.Add(@"Creature\Anduin\Anduin.M2");
+            models.Add(@"Creature\Arthas\Arthas.M2");
+            models.Add(@"Creature\Etherial\Etherial.M2");
+            models.Add(@"Creature\Arakkoa2\Arakkoa2.m2");
+            models.Add(@"Creature\Garrosh\Garrosh.M2");
+            models.Add(@"Item\ObjectComponents\Weapon\sword_1h_garrison_a_01.m2");
+            models.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
+            models.Add(@"World\WMO\Kalimdor\Ogrimmar\Ogrimmar.wmo");
+            models.Add(@"World\WMO\Azeroth\Buildings\StormWind\Stormwind2.wmo");
+            models.Add(@"World\WMO\Draenor\IronHorde\6ih_ironhorde_tower01.wmo");
+            models.Add(@"World\WMO\transports\Icebreaker\Transport_Icebreaker_ship_stationary.wmo");
+            models.Add(@"World\WMO\Azeroth\Buildings\TownHall\TownHall.wmo");
+            models.Add(@"World\WMO\transports\passengership\transportship_A.wmo");
+            models.Add(@"World\WMO\Azeroth\Buildings\AltarOfStorms\AltarOfStorms.wmo");
+            models.Add(@"World\WMO\Northrend\Dalaran\ND_Dalaran.wmo");
+            models.Add(@"World\WMO\Northrend\HowlingFjord\RadioTower\RadioTower.wmo");
+            models.Add(@"World\WMO\Outland\DarkPortal\DarkPortal.wmo");
+            models.Add(@"World\WMO\transports\Alliance_Battleship\Transport_Alliance_Battleship.wmo");
+            models.Add(@"World\WMO\Draenor\TanaanJungle\6TJ_DarkPortal_Broken.wmo");
+
             if (File.Exists("listfile.txt"))
             {
                 string line;
                 StreamReader file = new System.IO.StreamReader("listfile.txt");
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+                    if (line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase) || line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase))
                     {
-                        M2s.Add(line);
+                        models.Add(line);
                     }
                 }
             }
 
-            for (int i = 0; i < M2s.Count; i++)
-            {
-                M2s[i] = M2s[i].Replace(basedir, string.Empty);
-            }
-
-            ModelListBox.DataContext = M2s;
+            ModelListBox.DataContext = models;
         }
 
         private void ModelListBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -258,5 +255,51 @@ namespace WoWOpenGL
             winFormControl = wfContainer;
         }
 
+        private void contentTypeOnline_Checked(object sender, RoutedEventArgs e)
+        {
+            useCASC = true;
+            if (!CASCinitialized)
+            {
+                SwitchToCASC();
+            }
+            else
+            {
+                ModelListBox.Visibility = System.Windows.Visibility.Visible;
+            }
+        }
+
+        private void contentTypeLocal_Checked(object sender, RoutedEventArgs e)
+        {
+            useCASC = false;
+            if (ConfigurationManager.AppSettings["basedir"].Count() == 0)
+            {
+                ModelListBox.Visibility = System.Windows.Visibility.Hidden;
+            }
+        }
+
+        private void SwitchToCASC()   
+        {
+            contentTypeLocal.Visibility = System.Windows.Visibility.Collapsed;
+            contentTypeOnline.Visibility = System.Windows.Visibility.Collapsed;
+            ModelListBox.Visibility = System.Windows.Visibility.Hidden;
+            contentTypeLoading.Visibility = System.Windows.Visibility.Visible;
+
+            BackgroundWorker bw = new BackgroundWorker();
+
+            bw.DoWork += (sender, args) =>
+            {
+                WoWFormatLib.Utils.CASC.InitCasc();
+            };
+
+            bw.RunWorkerCompleted += (sender, args) => {
+                CASCinitialized = true;
+                contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
+                contentTypeLocal.Visibility = System.Windows.Visibility.Visible;
+                ModelListBox.Visibility = System.Windows.Visibility.Visible;
+                contentTypeOnline.Visibility = System.Windows.Visibility.Visible;
+            };
+
+            bw.RunWorkerAsync();
+        }
     }
 }

@@ -8,6 +8,26 @@
         Closed="Window_Closed">
     <Grid Margin="0,0,4,5">
         <TabControl HorizontalAlignment="Left" Height="883" Margin="10,5,0,0" VerticalAlignment="Top" Width="1050">
+            <TabItem Header="Models">
+                <Grid>
+                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="495" Margin="10,46,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
+                    <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0">
+                        <WF:Label Text="Select something from the left to make it show up!" ForeColor="White" TextAlign="MiddleCenter"></WF:Label>
+                    </WindowsFormsHost>
+                    <ListBox HorizontalAlignment="Left" Height="299" Margin="10,546,0,0" VerticalAlignment="Top" Width="329">
+                        <ListView x:Name="DebugListBox" Height="275" Width="304">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </ListBox>
+                    <Label x:Name="contentTypeLoading" Content="Initialising web content, this might take a while!" Margin="48,8,735,815" Foreground="Black" Visibility="Collapsed"/>
+                    <RadioButton x:Name="contentTypeLocal" Content="Use local content" HorizontalAlignment="Left" Margin="40,14,0,0" VerticalAlignment="Top" GroupName="contentType" IsChecked="True" Checked="contentTypeLocal_Checked" />
+                    <RadioButton x:Name="contentTypeOnline" Content="Use web content" HorizontalAlignment="Left" Margin="201,14,0,0" VerticalAlignment="Top" GroupName="contentType" Checked="contentTypeOnline_Checked" RenderTransformOrigin="0.102,0.622" />
+                </Grid>
+            </TabItem>
             <TabItem Header="Maps">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -21,23 +41,6 @@
                     <ProgressBar x:Name="pbLoadMap" HorizontalAlignment="Left" Height="11" Margin="10,813,0,0" VerticalAlignment="Top" Width="231" Grid.ColumnSpan="2" />
                     <RadioButton x:Name="rbSortMapId" Content="Sort by Map Id" HorizontalAlignment="Left" Margin="14,793,0,0" VerticalAlignment="Top" GroupName="MapListSort" IsChecked="True" Checked="rbSortMapId_Checked" Grid.ColumnSpan="2" />
                     <RadioButton x:Name="rbSortName" Content="Sort by Name" HorizontalAlignment="Left" Margin="44.5,793,0,0" VerticalAlignment="Top" GroupName="MapListSort" Checked="rbSortName_Checked" Grid.Column="1" />
-                </Grid>
-            </TabItem>
-            <TabItem Header="Models">
-                <Grid>
-                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="531" Margin="10,10,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
-                    <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0">
-                        <WF:Label Text="Soup" ForeColor="White"></WF:Label>
-                    </WindowsFormsHost>
-                    <ListBox HorizontalAlignment="Left" Height="299" Margin="10,546,0,0" VerticalAlignment="Top" Width="329">
-                        <ListView x:Name="DebugListBox" Height="275" Width="304">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                    </ListBox>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -17,13 +17,22 @@ namespace WoWFormatLib.FileReaders
         public void LoadSKIN(string filename)
         {
             filename = Path.ChangeExtension(filename, ".skin");
-            if (!File.Exists(Path.Combine(basedir, filename)))
+            string fullpath = Path.Combine(basedir, filename);
+            Utils.CASC.DownloadFile(filename);
+            if (!File.Exists(fullpath))
             {
-                new WoWFormatLib.Utils.MissingFile(filename);
+                if(!File.Exists(Path.Combine("data", filename))){
+                    new WoWFormatLib.Utils.MissingFile(filename);
+                }
+                else
+                {
+                    fullpath = Path.Combine("data", filename);
+                }
+                
             }
 
             // Console.WriteLine("Reading " + filename);
-            FileStream stream = File.Open(Path.Combine(basedir, filename), FileMode.Open);
+            FileStream stream = File.Open(fullpath, FileMode.Open);
             BinaryReader bin = new BinaryReader(stream);
 
             var header = new string(bin.ReadChars(4));
