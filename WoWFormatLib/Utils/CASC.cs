@@ -11,7 +11,6 @@ namespace WoWFormatLib.Utils
     public class CASC
     {
         public static CASCHandler cascHandler;
-        private static LocaleFlags locale = LocaleFlags.All;
         private static AsyncAction bgAction;
         public static int progressNum;
         public static string progressDesc;
@@ -20,6 +19,7 @@ namespace WoWFormatLib.Utils
             CASC.bgAction = bgAction;
             //bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
             cascHandler = CASCHandler.OpenOnlineStorage("wow_beta", bgAction);
+            cascHandler.Root.SetFlags(LocaleFlags.enUS, ContentFlags.None, false);
         }
 
         private static void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
@@ -32,7 +32,7 @@ namespace WoWFormatLib.Utils
         public static void GenerateListfile()
         {
             //extract signaturefile and extract list of some files from that
-            cascHandler.SaveFileTo("signaturefile", "data/", locale);
+            cascHandler.SaveFileTo("signaturefile", "data/");
             string line;
             string[] linesplit;
             List<string> files = new List<String>();
@@ -58,12 +58,12 @@ namespace WoWFormatLib.Utils
         {
             if (!File.Exists(Path.Combine("data", filename)))
             {
-                cascHandler.SaveFileTo(filename, "data/", locale);
+                cascHandler.SaveFileTo(filename, "data/");
                 Console.WriteLine("Downloaded " + filename + "!");
             }
             else
             {
-                cascHandler.SaveFileTo(filename, "data/", locale);
+                cascHandler.SaveFileTo(filename, "data/");
                 Console.WriteLine(filename + " was already present on disk!");
             }
             
