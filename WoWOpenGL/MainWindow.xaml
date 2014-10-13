@@ -24,6 +24,8 @@
                         </ListView>
                     </ListBox>
                     <Label x:Name="contentTypeLoading" Content="Initialising web content, this might take a while!" Margin="48,8,735,815" Foreground="Black" Visibility="Collapsed"/>
+                    <ProgressBar x:Name="CASCprogress" Margin="50,233,735,601"/>
+                    <Label x:Name="CASCdesc" Content="Doing CASC stuff.." Margin="50,254,735,569" Foreground="Black" Visibility="Visible"/>
                     <RadioButton x:Name="contentTypeLocal" Content="Use local content" HorizontalAlignment="Left" Margin="40,14,0,0" VerticalAlignment="Top" GroupName="contentType" IsChecked="True" Checked="contentTypeLocal_Checked" />
                     <RadioButton x:Name="contentTypeOnline" Content="Use web content" HorizontalAlignment="Left" Margin="201,14,0,0" VerticalAlignment="Top" GroupName="contentType" Checked="contentTypeOnline_Checked" RenderTransformOrigin="0.102,0.622" />
                 </Grid>

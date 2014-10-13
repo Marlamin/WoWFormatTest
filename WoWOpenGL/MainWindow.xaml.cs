@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using CASCExplorer;
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using System;
@@ -33,11 +34,14 @@ namespace WoWOpenGL
         public static GLControl glc;
         public static System.Windows.Forms.Integration.WindowsFormsHost winFormControl;
         public static ListView debugList;
+        public static ProgressBar cascProgressBar;
+        public static Label cascProgressDesc;
         private volatile bool fCancelMapLoading = false;
         private bool loaded = false;
         public static int curlogentry = 0;
         public static bool useCASC = false;
         public static bool CASCinitialized = false;
+        public static AsyncAction bgAction;
         public MainWindow()
         {
             InitializeComponent();
@@ -253,6 +257,8 @@ namespace WoWOpenGL
         {
             debugList = DebugListBox;
             winFormControl = wfContainer;
+            cascProgressBar = CASCprogress;
+            cascProgressDesc = CASCdesc;
         }
 
         private void contentTypeOnline_Checked(object sender, RoutedEventArgs e)
@@ -277,6 +283,34 @@ namespace WoWOpenGL
             }
         }
 
+        private void CascProgress()
+        {
+            BackgroundWorker bw = new BackgroundWorker();
+            MainWindow.cascProgressBar.Visibility = System.Windows.Visibility.Visible;
+            MainWindow.cascProgressDesc.Visibility = System.Windows.Visibility.Visible;
+
+            bw.DoWork += (sender, args) =>
+            {
+                string prevDesc = "";
+                while (CASCinitialized == false)
+                {
+                    Console.WriteLine(WoWFormatLib.Utils.CASC.progressNum);
+                    if (prevDesc != WoWFormatLib.Utils.CASC.progressDesc)
+                    {
+                        MainWindow.cascProgressDesc.Content = WoWFormatLib.Utils.CASC.progressDesc; 
+                    }
+                    System.Threading.Thread.Sleep(100);
+                }
+            };
+            
+            bw.RunWorkerCompleted += (sender, args) =>
+            {
+                MainWindow.cascProgressBar.Visibility = System.Windows.Visibility.Hidden;
+                MainWindow.cascProgressDesc.Visibility = System.Windows.Visibility.Hidden;
+            };
+            
+            bw.RunWorkerAsync();
+        }
         private void SwitchToCASC()   
         {
             contentTypeLocal.Visibility = System.Windows.Visibility.Collapsed;
@@ -288,7 +322,9 @@ namespace WoWOpenGL
 
             bw.DoWork += (sender, args) =>
             {
-                WoWFormatLib.Utils.CASC.InitCasc();
+                bgAction = new AsyncAction(() => { });
+                bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
+                WoWFormatLib.Utils.CASC.InitCasc(bgAction);
             };
 
             bw.RunWorkerCompleted += (sender, args) => {
@@ -300,6 +336,16 @@ namespace WoWOpenGL
             };
 
             bw.RunWorkerAsync();
+        }
+
+        private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
+        {
+            //MainWindow.cascProgressBar.Visibility = System.Windows.Visibility.Visible;
+            //MainWindow.cascProgressDesc.Visibility = System.Windows.Visibility.Visible;
+            Console.WriteLine("progress changed!");
+            // (bgAction.IsCancellationRequested) { return; }
+            //progressNum = progress.Progress;
+            //if (progress.UserData != null) { progressDesc = progress.UserData.ToString(); }
         }
     }
 }

@@ -13,9 +13,21 @@ namespace WoWFormatLib.Utils
         public static CASCHandler cascHandler;
         private static LocaleFlags locale = LocaleFlags.All;
         private static ContentFlags content = ContentFlags.None;
+        private static AsyncAction bgAction;
+        public static int progressNum;
+        public static string progressDesc;
 
-        public static void InitCasc(){
-            cascHandler = CASCHandler.OpenOnlineStorage("wow_beta");
+        public static void InitCasc(AsyncAction bgAction = null){
+            //bgAction = new AsyncAction(() => { });
+            //bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
+            cascHandler = CASCHandler.OpenOnlineStorage("wow_beta", bgAction);
+        }
+
+        private static void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
+        {
+            if (bgAction.IsCancellationRequested) { return; }
+            progressNum = progress.Progress;
+            if (progress.UserData != null) { progressDesc = progress.UserData.ToString(); }
         }
 
         public static void GenerateListfile()

@@ -32,8 +32,6 @@ namespace WoWOpenGL
         private static float dragZ;
         private bool isWMO = false;
 
-        private int inputwait = 30; //temp hackfix to deal with high fps making impossible input
-        private int curinputwait = 0; //temp hackfix to deal with high fps making impossible input
         public Render()
         {
             //RenderModel(@"World\ArtTest\Boxtest\xyz.m2");

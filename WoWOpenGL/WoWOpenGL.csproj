@@ -121,6 +121,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\GitHub\CASCExplorer\CascLib\CascLib.csproj">
+      <Project>{e08e1e48-6585-4137-8405-661c62c10713}</Project>
+      <Name>CascLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj">
       <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>
       <Name>WoWFormatLib</Name>
