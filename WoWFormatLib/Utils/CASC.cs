@@ -8,7 +8,7 @@ using System.IO;
 
 namespace WoWFormatLib.Utils
 {
-    class CASC
+    public class CASC
     {
         public static CASCHandler cascHandler;
         private static LocaleFlags locale = LocaleFlags.All;
