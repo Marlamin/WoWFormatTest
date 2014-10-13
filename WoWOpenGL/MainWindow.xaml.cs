@@ -311,41 +311,40 @@ namespace WoWOpenGL
             
             bw.RunWorkerAsync();
         }
-        private void SwitchToCASC()   
+        private async void SwitchToCASC()
         {
             contentTypeLocal.Visibility = System.Windows.Visibility.Collapsed;
             contentTypeOnline.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Hidden;
             contentTypeLoading.Visibility = System.Windows.Visibility.Visible;
+            CASCdesc.Visibility = System.Windows.Visibility.Visible;
+            CASCprogress.Visibility = System.Windows.Visibility.Visible;
 
-            BackgroundWorker bw = new BackgroundWorker();
+            bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction));
+            bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
 
-            bw.DoWork += (sender, args) =>
+            try
             {
-                bgAction = new AsyncAction(() => { });
-                bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
-                WoWFormatLib.Utils.CASC.InitCasc(bgAction);
-            };
+                await bgAction.DoAction();
+            }
+            catch
+            {
 
-            bw.RunWorkerCompleted += (sender, args) => {
-                CASCinitialized = true;
-                contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
-                contentTypeLocal.Visibility = System.Windows.Visibility.Visible;
-                ModelListBox.Visibility = System.Windows.Visibility.Visible;
-                contentTypeOnline.Visibility = System.Windows.Visibility.Visible;
-            };
+            }
 
-            bw.RunWorkerAsync();
+            CASCinitialized = true;
+            CASCdesc.Visibility = System.Windows.Visibility.Hidden;
+            CASCprogress.Visibility = System.Windows.Visibility.Hidden;
+            contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
+            contentTypeLocal.Visibility = System.Windows.Visibility.Visible;
+            ModelListBox.Visibility = System.Windows.Visibility.Visible;
+            contentTypeOnline.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
         {
-            //MainWindow.cascProgressBar.Visibility = System.Windows.Visibility.Visible;
-            //MainWindow.cascProgressDesc.Visibility = System.Windows.Visibility.Visible;
-            Console.WriteLine("progress changed!");
-            // (bgAction.IsCancellationRequested) { return; }
-            //progressNum = progress.Progress;
-            //if (progress.UserData != null) { progressDesc = progress.UserData.ToString(); }
+            CASCprogress.Value = progress.Progress;
+            if (progress.UserData != null) { CASCdesc.Content = progress.UserData; }
         }
     }
 }
