@@ -10,7 +10,10 @@ namespace CASCtest
 {
     class Program
     {
+        //wow_beta for WoD Beta, wowt for 6.0 PTR, wow for live/preload
         private static string programcode = "wow_beta";
+
+        //Versions values
         public static string buildConfigHash;
         public static string cdnConfigHash;
         public static string buildID;
@@ -62,6 +65,11 @@ namespace CASCtest
                     Console.Write(" already exists!\n");
                 }
             }
+
+            Console.WriteLine("Loading encoding..");
+            CascUtils.ParseEncoding(encodingHashes);
+            Console.WriteLine("Loaded encoding!");
+
             Console.ReadLine();
         }
 
