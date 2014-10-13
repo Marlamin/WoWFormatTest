@@ -4,18 +4,15 @@ Built from the ground up, but with lots of copy pasta from older projects (noted
 
 ## Supported expansions
 Built for (latest) Warlords of Draenor files. Backwards compatibility with Mists of Pandaria not guaranteed. Cataclysm and lower probably won't work at all.
- 
-Files need to be extracted to the HDD with intact folder structures. 
 
-MPQ support is currently not planned. Support for the new CASC file format introduced in Warlords of Draenor might be included in the future. 
+MPQ support is currently not planned. Very basic support for the new CASC file format introduced in Warlords of Draenor is present. It can only download content from Blizzard's servers, not load storages already present on HDD (yet).
 
 ## Configuration
-The App.config file in the WoWFormatUI project must be edited to point to the location of the extracted files.
+Should be no configuration neccesary at the time of writing. 
 
 ## Requirements
 - [CSDBCReader](http://marlamin.com/u/CSDBCReader.dll)
-- [SharpDX 2.6.2](http://sharpdx.org/download/) (Should be downloaded automatically through NuGet)
-- [SharpDX.WPF](https://github.com/Marlamin/SharpDX.WPF) (Updated version for SharpDX 6.x)
+- [OpenTK](http://www.opentk.com/)
 
 ## Thanks
 - TOM_RUS
@@ -28,3 +25,4 @@ The App.config file in the WoWFormatUI project must be edited to point to the lo
 - ..and all the people the above people base their work on
 - also Thoorium
 
+Last updated on October 14th 2014
