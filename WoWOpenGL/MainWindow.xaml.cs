@@ -44,6 +44,7 @@ namespace WoWOpenGL
         public static bool CASCinitialized = false;
         public static bool mapsTabLoaded = false;
         public static AsyncAction bgAction;
+        public static bool mouseOverRenderArea = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -299,13 +300,14 @@ namespace WoWOpenGL
             {
                 return;
             }
-            var reader = new MapReader();
+            /*var reader = new MapReader();
             Dictionary<int, string> maps = reader.GetMaps();
             foreach (KeyValuePair<int, string> map in maps)
             {
                 MapListBox.Items.Add(map);
             }
             MapListBox.DisplayMemberPath = "Value";
+            */
             mapsTabLoaded = true;
         }
 
@@ -315,6 +317,18 @@ namespace WoWOpenGL
             files = CASC.GenerateListfile();
             ModelListBox.DataContext = files;
             ModelListBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
+        }
+
+        private void glControl_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Console.WriteLine("Mouse entered!");
+            mouseOverRenderArea = true;
+        }
+
+        private void glControl_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Console.WriteLine("Mouse left!");
+            mouseOverRenderArea = false;
         }
         
        /* public static void AddToDebugLog(string log)

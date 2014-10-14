@@ -29,8 +29,8 @@ namespace WoWOpenGL
         private static float dragX;
         private static float dragY;
         private static float dragZ;
-        private bool isWMO = false;
-
+        private static bool isWMO = false;
+        private static bool mouseInRender = false;
         public Render()
         {
             //RenderModel(@"World\ArtTest\Boxtest\xyz.m2");
@@ -70,6 +70,8 @@ namespace WoWOpenGL
             glControl.Left = 0;
             glControl.Top = 0;
 
+            glControl.MouseEnter += glControl_MouseEnter;
+            glControl.MouseLeave += glControl_MouseLeave;
             glControl.Load += glControl_Load;
             glControl.Paint += RenderFrame;
             glControl.Resize += glControl_Resize;
@@ -84,6 +86,16 @@ namespace WoWOpenGL
             
 
             Console.WriteLine(glControl.Width + "x" + glControl.Height);
+        }
+
+        private void glControl_MouseEnter(object sender, EventArgs e)
+        {
+            mouseInRender = true;
+        }
+
+        private void glControl_MouseLeave(object sender, EventArgs e)
+        {
+            mouseInRender = false;
         }
 
         public void DrawAxes()
@@ -166,18 +178,28 @@ namespace WoWOpenGL
 
             GL.Enable(EnableCap.Texture2D);
 
+            string texturefilename;
+
             materials = new Material[reader.model.textures.Count()];
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
                 materials[i].flags = reader.model.textures[i].flags;
-                if (reader.model.textures[i].type == 0)
+                switch (reader.model.textures[i].type)
                 {
-                    DebugLog("Texture given in file!");
+                    case 0:
+                        DebugLog("Texture given in file!");
+                        texturefilename = reader.model.textures[i].filename;
+                        break;
+                    case 1:
+                        DebugLog("Requires type 1 texture");
+                        texturefilename = "Test\\TotallyRad.blp";
+                        break;
+                    default:
+                        DebugLog("Requires type " + reader.model.textures[i].type + " texture");
+                        texturefilename = "Test\\TotallyRad.blp";
+                        break;
                 }
-                else
-                {
-                    DebugLog("Requires external texture! Type " + reader.model.textures[i].type);
-                }
+
                 materials[i].textureID = GL.GenTexture();
                 
                 var blp = new BLPReader();
@@ -189,8 +211,8 @@ namespace WoWOpenGL
                // }
                // else
               //  {
-                    materials[i].filename = reader.model.textures[i].filename;
-                    blp.LoadBLP(reader.model.textures[i].filename);
+                    materials[i].filename = texturefilename;
+                    blp.LoadBLP(texturefilename);
               //  }
 
                 if (blp.bmp == null)
@@ -368,18 +390,19 @@ namespace WoWOpenGL
 
         private static void InputTick(object sender, EventArgs e)
         {
+            
             OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
             OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
 
-            if (keyboardState.IsKeyDown(Key.Left))
+            /*if (keyboardState.IsKeyDown(Key.Up))
             {
-                angle = angle + 1.0f;
+                dragX = dragX + 0.01f;
             }
 
-            if (keyboardState.IsKeyDown(Key.Right))
+            if (keyboardState.IsKeyDown(Key.Down))
             {
-                angle = angle - 1.0f;
-            }
+                dragX = dragX - 0.01f;
+            }*/
 
             if (keyboardState.IsKeyDown(Key.Up))
             {
@@ -391,7 +414,22 @@ namespace WoWOpenGL
                 dragY = dragY - 0.01f;
             }
 
-            dragZ = (mouseState.WheelPrecise / 10) - 7.5f; //Startzoom is at -7.5f 
+            if (keyboardState.IsKeyDown(Key.Left))
+            {
+                angle = angle + 1.0f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.Right))
+            {
+                angle = angle - 1.0f;
+            }
+
+
+            //if (mouseInRender)
+            //{
+                dragZ = (mouseState.WheelPrecise/ 10) - 7.5f; //Startzoom is at -7.5f 
+            //}
+            
         }
 
         private void RenderFrame(object sender, EventArgs e) //This is called every frame
@@ -453,7 +491,7 @@ namespace WoWOpenGL
                             break;
                         case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
                             GL.Enable(EnableCap.Blend);
-                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.One, BlendingFactorDest.Zero);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                             //Tried:
                             //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha
                             //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha
