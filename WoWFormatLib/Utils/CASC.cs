@@ -56,8 +56,17 @@ namespace WoWFormatLib.Utils
 
         public static void DownloadFile(string filename)
         {
-            cascHandler.SaveFileTo(filename, "data/");
-            //Console.WriteLine("Downloaded " + filename + "!");
+            try
+            {
+                cascHandler.SaveFileTo(filename, "data/");
+                //Console.WriteLine("Downloaded " + filename + "!");
+            }
+            catch (System.IO.FileNotFoundException e)
+            {
+                Console.WriteLine("Couldn't download " + filename + ", file was not found!");
+            }
+            
+            
         }
 
         public static bool FileExists(string filename)
