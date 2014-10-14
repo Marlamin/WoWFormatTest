@@ -1,0 +1,19 @@
+﻿v0.05
+- Fix issue where repeatedly giving focus to the Maps tab would make it load maps over and over
+- Update CASClib
+- Add handling for when CASClib can not find a file
+
+v0.04
+- Full transition to CASC, no longer using local files
+- Show CASC loading progress in UI (thanks TOM_RUS)
+- Update CASClib
+- Add support for textures with alpha channels
+
+v0.03 
+- Improve CASC implementation
+
+v0.02
+- Fixed issue with input going too fast if framerate is high
+
+v0.01
+- Initial release
