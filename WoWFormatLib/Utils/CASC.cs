@@ -14,12 +14,15 @@ namespace WoWFormatLib.Utils
         private static AsyncAction bgAction;
         public static int progressNum;
         public static string progressDesc;
+        private static bool fIsCASCInit = false;
 
         public static void InitCasc(AsyncAction bgAction = null){
             CASC.bgAction = bgAction;
             //bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
             cascHandler = CASCHandler.OpenOnlineStorage("wow_beta", bgAction);
             cascHandler.Root.SetFlags(LocaleFlags.enUS, ContentFlags.None, false);
+
+            fIsCASCInit = true;
         }
 
         private static void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
@@ -114,5 +117,7 @@ namespace WoWFormatLib.Utils
                 return true;
             }
         }
+
+        public static bool IsCASCInit { get { return fIsCASCInit; } }
     }
 }

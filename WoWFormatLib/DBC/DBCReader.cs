@@ -8,18 +8,21 @@ using WoWFormatLib.DBC;
 using WoWFormatLib.Utils;
 namespace WoWFormatLib.DBC
 {
-    public class FileDataReader
+    public class DBCReader<T>
     {
         public DBCHeader header;
-        public FileDataRecord[] records;
+        public T[] records;
         public byte[] stringblock;
 
-        public FileDataReader()
+        public DBCReader()
         {
         }
 
         public void LoadDBC(string filename)
         {
+            if(!CASC.IsCASCInit)
+                CASC.InitCasc();
+
             if (!CASC.FileExists(filename))
             {
                 new MissingFile(filename);
@@ -30,18 +33,19 @@ namespace WoWFormatLib.DBC
             {
                 header = bin.Read<DBCHeader>();
 
-                records = new FileDataRecord[header.record_count];
+                records = new T[header.record_count];
 
                 for (int i = 0; i < header.record_count; i++)
                 {
-                    records[i] = bin.Read<FileDataRecord>();
+                    records[i] = bin.Read<T>();
                 }
-               
+
                 stringblock = bin.ReadBytes((int)header.string_block_size);
             }
         }
 
-        public string getString(uint offset){
+        public string getString(uint offset)
+        {
             BinaryReader bin = new BinaryReader(new MemoryStream(stringblock));
             bin.BaseStream.Position = offset;
             return bin.ReadStringNull();
