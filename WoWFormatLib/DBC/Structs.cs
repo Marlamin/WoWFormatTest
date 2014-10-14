@@ -18,19 +18,19 @@ namespace WoWFormatLib.DBC
     public struct MapRecord
     {
         public int ID;
-        public string Directory;
+        public uint Directory;
         public int InstanceType;
         public int Flags;
         public int MapType;
-        public string Mapname_lang;
+        public uint Mapname_lang;
         public int areaTableID;
-        public string MapDescription0_lang;
-        public string MapDescription1_lang;
+        public uint MapDescription0_lang;
+        public uint MapDescription1_lang;
         public int LoadingScreenID;
         public float minimapIconScale; //Like I'll ever have to use this. HA!
         public int corpseMapID;
-        public float corpse1;
-        public float corpse2;
+        public float corpse_x;
+        public float corpse_y;
         public int timeOfDayoverride;
         public int expansionID;
         public int raidOffset;
@@ -38,5 +38,6 @@ namespace WoWFormatLib.DBC
         public int parentMapID;
         public int cosmeticParentMapID;
         public int timeOffset;
+        public int unk1;
     }
 }

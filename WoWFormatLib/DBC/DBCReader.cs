@@ -11,6 +11,9 @@ namespace WoWFormatLib.DBC
     public class DBCReader
     {
         public DBCHeader header;
+        public MapRecord[] records;
+        public byte[] stringblock;
+
         public DBCReader()
         {
         }
@@ -28,7 +31,22 @@ namespace WoWFormatLib.DBC
             using (BinaryReader bin = new BinaryReader(File.Open(Path.Combine("data", filename), FileMode.Open)))
             {
                 header = bin.Read<DBCHeader>();
+
+                records = new MapRecord[header.record_count];
+
+                for (int i = 0; i < header.record_count; i++)
+                {
+                    records[i] = bin.Read<MapRecord>();
+                }
+               
+                stringblock = bin.ReadBytes((int)header.string_block_size);
             }
+        }
+
+        public string getString(uint offset){
+            BinaryReader bin = new BinaryReader(new MemoryStream(stringblock));
+            bin.BaseStream.Position = offset;
+            return bin.ReadStringNull();
         }
     }
 }
