@@ -9,11 +9,8 @@ namespace WoWFormatLib.FileReaders
     public class WDTReader
     {
         public List<int[]> tiles;
-        private string basedir;
-
-        public WDTReader(string basedir)
+        public WDTReader()
         {
-            this.basedir = basedir;
         }
 
         //TODO there's probably a better way to do this
@@ -25,11 +22,11 @@ namespace WoWFormatLib.FileReaders
         public void LoadWDT(string filename)
         {
             tiles = new List<int[]>();
-            if (File.Exists(Path.Combine(basedir, filename)))
+            if (CASC.FileExists(filename))
             {
-                using (FileStream wdt = File.Open(Path.Combine(basedir, filename), FileMode.Open))
+                using (FileStream tex = File.Open(Path.Combine("data", filename), FileMode.Open))
                 {
-                    ReadWDT(filename, wdt);
+                    ReadWDT(filename, tex);
                 }
             }
             else
@@ -55,8 +52,8 @@ namespace WoWFormatLib.FileReaders
                     if (flags == 1)
                     {
                         //ADT exists
-                        var adtreader = new ADTReader(basedir);
-                        var adtfilename = filename.Replace(".WDT", "_" + y + "_" + x + ".adt"); //blizz flips these
+                        //var adtreader = new ADTReader();
+                        //var adtfilename = filename.Replace(".WDT", "_" + y + "_" + x + ".adt"); //blizz flips these
                         //adtreader.LoadADT(adtfilename);
                         int[] xy = new int[] { y, x };
                         tiles.Add(xy);
@@ -86,9 +83,8 @@ namespace WoWFormatLib.FileReaders
                     str.Append(c);
                 }
                 var wmofilename = str.ToString();
-
-                var wmoreader = new WMOReader(basedir);
-                wmoreader.LoadWMO(wmofilename);
+                //var wmoreader = new WMOReader();
+                //wmoreader.LoadWMO(wmofilename);
             }
         }
 

@@ -7,20 +7,17 @@ namespace WoWFormatLib.FileReaders
 {
     public class WDLReader
     {
-        private string basedir;
-
-        public WDLReader(string basedir)
+        public WDLReader()
         {
-            this.basedir = basedir;
         }
 
         public void LoadWDL(string filename)
         {
-            if (File.Exists(Path.Combine(basedir, filename)))
+            if (CASC.FileExists(filename))
             {
-                using (FileStream wdl = File.Open(Path.Combine(basedir, filename), FileMode.Open))
+                using (FileStream tex = File.Open(Path.Combine("data", filename), FileMode.Open))
                 {
-                    ReadWDL(filename, wdl);
+                    ReadWDL(filename, tex);
                 }
             }
             else
@@ -50,7 +47,7 @@ namespace WoWFormatLib.FileReaders
                 {
                     if (str.Length > 1)
                     {
-                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
+                        if (!CASC.FileExists(str.ToString()))
                         {
                             Console.WriteLine("WMO file does not exist!!! {0}", str.ToString());
                             new WoWFormatLib.Utils.MissingFile(str.ToString());

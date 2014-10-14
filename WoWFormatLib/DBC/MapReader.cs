@@ -1,47 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.DBC
 {
     public class MapReader
     {
-        private string basedir;
-        public bool useCASC = false;
-
-        public MapReader(string basedir)
+        public MapReader()
         {
-            this.basedir = basedir;
         }
 
         public Dictionary<int, string> GetMaps()
         {
-            var maps = new Dictionary<int, string>();
             string fullpath;
-            if (useCASC)
+            var maps = new Dictionary<int, string>();
+            var filename = Path.Combine("DBFilesClient", "Map.dbc");
+
+            if (CASC.FileExists(filename))
             {
-                Utils.CASC.DownloadFile(@"DBFilesClient\Map.dbc");
-                if (!File.Exists(Path.Combine("data", @"DBFilesClient\Map.dbc")))
-                {
-                    new WoWFormatLib.Utils.MissingFile(@"DBFilesClient\Map.dbc");
-                    return maps;
-                }
-                else
-                {
-                    fullpath = Path.Combine("data", @"DBFilesClient\Map.dbc");
-                }
+                fullpath = Path.Combine("data", filename);
             }
             else
             {
-                if (!File.Exists(Path.Combine(basedir, @"DBFilesClient\Map.dbc")))
-                {
-                    new WoWFormatLib.Utils.MissingFile(@"DBFilesClient\Map.dbc");
-                    return maps;
-                }
-                else
-                {
-                    fullpath = Path.Combine(basedir, @"DBFilesClient\Map.dbc");
-                }
+                new WoWFormatLib.Utils.MissingFile(filename);
+                return maps;
             }
 
             var Map = new CSDBCReader.DBCFile(fullpath);

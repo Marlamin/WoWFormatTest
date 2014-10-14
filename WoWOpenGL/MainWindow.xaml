@@ -8,9 +8,9 @@
         Closed="Window_Closed">
     <Grid Margin="0,0,4,5">
         <TabControl HorizontalAlignment="Left" Height="883" Margin="10,5,0,0" VerticalAlignment="Top" Width="1050">
-            <TabItem Header="Models">
+            <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
-                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="495" Margin="10,46,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
+                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="531" Margin="10,10,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
                     <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0">
                         <WF:Label Text="Select something from the left to make it show up!" ForeColor="White" TextAlign="MiddleCenter"></WF:Label>
                     </WindowsFormsHost>
@@ -23,14 +23,12 @@
                             </ListView.View>
                         </ListView>
                     </ListBox>
-                    <Label x:Name="contentTypeLoading" Content="Initialising web content, this might take a while!" Margin="48,8,735,815" Foreground="Black" Visibility="Collapsed"/>
+                    <Label x:Name="contentTypeLoading" Content="Initializing web content, this might take a while!" Margin="48,8,735,815" Foreground="Black" Visibility="Collapsed"/>
                     <ProgressBar x:Name="CASCprogress" Margin="50,233,735,601" Visibility="Hidden"/>
-                    <Label x:Name="CASCdesc" Content="Loading web content.." Margin="50,254,735,569" Foreground="Black" Visibility="Hidden"/>
-                    <RadioButton x:Name="contentTypeLocal" Content="Use local content" HorizontalAlignment="Left" Margin="40,14,0,0" VerticalAlignment="Top" GroupName="contentType" IsChecked="True" Checked="contentTypeLocal_Checked" />
-                    <RadioButton x:Name="contentTypeOnline" Content="Use web content" HorizontalAlignment="Left" Margin="201,14,0,0" VerticalAlignment="Top" GroupName="contentType" Checked="contentTypeOnline_Checked" RenderTransformOrigin="0.102,0.622" />
+                    <Label x:Name="CASCdesc" Content="Loading web content..." Margin="50,254,735,569" Foreground="Black" Visibility="Hidden"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Maps">
+            <TabItem x:Name="MapsTab" Header="Maps" Visibility="Collapsed" GotFocus="MapsTab_Focused">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="73*" />

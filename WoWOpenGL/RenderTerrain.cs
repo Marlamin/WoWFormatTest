@@ -16,7 +16,6 @@ namespace WoWOpenGL
     public class RenderTerrain : GameWindow
     {
         private static float angle = 0.0f;
-        private string basedir;
         private GLControl glControl;
         private bool gLoaded = false;
         private bool modelLoaded;
@@ -28,7 +27,6 @@ namespace WoWOpenGL
 
         public RenderTerrain(string ModelPath)
         {
-            basedir = ConfigurationManager.AppSettings["basedir"];
             Console.WriteLine(ModelPath);
 
             string[] adt = ModelPath.Split('_');
@@ -78,7 +76,7 @@ namespace WoWOpenGL
 
         private void LoadADT(string map, string x, string y)
         {
-            ADTReader reader = new ADTReader(basedir);
+            ADTReader reader = new ADTReader();
             reader.LoadADT("World/Maps/" + map + "/" + map + "_" + x + "_" + y + ".adt");
             Console.WriteLine(reader.adtfile.version);
         }

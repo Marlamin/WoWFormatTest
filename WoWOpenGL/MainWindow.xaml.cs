@@ -23,6 +23,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WoWFormatLib.DBC;
 using WoWFormatLib.FileReaders;
+using WoWFormatLib.Utils;
 
 namespace WoWOpenGL
 {
@@ -45,19 +46,10 @@ namespace WoWOpenGL
         public MainWindow()
         {
             InitializeComponent();
-            var basedir = ConfigurationManager.AppSettings["basedir"];
-            var reader = new MapReader(basedir);
-
-            Dictionary<int, string> maps = reader.GetMaps();
-            foreach (KeyValuePair<int, string> map in maps)
-            {
-                MapListBox.Items.Add(map);
-            }
-            MapListBox.DisplayMemberPath = "Value";
         }
 
         /* MAP STUFF */
-        private delegate void LoadMapDelegate(string basedir, WDTReader wdt);
+        private delegate void LoadMapDelegate(WDTReader wdt);
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -69,13 +61,12 @@ namespace WoWOpenGL
             if (MapListBox.SelectedValue == null)
                 return;
 
-            var basedir = ConfigurationManager.AppSettings["basedir"];
             string _SelectedMapName = ((KeyValuePair<int, string>)MapListBox.SelectedValue).Value;
             WDTGrid.Children.Clear();
             pbLoadMap.Value = 0d;
 
-            var wdt = new WDTReader(basedir);
-            if (File.Exists(System.IO.Path.Combine(basedir, "World\\Maps\\", _SelectedMapName, _SelectedMapName + ".wdt")))
+            var wdt = new WDTReader();
+            if (CASC.FileExists(System.IO.Path.Combine("World\\Maps\\", _SelectedMapName, _SelectedMapName + ".wdt")))
             {
                 Stopwatch _SW = new Stopwatch();
                 BackgroundWorker _BackgroundWorker = new BackgroundWorker();
@@ -94,7 +85,7 @@ namespace WoWOpenGL
                             if (fCancelMapLoading)
                                 break;
 
-                            Action _LoadTileAction = delegate() { LoadTile(basedir, tiles[i]); };
+                            Action _LoadTileAction = delegate() { LoadTile(tiles[i]); };
                             this.Dispatcher.Invoke(_LoadTileAction);
                             _Worker.ReportProgress((i * 100) / tiles.Count);
                         }
@@ -120,7 +111,7 @@ namespace WoWOpenGL
             }
         }
 
-        private void LoadTile(string basedir, int[] tile)
+        private void LoadTile(int[] tile)
         {
             var x = tile[0];
             var y = tile[1];
@@ -132,13 +123,13 @@ namespace WoWOpenGL
             rect.VerticalAlignment = VerticalAlignment.Top;
             rect.HorizontalAlignment = HorizontalAlignment.Left;
 
-            if (File.Exists(basedir + "World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp"))
+            if (CASC.FileExists(System.IO.Path.Combine("World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp")))
             {
                 rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
                 var xmargin = x * rect.Width;
                 var ymargin = y * rect.Height;
                 rect.Margin = new Thickness(xmargin, ymargin, 0, 0);
-                var blp = new BLPReader(basedir);
+                var blp = new BLPReader();
 
                 //Kalimdor takes a few seconds to load, and takes up about ~4xxMB of memory after its loaded, this can be much improved
                 blp.LoadBLP("World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
@@ -158,7 +149,7 @@ namespace WoWOpenGL
             else
             {
                 rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
-                Console.WriteLine(basedir + "World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                Console.WriteLine("World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
             }
             WDTGrid.Children.Add(rect);
         }
@@ -259,62 +250,15 @@ namespace WoWOpenGL
             winFormControl = wfContainer;
             cascProgressBar = CASCprogress;
             cascProgressDesc = CASCdesc;
-        }
-
-        private void contentTypeOnline_Checked(object sender, RoutedEventArgs e)
-        {
             useCASC = true;
             if (!CASCinitialized)
             {
                 SwitchToCASC();
             }
-            else
-            {
-                ModelListBox.Visibility = System.Windows.Visibility.Visible;
-            }
         }
 
-        private void contentTypeLocal_Checked(object sender, RoutedEventArgs e)
-        {
-            useCASC = false;
-            if (ConfigurationManager.AppSettings["basedir"].Count() == 0)
-            {
-                ModelListBox.Visibility = System.Windows.Visibility.Hidden;
-            }
-        }
-
-        private void CascProgress()
-        {
-            BackgroundWorker bw = new BackgroundWorker();
-            MainWindow.cascProgressBar.Visibility = System.Windows.Visibility.Visible;
-            MainWindow.cascProgressDesc.Visibility = System.Windows.Visibility.Visible;
-
-            bw.DoWork += (sender, args) =>
-            {
-                string prevDesc = "";
-                while (CASCinitialized == false)
-                {
-                    Console.WriteLine(WoWFormatLib.Utils.CASC.progressNum);
-                    if (prevDesc != WoWFormatLib.Utils.CASC.progressDesc)
-                    {
-                        MainWindow.cascProgressDesc.Content = WoWFormatLib.Utils.CASC.progressDesc; 
-                    }
-                    System.Threading.Thread.Sleep(100);
-                }
-            };
-            
-            bw.RunWorkerCompleted += (sender, args) =>
-            {
-                MainWindow.cascProgressBar.Visibility = System.Windows.Visibility.Hidden;
-                MainWindow.cascProgressDesc.Visibility = System.Windows.Visibility.Hidden;
-            };
-            
-            bw.RunWorkerAsync();
-        }
         private async void SwitchToCASC()
         {
-            contentTypeLocal.Visibility = System.Windows.Visibility.Collapsed;
-            contentTypeOnline.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Hidden;
             contentTypeLoading.Visibility = System.Windows.Visibility.Visible;
             CASCdesc.Visibility = System.Windows.Visibility.Visible;
@@ -336,15 +280,25 @@ namespace WoWOpenGL
             CASCdesc.Visibility = System.Windows.Visibility.Hidden;
             CASCprogress.Visibility = System.Windows.Visibility.Hidden;
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
-            contentTypeLocal.Visibility = System.Windows.Visibility.Visible;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
-            contentTypeOnline.Visibility = System.Windows.Visibility.Visible;
+            MapsTab.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
         {
             CASCprogress.Value = progress.Progress;
             if (progress.UserData != null) { CASCdesc.Content = progress.UserData; }
+        }
+
+        private void MapsTab_Focused(object sender, RoutedEventArgs e)
+        {
+            var reader = new MapReader();
+            Dictionary<int, string> maps = reader.GetMaps();
+            foreach (KeyValuePair<int, string> map in maps)
+            {
+                MapListBox.Items.Add(map);
+            }
+            MapListBox.DisplayMemberPath = "Value";
         }
     }
 }

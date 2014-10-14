@@ -10,38 +10,24 @@ namespace WoWFormatLib.FileReaders
     public class WMOReader
     {
         public WMO wmofile;
-        private string basedir;
-        public bool useCASC = false;
 
-        public WMOReader(string basedir)
+        public WMOReader()
         {
-            this.basedir = basedir;
         }
 
         public void LoadWMO(string filename)
         {
-            if (File.Exists(Path.Combine(basedir, filename)))
+            if (!CASC.FileExists(filename))
             {
-                using (FileStream wmoStream = File.Open(Path.Combine(basedir, filename), FileMode.Open))
-                {
-                    ReadWMO(filename, wmoStream);
-                    wmoStream.Close();
-                }
+                new WoWFormatLib.Utils.MissingFile(filename);
+                return;
             }
             else
             {
-                CASC.DownloadFile(filename);
-                if (!File.Exists(Path.Combine("data", filename)))
+                using (FileStream wmoStream = File.Open(Path.Combine("data", filename), FileMode.Open))
                 {
-                    new WoWFormatLib.Utils.MissingFile(filename);
-                }
-                else
-                {
-                    using (FileStream wmoStream = File.Open(Path.Combine("data", filename), FileMode.Open))
-                    {
-                        ReadWMO(filename, wmoStream);
-                        wmoStream.Close();
-                    }
+                    ReadWMO(filename, wmoStream);
+                    wmoStream.Close();
                 }
             }
         }
@@ -60,7 +46,7 @@ namespace WoWFormatLib.FileReaders
                     if (str.Length > 1)
                     {
                         //m2Files.Add(str.ToString());
-                        //var m2reader = new M2Reader(basedir);
+                        //var m2reader = new M2Reader();
                         //m2reader.LoadM2(str.ToString());
                     }
                     str = new StringBuilder();
@@ -237,16 +223,10 @@ namespace WoWFormatLib.FileReaders
                         str.Replace("..", ".");
                         blpFiles.Add(str.ToString());
                         blpOffset.Add(i - str.ToString().Length);
-                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
+                        if (!CASC.FileExists(str.ToString()))
                         {
                             new WoWFormatLib.Utils.MissingFile(str.ToString());
                         }
-                        else
-                        {
-                            // Console.WriteLine(str.ToString() + " exists!");
-                            // Console.ReadLine();
-                        }
-                        //Console.WriteLine("         " + str.ToString());
                     }
                     str = new StringBuilder();
                 }
@@ -405,32 +385,14 @@ namespace WoWFormatLib.FileReaders
             {
                 var groupfilename = filename.Replace(".WMO", "_" + i.ToString().PadLeft(3, '0') + ".WMO");
                 groupfilename = groupfilename.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
-                if (!File.Exists(System.IO.Path.Combine(basedir, groupfilename)))
+                if (!CASC.FileExists(groupfilename))
                 {
-                    if (useCASC == true)
-                    {
-                        CASC.DownloadFile(groupfilename);
-                        if (!File.Exists(Path.Combine("data", groupfilename)))
-                        {
-                            new WoWFormatLib.Utils.MissingFile(groupfilename);
-                        }
-                        else
-                        {
-                            using (FileStream wmoStream = File.Open(Path.Combine("data", groupfilename), FileMode.Open))
-                            {
-                                groupFiles[i] = ReadWMOGroupFile(groupfilename, wmoStream);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        new WoWFormatLib.Utils.MissingFile(groupfilename);
-                    }
-                    
+                    new WoWFormatLib.Utils.MissingFile(groupfilename);
+                    return;
                 }
                 else
                 {
-                    using (FileStream wmoStream = File.Open(Path.Combine(basedir, groupfilename), FileMode.Open))
+                    using (FileStream wmoStream = File.Open(Path.Combine("data", groupfilename), FileMode.Open))
                     {
                         groupFiles[i] = ReadWMOGroupFile(groupfilename, wmoStream);
                     }

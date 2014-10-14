@@ -1,37 +1,29 @@
 ﻿using System;
 using System.IO;
 using WoWFormatLib.Structs.SKIN;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
 {
     public class SKINReader
     {
         public SKIN skin;
-        private string basedir;
 
-        public SKINReader(string basedir)
+        public SKINReader()
         {
-            this.basedir = basedir;
         }
 
         public void LoadSKIN(string filename)
         {
             filename = Path.ChangeExtension(filename, ".skin");
-            string fullpath = Path.Combine(basedir, filename);
-            Utils.CASC.DownloadFile(filename);
-            if (!File.Exists(fullpath))
+            
+            if (!CASC.FileExists(filename))
             {
-                if(!File.Exists(Path.Combine("data", filename))){
-                    new WoWFormatLib.Utils.MissingFile(filename);
-                }
-                else
-                {
-                    fullpath = Path.Combine("data", filename);
-                }
-                
+                new WoWFormatLib.Utils.MissingFile(filename);
             }
 
-            // Console.WriteLine("Reading " + filename);
+            string fullpath = Path.Combine("data", filename);
+
             FileStream stream = File.Open(fullpath, FileMode.Open);
             BinaryReader bin = new BinaryReader(stream);
 

@@ -9,16 +9,13 @@ namespace WoWFormatLib.FileReaders
 {
     public class ADTReader
     {
-        private string basedir;
         public ADT adtfile;
         private List<String> blpFiles;
         private List<String> m2Files;
         private List<String> wmoFiles;
-        private Boolean useCASC = false;
-        public ADTReader(string basedir, bool CASC = false)
+
+        public ADTReader()
         {
-            this.basedir = basedir;
-            this.useCASC = CASC;
         }
 
         public void LoadADT(string filename)
@@ -28,14 +25,14 @@ namespace WoWFormatLib.FileReaders
             blpFiles = new List<string>();
 
             filename = Path.ChangeExtension(filename, ".adt");
-            //Console.WriteLine(filename);
-            if (!File.Exists(Path.Combine(basedir, filename))) { CASC.DownloadFile(filename);  new WoWFormatLib.Utils.MissingFile(filename); return; }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_obj0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_obj1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
-            if (!File.Exists(Path.Combine(basedir, filename).Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; }
 
-            var adt = File.Open(Path.Combine(basedir, filename), FileMode.Open);
+            if (!CASC.FileExists(filename)) { new WoWFormatLib.Utils.MissingFile(filename); return; }
+            if (!CASC.FileExists(filename.Replace(".adt", "_obj0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
+            if (!CASC.FileExists(filename.Replace(".adt", "_obj1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
+            if (!CASC.FileExists(filename.Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
+            if (!CASC.FileExists(filename.Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; } 
+
+            var adt = File.Open(Path.Combine("data", filename), FileMode.Open);
 
             var bin = new BinaryReader(adt);
             BlizzHeader chunk = null;
@@ -81,12 +78,12 @@ namespace WoWFormatLib.FileReaders
             adt.Close();
 
             //OBJ1 and TEX1 are ignored atm
-            using (var adtobj0 = File.Open(Path.Combine(basedir, filename).Replace(".adt", "_obj0.adt"), FileMode.Open))
+            using (var adtobj0 = File.Open(Path.Combine("data", filename).Replace(".adt", "_obj0.adt"), FileMode.Open))
             {
                 ReadObjFile(filename, adtobj0, ref chunk);
             }
 
-            using (FileStream adttex0 = File.Open(Path.Combine(basedir, filename).Replace(".adt", "_tex0.adt"), FileMode.Open))
+            using (FileStream adttex0 = File.Open(Path.Combine("data", filename).Replace(".adt", "_tex0.adt"), FileMode.Open))
             {
                 ReadTexFile(filename, adttex0, ref chunk);
             }
@@ -116,7 +113,7 @@ namespace WoWFormatLib.FileReaders
                 {
                     if (str.Length > 1)
                     {
-                        var m2reader = new M2Reader(basedir);
+                        var m2reader = new M2Reader();
                         m2reader.LoadM2(str.ToString());
                         m2Files.Add(str.ToString());
                     }
@@ -143,7 +140,7 @@ namespace WoWFormatLib.FileReaders
                     if (str.Length > 1)
                     {
                         blpFiles.Add(str.ToString());
-                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
+                        if (!CASC.FileExists(str.ToString()))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
                             new WoWFormatLib.Utils.MissingFile(str.ToString());
@@ -172,8 +169,8 @@ namespace WoWFormatLib.FileReaders
                     if (str.Length > 1)
                     {
                         wmoFiles.Add(str.ToString());
-                        var wmoreader = new WMOReader(basedir);
-                        wmoreader.LoadWMO(str.ToString());
+                        //var wmoreader = new WMOReader();
+                        //wmoreader.LoadWMO(str.ToString());
                     }
                     str = new StringBuilder();
                 }

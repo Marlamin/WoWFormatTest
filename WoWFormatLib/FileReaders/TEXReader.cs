@@ -7,29 +7,23 @@ namespace WoWFormatLib.FileReaders
 {
     public class TEXReader
     {
-        private string basedir;
-
-        public TEXReader(string basedir)
+        public TEXReader()
         {
-            this.basedir = basedir;
         }
 
         public void LoadTEX(string filename)
         {
-            if (File.Exists(Path.Combine(basedir, filename)))
+            if (CASC.FileExists(filename))
             {
-                using (FileStream tex = File.Open(Path.Combine(basedir, filename), FileMode.Open))
+                using (FileStream tex = File.Open(Path.Combine("data", filename), FileMode.Open))
                 {
                     ReadTEX(filename, tex);
                 }
             }
             else
             {
-                if (!File.Exists(basedir + filename))
-                {
-                    new WoWFormatLib.Utils.MissingFile(filename);
-                    return;
-                }
+                new WoWFormatLib.Utils.MissingFile(filename);
+                return;
             }
         }
 
@@ -76,7 +70,7 @@ namespace WoWFormatLib.FileReaders
                     {
                         str.Replace("..", ".");
                         str.Append(".blp"); //Filenames in TEX dont have have BLP extensions
-                        if (!System.IO.File.Exists(System.IO.Path.Combine(basedir, str.ToString())))
+                        if (!CASC.FileExists(str.ToString()))
                         {
                             new WoWFormatLib.Utils.MissingFile(str.ToString());
                         }

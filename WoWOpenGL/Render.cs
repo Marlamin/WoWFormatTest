@@ -20,7 +20,6 @@ namespace WoWOpenGL
         bool mouseDragging = false;
         
         private static float angle = 90.0f;
-        private string basedir;
         private GLControl glControl;
         private bool gLoaded = false;
         private Material[] materials;
@@ -39,8 +38,6 @@ namespace WoWOpenGL
 
         public Render(string ModelPath)
         {
-            basedir = ConfigurationManager.AppSettings["basedir"];
-
             dragX = 0.0f;
             dragY = 0.0f;
             dragZ = -7.5f;
@@ -130,8 +127,7 @@ namespace WoWOpenGL
         private void LoadM2(string modelpath)
         {
             DebugLog("Loading M2 file ("+modelpath+")..");
-            M2Reader reader = new M2Reader(basedir);
-            reader.useCASC = MainWindow.useCASC;
+            M2Reader reader = new M2Reader();
 
             string filename = modelpath;
             reader.LoadM2(filename);
@@ -184,10 +180,9 @@ namespace WoWOpenGL
                 }
                 materials[i].textureID = GL.GenTexture();
                 
-                var blp = new BLPReader(basedir);
-                blp.useCASC = MainWindow.useCASC;
+                var blp = new BLPReader();
 
-               // if (File.Exists(System.IO.Path.Combine(basedir, reader.model.filename.Replace("M2", "BLP"))))
+               // if (File.Exists(System.IO.Path.Combine("data", reader.model.filename.Replace("M2", "BLP"))))
                // {
                //     materials[i].filename = reader.model.filename.Replace("M2", "BLP");
                //     blp.LoadBLP(reader.model.filename.Replace("M2", "BLP"));
@@ -242,9 +237,8 @@ namespace WoWOpenGL
         private void LoadWMO(string modelpath)
         {
             DebugLog("Loading WMO file..");
-            WMOReader reader = new WMOReader(basedir);
+            WMOReader reader = new WMOReader();
             string filename = modelpath;
-            reader.useCASC = MainWindow.useCASC;
             //Load WMO
             reader.LoadWMO(filename);
 
@@ -302,8 +296,7 @@ namespace WoWOpenGL
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
                     {
                         materials[i].textureID = GL.GenTexture();
-                        var blp = new BLPReader(basedir);
-                        blp.useCASC = MainWindow.useCASC;
+                        var blp = new BLPReader();
                         blp.LoadBLP(reader.wmofile.textures[ti].filename);
                         if (blp.bmp == null)
                         {

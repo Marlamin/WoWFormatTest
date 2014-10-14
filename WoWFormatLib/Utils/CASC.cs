@@ -56,17 +56,32 @@ namespace WoWFormatLib.Utils
 
         public static void DownloadFile(string filename)
         {
+            cascHandler.SaveFileTo(filename, "data/");
+            //Console.WriteLine("Downloaded " + filename + "!");
+        }
+
+        public static bool FileExists(string filename)
+        {
             if (!File.Exists(Path.Combine("data", filename)))
             {
-                cascHandler.SaveFileTo(filename, "data/");
-                Console.WriteLine("Downloaded " + filename + "!");
+                Console.WriteLine("File does not exist! Downloading.. (" + filename + ")");
+                DownloadFile(filename);
+                if (!File.Exists(Path.Combine("data", filename)))
+                {
+                    //Console.WriteLine("Download failed!");
+                    return false;
+                }
+                else
+                {
+                    //Console.WriteLine("Downloaded " + filename);
+                    return true;
+                }
             }
             else
             {
-                cascHandler.SaveFileTo(filename, "data/");
-                Console.WriteLine(filename + " was already present on disk!");
+                //Console.WriteLine("File was already present on disk!");
+                return true;
             }
-            
         }
     }
 }
