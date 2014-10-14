@@ -27,7 +27,8 @@ namespace WoWFormatLib.DBC
         public uint textureVariation_0;
         public uint textureVariation_1;
         public uint textureVariation_2;
-        public int portraitTextureName;
+        public uint portraitTextureName;
+        public int portraitCreatureDisplayInfoID;
         public int sizeClass;
         public int bloodID;
         public int NPCSoundID;

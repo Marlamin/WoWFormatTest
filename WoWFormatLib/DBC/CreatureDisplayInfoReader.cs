@@ -20,8 +20,6 @@ namespace WoWFormatLib.DBC
 
         public void LoadDBC(string filename)
         {
-            CASC.InitCasc();
-
             if (!CASC.FileExists(filename))
             {
                 new MissingFile(filename);

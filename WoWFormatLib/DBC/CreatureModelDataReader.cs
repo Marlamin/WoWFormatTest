@@ -8,13 +8,13 @@ using WoWFormatLib.DBC;
 using WoWFormatLib.Utils;
 namespace WoWFormatLib.DBC
 {
-    public class FileDataReader
+    public class CreatureModelDataReader
     {
         public DBCHeader header;
-        public FileDataRecord[] records;
+        public CreatureModelDataRecord[] records;
         public byte[] stringblock;
 
-        public FileDataReader()
+        public CreatureModelDataReader()
         {
         }
 
@@ -30,11 +30,11 @@ namespace WoWFormatLib.DBC
             {
                 header = bin.Read<DBCHeader>();
 
-                records = new FileDataRecord[header.record_count];
+                records = new CreatureModelDataRecord[header.record_count];
 
                 for (int i = 0; i < header.record_count; i++)
                 {
-                    records[i] = bin.Read<FileDataRecord>();
+                    records[i] = bin.Read<CreatureModelDataRecord>();
                 }
                
                 stringblock = bin.ReadBytes((int)header.string_block_size);
