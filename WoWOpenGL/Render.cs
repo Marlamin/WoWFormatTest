@@ -169,8 +169,6 @@ namespace WoWOpenGL
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 8 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
             GL.Enable(EnableCap.Texture2D);
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             materials = new Material[reader.model.textures.Count()];
             for (int i = 0; i < reader.model.textures.Count(); i++)
@@ -228,6 +226,7 @@ namespace WoWOpenGL
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
+                        renderbatches[i].blendType = reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode;
                         renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
                     }
                 }
@@ -293,8 +292,6 @@ namespace WoWOpenGL
             }
 
             GL.Enable(EnableCap.Texture2D);
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
             materials = new Material[reader.wmofile.materials.Count()];
             for (int i = 0; i < reader.wmofile.materials.Count(); i++)
@@ -348,6 +345,7 @@ namespace WoWOpenGL
                     renderbatches[rb].firstFace = group.mogp.renderBatches[i].firstFace;
                     renderbatches[rb].numFaces = group.mogp.renderBatches[i].numFaces;
                     renderbatches[rb].materialID = group.mogp.renderBatches[i].materialID;
+                    renderbatches[rb].blendType = reader.wmofile.materials[group.mogp.renderBatches[i].materialID].blendMode;
                     renderbatches[rb].groupID = (uint)g;
                     rb++;
                 }
@@ -407,12 +405,11 @@ namespace WoWOpenGL
 
             ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
 
-           // ActiveCamera.OrbitXY(dragX, dragY);
             ActiveCamera.setupGLRenderMatrix();
 
             if (!gLoaded) return;
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
+            
             GL.Enable(EnableCap.Texture2D);
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
@@ -447,7 +444,43 @@ namespace WoWOpenGL
                 }
                 else
                 {
+                    if(renderbatches[i].blendType != null){
+                        switch(renderbatches[i].blendType)
+                        {
+                            case 0: //Combiners_Opaque (Blend disabled)
+                                GL.Disable(EnableCap.Blend);
+                                break;
+                            case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
+                                GL.Enable(EnableCap.Blend);
+                                //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                break;
+                            case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                break;
+                            case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
+                                break;
+                            case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                                break;
+                            case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                break; 
+                            case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                                break;
+                            default:
+                                throw new Exception("Unknown blend type " + renderbatches[i].blendType);
+                        }
+                    }
                     GL.BindTexture(TextureTarget.Texture2D, materials[renderbatches[i].materialID].textureID);
+                    
                 }
                 
                 GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, (renderbatches[i].firstFace + renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedShort, new IntPtr(renderbatches[i].firstFace * 2));
@@ -468,6 +501,7 @@ namespace WoWOpenGL
             public uint materialID;
             public uint numFaces;
             public uint groupID;
+            public uint? blendType;
         }
 
         private struct Vertex
