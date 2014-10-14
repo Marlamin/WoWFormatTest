@@ -176,7 +176,7 @@ namespace WoWOpenGL
             
             var rw = new RenderWindow(name);
             rw.Show();
-            this.Hide();
+            //this.Hide();
         }
 
         /* MODEL STUFF */
@@ -276,7 +276,7 @@ namespace WoWOpenGL
             {
 
             }
-
+           // AddToDebugLog("CASC filesystem loaded!");
             CASCinitialized = true;
             CASCdesc.Visibility = System.Windows.Visibility.Hidden;
             CASCprogress.Visibility = System.Windows.Visibility.Hidden;
@@ -288,7 +288,7 @@ namespace WoWOpenGL
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
         {
             CASCprogress.Value = progress.Progress;
-            if (progress.UserData != null) { CASCdesc.Content = progress.UserData; }
+            if (progress.UserData != null) { CASCdesc.Content = progress.UserData;}
         }
 
         private void MapsTab_Focused(object sender, RoutedEventArgs e)
@@ -306,5 +306,12 @@ namespace WoWOpenGL
             MapListBox.DisplayMemberPath = "Value";
             mapsTabLoaded = true;
         }
+        
+       /* public static void AddToDebugLog(string log)
+        {
+            MainWindow.curlogentry = MainWindow.curlogentry + 1;
+            MainWindow.debugList.Items.Add("[" + MainWindow.curlogentry + "] " + log);
+            MainWindow.debugList.ScrollIntoView(MainWindow.debugList.Items[MainWindow.debugList.Items.Count - 1]);
+        }*/
     }
 }

@@ -1,4 +1,8 @@
-﻿v0.05
+﻿v0.06 
+- Add CHANGELOG
+- Non-buggy placeholder for terrain render
+
+v0.05
 - Fix issue where repeatedly giving focus to the Maps tab would make it load maps over and over
 - Update CASClib
 - Add handling for when CASClib can not find a file

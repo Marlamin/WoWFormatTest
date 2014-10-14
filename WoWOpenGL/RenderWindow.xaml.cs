@@ -21,14 +21,14 @@ namespace WoWOpenGL
 
         public void OnWindowClosing(object sender, CancelEventArgs e)
         {
-            MainWindow mw = new MainWindow();
-            mw.Show();
+            //MainWindow mw = new MainWindow();
+            //mw.Show();
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             
             winFormControl = wfContainer;
-            new RenderTerrain(loadmap);
+            //new RenderTerrain(loadmap);
         }
     }
 }
