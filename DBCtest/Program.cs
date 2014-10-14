@@ -12,7 +12,7 @@ namespace DBCtest
     {
         static void Main(string[] args)
         {
-            DBCReader reader = new DBCReader();
+            MapReader reader = new MapReader();
             reader.LoadDBC("DBFilesClient\\Map.dbc");
             Console.WriteLine(reader.header.field_count);
             Console.WriteLine(reader.header.record_size);

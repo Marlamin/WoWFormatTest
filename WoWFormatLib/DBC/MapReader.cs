@@ -8,13 +8,13 @@ using WoWFormatLib.DBC;
 using WoWFormatLib.Utils;
 namespace WoWFormatLib.DBC
 {
-    public class DBCReader
+    public class MapReader
     {
         public DBCHeader header;
         public MapRecord[] records;
         public byte[] stringblock;
 
-        public DBCReader()
+        public MapReader()
         {
         }
 

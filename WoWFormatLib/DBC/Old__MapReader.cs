@@ -5,9 +5,9 @@ using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.DBC
 {
-    public class MapReader
+    public class MapReaderOld
     {
-        public MapReader()
+        public MapReaderOld()
         {
         }
 
