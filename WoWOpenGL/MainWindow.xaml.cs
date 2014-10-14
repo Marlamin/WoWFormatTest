@@ -42,6 +42,7 @@ namespace WoWOpenGL
         public static int curlogentry = 0;
         public static bool useCASC = false;
         public static bool CASCinitialized = false;
+        public static bool mapsTabLoaded = false;
         public static AsyncAction bgAction;
         public MainWindow()
         {
@@ -292,6 +293,10 @@ namespace WoWOpenGL
 
         private void MapsTab_Focused(object sender, RoutedEventArgs e)
         {
+            if (mapsTabLoaded)
+            {
+                return;
+            }
             var reader = new MapReader();
             Dictionary<int, string> maps = reader.GetMaps();
             foreach (KeyValuePair<int, string> map in maps)
@@ -299,6 +304,7 @@ namespace WoWOpenGL
                 MapListBox.Items.Add(map);
             }
             MapListBox.DisplayMemberPath = "Value";
+            mapsTabLoaded = true;
         }
     }
 }

@@ -64,7 +64,7 @@ namespace WoWFormatLib.Utils
         {
             if (!File.Exists(Path.Combine("data", filename)))
             {
-                Console.WriteLine("File does not exist! Downloading.. (" + filename + ")");
+                //Console.WriteLine("File does not exist! Downloading.. (" + filename + ")");
                 DownloadFile(filename);
                 if (!File.Exists(Path.Combine("data", filename)))
                 {
