@@ -4,25 +4,26 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5DB0FB8F-0EAA-490A-AA7D-28AE010186A9}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{83CA2422-F9FF-4D25-8293-CBD94480D175}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WoWFormatLib</RootNamespace>
-    <AssemblyName>WoWFormatLib</AssemblyName>
+    <RootNamespace>DBCtest</RootNamespace>
+    <AssemblyName>DBCtest</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,12 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CSDBCReader">
-      <HintPath>..\CSDBCReader.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,42 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DBC\DBCReader.cs" />
-    <Compile Include="DBC\Old__MapReader.cs" />
-    <Compile Include="DBC\Structs.cs" />
-    <Compile Include="FileReaders\ADTReader.cs" />
-    <Compile Include="FileReaders\BLPReader.cs" />
-    <Compile Include="FileReaders\M2Reader.cs" />
-    <Compile Include="FileReaders\SKINReader.cs" />
-    <Compile Include="FileReaders\TEXReader.cs" />
-    <Compile Include="FileReaders\WDLReader.cs" />
-    <Compile Include="FileReaders\WDTReader.cs" />
-    <Compile Include="FileReaders\WMOReader.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SereniaBLPLib\BlpFile.cs" />
-    <Compile Include="SereniaBLPLib\DXTDecompression.cs" />
-    <Compile Include="Structs\ADT.struct.cs" />
-    <Compile Include="Structs\ADTobj.struct.cs" />
-    <Compile Include="Structs\ADTtex.struct.cs" />
-    <Compile Include="Structs\M2.struct.cs" />
-    <Compile Include="Structs\SKIN.struct.cs" />
-    <Compile Include="Structs\WDL.struct.cs" />
-    <Compile Include="Structs\WMO.struct.cs" />
-    <Compile Include="Utils\ABlock.cs" />
-    <Compile Include="Utils\BlizzHeader.cs" />
-    <Compile Include="Utils\CASC.cs" />
-    <Compile Include="Utils\RGBColor.cs" />
-    <Compile Include="Utils\MissingFile.cs" />
-    <Compile Include="Utils\Quaternion.cs" />
-    <Compile Include="Utils\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CASCExplorer\CascLib\CascLib.csproj">
-      <Project>{e08e1e48-6585-4137-8405-661c62c10713}</Project>
-      <Name>CascLib</Name>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj">
+      <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>
+      <Name>WoWFormatLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
