@@ -37,7 +37,7 @@ namespace WoWFormatLib.Structs.SKIN
         public ushort unk1;
         public ushort startVertex;
         public ushort nVertices;
-        public ushort startTriangle;
+        public uint startTriangle;
         public ushort nTriangles;
         public ushort nBones;
         public ushort startBones;

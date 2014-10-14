@@ -1,4 +1,8 @@
-﻿v0.06 
+﻿v0.07
+- Add on the go listfile creation
+- Fix high quality models (WoD+) spazzing out
+
+v0.06 
 - Add CHANGELOG
 - Non-buggy placeholder for terrain render
 

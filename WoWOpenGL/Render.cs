@@ -140,7 +140,7 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
 
-            List<ushort> indicelist = new List<ushort>();
+            List<uint> indicelist = new List<uint>();
             for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
             {
                 indicelist.Add(reader.model.skins[0].triangles[i].pt1);
@@ -148,10 +148,10 @@ namespace WoWOpenGL
                 indicelist.Add(reader.model.skins[0].triangles[i].pt3);
             }
 
-            ushort[] indices = indicelist.ToArray();
+            uint[] indices = indicelist.ToArray();
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(ushort)), indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
             
             Vertex[] vertices = new Vertex[reader.model.vertices.Count()];
 
@@ -205,8 +205,8 @@ namespace WoWOpenGL
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat); 
-                    
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+                    //Console.WriteLine(blp.bmp.PixelFormat);
                     DebugLog("Created texture \"" + reader.model.textures[i].filename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
                     blp.bmp.UnlockBits(bmp_data);
                 }
@@ -221,8 +221,11 @@ namespace WoWOpenGL
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
+                        Console.WriteLine("SubmeshIndex: " + i);
                         renderbatches[i].blendType = reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode;
-                        renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
+                        Console.WriteLine("Material ID: " + renderbatches[i].materialID);
+                        Console.WriteLine("BlendType: " +renderbatches[i].blendType);
+                       renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
                     }
                 }
             }
@@ -273,16 +276,16 @@ namespace WoWOpenGL
                 //Switch to Index buffer
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[(g * 2) + 1]);
 
-                List<ushort> indicelist = new List<ushort>();
+                List<uint> indicelist = new List<uint>();
                 for (int i = 0; i < reader.wmofile.group[g].mogp.indices.Count(); i++)
                 {
                     indicelist.Add(reader.wmofile.group[g].mogp.indices[i].indice);
                 }
 
-                ushort[] indices = indicelist.ToArray();
+                uint[] indices = indicelist.ToArray();
 
                 //Push to buffer
-                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(ushort)), indices, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
             }
 
             GL.Enable(EnableCap.Texture2D);
@@ -437,46 +440,48 @@ namespace WoWOpenGL
                 }
                 else
                 {
-                    if(renderbatches[i].blendType != null){
-                        switch(renderbatches[i].blendType)
-                        {
-                            case 0: //Combiners_Opaque (Blend disabled)
-                                GL.Disable(EnableCap.Blend);
-                                break;
-                            case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
-                                GL.Enable(EnableCap.Blend);
-                                //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
-                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                                break;
-                            case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
-                                GL.Enable(EnableCap.Blend);
-                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                                break;
-                            case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
-                                GL.Enable(EnableCap.Blend);
-                                GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
-                                break;
-                            case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
-                                GL.Enable(EnableCap.Blend);
-                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
-                                break;
-                            case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
-                                GL.Enable(EnableCap.Blend);
-                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                                break; 
-                            case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
-                                GL.Enable(EnableCap.Blend);
-                                GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
-                                break;
-                            default:
-                                throw new Exception("Unknown blend type " + renderbatches[i].blendType);
-                        }
+                    switch(renderbatches[i].blendType)
+                    {
+                        case 0: //Combiners_Opaque (Blend disabled)
+                            GL.Disable(EnableCap.Blend);
+                            break;
+                        case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
+                            GL.Enable(EnableCap.Blend);
+                            //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
+                            //GL.BlendFuncSeparate(BlendingFactorSrc.One, BlendingFactorDest.Zero, BlendingFactorSrc.One, BlendingFactorDest.Zero);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            break;
+                        case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.One, BlendingFactorDest.Zero);
+                            //Tried:
+                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha
+                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha
+                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusDstAlpha
+                            break;
+                        case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
+                            break;
+                        case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                            break;
+                        case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            break; 
+                        case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                            break;
+                        default:
+                            throw new Exception("Unknown blend type " + renderbatches[i].blendType);
                     }
                     GL.BindTexture(TextureTarget.Texture2D, materials[renderbatches[i].materialID].textureID);
-                    
                 }
                 
-                GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, (renderbatches[i].firstFace + renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedShort, new IntPtr(renderbatches[i].firstFace * 2));
+                GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, (renderbatches[i].firstFace + renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(renderbatches[i].firstFace * 4));
                 if (GL.GetError().ToString() != "NoError")
                 {
                     DebugLog(GL.GetError().ToString());
@@ -494,7 +499,7 @@ namespace WoWOpenGL
             public uint materialID;
             public uint numFaces;
             public uint groupID;
-            public uint? blendType;
+            public uint blendType;
         }
 
         private struct Vertex

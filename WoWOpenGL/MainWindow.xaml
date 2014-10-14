@@ -10,7 +10,7 @@
         <TabControl HorizontalAlignment="Left" Height="883" Margin="10,5,0,0" VerticalAlignment="Top" Width="1050">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
-                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="531" Margin="10,10,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
+                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="491" Margin="10,10,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
                     <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0">
                         <WF:Label Text="Select something from the left to make it show up!" ForeColor="White" TextAlign="MiddleCenter"></WF:Label>
                     </WindowsFormsHost>
@@ -26,6 +26,7 @@
                     <Label x:Name="contentTypeLoading" Content="Initializing web content, this might take a while!" Margin="48,8,735,815" Foreground="Black" Visibility="Collapsed"/>
                     <ProgressBar x:Name="CASCprogress" Margin="50,233,735,601" Visibility="Hidden"/>
                     <Label x:Name="CASCdesc" Content="Loading web content..." Margin="50,254,735,569" Foreground="Black" Visibility="Hidden"/>
+                    <Button x:Name="LoadListfile" Click="LoadListfile_Click" Visibility="Hidden" Content="Load listfile (will lock up for a moment)" Margin="10,506,701,316"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="MapsTab" Header="Maps" Visibility="Collapsed" GotFocus="MapsTab_Focused">

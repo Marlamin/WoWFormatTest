@@ -192,6 +192,7 @@ namespace WoWOpenGL
             models.Add(@"Creature\Garrosh\Garrosh.M2");
             models.Add(@"Item\ObjectComponents\Weapon\sword_1h_garrison_a_01.m2");
             models.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
+            models.Add(@"Environments\Stars\CavernsOfTimeSky.m2");
             models.Add(@"World\WMO\Kalimdor\Ogrimmar\Ogrimmar.wmo");
             models.Add(@"World\WMO\Azeroth\Buildings\StormWind\Stormwind2.wmo");
             models.Add(@"World\WMO\Draenor\IronHorde\6ih_ironhorde_tower01.wmo");
@@ -283,6 +284,7 @@ namespace WoWOpenGL
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
             MapsTab.Visibility = System.Windows.Visibility.Visible;
+            LoadListfile.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
@@ -305,6 +307,14 @@ namespace WoWOpenGL
             }
             MapListBox.DisplayMemberPath = "Value";
             mapsTabLoaded = true;
+        }
+
+        private void LoadListfile_Click(object sender, RoutedEventArgs e)
+        {
+            List<string> files = new List<String>();
+            files = CASC.GenerateListfile();
+            ModelListBox.DataContext = files;
+            ModelListBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
         }
         
        /* public static void AddToDebugLog(string log)
