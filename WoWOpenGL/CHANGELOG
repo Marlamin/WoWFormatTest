@@ -1,4 +1,8 @@
-﻿v0.07
+﻿v0.08
+- Basic DBC reader implemented, so no longer relying on external DBC library
+- Fix some missing textures in a quick but dirty way
+
+v0.07
 - Add on the go listfile creation
 - Fix high quality models (WoD+) spazzing out
 

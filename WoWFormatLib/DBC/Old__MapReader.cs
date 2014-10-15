@@ -13,8 +13,12 @@ namespace WoWFormatLib.DBC
 
         public Dictionary<int, string> GetMaps()
         {
-            string fullpath;
+            Console.WriteLine("Removed class, only here for archiving atm");
             var maps = new Dictionary<int, string>();
+
+            /*
+            string fullpath;
+            
             var filename = Path.Combine("DBFilesClient", "Map.dbc");
 
             if (CASC.FileExists(filename))
@@ -52,6 +56,7 @@ namespace WoWFormatLib.DBC
                 }
                 maps.Add(mapid, mapname);
             }
+             */
             return maps;
         }
     }
