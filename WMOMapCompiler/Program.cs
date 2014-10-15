@@ -87,7 +87,7 @@ namespace WMOMapCompiler
                         var x = int.Parse(location.Substring(0, 2));
                         var y = int.Parse(location.Substring(3, 2));
 
-                        var blpreader = new BLPReader(basedir);
+                        var blpreader = new BLPReader();
                         blpreader.LoadBLP(s.Replace(basedir, ""));
                         g.DrawImage(blpreader.bmp, (x - min_x) * 256, (y - min_y) * 256, new Rectangle(0, 0, 256, 256), GraphicsUnit.Pixel);
                     }
