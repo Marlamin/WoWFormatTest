@@ -192,7 +192,27 @@ namespace WoWOpenGL
                         break;
                     case 1:
                         DebugLog("Requires type 1 texture");
+                        string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(reader.model.name, 1);
                         texturefilename = "Test\\TotallyRad.blp";
+                        for (int ti = 0; ti < cdifilenames.Count(); ti++)
+                        {
+                            Console.WriteLine("Found " + cdifilenames[ti]);
+                            //texturefilename = cdifilenames[ti];
+                            Console.WriteLine(reader.model.filename);
+                            texturefilename = modelpath.Replace(reader.model.name + ".M2", cdifilenames[ti] + ".blp");
+                        }
+                        break;
+                    case 11:
+                        DebugLog("Requires type 11 texture");
+                        string[] cdifilenames2 = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(reader.model.name, 1);
+                        texturefilename = "Test\\TotallyRad.blp";
+                        for (int ti = 0; ti < cdifilenames2.Count(); ti++)
+                        {
+                            Console.WriteLine("Found " + cdifilenames2[ti]);
+                            //texturefilename = cdifilenames[ti];
+                            Console.WriteLine(reader.model.filename);
+                            texturefilename = modelpath.Replace(reader.model.name + ".M2", cdifilenames2[ti] + ".blp");
+                        }
                         break;
                     default:
                         DebugLog("Requires type " + reader.model.textures[i].type + " texture");
@@ -200,6 +220,7 @@ namespace WoWOpenGL
                         break;
                 }
 
+                Console.WriteLine("Eventual filename is " + texturefilename);
                 materials[i].textureID = GL.GenTexture();
                 
                 var blp = new BLPReader();
@@ -229,7 +250,7 @@ namespace WoWOpenGL
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
                     //Console.WriteLine(blp.bmp.PixelFormat);
-                    DebugLog("Created texture \"" + reader.model.textures[i].filename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
+                    DebugLog("Created texture \"" + texturefilename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
                     blp.bmp.UnlockBits(bmp_data);
                 }
             }
