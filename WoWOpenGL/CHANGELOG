@@ -1,4 +1,8 @@
-﻿v0.08
+﻿v0.09
+- Listfile generation should find much more files now!
+- Changed fallback texture to blue
+
+v0.08
 - Basic DBC reader implemented, so no longer relying on external DBC library
 - Fix some missing textures in a quick but dirty way
 

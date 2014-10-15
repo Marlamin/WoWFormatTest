@@ -178,7 +178,7 @@ namespace WoWOpenGL
 
             GL.Enable(EnableCap.Texture2D);
 
-            string texturefilename = "Test\\TotallyRad.blp";
+            string texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
 
             materials = new Material[reader.model.textures.Count()];
             for (int i = 0; i < reader.model.textures.Count(); i++)

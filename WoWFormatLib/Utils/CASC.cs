@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CASCExplorer;
 using System.IO;
+using WoWFormatLib.DBC;
 
 namespace WoWFormatLib.Utils
 {
@@ -45,6 +46,27 @@ namespace WoWFormatLib.Utils
             List<string> files = new List<String>();
 
             System.IO.StreamReader file = new System.IO.StreamReader("data/signaturefile");
+            DBCReader<FileDataRecord> filedatareader = new DBCReader<FileDataRecord>();
+            filedatareader.LoadDBC("DBFilesClient\\FileData.dbc");
+
+            for (int i = 0; i < filedatareader.records.Count(); i++)
+            {
+                string filename = DBCHelper.getString(filedatareader.records[i].FilePath, filedatareader.stringblock) + DBCHelper.getString(filedatareader.records[i].FileName, filedatareader.stringblock);
+                if (filename.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || filename.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+                {
+                    files.Add(filename);
+                }
+            }
+
+            while ((line = file.ReadLine()) != null)
+            {
+                linesplit = line.Split(';');
+                if (linesplit.Count() != 4) { continue; } //filter out junk 
+                if (linesplit[3].EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || linesplit[3].EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+                {
+                    files.Add(linesplit[3]);
+                }
+            }
 
             List<string> unwantedExtensions = new List<String>();
             for (int i = 0; i < 1024; i++)
@@ -54,31 +76,23 @@ namespace WoWFormatLib.Utils
             }
 
             string[] unwanted = unwantedExtensions.ToArray();
+            List<string> retlist = new List<string>();
 
-            //File.WriteAllText("listfile.txt", "");
-            while ((line = file.ReadLine()) != null)
+            for (int i = 0; i < files.Count(); i++)
             {
-                linesplit = line.Split(';');
-                if (linesplit.Count() != 4) { continue; } //filter out junk 
-                
-                if (linesplit[3].EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || linesplit[3].EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+                if (!files[i].StartsWith("alternate"))
                 {
-                    if (!linesplit[3].StartsWith("alternate"))
+                    if (!unwanted.Contains(files[i].Substring(files[i].Length - 8, 8)))
                     {
-                        if (!unwanted.Contains(linesplit[3].Substring(linesplit[3].Length - 8, 8)))
+                        if (!files[i].Contains("LOD"))
                         {
-                            if (!linesplit[3].Contains("LOD"))
-                            { 
-                                files.Add(linesplit[3]); 
-                            }
+                            retlist.Add(files[i]);
                         }
-                        
                     }
                 }
-
             }
-           // File.AppendAllLines("listfile.txt", files.ToArray());
-            return files;
+
+            return retlist.Distinct().ToList();
         }
 
         public static void DownloadFile(string filename)
