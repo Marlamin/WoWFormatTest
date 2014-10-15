@@ -12,7 +12,7 @@ namespace WoWFormatLib.DBC
         public static string[] getTexturesByModelFilename(string modelfilename, int flag)
         {
             List<string> filenames = new List<string>();
-            if (flag == 1)
+            if (flag == 1 || flag == 11)
             {
                 DBCReader<FileDataRecord> reader = new DBCReader<FileDataRecord>();
                 reader.LoadDBC("DBFilesClient\\FileData.dbc");
