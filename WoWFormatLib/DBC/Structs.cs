@@ -34,25 +34,25 @@ namespace WoWFormatLib.DBC
     public struct CreatureRecord
     {
         public uint ID;
-        public uint unk1; //1-12, 14-15
+        public uint type; //Probably CreatureType.ID (1-12, 14-15)
         public uint unk2;
         public uint unk3;
         public uint unk4;
         public uint unk5;
-        public uint unk6;
-        public uint unk7;
-        public uint unk8;
-        public uint unk9;
-        public uint unk10;
-        public uint unk11;
-        public uint unk12;
-        public uint unk13;
+        public uint displayID1; //CreatureDisplayInfoRecord.ID
+        public uint displayID2; //CreatureDisplayInfoRecord.ID
+        public uint displayID3; //CreatureDisplayInfoRecord.ID
+        public uint displayID4; //CreatureDisplayInfoRecord.ID
+        public uint unk10; //0, 1, 2, 3, 9, 25, 50, 99, 100
+        public uint unk11; //0, 1, 2, 3, 9, 25, 50
+        public uint unk12; //0, 1, 2, 3, 25
+        public uint unk13; //0, 1, 25
         public uint name;
-        public uint unk15;
+        public uint somekindoftitle; //Bigger Warsong Wolf is only value
         public uint title;
-        public uint unk17;
-        public uint unk18;
-        public uint unk19;
+        public uint unk17; //0
+        public uint unk18; //1, 2, 3, 4, 6, 
+        public uint unk19; //0, 2, 3, 4
     }
 
     public struct CreatureDisplayInfoRecord
