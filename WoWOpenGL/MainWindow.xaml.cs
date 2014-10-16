@@ -303,14 +303,13 @@ namespace WoWOpenGL
             {
                 return;
             }
-            /*var reader = new MapReader();
-            Dictionary<int, string> maps = reader.GetMaps();
-            foreach (KeyValuePair<int, string> map in maps)
-            {
-                MapListBox.Items.Add(map);
+
+            var reader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");
+            
+            for(int i = 0; i < reader.recordCount; i++){
+                MapListBox.Items.Add(new KeyValuePair<int, string>(reader[i].ID, reader[i].Directory));
             }
             MapListBox.DisplayMemberPath = "Value";
-            */
             mapsTabLoaded = true;
         }
 
