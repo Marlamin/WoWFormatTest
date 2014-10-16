@@ -51,7 +51,7 @@ namespace WoWFormatLib.Utils
 
             for (int i = 0; i < filedatareader.records.Count(); i++)
             {
-                string filename = DBCHelper.getString(filedatareader.records[i].FilePath, filedatareader.stringblock) + DBCHelper.getString(filedatareader.records[i].FileName, filedatareader.stringblock);
+                string filename = filedatareader.stringblock[(int)filedatareader.records[i].FilePath] + filedatareader.stringblock[(int)filedatareader.records[i].FileName];
                 if (filename.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || filename.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
                 {
                     files.Add(filename);
@@ -104,7 +104,7 @@ namespace WoWFormatLib.Utils
             }
             catch (System.IO.FileNotFoundException e)
             {
-                Console.WriteLine("Couldn't download " + filename + ", file was not found!");
+                Console.WriteLine("Couldn't download " + filename + ", file was not found!" + e.Message);
             }
         }
 
