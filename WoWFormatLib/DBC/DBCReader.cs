@@ -4,50 +4,113 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WoWFormatLib.DBC;
 using WoWFormatLib.Utils;
+
 namespace WoWFormatLib.DBC
 {
-    public class DBCReader<T>
+    public class DBCReader<T> where T : new()
     {
-        public DBCHeader header;
-        public T[] records;
-        public Dictionary<int, string> stringblock;
+        private const uint headerSize = 20;
+        private const uint DBCFmtSig = 0x43424457;  // WDBC
 
-        public DBCReader()
+        public int recordCount { get; private set; }
+        public int fieldCount { get; private set; }
+        public int recordSize { get; private set; }
+        public int stringBlockSize { get; private set; }
+
+        private T[] m_rows;
+
+        public T this[int row]
         {
+            get { return m_rows[row]; }
         }
 
-        public void LoadDBC(string filename)
+        public DBCReader(string filename)
         {
-            if(!CASC.IsCASCInit)
+            if (!CASC.IsCASCInit)
                 CASC.InitCasc();
 
             if (!CASC.FileExists(filename))
             {
                 new MissingFile(filename);
-                return; //well shit what now
+                return;
             }
 
-            using (BinaryReader bin = new BinaryReader(File.Open(Path.Combine("data", filename), FileMode.Open)))
+            using (var reader = new BinaryReader(new FileStream(Path.Combine("data", filename), FileMode.Open), Encoding.UTF8))
             {
-                header = bin.Read<DBCHeader>();
-
-                records = new T[header.record_count];
-
-                for (int i = 0; i < header.record_count; i++)
+                if (reader.BaseStream.Length < headerSize)
                 {
-                    records[i] = bin.Read<T>();
+                    throw new InvalidDataException(String.Format("File {0} is corrupted!", filename));
                 }
 
-                int stringblock_start = (int)bin.BaseStream.Position;
-
-                stringblock = new Dictionary<int, string>();
-
-                while (bin.BaseStream.Position != bin.BaseStream.Length)
+                if (reader.ReadUInt32() != DBCFmtSig)
                 {
-                    int index = (int)bin.BaseStream.Position - stringblock_start;
-                    stringblock[index] = bin.ReadStringNull();
+                    throw new InvalidDataException(String.Format("File {0} isn't valid DBC file!", filename));
+                }
+
+                recordCount = reader.ReadInt32();
+                fieldCount = reader.ReadInt32();
+                recordSize = reader.ReadInt32();
+                stringBlockSize = reader.ReadInt32();
+
+                long pos = reader.BaseStream.Position;
+                long stringTableStart = reader.BaseStream.Position + recordCount * recordSize;
+                reader.BaseStream.Position = stringTableStart;
+
+                Dictionary<int, string> StringTable = new Dictionary<int, string>();
+
+                while (reader.BaseStream.Position != reader.BaseStream.Length)
+                {
+                    int index = (int)(reader.BaseStream.Position - stringTableStart);
+                    StringTable[index] = reader.ReadStringNull();
+                }
+
+                reader.BaseStream.Position = pos;
+
+                m_rows = new T[recordCount];
+
+                var props = typeof(T).GetProperties();
+
+                for (int i = 0; i < recordCount; i++)
+                {
+                    T row = new T();
+
+                    long rowStart = reader.BaseStream.Position;
+
+                    for (int j = 0; j < props.Length; j++)
+                    {
+                        switch (Type.GetTypeCode(props[j].PropertyType))
+                        {
+                            case TypeCode.Int32:
+                                props[j].SetValue(row, reader.ReadInt32());
+                                break;
+                            case TypeCode.UInt32:
+                                props[j].SetValue(row, reader.ReadUInt32());
+                                break;
+                            case TypeCode.Single:
+                                props[j].SetValue(row, reader.ReadSingle());
+                                break;
+                            case TypeCode.String:
+                                props[j].SetValue(row, StringTable[reader.ReadInt32()]);
+                                break;
+                            default:
+                                throw new Exception("Unsupported field type " + Type.GetTypeCode(props[j].PropertyType));
+                        }
+                    }
+
+                    if (reader.BaseStream.Position - rowStart != recordSize)
+                    {
+                        // struct bigger than record size
+                        if (reader.BaseStream.Position - rowStart > recordSize)
+                            throw new Exception("Incorrect DBC struct!");
+
+                        // struct smaller than record size (imcomplete)
+                        Console.WriteLine("Remaining data in row!");
+                        int remaining = recordSize - (int)(reader.BaseStream.Position - rowStart);
+                        reader.ReadBytes(remaining);
+                    }
+
+                    m_rows[i] = row;
                 }
             }
         }

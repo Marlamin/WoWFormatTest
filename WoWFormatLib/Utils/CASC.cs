@@ -46,12 +46,11 @@ namespace WoWFormatLib.Utils
             List<string> files = new List<String>();
 
             System.IO.StreamReader file = new System.IO.StreamReader("data/signaturefile");
-            DBCReader<FileDataRecord> filedatareader = new DBCReader<FileDataRecord>();
-            filedatareader.LoadDBC("DBFilesClient\\FileData.dbc");
+            DBCReader<FileDataRecord> filedatareader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
 
-            for (int i = 0; i < filedatareader.records.Count(); i++)
+            for (int i = 0; i < filedatareader.recordCount; i++)
             {
-                string filename = filedatareader.stringblock[(int)filedatareader.records[i].FilePath] + filedatareader.stringblock[(int)filedatareader.records[i].FileName];
+                string filename = filedatareader[i].FilePath + filedatareader[i].FileName;
                 if (filename.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || filename.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
                 {
                     files.Add(filename);

@@ -16,20 +16,22 @@ namespace DBCtest
         {
             CASC.InitCasc();
 
-            DB2Reader<CreatureRecord> reader = new DB2Reader<CreatureRecord>();
-            reader.LoadDB2("DBFilesClient\\Creature.db2");
-            Console.WriteLine(reader.header.record_count + " rows!");
-            Console.WriteLine(reader.header.record_size + " row size!");
-            Console.WriteLine(reader.header.field_count + " fields!");
-            
-            for (int i = 0; i < reader.records.Count(); i++)
+            DB2Reader<AreaPOIRecord> reader = new DB2Reader<AreaPOIRecord>("DBFilesClient\\AreaPOI.db2");
+            for (int i = 0; i < reader.recordCount; i++)
             {
-                if (reader.records[i].ID == 11326)
-                {
-                    Console.WriteLine("Creature: " + reader.stringblock[(int)reader.records[i].name] + " <" + reader.stringblock[(int)reader.records[i].title] +">");
-                }
+                Console.WriteLine(reader[i].ID + ": " + reader[i].name_lang);
             }
-            Console.ReadLine();
+                //DBCReader<AreaTableRecord> reader = new DBCReader<AreaTableRecord>();
+                //reader.LoadDBC("DBFilesClient\\AreaTable.dbc");
+                /*Console.WriteLine(reader.header.record_count + " rows!");
+                Console.WriteLine(reader.header.record_size + " row size!");
+                Console.WriteLine(reader.header.field_count + " fields!");
+                at.rows
+                for (int i = 0; i < at.records.Count(); i++)
+                {
+                 //Console.WriteLine("Area: " + reader.stringblock[(int)reader.records[i].AreaName_lang] + " <" + reader.stringblock[(int)reader.records[i].ZoneName] +">");
+                }*/
+                Console.ReadLine();
         }
     }
 }

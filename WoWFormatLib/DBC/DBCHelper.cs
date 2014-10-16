@@ -14,27 +14,25 @@ namespace WoWFormatLib.DBC
             List<string> filenames = new List<string>();
             if (flag == 1 || flag == 11)
             {
-                DBCReader<FileDataRecord> reader = new DBCReader<FileDataRecord>();
-                reader.LoadDBC("DBFilesClient\\FileData.dbc");
-                for (int i = 0; i < reader.records.Count(); i++)
+                DBCReader<FileDataRecord> reader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
+
+                for (int i = 0; i < reader.recordCount; i++)
                 {
-                    if (reader.stringblock[(int)reader.records[i].FileName] == modelfilename + ".M2")
+                    if (reader[i].FileName == modelfilename + ".M2")
                     {
-                        Console.WriteLine("Found ID in FileData.dbc: " + reader.records[i].ID);
-                        DBCReader<CreatureModelDataRecord> cmdreader = new DBCReader<CreatureModelDataRecord>();
-                        cmdreader.LoadDBC("DBFilesClient\\CreatureModelData.dbc");
-                        for (int cmdi = 0; cmdi < cmdreader.records.Count(); cmdi++)
+                        Console.WriteLine("Found ID in FileData.dbc: " + reader[i].ID);
+                        DBCReader<CreatureModelDataRecord> cmdreader = new DBCReader<CreatureModelDataRecord>("DBFilesClient\\CreatureModelData.dbc");
+                        for (int cmdi = 0; cmdi < cmdreader.recordCount; cmdi++)
                         {
-                            if (reader.records[i].ID == cmdreader.records[cmdi].fileDataID)
+                            if (reader[i].ID == cmdreader[cmdi].fileDataID)
                             {
-                                Console.WriteLine("Found Creature ID in CreatureModelData.dbc: " + cmdreader.records[cmdi].ID);
-                                DBCReader<CreatureDisplayInfoRecord> cdireader = new DBCReader<CreatureDisplayInfoRecord>();
-                                cdireader.LoadDBC("DBFilesClient\\CreatureDisplayInfo.dbc");
-                                for (int cdii = 0; cdii < cdireader.records.Count(); cdii++)
+                                Console.WriteLine("Found Creature ID in CreatureModelData.dbc: " + cmdreader[cmdi].ID);
+                                DBCReader<CreatureDisplayInfoRecord> cdireader = new DBCReader<CreatureDisplayInfoRecord>("DBFilesClient\\CreatureDisplayInfo.dbc");
+                                for (int cdii = 0; cdii < cdireader.recordCount; cdii++)
                                 {
-                                    if (cdireader.records[cdii].modelID == cmdreader.records[cmdi].ID)
+                                    if (cdireader[cdii].modelID == cmdreader[cmdi].ID)
                                     {
-                                        filenames.Add(cdireader.stringblock[(int)cdireader.records[cdii].textureVariation_0]);
+                                        filenames.Add(cdireader[cdii].textureVariation_0);
                                     }
                                 }
                             }
