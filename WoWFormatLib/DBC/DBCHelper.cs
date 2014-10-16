@@ -18,7 +18,7 @@ namespace WoWFormatLib.DBC
                 reader.LoadDBC("DBFilesClient\\FileData.dbc");
                 for (int i = 0; i < reader.records.Count(); i++)
                 {
-                    if (reader.getString(reader.records[i].FileName) == modelfilename + ".M2")
+                    if (DBCHelper.getString(reader.records[i].FileName, reader.stringblock) == modelfilename + ".M2")
                     {
                         Console.WriteLine("Found ID in FileData.dbc: " + reader.records[i].ID);
                         DBCReader<CreatureModelDataRecord> cmdreader = new DBCReader<CreatureModelDataRecord>();
@@ -47,11 +47,10 @@ namespace WoWFormatLib.DBC
             return ret;
         }
 
-        public static string getString(uint offset, byte[] stringblock)
+        public static string getString(uint offset, Dictionary<int, string> stringblock)
         {
-            BinaryReader bin = new BinaryReader(new MemoryStream(stringblock));
-            bin.BaseStream.Position = offset;
-            return bin.ReadStringNull();
+            Console.WriteLine("Using old getstring method, please refer to dictionary");
+            return stringblock[(int)offset];
         }
     }
 }

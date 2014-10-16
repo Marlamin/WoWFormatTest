@@ -15,48 +15,21 @@ namespace DBCtest
         static void Main(string[] args)
         {
             CASC.InitCasc();
-            Console.WriteLine("CASC loaded");
-            DBCReader<FileDataRecord> reader = new DBCReader<FileDataRecord>();
-            reader.LoadDBC("DBFilesClient\\FileData.dbc");
-            Console.WriteLine(reader.header.field_count);
-            Console.WriteLine(reader.header.record_size);
-            Console.WriteLine(reader.header.record_count + " records!");
+
+            DB2Reader<CreatureRecord> reader = new DB2Reader<CreatureRecord>();
+            reader.LoadDB2("DBFilesClient\\Creature.db2");
+            Console.WriteLine(reader.header.record_count + " rows!");
+            Console.WriteLine(reader.header.record_size + " row size!");
+            Console.WriteLine(reader.header.field_count + " fields!");
+            
             for (int i = 0; i < reader.records.Count(); i++)
             {
-                if (reader.getString(reader.records[i].FileName) == "Serpent.M2")
+                if (reader.records[i].ID == 11326)
                 {
-                    Console.WriteLine("Found ID in FileData.dbc: " + reader.records[i].ID);
-                    DBCReader<CreatureModelDataRecord> cmdreader = new DBCReader<CreatureModelDataRecord>();
-                    cmdreader.LoadDBC("DBFilesClient\\CreatureModelData.dbc");
-                    for (int cmdi = 0; cmdi < cmdreader.records.Count(); cmdi++)
-                    {
-                        if (reader.records[i].ID == cmdreader.records[cmdi].fileDataID)
-                        {
-                            Console.WriteLine("Found Creature ID in CreatureModelData.dbc: " + cmdreader.records[cmdi].ID);
-                            DBCReader<CreatureDisplayInfoRecord> cdireader = new DBCReader<CreatureDisplayInfoRecord>();
-                            cdireader.LoadDBC("DBFilesClient\\CreatureDisplayInfo.dbc");
-                            for (int cdii = 0; cdii < cdireader.records.Count(); cdii++)
-                            {
-                                if (cdireader.records[cdii].modelID == cmdreader.records[cmdi].ID)
-                                {
-                                    Console.WriteLine("Found a texture! Just fucking use " + getString(cdireader.records[cdii].textureVariation_0, cdireader.stringblock) + " already! Stopping here because fuck this.");
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    Console.WriteLine("Creature: " + reader.stringblock[(int)reader.records[i].name] + " <" + reader.stringblock[(int)reader.records[i].title] +">");
                 }
             }
             Console.ReadLine();
         }
-
-        public static string getString(uint offset, byte[] stringblock)
-        {
-            BinaryReader bin = new BinaryReader(new MemoryStream(stringblock));
-            File.WriteAllBytes("test.bin", stringblock);
-            bin.BaseStream.Position = offset;
-            return bin.ReadStringNull();
-        }
-
     }
 }

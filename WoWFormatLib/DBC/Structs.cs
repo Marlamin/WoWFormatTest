@@ -15,6 +15,45 @@ namespace WoWFormatLib.DBC
         public uint string_block_size;
     }
 
+    public struct DB2Header
+    {
+        public uint magic;
+        public uint record_count;
+        public uint field_count;
+        public uint record_size;
+        public uint string_block_size;
+        public uint tablehash;
+        public uint build;
+        public uint timestamp_last_written;
+        public uint min_id;
+        public uint max_id;
+        public uint locale;
+        public uint unk;
+    }
+
+    public struct CreatureRecord
+    {
+        public uint ID;
+        public uint unk1; //1-12, 14-15
+        public uint unk2;
+        public uint unk3;
+        public uint unk4;
+        public uint unk5;
+        public uint unk6;
+        public uint unk7;
+        public uint unk8;
+        public uint unk9;
+        public uint unk10;
+        public uint unk11;
+        public uint unk12;
+        public uint unk13;
+        public uint name;
+        public uint unk15;
+        public uint title;
+        public uint unk17;
+        public uint unk18;
+        public uint unk19;
+    }
 
     public struct CreatureDisplayInfoRecord
     {

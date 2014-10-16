@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DBC\DBCHelper.cs" />
+    <Compile Include="DBC\DB2Reader.cs" />
     <Compile Include="DBC\DBCReader.cs" />
     <Compile Include="DBC\Old__MapReader.cs" />
     <Compile Include="DBC\Structs.cs" />
