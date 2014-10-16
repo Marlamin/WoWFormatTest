@@ -234,7 +234,10 @@ namespace WoWOpenGL
 
             if (item == null)//Let's assume its a string
             {
-                new Render(ModelListBox.SelectedValue.ToString());
+                if (ModelListBox.SelectedValue != null)
+                {
+                    new Render(ModelListBox.SelectedValue.ToString());
+                }
             }
             else
             {
@@ -330,12 +333,5 @@ namespace WoWOpenGL
             Console.WriteLine("Mouse left!");
             mouseOverRenderArea = false;
         }
-        
-       /* public static void AddToDebugLog(string log)
-        {
-            MainWindow.curlogentry = MainWindow.curlogentry + 1;
-            MainWindow.debugList.Items.Add("[" + MainWindow.curlogentry + "] " + log);
-            MainWindow.debugList.ScrollIntoView(MainWindow.debugList.Items[MainWindow.debugList.Items.Count - 1]);
-        }*/
     }
 }

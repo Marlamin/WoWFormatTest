@@ -30,7 +30,7 @@ namespace WoWFormatLib.DBC
                                 DBCReader<CreatureDisplayInfoRecord> cdireader = new DBCReader<CreatureDisplayInfoRecord>("DBFilesClient\\CreatureDisplayInfo.dbc");
                                 for (int cdii = 0; cdii < cdireader.recordCount; cdii++)
                                 {
-                                    if (cdireader[cdii].modelID == cmdreader[cmdi].ID)
+                                    if (cdireader[cdii].modelID == cmdreader[cmdi].ID && cdireader[cdii].textureVariation_0 != null)
                                     {
                                         filenames.Add(cdireader[cdii].textureVariation_0);
                                     }
