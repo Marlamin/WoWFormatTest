@@ -91,7 +91,7 @@ namespace WoWFormatLib.Utils
                 }
             }
 
-            return retlist.Distinct().ToList();
+            return retlist.Distinct(StringComparer.CurrentCultureIgnoreCase).ToList();
         }
 
         public static void DownloadFile(string filename)

@@ -1,4 +1,13 @@
-﻿v0.09
+﻿v0.10
+- Listfile generation is now ran on startup
+- Added filter box to filter model list
+- More texture lookups (less blue)
+- Fixed maps list not having any maps (again)
+- Fix duplicate models with different case in model list
+- New DBC reader, thanks TOM_RUS!
+- More DBCs are now supported
+
+v0.09
 - Listfile generation should find much more files now!
 - Changed fallback texture to blue
 

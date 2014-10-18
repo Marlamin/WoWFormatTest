@@ -12,7 +12,11 @@ namespace WoWFormatLib.DBC
         public static string[] getTexturesByModelFilename(string modelfilename, int flag)
         {
             List<string> filenames = new List<string>();
-            if (flag == 1 || flag == 11)
+            if (flag == 1)
+            {
+                //Do additional lookups
+            }
+            else if (flag == 11)
             {
                 DBCReader<FileDataRecord> reader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
 

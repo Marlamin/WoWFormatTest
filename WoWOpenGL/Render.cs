@@ -178,12 +178,12 @@ namespace WoWOpenGL
 
             GL.Enable(EnableCap.Texture2D);
 
-            string texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
-
             materials = new Material[reader.model.textures.Count()];
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
+                string texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
                 materials[i].flags = reader.model.textures[i].flags;
+                Console.WriteLine("Texture type " + reader.model.textures[i].type);
                 switch (reader.model.textures[i].type)
                 {
                     case 0:
@@ -191,6 +191,23 @@ namespace WoWOpenGL
                         texturefilename = reader.model.textures[i].filename;
                         break;
                     case 1:
+                        DebugLog("Requires type " + reader.model.textures[i].type + " texture");
+                        string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(reader.model.name, (int)reader.model.textures[i].type);
+                        if(csfilenames.Count() > 0){
+                            texturefilename = csfilenames[0];
+                        }
+                        break;
+                    case 2:
+                        if (WoWFormatLib.Utils.CASC.FileExists(Path.ChangeExtension(modelpath, ".blp")))
+                        {
+                            Console.WriteLine("BLP exists!");
+                            texturefilename = Path.ChangeExtension(modelpath, ".blp");
+                        }
+                        else
+                        {
+                            //needs lookup?
+                        }
+                        break;
                     case 11:
                         DebugLog("Requires type " + reader.model.textures[i].type + " texture");
                         string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(reader.model.name, (int)reader.model.textures[i].type);
@@ -209,16 +226,9 @@ namespace WoWOpenGL
                 
                 var blp = new BLPReader();
 
-               // if (File.Exists(System.IO.Path.Combine("data", reader.model.filename.Replace("M2", "BLP"))))
-               // {
-               //     materials[i].filename = reader.model.filename.Replace("M2", "BLP");
-               //     blp.LoadBLP(reader.model.filename.Replace("M2", "BLP"));
-               // }
-               // else
-              //  {
-                    materials[i].filename = texturefilename;
-                    blp.LoadBLP(texturefilename);
-              //  }
+                materials[i].filename = texturefilename;
+
+                blp.LoadBLP(texturefilename);
 
                 if (blp.bmp == null)
                 {

@@ -6,16 +6,18 @@
         Title="WoW Format Test UI (OpenGL)" Height="931.5" Width="1080.5" Background="White" ResizeMode="CanMinimize"
         Loaded="Window_Loaded"
         Closed="Window_Closed">
+
     <Grid Margin="0,0,4,5">
         <TabControl HorizontalAlignment="Left" Height="883" Margin="10,5,0,0" VerticalAlignment="Top" Width="1050">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
-                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="491" Margin="10,10,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="329" />
+                    <TextBox x:Name="FilterBox" Margin="5,5,705,832" TextChanged="FilterBox_TextChanged" ToolTip="Type something here to filter"/>
+                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Height="473" Margin="5,28,0,0" VerticalAlignment="Top" PreviewKeyDown="ModelListBox_PreviewKeyDown" SelectionChanged="ModelListBox_SelectionChanged" Loaded="ModelListBox_Loaded" ItemsSource="{Binding}" Width="334" />
                     <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0">
                         <WF:Label Text="Select something from the left to make it show up!" ForeColor="White" TextAlign="MiddleCenter"></WF:Label>
                     </WindowsFormsHost>
-                    <ListBox HorizontalAlignment="Left" Height="299" Margin="10,546,0,0" VerticalAlignment="Top" Width="329">
-                        <ListView x:Name="DebugListBox" Height="275" Width="304">
+                    <ListBox HorizontalAlignment="Left" Height="339" Margin="5,506,0,0" VerticalAlignment="Top" Width="334">
+                        <ListView x:Name="DebugListBox" Height="289" Width="315">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn/>
@@ -26,7 +28,6 @@
                     <Label x:Name="contentTypeLoading" Content="Initializing web content, this might take a while!" Margin="48,8,735,815" Foreground="Black" Visibility="Collapsed"/>
                     <ProgressBar x:Name="CASCprogress" Margin="50,233,735,601" Visibility="Hidden"/>
                     <Label x:Name="CASCdesc" Content="Loading web content..." Margin="50,254,735,569" Foreground="Black" Visibility="Hidden"/>
-                    <Button x:Name="LoadListfile" Click="LoadListfile_Click" Visibility="Hidden" Content="Load listfile (will lock up for a moment)" Margin="10,506,701,316"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="MapsTab" Header="Maps" Visibility="Collapsed" GotFocus="MapsTab_Focused">

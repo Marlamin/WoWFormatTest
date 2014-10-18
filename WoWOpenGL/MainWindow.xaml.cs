@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using WoWFormatLib.DBC;
 using WoWFormatLib.FileReaders;
 using WoWFormatLib.Utils;
@@ -45,6 +45,7 @@ namespace WoWOpenGL
         public static bool mapsTabLoaded = false;
         public static AsyncAction bgAction;
         public static bool mouseOverRenderArea = false;
+        private static List<string> models = new List<String>();
         public MainWindow()
         {
             InitializeComponent();
@@ -183,7 +184,8 @@ namespace WoWOpenGL
         /* MODEL STUFF */
         private void ModelListBox_Loaded(object sender, RoutedEventArgs e)
         {
-            List<string> models = new List<String>();
+            models.Add(@"Character\Human\Male\HumanMale_HD.m2");
+            models.Add(@"Character\Troll\Male\TrollMale_HD.m2");
             models.Add(@"Creature\Serpent\Serpent.M2");
             models.Add(@"Creature\Deathwing\Deathwing.M2");
             models.Add(@"Creature\Anduin\Anduin.M2");
@@ -269,6 +271,7 @@ namespace WoWOpenGL
             contentTypeLoading.Visibility = System.Windows.Visibility.Visible;
             CASCdesc.Visibility = System.Windows.Visibility.Visible;
             CASCprogress.Visibility = System.Windows.Visibility.Visible;
+            FilterBox.Visibility = System.Windows.Visibility.Hidden;
 
             bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction));
             bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
@@ -281,14 +284,19 @@ namespace WoWOpenGL
             {
 
             }
-           // AddToDebugLog("CASC filesystem loaded!");
+
+            List<string> files = new List<String>();
+            models = CASC.GenerateListfile();
+            ModelListBox.DataContext = models;
+            ModelListBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
+
             CASCinitialized = true;
+            FilterBox.Visibility = System.Windows.Visibility.Visible;
             CASCdesc.Visibility = System.Windows.Visibility.Hidden;
             CASCprogress.Visibility = System.Windows.Visibility.Hidden;
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
             MapsTab.Visibility = System.Windows.Visibility.Visible;
-            LoadListfile.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
@@ -313,14 +321,6 @@ namespace WoWOpenGL
             mapsTabLoaded = true;
         }
 
-        private void LoadListfile_Click(object sender, RoutedEventArgs e)
-        {
-            List<string> files = new List<String>();
-            files = CASC.GenerateListfile();
-            ModelListBox.DataContext = files;
-            ModelListBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
-        }
-
         private void glControl_MouseEnter(object sender, MouseEventArgs e)
         {
             Console.WriteLine("Mouse entered!");
@@ -331,6 +331,20 @@ namespace WoWOpenGL
         {
             Console.WriteLine("Mouse left!");
             mouseOverRenderArea = false;
+        }
+
+        private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            List<String> filtered = new List<String>();
+
+            for (int i = 0; i < models.Count(); i++)
+            {
+                if (models[i].IndexOf(FilterBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
+                {
+                    filtered.Add(models[i]);
+                }
+            }
+            ModelListBox.DataContext = filtered;
         }
     }
 }
