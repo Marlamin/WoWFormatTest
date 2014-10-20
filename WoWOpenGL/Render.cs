@@ -179,49 +179,54 @@ namespace WoWOpenGL
             GL.Enable(EnableCap.Texture2D);
 
             materials = new Material[reader.model.textures.Count()];
+            DebugLog("Loading textures..");
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
+                DebugLog("Loading texture " + i);
                 string texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
                 materials[i].flags = reader.model.textures[i].flags;
-                Console.WriteLine("Texture type " + reader.model.textures[i].type);
+                DebugLog("      Requires type " + reader.model.textures[i].type + " texture");
                 switch (reader.model.textures[i].type)
                 {
                     case 0:
-                        DebugLog("Texture given in file!");
+                        DebugLog("      Texture given in file!");
                         texturefilename = reader.model.textures[i].filename;
                         break;
                     case 1:
-                        DebugLog("Requires type " + reader.model.textures[i].type + " texture");
-                        string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(reader.model.name, (int)reader.model.textures[i].type);
+                        string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)reader.model.textures[i].type);
                         if(csfilenames.Count() > 0){
                             texturefilename = csfilenames[0];
+                        }
+                        else
+                        {
+                            DebugLog("      No type 1 texture found, falling back to placeholder texture");
                         }
                         break;
                     case 2:
                         if (WoWFormatLib.Utils.CASC.FileExists(Path.ChangeExtension(modelpath, ".blp")))
                         {
-                            Console.WriteLine("BLP exists!");
+                            DebugLog("      BLP exists!");
                             texturefilename = Path.ChangeExtension(modelpath, ".blp");
                         }
                         else
                         {
+                            DebugLog("      Type 2 does not exist!");
                             //needs lookup?
                         }
                         break;
                     case 11:
-                        DebugLog("Requires type " + reader.model.textures[i].type + " texture");
-                        string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(reader.model.name, (int)reader.model.textures[i].type);
+                        string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)reader.model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Count(); ti++)
                         {
                             texturefilename = modelpath.Replace(reader.model.name + ".M2", cdifilenames[ti] + ".blp");
                         }
                         break;
                     default:
-                        DebugLog("Requires type " + reader.model.textures[i].type + " texture");
+                        DebugLog("      Falling back to placeholder texture");
                         break;
                 }
 
-                Console.WriteLine("Eventual filename is " + texturefilename);
+                Console.WriteLine("      Eventual filename is " + texturefilename);
                 materials[i].textureID = GL.GenTexture();
                 
                 var blp = new BLPReader();
@@ -258,10 +263,10 @@ namespace WoWOpenGL
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
-                        Console.WriteLine("SubmeshIndex: " + i);
+                        //Console.WriteLine("SubmeshIndex: " + i);
                         renderbatches[i].blendType = reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode;
-                        Console.WriteLine("Material ID: " + renderbatches[i].materialID);
-                        Console.WriteLine("BlendType: " +renderbatches[i].blendType);
+                        //Console.WriteLine("Material ID: " + renderbatches[i].materialID);
+                        //Console.WriteLine("BlendType: " +renderbatches[i].blendType);
                        renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
                     }
                 }

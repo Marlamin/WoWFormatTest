@@ -79,7 +79,7 @@ namespace WoWFormatLib.Utils
 
             for (int i = 0; i < files.Count(); i++)
             {
-                if (!files[i].StartsWith("alternate"))
+                if (!files[i].StartsWith("alternate") && !files[i].StartsWith("Camera"))
                 {
                     if (!unwanted.Contains(files[i].Substring(files[i].Length - 8, 8)))
                     {

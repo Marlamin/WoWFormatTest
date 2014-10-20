@@ -14,15 +14,36 @@ namespace WoWFormatLib.DBC
             List<string> filenames = new List<string>();
             if (flag == 1)
             {
-                //Do additional lookups
+                if (modelfilename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase)){
+                    /*DBCReader<CharSectionRecord> reader = new DBCReader<CharSectionRecord>("DBFilesClient\\CharSections.dbc");
+                    for (int i = 0; i < reader.recordCount; i++)
+                    {
+
+                    }*/
+                    Console.WriteLine("[NYI] Type 1 character texture lookups aren't implemented yet");
+                }
+                else if (modelfilename.StartsWith("creature", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    Console.WriteLine("[NYI] Type 1 creature texture lookups aren't implemented yet");
+                }
+                else if (modelfilename.StartsWith("item", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    Console.WriteLine("[NYI] Type 1 item texture lookups aren't implemented yet");
+                }
+                else
+                {
+                    Console.WriteLine("[NYI] Type 1 texture lookups aren't implemented yet (model: " + modelfilename + ")");
+                }
             }
             else if (flag == 11)
             {
                 DBCReader<FileDataRecord> reader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
-
+                string[] modelnamearr = modelfilename.Split('\\');
+                string modelonly = modelnamearr[modelnamearr.Count() - 1];
+                modelonly = Path.ChangeExtension(modelonly, ".M2");
                 for (int i = 0; i < reader.recordCount; i++)
                 {
-                    if (reader[i].FileName == modelfilename + ".M2")
+                    if (reader[i].FileName == modelonly)
                     {
                         Console.WriteLine("Found ID in FileData.dbc: " + reader[i].ID);
                         DBCReader<CreatureModelDataRecord> cmdreader = new DBCReader<CreatureModelDataRecord>("DBFilesClient\\CreatureModelData.dbc");
