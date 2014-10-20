@@ -144,6 +144,20 @@ namespace WoWFormatLib.DBC
         public int flags { get; private set; }
     }
 
+    public class CharSectionRecord
+    {
+        public int ID { get; private set; }
+        public int raceID { get; private set; }
+        public int sexID { get; private set; }
+        public int baseSection { get; private set; }
+        public string TextureName_0 { get; private set; }
+        public string TextureName_1 { get; private set; }
+        public string TextureName_2 { get; private set; }
+        public int flags { get; private set; }
+        public int variationIndex { get; private set; }
+        public int colorIndex { get; private set; }
+    }
+
     public class CreatureRecord
     {
         public uint ID { get; private set; }
@@ -281,19 +295,7 @@ namespace WoWFormatLib.DBC
         public int flags { get; private set; }
     }
 
-    public class CharSectionRecord
-    {
-        public int ID { get; private set; }
-        public int raceID { get; private set; }
-        public int sexID { get; private set; }
-        public int baseSection { get; private set; }
-        public string TextureName_0 { get; private set; }
-        public string TextureName_1 { get; private set; }
-        public string TextureName_2 { get; private set; }
-        public int flags { get; private set; }
-        public int variationIndex { get; private set; }
-        public int colorIndex { get; private set; }
-    }
+
 
     public class FileDataRecord
     {

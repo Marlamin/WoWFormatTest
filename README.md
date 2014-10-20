@@ -11,7 +11,6 @@ MPQ support is currently not planned. Very basic support for the new CASC file f
 Should be no configuration neccesary at the time of writing. 
 
 ## Requirements
-- [CSDBCReader](http://marlamin.com/u/CSDBCReader.dll)
 - [OpenTK](http://www.opentk.com/) (recent version already included)
 
 ## Thanks
