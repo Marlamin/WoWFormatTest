@@ -9,14 +9,13 @@ namespace WoWFormatLib.DBC
 {
     public class DBCHelper
     {
-        public static string[] getTexturesByModelFilename(string modelfilename, int flag, int repltex = 0)
+        public static string[] getTexturesByModelFilename(string modelfilename, int flag, int texid = 0)
         {
             List<string> filenames = new List<string>();
             if (flag == 1)
             {
                 if (modelfilename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
                 {
-
                     DBCReader<ChrRaceRecord> reader = new DBCReader<ChrRaceRecord>("DBFilesClient\\ChrRaces.dbc");
 
                     int race_id = 1; //Default to human male
@@ -42,9 +41,31 @@ namespace WoWFormatLib.DBC
                     DBCReader<CharSectionRecord> secreader = new DBCReader<CharSectionRecord>("DBFilesClient\\CharSections.dbc");
                     for (int i = 0; i < secreader.recordCount; i++)
                     {
-                        if (secreader[i].raceID == race_id && secreader[i].sexID == gender_id && secreader[i].baseSection == 5)
+                        if (secreader[i].TextureName_0 == "")
                         {
-                            filenames.Add(secreader[i].TextureName_0);
+                            continue; //skip empty shit
+                        }
+                        int addhd = 0;
+                        if (modelfilename.IndexOf("_HD", 0, StringComparison.CurrentCultureIgnoreCase) != -1)
+                        {
+                            addhd = 5;
+                        }
+                        if (secreader[i].raceID == race_id && secreader[i].sexID == gender_id)
+                        {
+                            if (modelfilename.IndexOf("_HD", 0, StringComparison.CurrentCultureIgnoreCase) != -1)
+                            {
+                                if (secreader[i].baseSection == (0 + addhd) && texid == 1)
+                                {
+                                    filenames.Add(secreader[i].TextureName_0);
+                                }
+                            }
+                            else
+                            {
+                                if (secreader[i].baseSection == (0 + addhd) && texid == 0)
+                                {
+                                    filenames.Add(secreader[i].TextureName_0);
+                                }
+                            }
                         }
                     }
 
@@ -53,7 +74,35 @@ namespace WoWFormatLib.DBC
                 }
                 else if (modelfilename.StartsWith("creature", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    Console.WriteLine("[NYI] Type 1 creature texture lookups aren't implemented yet");
+                    Console.WriteLine("RUNNING TYPE 1 DETECTION");
+                    DBCReader<FileDataRecord> reader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
+                    string[] modelnamearr = modelfilename.Split('\\');
+                    string modelonly = modelnamearr[modelnamearr.Count() - 1];
+                    modelonly = Path.ChangeExtension(modelonly, ".M2");
+                    for (int i = 0; i < reader.recordCount; i++)
+                    {
+                        if (reader[i].FileName == modelonly)
+                        {
+                            Console.WriteLine("Found ID in FileData.dbc: " + reader[i].ID);
+                            DBCReader<CreatureModelDataRecord> cmdreader = new DBCReader<CreatureModelDataRecord>("DBFilesClient\\CreatureModelData.dbc");
+                            for (int cmdi = 0; cmdi < cmdreader.recordCount; cmdi++)
+                            {
+                                if (reader[i].ID == cmdreader[cmdi].fileDataID)
+                                {
+                                    Console.WriteLine("Found Creature ID in CreatureModelData.dbc: " + cmdreader[cmdi].ID);
+                                    DBCReader<CreatureDisplayInfoRecord> cdireader = new DBCReader<CreatureDisplayInfoRecord>("DBFilesClient\\CreatureDisplayInfo.dbc");
+                                    for (int cdii = 0; cdii < cdireader.recordCount; cdii++)
+                                    {
+                                        if (cdireader[cdii].modelID == cmdreader[cmdi].ID && cdireader[cdii].textureVariation_0 != null)
+                                        {
+                                            //filenames.Add(cdireader[cdii].textureVariation_0);
+                                            filenames.Add(modelfilename.Replace(modelonly, cdireader[cdii].textureVariation_0 + ".blp"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else if (modelfilename.StartsWith("item", StringComparison.CurrentCultureIgnoreCase))
                 {

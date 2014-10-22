@@ -193,7 +193,7 @@ namespace WoWOpenGL
                         texturefilename = reader.model.textures[i].filename;
                         break;
                     case 1:
-                        string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)reader.model.textures[i].type);
+                        string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)reader.model.textures[i].type, i);
                         if(csfilenames.Count() > 0){
                             texturefilename = csfilenames[0];
                         }
@@ -257,6 +257,18 @@ namespace WoWOpenGL
             renderbatches = new RenderBatch[reader.model.skins[0].submeshes.Count()];
             for (int i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
             {
+                if(filename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase)){
+                    if (reader.model.skins[0].submeshes[i].submeshID != 0)
+                    {
+                        if (!reader.model.skins[0].submeshes[i].submeshID.ToString().EndsWith("01"))
+                        {
+                            continue;
+                        }
+                    }
+
+                    DebugLog("Loading submesh " + reader.model.skins[0].submeshes[i].submeshID + "("+ reader.model.skins[0].submeshes[i].unk2 + ")");
+                }
+                
                 renderbatches[i].firstFace = reader.model.skins[0].submeshes[i].startTriangle;
                 renderbatches[i].numFaces = reader.model.skins[0].submeshes[i].nTriangles;
                 for (int tu = 0; tu < reader.model.skins[0].textureunit.Count(); tu++)
