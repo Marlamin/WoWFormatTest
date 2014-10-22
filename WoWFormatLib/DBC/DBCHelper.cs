@@ -9,17 +9,46 @@ namespace WoWFormatLib.DBC
 {
     public class DBCHelper
     {
-        public static string[] getTexturesByModelFilename(string modelfilename, int flag)
+        public static string[] getTexturesByModelFilename(string modelfilename, int flag, int repltex = 0)
         {
             List<string> filenames = new List<string>();
             if (flag == 1)
             {
-                if (modelfilename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase)){
-                    /*DBCReader<CharSectionRecord> reader = new DBCReader<CharSectionRecord>("DBFilesClient\\CharSections.dbc");
+                if (modelfilename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
+                {
+
+                    DBCReader<ChrRaceRecord> reader = new DBCReader<ChrRaceRecord>("DBFilesClient\\ChrRaces.dbc");
+
+                    int race_id = 1; //Default to human male
+                    int gender_id = 0; 
+
                     for (int i = 0; i < reader.recordCount; i++)
                     {
+                        if (modelfilename.IndexOf(reader[i].clientFileString, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
+                        {
+                            race_id = reader[i].ID;
+                            if (modelfilename.IndexOf("female", 0, StringComparison.CurrentCultureIgnoreCase) != -1)
+                            {
+                                gender_id = 1;
+                            }
+                            else
+                            {
+                                gender_id = 0;
+                            }
+                            break;
+                        }
+                    }
 
-                    }*/
+                    DBCReader<CharSectionRecord> secreader = new DBCReader<CharSectionRecord>("DBFilesClient\\CharSections.dbc");
+                    for (int i = 0; i < secreader.recordCount; i++)
+                    {
+                        if (secreader[i].raceID == race_id && secreader[i].sexID == gender_id && secreader[i].baseSection == 5)
+                        {
+                            filenames.Add(secreader[i].TextureName_0);
+                        }
+                    }
+
+                    Console.WriteLine("Detected model as race ID " + race_id + " and gender " + gender_id);
                     Console.WriteLine("[NYI] Type 1 character texture lookups aren't implemented yet");
                 }
                 else if (modelfilename.StartsWith("creature", StringComparison.CurrentCultureIgnoreCase))

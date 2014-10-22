@@ -158,6 +158,49 @@ namespace WoWFormatLib.DBC
         public int colorIndex { get; private set; }
     }
 
+    public class ChrRaceRecord
+    {
+        public int ID { get; private set; }
+        public int flags { get; private set; }
+        public int factionID { get; private set; }
+        public int ExplorationSoundID { get; private set; }
+        public int MaleDisplayId { get; private set; }
+        public int FemaleDisplayId { get; private set; }
+        public string ClientPrefix { get; private set; }
+        public int BaseLanguage { get; private set; }
+        public int creatureType { get; private set; }
+        public int ResSicknessSpellID { get; private set; }
+        public int SplashSoundID { get; private set; }
+        public string clientFileString { get; private set; }
+        public int cinematicSequenceID { get; private set; }
+        public int alliance { get; private set; }
+        public string name_lang { get; private set; }
+        public string name_female_lang { get; private set; }
+        public string name_male_lang { get; private set; }
+        public string facialHairCustomization_0 { get; private set; }
+        public string facialHairCustomization_1 { get; private set; }
+        public string hairCustomization { get; private set; }
+        public int race_related { get; private set; }
+        public int unalteredVisualRaceID { get; private set; }
+        public int uaMaleCreatureSoundDataID { get; private set; }
+        public int uaFemaleCreatureSoundDataID { get; private set; }
+        public int charComponentTextureLayoutID { get; private set; }
+        public int defaultClassID { get; private set; }
+        public int createScreenFileDataID { get; private set; }
+        public int selectScreenFileDataID { get; private set; }
+        public float maleCustomizeOffset_0 { get; private set; }
+        public float maleCustomizeOffset_1 { get; private set; }
+        public float maleCustomizeOffset_2 { get; private set; }
+        public float femaleCustomizeOffset_0 { get; private set; }
+        public float femaleCustomizeOffset_1 { get; private set; }
+        public float femaleCustomizeOffset_2 { get; private set; }
+        public int neutralRaceID { get; private set; }
+        public int lowResScreenFileDataID { get; private set; }
+        public int HighResMaleDisplayId { get; private set; }
+        public int HighResFemaleDisplayId { get; private set; }
+        public int charComponentTexLayoutHiResID { get; private set; }
+    }
+
     public class CreatureRecord
     {
         public uint ID { get; private set; }
