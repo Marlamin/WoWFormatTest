@@ -72,12 +72,11 @@
     <Compile Include="Utils\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CASCExplorer\CascLib\CascLib.csproj">
+    <ProjectReference Include="..\CASCExplorer\CascLib\CascLib.csproj">
       <Project>{e08e1e48-6585-4137-8405-661c62c10713}</Project>
       <Name>CascLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
