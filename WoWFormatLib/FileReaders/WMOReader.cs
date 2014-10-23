@@ -24,10 +24,9 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                using (FileStream wmoStream = File.Open(Path.Combine("data", filename), FileMode.Open))
+                using (Stream wmoStream = CASC.OpenFile(filename))
                 {
                     ReadWMO(filename, wmoStream);
-                    wmoStream.Close();
                 }
             }
         }
@@ -322,7 +321,7 @@ namespace WoWFormatLib.FileReaders
             throw new NotImplementedException();
         }
 
-        private void ReadWMO(string filename, FileStream wmo)
+        private void ReadWMO(string filename, Stream wmo)
         {
             var bin = new BinaryReader(wmo);
             BlizzHeader chunk;
@@ -392,7 +391,7 @@ namespace WoWFormatLib.FileReaders
                 }
                 else
                 {
-                    using (FileStream wmoStream = File.Open(Path.Combine("data", groupfilename), FileMode.Open))
+                    using (Stream wmoStream = CASC.OpenFile(groupfilename))
                     {
                         groupFiles[i] = ReadWMOGroupFile(groupfilename, wmoStream);
                     }
@@ -402,7 +401,7 @@ namespace WoWFormatLib.FileReaders
             wmofile.group = groupFiles;
         }
 
-        private WMOGroupFile ReadWMOGroupFile(string filename, FileStream wmo)
+        private WMOGroupFile ReadWMOGroupFile(string filename, Stream wmo)
         {
             WMOGroupFile groupFile = new WMOGroupFile();
 

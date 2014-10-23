@@ -17,10 +17,18 @@ namespace WoWFormatLib.Utils
         public static string progressDesc;
         private static bool fIsCASCInit = false;
 
-        public static void InitCasc(AsyncAction bgAction = null){
+        public static void InitCasc(AsyncAction bgAction = null, string basedir = null){
             CASC.bgAction = bgAction;
             //bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
-            cascHandler = CASCHandler.OpenOnlineStorage("wow_beta", bgAction);
+            if (basedir == null)
+            {
+                cascHandler = CASCHandler.OpenOnlineStorage("wow_beta", bgAction);
+            }
+            else
+            {
+                cascHandler = CASCHandler.OpenLocalStorage(basedir, bgAction);
+            }
+            
             cascHandler.Root.SetFlags(LocaleFlags.enUS, ContentFlags.None, false);
 
             fIsCASCInit = true;
@@ -94,41 +102,14 @@ namespace WoWFormatLib.Utils
             return retlist.Distinct(StringComparer.CurrentCultureIgnoreCase).ToList();
         }
 
-        public static void DownloadFile(string filename)
-        {
-            try
-            {
-                cascHandler.SaveFileTo(filename, "data/");
-                //Console.WriteLine("Downloaded " + filename + "!");
-            }
-            catch (System.IO.FileNotFoundException e)
-            {
-                Console.WriteLine("Couldn't download " + filename + ", file was not found!" + e.Message);
-            }
-        }
-
         public static bool FileExists(string filename)
         {
-            if (!File.Exists(Path.Combine("data", filename)))
-            {
-                //Console.WriteLine("File does not exist! Downloading.. (" + filename + ")");
-                DownloadFile(filename);
-                if (!File.Exists(Path.Combine("data", filename)))
-                {
-                    //Console.WriteLine("Download failed!");
-                    return false;
-                }
-                else
-                {
-                    //Console.WriteLine("Downloaded " + filename);
-                    return true;
-                }
-            }
-            else
-            {
-                //Console.WriteLine("File was already present on disk!");
-                return true;
-            }
+            return cascHandler.FileExists(filename);
+        }
+
+        public static Stream OpenFile(string filename)
+        {
+            return cascHandler.OpenFile(filename);
         }
 
         public static bool IsCASCInit { get { return fIsCASCInit; } }

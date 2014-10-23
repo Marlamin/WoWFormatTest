@@ -32,7 +32,7 @@ namespace WoWFormatLib.FileReaders
             if (!CASC.FileExists(filename.Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
             if (!CASC.FileExists(filename.Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; } 
 
-            var adt = File.Open(Path.Combine("data", filename), FileMode.Open);
+            var adt = CASC.OpenFile(filename);
 
             var bin = new BinaryReader(adt);
             BlizzHeader chunk = null;
@@ -78,12 +78,12 @@ namespace WoWFormatLib.FileReaders
             adt.Close();
 
             //OBJ1 and TEX1 are ignored atm
-            using (var adtobj0 = File.Open(Path.Combine("data", filename).Replace(".adt", "_obj0.adt"), FileMode.Open))
+            using (var adtobj0 = CASC.OpenFile(filename.Replace(".adt", "_obj0.adt")))
             {
                 ReadObjFile(filename, adtobj0, ref chunk);
             }
 
-            using (FileStream adttex0 = File.Open(Path.Combine("data", filename).Replace(".adt", "_tex0.adt"), FileMode.Open))
+            using (var adttex0 = CASC.OpenFile(filename.Replace(".adt", "_tex0.adt")))
             {
                 ReadTexFile(filename, adttex0, ref chunk);
             }
@@ -201,7 +201,7 @@ namespace WoWFormatLib.FileReaders
             var pad7 = bin.ReadUInt32();
         }
 
-        private void ReadObjFile(string filename, FileStream adtObjStream, ref BlizzHeader chunk)
+        private void ReadObjFile(string filename, Stream adtObjStream, ref BlizzHeader chunk)
         {
             var bin = new BinaryReader(adtObjStream);
             long position = 0;
@@ -226,7 +226,7 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadTexFile(string filename, FileStream adtTexStream, ref BlizzHeader chunk)
+        private void ReadTexFile(string filename, Stream adtTexStream, ref BlizzHeader chunk)
         {
             var bin = new BinaryReader(adtTexStream);
             long position = 0;

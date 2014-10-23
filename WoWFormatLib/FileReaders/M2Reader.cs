@@ -24,9 +24,8 @@ namespace WoWFormatLib.FileReaders
                 return;
             }
 
-            string fullPath = Path.Combine("data", filename);
+            Stream m2 = CASC.OpenFile(filename);
 
-            FileStream m2 = File.Open(fullPath, FileMode.Open);
             BinaryReader bin = new BinaryReader(m2);
 
             var header = new string(bin.ReadChars(4));

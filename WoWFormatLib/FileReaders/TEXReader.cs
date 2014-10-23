@@ -15,7 +15,7 @@ namespace WoWFormatLib.FileReaders
         {
             if (CASC.FileExists(filename))
             {
-                using (FileStream tex = File.Open(Path.Combine("data", filename), FileMode.Open))
+                using (Stream tex = CASC.OpenFile(filename))
                 {
                     ReadTEX(filename, tex);
                 }
@@ -27,7 +27,7 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadTEX(string filename, FileStream tex)
+        private void ReadTEX(string filename, Stream tex)
         {
             var bin = new BinaryReader(tex);
             BlizzHeader chunk;

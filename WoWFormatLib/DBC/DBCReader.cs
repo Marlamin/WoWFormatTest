@@ -36,7 +36,7 @@ namespace WoWFormatLib.DBC
                 return;
             }
 
-            using (var reader = new BinaryReader(new FileStream(Path.Combine("data", filename), FileMode.Open), Encoding.UTF8))
+            using (var reader = new BinaryReader(CASC.OpenFile(filename)))
             {
                 if (reader.BaseStream.Length < headerSize)
                 {

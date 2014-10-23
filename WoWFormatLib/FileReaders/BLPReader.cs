@@ -32,7 +32,7 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                using (var blp = new BlpFile(File.Open(Path.Combine("data", filename), FileMode.Open)))
+                using (var blp = new BlpFile(CASC.OpenFile(filename)))
                 {
                     bmp = blp.GetBitmap(0);
                 }

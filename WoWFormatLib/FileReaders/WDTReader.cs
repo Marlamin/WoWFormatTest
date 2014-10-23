@@ -24,7 +24,7 @@ namespace WoWFormatLib.FileReaders
             tiles = new List<int[]>();
             if (CASC.FileExists(filename))
             {
-                using (FileStream tex = File.Open(Path.Combine("data", filename), FileMode.Open))
+                using (Stream tex = CASC.OpenFile(filename))
                 {
                     ReadWDT(filename, tex);
                 }
@@ -88,7 +88,7 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadWDT(string filename, FileStream wdt)
+        private void ReadWDT(string filename, Stream wdt)
         {
             filename = Path.ChangeExtension(filename, "WDT");
             var bin = new BinaryReader(wdt);

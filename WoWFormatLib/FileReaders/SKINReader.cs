@@ -22,10 +22,7 @@ namespace WoWFormatLib.FileReaders
                 new WoWFormatLib.Utils.MissingFile(filename);
             }
 
-            string fullpath = Path.Combine("data", filename);
-
-            FileStream stream = File.Open(fullpath, FileMode.Open);
-            BinaryReader bin = new BinaryReader(stream);
+            BinaryReader bin = new BinaryReader(CASC.OpenFile(filename));
 
             var header = new string(bin.ReadChars(4));
             if (header != "SKIN")
@@ -52,7 +49,7 @@ namespace WoWFormatLib.FileReaders
             skin.submeshes = ReadSubmeshes(nSubmeshes, ofsSubmeshes, bin);
             skin.textureunit = ReadTextureUnits(nTextureUnits, ofsTextureUnits, bin);
 
-            stream.Close();
+            bin.Close();
         }
 
         private Indice[] ReadIndices(uint nIndices, uint ofsIndices, BinaryReader bin)
