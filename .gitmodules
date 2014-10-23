@@ -1,0 +1,4 @@
+[submodule "CASCExplorer"]
+	path = CASCExplorer
+	url = https://github.com/WoW-Tools/CASCExplorer.git
+	branch = cli
