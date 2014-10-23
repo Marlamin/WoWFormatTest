@@ -53,7 +53,7 @@ namespace WoWFormatLib.Utils
             string[] linesplit;
             List<string> files = new List<String>();
 
-            System.IO.StreamReader file = new System.IO.StreamReader("data/signaturefile");
+            System.IO.StreamReader file = new System.IO.StreamReader(CASC.OpenFile("signaturefile"));
             DBCReader<FileDataRecord> filedatareader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
 
             for (int i = 0; i < filedatareader.recordCount; i++)
