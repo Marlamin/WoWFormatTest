@@ -175,10 +175,11 @@ namespace WoWOpenGL
             fCancelMapLoading = true;
             string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
             Console.WriteLine("Detected mouse event on " + name + "!");
-            
-            var rw = new RenderWindow(name);
-            rw.Show();
-            //this.Hide();
+
+            using (TerrainWindow tw = new TerrainWindow(name))
+            {
+                tw.Run(30.0, 60.0);
+            }
         }
 
         /* MODEL STUFF */
