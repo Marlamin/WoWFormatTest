@@ -8,7 +8,7 @@ Built for (latest) Warlords of Draenor files. Backwards compatibility with Mists
 MPQ support is currently not planned. Very basic support for the new CASC file format introduced in Warlords of Draenor is present. It can only download content from Blizzard's servers, not load storages already present on HDD (yet).
 
 ## Configuration
-Should be no configuration necessary at the time of writing. 
+If you have World of Warcraft (6.0 or higher) fully installed you can use your installed data instead of falling back to downloading stuff. To set this up, simply change the basedir setting in WoWOpenGL.exe.config to the directory that contains WoW.exe.
 
 ## Requirements
 - [OpenTK](http://www.opentk.com/) (recent version already included)

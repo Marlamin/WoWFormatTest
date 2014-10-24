@@ -274,7 +274,15 @@ namespace WoWOpenGL
             CASCprogress.Visibility = System.Windows.Visibility.Visible;
             FilterBox.Visibility = System.Windows.Visibility.Hidden;
 
-            bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction));
+            if (ConfigurationManager.AppSettings["basedir"] != "" && Directory.Exists(ConfigurationManager.AppSettings["basedir"]))
+            {
+                bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction, ConfigurationManager.AppSettings["basedir"]));
+            }
+            else
+            {
+                bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction));
+            }
+            
             bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
 
             try
