@@ -20,6 +20,8 @@ namespace WoWOpenGL
         private static float dragZ;
         private static float angle;
 
+        private uint[] VBOid;
+
         Camera ActiveCamera;
 
         public TerrainWindow(string modelPath)
@@ -77,19 +79,65 @@ namespace WoWOpenGL
 
         }
 
-        private void LoadADT(string map, string x, string y)
+        private void LoadADT(string map, string xx, string yy)
         {
+            throw new NotImplementedException();
             ADTReader reader = new ADTReader();
-            reader.LoadADT("World/Maps/" + map + "/" + map + "_" + x + "_" + y + ".adt");
+            reader.LoadADT("World/Maps/" + map + "/" + map + "_" + xx + "_" + yy + ".adt");
 
             float TileSize = 1600.0f / 3.0f;
             float ChunkSize = TileSize / 16.0f;
             float UnitSize = ChunkSize / 8.0f;
-            
-            for (int i = 0; i < reader.adtfile.chunks.Count(); i++)
+
+            VBOid = new uint[2];
+            GL.GenBuffers(2, VBOid);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
+
+            GL.EnableClientState(ArrayCap.VertexArray);
+            //GL.EnableClientState(ArrayCap.NormalArray);
+
+            for (int c = 0; c < reader.adtfile.chunks.Count(); c++)
             {
-                Console.WriteLine("Reading ADT chunk " + i);
-            } 
+                Console.WriteLine("Reading ADT chunk " + c);
+                Console.WriteLine("ADT is at position " + reader.adtfile.chunks[c].header.position.ToString());
+                Console.WriteLine("ADT has " + reader.adtfile.chunks[c].vertices.vertices.Count() + " vertices!");
+
+                Vertex[] vertices = new Vertex[145];
+
+                int vindex = 0;
+                for (int i = 0; i < 17; i++)
+                {
+                    for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
+                    {
+                        var v = new Vertex();
+                        v.Position = new Vector3(0, 0, 0);
+
+                        if ((i % 2) != 0) v.Position.X += 0.5f * UnitSize;
+                        vertices[vindex++] = v;
+                    }
+                }
+
+                List<uint> indicelist = new List<uint>();
+                /*
+                for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
+                {
+                    indicelist.Add(reader.model.skins[0].triangles[i].pt1);
+                    indicelist.Add(reader.model.skins[0].triangles[i].pt2);
+                }
+                */
+                uint[] indices = indicelist.ToArray();
+
+            }
+            /*
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 3 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
+            */
+
         }
 
         protected override void OnLoad(EventArgs e)
@@ -152,7 +200,13 @@ namespace WoWOpenGL
             Dispose();
             base.OnUnload(e);
             System.Windows.Application.Current.Shutdown();
-            
+        }
+
+        private struct Vertex
+        {
+            public Vector3 Position;
+            public Vector3 Normal;
+            public Vector2 TexCoord;
         }
     }
 }
