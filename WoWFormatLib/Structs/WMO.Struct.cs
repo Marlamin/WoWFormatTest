@@ -131,7 +131,7 @@ namespace WoWFormatLib.Structs.WMO
         public MOVI[] indices;
         public MOVT[] vertices;
         public MONR[] normals;
-        public MOTV[] textureCoords;
+        public MOTV[][] textureCoords;
         public MOBA[] renderBatches;
     }
 

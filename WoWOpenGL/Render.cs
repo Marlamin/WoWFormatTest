@@ -321,7 +321,7 @@ namespace WoWOpenGL
                 {
                     vertices[i].Position = new Vector3(reader.wmofile.group[g].mogp.vertices[i].vector.X, reader.wmofile.group[g].mogp.vertices[i].vector.Z, reader.wmofile.group[g].mogp.vertices[i].vector.Y);
                     vertices[i].Normal = new Vector3(reader.wmofile.group[g].mogp.normals[i].normal.X, reader.wmofile.group[g].mogp.normals[i].normal.Z, reader.wmofile.group[g].mogp.normals[i].normal.Y);
-                    vertices[i].TexCoord = new Vector2(reader.wmofile.group[g].mogp.textureCoords[i].X, reader.wmofile.group[g].mogp.textureCoords[i].Y);
+                    vertices[i].TexCoord = new Vector2(reader.wmofile.group[g].mogp.textureCoords[0][i].X, reader.wmofile.group[g].mogp.textureCoords[0][i].Y);
                 }
 
                 //Push to buffer

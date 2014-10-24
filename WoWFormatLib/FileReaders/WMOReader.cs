@@ -124,6 +124,8 @@ namespace WoWFormatLib.FileReaders
             var subbin = new BinaryReader(stream);
             BlizzHeader subchunk;
             long position = 0;
+            int MOTVi = 0;
+            mogp.textureCoords = new MOTV[2][];
 
             while (position < stream.Length)
             {
@@ -144,7 +146,7 @@ namespace WoWFormatLib.FileReaders
                         break;
 
                     case "MOTV": //Texture coordinates
-                        mogp.textureCoords = ReadMOTVChunk(subchunk, subbin);
+                        mogp.textureCoords[MOTVi++] = ReadMOTVChunk(subchunk, subbin);
                         break;
 
                     case "MONR": //Normals
