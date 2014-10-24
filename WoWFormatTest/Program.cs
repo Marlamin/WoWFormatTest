@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using WoWFormatLib.DBC;
 using WoWFormatLib.FileReaders;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib
 {
@@ -11,12 +12,12 @@ namespace WoWFormatLib
     {
         private static void LoadAllMaps(string basedir)
         {
-            var reader = new MapReader(basedir);
-            Dictionary<int, string> maps = reader.GetMaps();
-            foreach (KeyValuePair<int, string> map in maps)
-            {
-                LoadMap(map.Value, basedir);
-            }
+            //var reader = new MapReader(basedir);
+           // Dictionary<int, string> maps = reader.GetMaps();
+           // foreach (KeyValuePair<int, string> map in maps)
+          //  {
+            //    LoadMap(map.Value, basedir);
+            //}
         }
 
         private static void LoadFromListfile(string listfile, string basedir)
@@ -27,28 +28,28 @@ namespace WoWFormatLib
             {
                 if (line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
                 {
-                    M2Reader reader = new M2Reader(basedir);
-                    reader.LoadM2(line);
+                    //M2Reader reader = new M2Reader(basedir);
+                    //reader.LoadM2(line);
                 }
                 else if (line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase))
                 {
-                    WMOReader reader = new WMOReader(basedir);
-                    reader.LoadWMO(line);
+                    //WMOReader reader = new WMOReader(basedir);
+                    //reader.LoadWMO(line);
                 }
                 else if (line.EndsWith(".wdt", StringComparison.OrdinalIgnoreCase))
                 {
-                    WDTReader reader = new WDTReader(basedir);
-                    reader.LoadWDT(line);
+                    //WDTReader reader = new WDTReader(basedir);
+                    //reader.LoadWDT(line);
                 }
                 else if (line.EndsWith(".tex", StringComparison.OrdinalIgnoreCase))
                 {
-                    TEXReader reader = new TEXReader(basedir);
-                    reader.LoadTEX(line);
+                    //TEXReader reader = new TEXReader(basedir);
+                    //reader.LoadTEX(line);
                 }
                 else if (line.EndsWith(".wdl", StringComparison.OrdinalIgnoreCase))
                 {
-                    WDLReader reader = new WDLReader(basedir);
-                    reader.LoadWDL(line);
+                    //WDLReader reader = new WDLReader(basedir);
+                    //reader.LoadWDL(line);
                 }
                 else if (
                     line.EndsWith(".blp", StringComparison.OrdinalIgnoreCase) || //Useless to read out for now
@@ -98,8 +99,8 @@ namespace WoWFormatLib
             if (File.Exists(Path.Combine(basedir, "World\\Maps\\", map, map + ".wdt")))
             {
                 Console.WriteLine("Loading " + map + "...");
-                var wdtreader = new WDTReader(basedir);
-                wdtreader.LoadWDT(map);
+               // var wdtreader = new WDTReader(basedir);
+               // wdtreader.LoadWDT(map);
             }
             else
             {
@@ -109,12 +110,17 @@ namespace WoWFormatLib
 
         private static void Main(string[] args)
         {
-            string basedir = ConfigurationManager.AppSettings["basedir"];
+            //string basedir = ConfigurationManager.AppSettings["basedir"];
             //LoadAllMaps(basedir);
-
             //LoadFromListfile("C:\\WoD\\18663listfile.txt", basedir);
-            var wdtreader = new WDTReader(basedir);
-            wdtreader.LoadWDT(@"World\Maps\BlackrockFoundryTrainDepot\BlackrockFoundryTrainDepot.wdt");
+            //var wdtreader = new WDTReader(basedir);
+            //wdtreader.LoadWDT(@"World\Maps\BlackrockFoundryTrainDepot\BlackrockFoundryTrainDepot.wdt");
+
+            CASC.InitCasc();
+            Console.WriteLine("CASC loaded!");
+            var adtreader = new ADTReader();
+            adtreader.LoadADT("World\\Maps\\Kalimdor\\Kalimdor_36_17.adt");
+            Console.WriteLine("DONE!");
         }
     }
 }

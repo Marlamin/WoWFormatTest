@@ -37,6 +37,8 @@ namespace WoWFormatLib.FileReaders
             var bin = new BinaryReader(adt);
             BlizzHeader chunk = null;
             long position = 0;
+            int MCNKi = 0;
+            adtfile.chunks = new MCNK[16 * 16];
             while (position < adt.Length)
             {
                 adt.Position = position;
@@ -58,10 +60,11 @@ namespace WoWFormatLib.FileReaders
                         }
                         continue;
                     case "MCNK":
-                        ReadMCNKChunk(chunk, bin);
+                        adtfile.chunks[MCNKi] = ReadMCNKChunk(chunk, bin);
+                        MCNKi++;
                         continue;
                     case "MHDR":
-                        ReadMHDRChunk(chunk, bin);
+                        adtfile.header = ReadMHDRChunk(chunk, bin);
                         continue;
                     case "MH2O":
                     case "MFBO":
@@ -89,15 +92,20 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
+        public MCNK ReadMCNKChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //256 of these chunks per file
-            
-            //Read header
-
-            //MCVT subchunk has 145 floats
-            MCNK mcnk = bin.Read<MCNK>();
-            
+            MCNK mapchunk = new MCNK();
+            mapchunk.header = bin.Read<MCNKheader>();
+            bin.ReadBytes(8); //read chunk beginning
+            MCVT vtchunk = new MCVT();
+            vtchunk.vertices = new Vertice[145];
+            for (int i = 0; i < 145; i++)
+            {
+                vtchunk.vertices[i] = bin.Read<Vertice>();
+            }
+            mapchunk.vertices = vtchunk;
+            return mapchunk;
         }
 
         public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)
@@ -181,24 +189,9 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadMHDRChunk(BlizzHeader chunk, BinaryReader bin)
+        private MHDR ReadMHDRChunk(BlizzHeader chunk, BinaryReader bin)
         {
-            var pad = bin.ReadUInt32();
-            var offsInfo = bin.ReadUInt32();
-            var offsTex = bin.ReadUInt32();
-            var offsModels = bin.ReadUInt32();
-            var offsModelsIds = bin.ReadUInt32();
-            var offsMapObejcts = bin.ReadUInt32();
-            var offsMapObejctsIds = bin.ReadUInt32();
-            var offsDoodsDef = bin.ReadUInt32();
-            var offsObjectsDef = bin.ReadUInt32();
-            var pad1 = bin.ReadUInt32();
-            var pad2 = bin.ReadUInt32();
-            var pad3 = bin.ReadUInt32();
-            var pad4 = bin.ReadUInt32();
-            var pad5 = bin.ReadUInt32();
-            var pad6 = bin.ReadUInt32();
-            var pad7 = bin.ReadUInt32();
+            return bin.Read<MHDR>();
         }
 
         private void ReadObjFile(string filename, Stream adtObjStream, ref BlizzHeader chunk)

@@ -6,7 +6,6 @@ namespace WoWFormatLib.Structs.ADT
         public uint version;
         public MHDR header;
         public MCNK[] chunks;
-        public MCVT[] vertices;
     }
 
     public enum MHDRFlags{
@@ -34,7 +33,7 @@ namespace WoWFormatLib.Structs.ADT
         public uint unk4;
     }
 
-    public struct MCNK
+    public struct MCNKheader
     {
         public uint flags;
         public uint indexX;
@@ -52,7 +51,14 @@ namespace WoWFormatLib.Structs.ADT
         public uint areaID;
         public uint nMapObjRefs;
         public uint holes;
-        public unsafe fixed short lowQualityTexturingMap[8];
+        public short lowQualityTexturingMap_0;
+        public short lowQualityTexturingMap_1;
+        public short lowQualityTexturingMap_2;
+        public short lowQualityTexturingMap_3;
+        public short lowQualityTexturingMap_4;
+        public short lowQualityTexturingMap_5;
+        public short lowQualityTexturingMap_6;
+        public short lowQualityTexturingMap_7;
         public uint predTex;
         public uint noEffectDoodad;
         public uint ofsMCSE;
@@ -65,9 +71,22 @@ namespace WoWFormatLib.Structs.ADT
         public uint unused;
     }
 
+    public struct MCNK
+    {
+        public MCNKheader header;
+        public MCVT vertices;
+        public MCNR normals;
+        public MCLV colors;
+        public MCCV vertexshading;
+    }
     public struct MCVT
     {
-        public unsafe fixed float vertice[145];
+        public Vertice[] vertices;
+    }
+
+    public struct Vertice
+    {
+        public float vt;
     }
 
     public struct MCLV

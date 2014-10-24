@@ -81,7 +81,15 @@ namespace WoWOpenGL
         {
             ADTReader reader = new ADTReader();
             reader.LoadADT("World/Maps/" + map + "/" + map + "_" + x + "_" + y + ".adt");
+
+            float TileSize = 1600.0f / 3.0f;
+            float ChunkSize = TileSize / 16.0f;
+            float UnitSize = ChunkSize / 8.0f;
             
+            for (int i = 0; i < reader.adtfile.chunks.Count(); i++)
+            {
+                Console.WriteLine("Reading ADT chunk " + i);
+            } 
         }
 
         protected override void OnLoad(EventArgs e)
@@ -141,8 +149,10 @@ namespace WoWOpenGL
 
         protected override void OnUnload(EventArgs e)
         {
-            System.Windows.Application.Current.Shutdown();
+            Dispose();
             base.OnUnload(e);
+            System.Windows.Application.Current.Shutdown();
+            
         }
     }
 }
