@@ -119,7 +119,7 @@ namespace WoWFormatLib.DBC
                             throw new Exception("Incorrect DB2 struct!");
 
                         // struct smaller than record size (imcomplete)
-                        Console.WriteLine("Remaining data in row!");
+                        //Console.WriteLine("Remaining data in row!");
                         int remaining = recordSize - (int)(reader.BaseStream.Position - rowStart);
                         reader.ReadBytes(remaining);
                     }

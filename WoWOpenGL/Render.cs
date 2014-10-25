@@ -120,7 +120,7 @@ namespace WoWOpenGL
 
         private void glControl_Load(object sender, EventArgs e)
         {
-            DebugLog("Loading GLcontrol..");
+            Console.WriteLine("Loading GLcontrol..");
             glControl.MakeCurrent();
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
@@ -128,7 +128,7 @@ namespace WoWOpenGL
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             InitializeInputTick();
             ActiveCamera.setupGLRenderMatrix();
-            DebugLog("GLcontrol is done loading!");
+            Console.WriteLine("GLcontrol is done loading!");
 
         }
 
@@ -138,7 +138,7 @@ namespace WoWOpenGL
 
         private void LoadM2(string modelpath)
         {
-            DebugLog("Loading M2 file ("+modelpath+")..");
+            Console.WriteLine("Loading M2 file ("+modelpath+")..");
             M2Reader reader = new M2Reader();
 
             string filename = modelpath;
@@ -179,17 +179,17 @@ namespace WoWOpenGL
             GL.Enable(EnableCap.Texture2D);
 
             materials = new Material[reader.model.textures.Count()];
-            DebugLog("Loading textures..");
+            Console.WriteLine("Loading textures..");
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
-                DebugLog("Loading texture " + i);
+                Console.WriteLine("Loading texture " + i);
                 string texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
                 materials[i].flags = reader.model.textures[i].flags;
-                DebugLog("      Requires type " + reader.model.textures[i].type + " texture");
+                Console.WriteLine("      Requires type " + reader.model.textures[i].type + " texture");
                 switch (reader.model.textures[i].type)
                 {
                     case 0:
-                        DebugLog("      Texture given in file!");
+                        Console.WriteLine("      Texture given in file!");
                         texturefilename = reader.model.textures[i].filename;
                         break;
                     case 1:
@@ -199,18 +199,18 @@ namespace WoWOpenGL
                         }
                         else
                         {
-                            DebugLog("      No type 1 texture found, falling back to placeholder texture");
+                            Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
                         }
                         break;
                     case 2:
                         if (WoWFormatLib.Utils.CASC.FileExists(Path.ChangeExtension(modelpath, ".blp")))
                         {
-                            DebugLog("      BLP exists!");
+                            Console.WriteLine("      BLP exists!");
                             texturefilename = Path.ChangeExtension(modelpath, ".blp");
                         }
                         else
                         {
-                            DebugLog("      Type 2 does not exist!");
+                            Console.WriteLine("      Type 2 does not exist!");
                             //needs lookup?
                         }
                         break;
@@ -222,7 +222,7 @@ namespace WoWOpenGL
                         }
                         break;
                     default:
-                        DebugLog("      Falling back to placeholder texture");
+                        Console.WriteLine("      Falling back to placeholder texture");
                         break;
                 }
 
@@ -249,7 +249,7 @@ namespace WoWOpenGL
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
                     GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
                     //Console.WriteLine(blp.bmp.PixelFormat);
-                    DebugLog("Created texture \"" + texturefilename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
+                    Console.WriteLine("Created texture \"" + texturefilename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
                     blp.bmp.UnlockBits(bmp_data);
                 }
             }
@@ -266,7 +266,7 @@ namespace WoWOpenGL
                         }
                     }
 
-                    DebugLog("Loading submesh " + reader.model.skins[0].submeshes[i].submeshID + "("+ reader.model.skins[0].submeshes[i].unk2 + ")");
+                    Console.WriteLine("Loading submesh " + reader.model.skins[0].submeshes[i].submeshID + "("+ reader.model.skins[0].submeshes[i].unk2 + ")");
                 }
                 
                 renderbatches[i].firstFace = reader.model.skins[0].submeshes[i].startTriangle;
@@ -283,17 +283,17 @@ namespace WoWOpenGL
                     }
                 }
             }
-            DebugLog("  " + reader.model.skins.Count() + " skins");
-            DebugLog("  " + renderbatches.Count() + " renderbatches");
-            DebugLog("  " + reader.model.vertices.Count() + " vertices");
-            DebugLog("Done loading M2 file!");
+            Console.WriteLine("  " + reader.model.skins.Count() + " skins");
+            Console.WriteLine("  " + renderbatches.Count() + " renderbatches");
+            Console.WriteLine("  " + reader.model.vertices.Count() + " vertices");
+            Console.WriteLine("Done loading M2 file!");
             
             gLoaded = true;
         }
 
         private void LoadWMO(string modelpath)
         {
-            DebugLog("Loading WMO file..");
+            Console.WriteLine("Loading WMO file..");
             WMOReader reader = new WMOReader();
             string filename = modelpath;
             //Load WMO
@@ -370,7 +370,7 @@ namespace WoWOpenGL
                             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
                             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 
-                            DebugLog("Created texture \"" + reader.wmofile.textures[ti].filename + "\" (ID "+materials[i].textureID+") of " + bmp_data.Width + "x" + bmp_data.Height);
+                            Console.WriteLine("Created texture \"" + reader.wmofile.textures[ti].filename + "\" (ID "+materials[i].textureID+") of " + bmp_data.Width + "x" + bmp_data.Height);
                             blp.bmp.UnlockBits(bmp_data);
                         }
                         materials[i].filename = reader.wmofile.textures[ti].filename;
@@ -404,11 +404,11 @@ namespace WoWOpenGL
                 }
             }
 
-            DebugLog("  " + reader.wmofile.group.Count() + " skins");
-            DebugLog("  " + materials.Count() + " materials");
-            DebugLog("  " + renderbatches.Count() + " renderbatches");
-            DebugLog("  " + reader.wmofile.group[0].mogp.vertices.Count() + " vertices");
-            DebugLog("Done loading WMO file!");
+            Console.WriteLine("  " + reader.wmofile.group.Count() + " skins");
+            Console.WriteLine("  " + materials.Count() + " materials");
+            Console.WriteLine("  " + renderbatches.Count() + " renderbatches");
+            Console.WriteLine("  " + reader.wmofile.group[0].mogp.vertices.Count() + " vertices");
+            Console.WriteLine("Done loading WMO file!");
             
             gLoaded = true;
             isWMO = true;
@@ -498,7 +498,7 @@ namespace WoWOpenGL
                 }
                 else
                 {
-                    //DebugLog("Switching to buffer " + renderbatches[i].groupID * 2);
+                    //Console.WriteLine("Switching to buffer " + renderbatches[i].groupID * 2);
                     GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[renderbatches[i].groupID * 2]);
                     GL.VertexPointer(3, VertexPointerType.Float, 32, 0);
                     GL.NormalPointer(NormalPointerType.Float, 32, 12);
@@ -508,7 +508,7 @@ namespace WoWOpenGL
                 
                 if (renderbatches[i].materialID > materials.Count() - 1) //temp hackfix
                 {
-                    DebugLog("[ERROR] Material ID encountered which is lower than material count!!!");
+                    Console.WriteLine("[ERROR] Material ID encountered which is lower than material count!!!");
                     //continue;
                 }
                 else
@@ -559,7 +559,7 @@ namespace WoWOpenGL
                 GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, (renderbatches[i].firstFace + renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(renderbatches[i].firstFace * 4));
                 if (GL.GetError().ToString() != "NoError")
                 {
-                    DebugLog(GL.GetError().ToString());
+                    Console.WriteLine(GL.GetError().ToString());
                 }
             }
 
@@ -589,13 +589,6 @@ namespace WoWOpenGL
             public string filename;
             public WoWFormatLib.Structs.M2.TextureFlags flags;
             public int textureID;
-        }
-
-        public void DebugLog(string log)
-        {
-            MainWindow.curlogentry = MainWindow.curlogentry + 1;
-            MainWindow.debugList.Items.Add("[" + MainWindow.curlogentry + "] " + log);
-            MainWindow.debugList.ScrollIntoView(MainWindow.debugList.Items[MainWindow.debugList.Items.Count - 1]);
         }
     }
 }

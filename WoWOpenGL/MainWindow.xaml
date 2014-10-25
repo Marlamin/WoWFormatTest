@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:WF="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:GL="clr-namespace:OpenTK;assembly=OpenTK.GLControl"
-        Title="WoW Format Test UI (OpenGL)" Height="931.5" Width="1422.5" Background="White" ResizeMode="CanMinimize"
+        Title="WoW Format Test UI (OpenGL)" Height="931.5" Width="1086.5" Background="White" ResizeMode="CanMinimize"
         Loaded="Window_Loaded"
         Closed="Window_Closed">
 
@@ -36,17 +36,7 @@
                     <RadioButton x:Name="rbSortName" Content="Sort by Name" HorizontalAlignment="Left" Margin="44.5,793,0,0" VerticalAlignment="Top" GroupName="MapListSort" Checked="rbSortName_Checked" Grid.Column="1" />
                 </Grid>
             </TabItem>
+
         </TabControl>
-        <Grid HorizontalAlignment="Left" Height="878" Margin="1065,10,0,0" VerticalAlignment="Top" Width="337" RenderTransformOrigin="0.28,0.36">
-            <ListBox HorizontalAlignment="Left" Height="868" Margin="3,0,0,0" VerticalAlignment="Top" Width="334">
-                <ListView x:Name="DebugListBox" Height="858" Width="315" FontSize="8">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </ListBox>
-        </Grid>
     </Grid>
 </Window>

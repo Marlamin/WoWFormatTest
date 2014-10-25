@@ -22,6 +22,8 @@ namespace WoWOpenGL
 
         private uint[] VBOid;
 
+        private uint[] indices;
+
         Camera ActiveCamera;
 
         public TerrainWindow(string modelPath)
@@ -81,7 +83,7 @@ namespace WoWOpenGL
 
         private void LoadADT(string map, string xx, string yy)
         {
-            throw new NotImplementedException();
+   
             ADTReader reader = new ADTReader();
             reader.LoadADT("World/Maps/" + map + "/" + map + "_" + xx + "_" + yy + ".adt");
 
@@ -89,55 +91,81 @@ namespace WoWOpenGL
             float ChunkSize = TileSize / 16.0f;
             float UnitSize = ChunkSize / 8.0f;
 
+            GL.EnableClientState(ArrayCap.VertexArray);
+
             VBOid = new uint[2];
             GL.GenBuffers(2, VBOid);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
 
-            GL.EnableClientState(ArrayCap.VertexArray);
-            //GL.EnableClientState(ArrayCap.NormalArray);
+            List<Vector3> verticelist = new List<Vector3>();
+            List<uint> indicelist = new List<uint>();
 
             for (int c = 0; c < reader.adtfile.chunks.Count(); c++)
             {
-                Console.WriteLine("Reading ADT chunk " + c);
-                Console.WriteLine("ADT is at position " + reader.adtfile.chunks[c].header.position.ToString());
-                Console.WriteLine("ADT has " + reader.adtfile.chunks[c].vertices.vertices.Count() + " vertices!");
+                //Console.WriteLine("Reading ADT chunk " + c);
+                //Console.WriteLine("ADT is at position " + reader.adtfile.chunks[c].header.position.ToString());
+                //Console.WriteLine("ADT has " + reader.adtfile.chunks[c].vertices.vertices.Count() + " vertices!");
 
-                Vertex[] vertices = new Vertex[145];
-
-                int vindex = 0;
-                for (int i = 0; i < 17; i++)
+                for (int i = 0, idx = 0; i < 17; i++)
                 {
                     for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                     {
-                        var v = new Vertex();
-                        v.Position = new Vector3(0, 0, 0);
-
-                        if ((i % 2) != 0) v.Position.X += 0.5f * UnitSize;
-                        vertices[vindex++] = v;
+                        var v = new Vector3(j * UnitSize, i * UnitSize, reader.adtfile.chunks[c].vertices.vertices[idx]);
+                        if ((i % 2) != 0) v.X += 0.5f * UnitSize;
+                        verticelist.Add(v);
+                        idx++;
                     }
                 }
 
-                List<uint> indicelist = new List<uint>();
-                /*
-                for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
+                for (uint j = 9; j < 8 * 8 + 9 * 8; j++)
                 {
-                    indicelist.Add(reader.model.skins[0].triangles[i].pt1);
-                    indicelist.Add(reader.model.skins[0].triangles[i].pt2);
-                }
-                */
-                uint[] indices = indicelist.ToArray();
+                    //Triangle 1
+                    indicelist.Add(j);
+                    indicelist.Add(j - 9);
+                    indicelist.Add(j + 8);
+                    //Triangle 2
+                    indicelist.Add(j);
+                    indicelist.Add(j - 8);
+                    indicelist.Add(j - 9);
+                    //Triangle 3
+                    indicelist.Add(j);
+                    indicelist.Add(j + 9);
+                    indicelist.Add(j - 8);
+                    //Triangle 4
+                    indicelist.Add(j);
+                    indicelist.Add(j + 8);
+                    indicelist.Add(j + 9);
 
+                    if ((j + 1) % (9 + 8) == 0) j += 9;
+                }
             }
-            /*
+
+
+            Vector3[] vertices = verticelist.ToArray();
+            Console.WriteLine("Vertices in array: " + vertices.Count()); //37120, correct
+
+            indices = indicelist.ToArray();
+            Console.WriteLine("Indices in array: " + indices.Count()); //196608, should be 65.5k
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 3 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Count() * 3 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
-            */
 
+            int verticeBufferSize = 0;
+            int indiceBufferSize = 0;
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
+            GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out verticeBufferSize);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[1]);
+            GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out indiceBufferSize);
+
+            Console.WriteLine("Vertices in buffer: " + verticeBufferSize / 3 / sizeof(float));
+            Console.WriteLine("Indices in buffer: " + indiceBufferSize / sizeof(uint));
         }
 
         protected override void OnLoad(EventArgs e)
@@ -192,6 +220,15 @@ namespace WoWOpenGL
             GL.Rotate(angle, 0.0, 1.0, 0.0);
             DrawAxes();
 
+            GL.Enable(EnableCap.VertexArray);
+            GL.EnableClientState(ArrayCap.VertexArray);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
+            GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
+
+            GL.DrawElements(PrimitiveType.TriangleStrip, indices.Count(), DrawElementsType.UnsignedInt, new IntPtr(0));
+
             this.SwapBuffers();
         }
 
@@ -202,11 +239,31 @@ namespace WoWOpenGL
             System.Windows.Application.Current.Shutdown();
         }
 
-        private struct Vertex
+        public struct Triangle<T>
         {
-            public Vector3 Position;
-            public Vector3 Normal;
-            public Vector2 TexCoord;
+            public T V0;
+            public T V1;
+            public T V2;
+
+            public TriangleType Type;
+
+            public Triangle(TriangleType type, T v0, T v1, T v2)
+            {
+                V0 = v0;
+                V1 = v1;
+                V2 = v2;
+                Type = type;
+            }
         }
+
+        public enum TriangleType : byte
+        {
+            Unknown,
+            Terrain,
+            Water,
+            Doodad,
+            Wmo
+        }
+
     }
 }

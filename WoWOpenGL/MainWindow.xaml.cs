@@ -34,7 +34,6 @@ namespace WoWOpenGL
     {
         public static GLControl glc;
         public static System.Windows.Forms.Integration.WindowsFormsHost winFormControl;
-        public static ListView debugList;
         public static ProgressBar cascProgressBar;
         public static Label cascProgressDesc;
         private volatile bool fCancelMapLoading = false;
@@ -255,7 +254,7 @@ namespace WoWOpenGL
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            debugList = DebugListBox;
+            
             winFormControl = wfContainer;
             cascProgressBar = CASCprogress;
             cascProgressDesc = CASCdesc;
@@ -268,6 +267,7 @@ namespace WoWOpenGL
 
         private async void SwitchToCASC()
         {
+            Console.WriteLine("Intializing CASC filesystem..");
             ModelListBox.Visibility = System.Windows.Visibility.Hidden;
             contentTypeLoading.Visibility = System.Windows.Visibility.Visible;
             CASCdesc.Visibility = System.Windows.Visibility.Visible;
@@ -293,12 +293,13 @@ namespace WoWOpenGL
             {
 
             }
-
+            Console.WriteLine("CASC filesystem initialized.");
+            Console.WriteLine("Generating listfile..");
             List<string> files = new List<String>();
             models = CASC.GenerateListfile();
             ModelListBox.DataContext = models;
             ModelListBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
-
+            Console.WriteLine("Listfile generated!");
             CASCinitialized = true;
             FilterBox.Visibility = System.Windows.Visibility.Visible;
             CASCdesc.Visibility = System.Windows.Visibility.Hidden;
