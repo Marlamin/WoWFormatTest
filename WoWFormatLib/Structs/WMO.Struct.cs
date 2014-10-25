@@ -56,8 +56,8 @@ namespace WoWFormatLib.Structs.WMO
         public uint texture3;
         public uint color3;
         public uint flags3;
-        //public unsafe fixed uint unk[3];
-        //public unsafe fixed uint runTimeData[4];
+        //public nsafe fixed uint unk[3];
+        //public nsafe fixed uint runTimeData[4];
     }
 
     //Group names
@@ -121,7 +121,10 @@ namespace WoWFormatLib.Structs.WMO
         public ushort numBatchesA;
         public ushort numBatchesB;
         public uint numBatchesC; //WoWDev: For the "Number of batches" fields, A + B + C == the total number of batches in the WMO/v17 group (in the MOBA chunk).
-        public unsafe fixed byte fogIndices[4];
+        public byte fogIndices_0;
+        public byte fogIndices_1;
+        public byte fogIndices_2;
+        public byte fogIndices_3;
         public uint liquidType;
         public uint groupID;
         public uint unk0;

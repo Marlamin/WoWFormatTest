@@ -99,10 +99,10 @@ namespace WoWFormatLib.FileReaders
             mapchunk.header = bin.Read<MCNKheader>();
             bin.ReadBytes(8); //read chunk beginning
             MCVT vtchunk = new MCVT();
-            vtchunk.vertices = new Vertice[145];
+            vtchunk.vertices = new float[145];
             for (int i = 0; i < 145; i++)
             {
-                vtchunk.vertices[i] = bin.Read<Vertice>();
+                vtchunk.vertices[i] = bin.ReadSingle();
             }
             mapchunk.vertices = vtchunk;
             return mapchunk;

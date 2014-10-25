@@ -81,17 +81,12 @@ namespace WoWFormatLib.Structs.ADT
     }
     public struct MCVT
     {
-        public Vertice[] vertices;
-    }
-
-    public struct Vertice
-    {
-        public float vt;
+        public float[] vertices; //make manually, 145
     }
 
     public struct MCLV
     {
-        public unsafe fixed ushort color[145];
+        public ushort[] color; //make manually, 145
     }
     public struct MCCV
     {
@@ -99,11 +94,14 @@ namespace WoWFormatLib.Structs.ADT
         public byte green;
         public byte blue;
         public byte alpha;
-    } //times 145
+    }
 
     public struct MCNR
     {
-        public unsafe fixed short normal[3];
+        public short normal_0;
+        public short normal_1;
+        public short normal_2;
+        //has entries too
     }
 
 }

@@ -28,7 +28,10 @@ namespace WoWFormatLib.Structs.SKIN
 
     public struct Property
     {
-        public unsafe fixed byte properties[4];
+        public byte properties_0;
+        public byte properties_1;
+        public byte properties_2;
+        public byte properties_3;
     }
 
     public struct Submesh

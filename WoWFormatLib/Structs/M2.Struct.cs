@@ -102,7 +102,9 @@ namespace WoWFormatLib.Structs.M2
         public int boneId;
         public uint flags;
         public short parentBone;
-        private unsafe fixed ushort unk[3];
+        private ushort unk_0;
+        private ushort unk_1;
+        private ushort unk_2;
         public ABlock<Vector3> translation;
         public ABlock<Quaternion> rotation;
         public ABlock<Vector3> scale;
@@ -130,12 +132,19 @@ namespace WoWFormatLib.Structs.M2
     public struct Vertice
     {
         public Vector3 position;
-        public unsafe fixed byte boneWeight[4];
-        public unsafe fixed byte boneIndices[4];
+        public byte boneWeight_0;
+        public byte boneWeight_1;
+        public byte boneWeight_2;
+        public byte boneWeight_3;
+        public byte boneIndices_0;
+        public byte boneIndices_1;
+        public byte boneIndices_2;
+        public byte boneIndices_3;
         public Vector3 normal;
         public float textureCoordX;
         public float textureCoordY;
-        public unsafe fixed float unknown[2];
+        public float unk_0;
+        public float unk_1;
     }
 
     public struct AttachLookup
@@ -158,7 +167,9 @@ namespace WoWFormatLib.Structs.M2
 
     public struct BoundingTriangle
     {
-        public unsafe fixed ushort index[3];
+        public ushort index_0;
+        public ushort index_1;
+        public ushort index_2;
     }
 
     public struct Camera
@@ -181,12 +192,23 @@ namespace WoWFormatLib.Structs.M2
 
     public struct CameraPosition
     {
-        public unsafe fixed float CameraPos[9];
+        public float CameraPos_0;
+        public float CameraPos_1;
+        public float CameraPos_2;
+        public float CameraPos_3;
+        public float CameraPos_4;
+        public float CameraPos_5;
+        public float CameraPos_6;
+        public float CameraPos_7;
+        public float CameraPos_8;
     }
 
     public struct Event
     {
-        public unsafe fixed char identifier[4];
+        public char identifier_0;
+        public char identifier_1;
+        public char identifier_2;
+        public char identifier_3;
         public uint data;
         public uint bone;
         public Vector3 position;

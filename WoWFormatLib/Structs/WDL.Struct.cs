@@ -31,6 +31,6 @@ namespace WoWFormatLib.Structs.WDL
 
     public struct MAOF
     {
-        public unsafe fixed uint areaLowOffsets[4096];
+        public uint[] areaLowOffsets; //4096 entries, make manually
     }
 }
