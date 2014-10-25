@@ -312,6 +312,7 @@ namespace WoWOpenGL
 
             for (int g = 0; g < reader.wmofile.group.Count(); g++)
             {
+                if (reader.wmofile.group[g].mogp.vertices == null) { continue; }
                 //Switch to Vertex buffer
                 GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[g * 2]);
 
@@ -381,6 +382,7 @@ namespace WoWOpenGL
             //Get total amount of render batches
             for (int i = 0; i < reader.wmofile.group.Count(); i++)
             {
+                if (reader.wmofile.group[i].mogp.renderBatches == null) { continue; }
                 numRenderbatches = numRenderbatches + reader.wmofile.group[i].mogp.renderBatches.Count();
             }
 
@@ -390,6 +392,7 @@ namespace WoWOpenGL
             for (int g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 var group = reader.wmofile.group[g];
+                if (group.mogp.renderBatches == null) { continue; }
                 for (int i = 0; i < group.mogp.renderBatches.Count(); i++)
                 {
                     renderbatches[rb].firstFace = group.mogp.renderBatches[i].firstFace;
@@ -544,6 +547,8 @@ namespace WoWOpenGL
                         case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
                             GL.Enable(EnableCap.Blend);
                             GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                            break;
+                        case 7: //World\Expansion05\Doodads\Shadowmoon\Doodads\6FX_Fire_Grassline_Doodad_blue_LARGE.m2
                             break;
                         default:
                             throw new Exception("Unknown blend type " + renderbatches[i].blendType);
