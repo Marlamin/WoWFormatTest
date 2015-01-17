@@ -17,3 +17,5 @@ SharpDX
 SubMeshDump/*
 Packages/*
 WoWJsonDumper/*
+WoWOpenGL/Data/*
+WoWOpenGL/*.log

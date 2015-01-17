@@ -118,9 +118,10 @@ namespace WoWFormatLib
 
             CASC.InitCasc();
             Console.WriteLine("CASC loaded!");
-            var adtreader = new ADTReader();
-            adtreader.LoadADT("World\\Maps\\Kalimdor\\Kalimdor_36_17.adt");
+            var wdtreader = new WDTReader();
+            wdtreader.LoadWDT("World\\Maps\\EdgeOfRealityMount\\EdgeOfRealityMount.wdt");
             Console.WriteLine("DONE!");
+            Console.ReadLine();
         }
     }
 }

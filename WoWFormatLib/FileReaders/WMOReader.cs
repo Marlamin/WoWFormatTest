@@ -31,11 +31,12 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void ReadMODNChunk(BlizzHeader chunk, BinaryReader bin)
+        public MODN[] ReadMODNChunk(BlizzHeader chunk, BinaryReader bin, uint num)
         {
             //List of M2 filenames, but are still named after MDXs internally. Have to rename!
             var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
-
+            List<String> m2Files = new List<string>();
+            List<int> m2Offset = new List<int>();
             var str = new StringBuilder();
 
             for (var i = 0; i < m2FilesChunk.Length; i++)
@@ -44,9 +45,13 @@ namespace WoWFormatLib.FileReaders
                 {
                     if (str.Length > 1)
                     {
-                        //m2Files.Add(str.ToString());
-                        //var m2reader = new M2Reader();
-                        //m2reader.LoadM2(str.ToString());
+                        str.Replace("..", ".");
+                        m2Files.Add(str.ToString());
+                        m2Offset.Add(i - str.ToString().Length);
+                        if (!CASC.FileExists(str.ToString()))
+                        {
+                            new WoWFormatLib.Utils.MissingFile(str.ToString());
+                        }
                     }
                     str = new StringBuilder();
                 }
@@ -55,6 +60,15 @@ namespace WoWFormatLib.FileReaders
                     str.Append((char)m2FilesChunk[i]);
                 }
             }
+            if (num != m2Files.Count) { throw new Exception("nModels does not match doodad count");  }
+
+            var doodadNames = new MODN[num];
+            for (var i = 0; i < num; i++)
+            {
+                doodadNames[i].filename = m2Files[i];
+                doodadNames[i].startOffset = (uint)m2Offset[i];
+            }
+            return doodadNames;
         }
 
         public MOGI[] ReadMOGIChunk(BlizzHeader chunk, BinaryReader bin, uint num)
@@ -360,10 +374,15 @@ namespace WoWFormatLib.FileReaders
                     case "MOMT":
                         wmofile.materials = ReadMOMTChunk(chunk, bin, wmofile.header.nMaterials);
                         continue;
+                    case "MODN":
+                        wmofile.doodadNames = ReadMODNChunk(chunk, bin, wmofile.header.nModels);
+                        continue;
+                    case "MODD":
+                        //wmofile.doodadDefinitions = ReadMODDChunk(chunk, bin);
+                        continue;
                     case "MOGP":
                     //ReadMOGPChunk(chunk, bin);
                     //continue;
-                    case "MODN":
                     case "MOSB":
                     case "MOPV":
                     case "MOPT":
@@ -372,7 +391,7 @@ namespace WoWFormatLib.FileReaders
                     case "MOVB": //Visible block list
                     case "MOLT":
                     case "MODS":
-                    case "MODD":
+                    
                     case "MFOG":
                     case "MCVP":
                         continue;
@@ -401,6 +420,11 @@ namespace WoWFormatLib.FileReaders
             }
 
             wmofile.group = groupFiles;
+        }
+
+        private MODD[] ReadMODDChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            throw new NotImplementedException();
         }
 
         private WMOGroupFile ReadWMOGroupFile(string filename, Stream wmo)

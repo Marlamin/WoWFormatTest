@@ -19,9 +19,11 @@ If you have World of Warcraft (6.0 or higher) fully installed you can use your i
 Does parsing of WoW's raw data files and returns them in a object that other applications can use. Handles CASC (WoW's filesystem), file parsing, DBC reading.
 #### WoWOpenGL 
 After some issues and annoyances with DirectX I decided to switch over to OpenTK/OpenGL.
-#### WMOMapCompiler 
-Not important, but still developed as I will need it for my other projects soon.
-	
+#### MinimapCompiler 
+Compiles minimaps. Not important, but still developed as I will need it for my other projects soon.
+#### WDLtextopentk
+Making a color heightmap from a WDL file, code ported from Noggit to C#. Based on a simple OpenTK example.
+
 ### Test projects
 #### CASCtest 
 App used to test CASC (file system) related things.

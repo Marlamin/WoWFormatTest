@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WoWFormatLib.FileReaders;
 
-namespace WMOMapCompiler
+namespace MinimapCompiler
 {
     internal class WMO
     {
@@ -20,7 +20,7 @@ namespace WMOMapCompiler
 
         public void Compile(string wmoname)
         {
-            WMOReader wmoreader = new WMOReader(basedir);
+            WMOReader wmoreader = new WMOReader();
             wmoreader.LoadWMO(wmoname);
 
             WoWFormatLib.Structs.WMO.WMO wmo = wmoreader.wmofile;
@@ -191,7 +191,7 @@ namespace WMOMapCompiler
 
             if (min_x == 0 && max_x == 0 && min_y == 0 && max_y == 0)
             {
-                var blpreader = new BLPReader(basedir);
+                var blpreader = new BLPReader();
                 blpreader.LoadBLP(lastpath.Replace(basedir, ""));
                 res_x = blpreader.bmp.Width;
                 res_y = blpreader.bmp.Height;
@@ -211,7 +211,7 @@ namespace WMOMapCompiler
             {
                 x = int.Parse(path.Substring(path.Length - 9, 2));
                 y = int.Parse(path.Substring(path.Length - 6, 2));
-                var blpreader = new BLPReader(basedir);
+                var blpreader = new BLPReader();
                 blpreader.LoadBLP(path.Replace(basedir, ""));
                 //  Console.WriteLine("BLP Width: " + blpreader.bmp.Width);
                 //  Console.WriteLine("BLP Height: " + blpreader.bmp.Height);

@@ -9,6 +9,8 @@ namespace WoWFormatLib.Structs.WMO
         public MVER version;
         public MOTX[] textures;
         public MOMT[] materials;
+        public MODN[] doodadNames;
+        public MODD[] doodadDefinitions;
         public MOGN[] groupNames;
         public MOGI[] groupInfo;
         public WMOGroupFile[] group;
@@ -33,6 +35,21 @@ namespace WoWFormatLib.Structs.WMO
         public Vector3 boundingBox1;
         public Vector3 boundingBox2;
         public uint flags;
+    }
+
+    public struct MODN
+    {
+        public string filename;
+        public uint startOffset;
+    }
+
+    public struct MODD
+    {
+        public uint offset;
+        public Vector3 position;
+        public Quaternion rotation;
+        public float scale;
+        public uint color;
     }
 
     //Texture filenames

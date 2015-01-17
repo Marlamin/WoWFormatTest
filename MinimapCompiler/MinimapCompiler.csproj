@@ -7,8 +7,8 @@
     <ProjectGuid>{2E691D58-C03D-416A-A23E-16693862231D}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WMOMapCompiler</RootNamespace>
-    <AssemblyName>WMOMapCompiler</AssemblyName>
+    <RootNamespace>MinimapCompiler</RootNamespace>
+    <AssemblyName>MinimapCompiler</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

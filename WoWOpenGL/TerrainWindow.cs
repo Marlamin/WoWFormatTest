@@ -19,7 +19,7 @@ namespace WoWOpenGL
         private static float dragY;
         private static float dragZ;
         private static float angle;
-
+        private static float camSpeed = 0.025f;
         private uint[] VBOid;
 
         private uint[] indices;
@@ -112,15 +112,19 @@ namespace WoWOpenGL
                 {
                     for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                     {
-                        var v = new Vector3(j * UnitSize, i * UnitSize, reader.adtfile.chunks[c].vertices.vertices[idx]);
+                        var v = new Vector3(((c / 16) * ChunkSize) - (j * UnitSize), ((c % 16) * ChunkSize) - -(i * UnitSize * 0.5f), reader.adtfile.chunks[c].vertices.vertices[idx] + reader.adtfile.chunks[c].header.position.Z);
+                        //var v = new Vector3(j * UnitSize, i * UnitSize, reader.adtfile.chunks[c].vertices.vertices[idx]); 
                         if ((i % 2) != 0) v.X += 0.5f * UnitSize;
                         verticelist.Add(v);
+                        //Console.WriteLine(reader.adtfile.chunks[c].vertices.vertices[idx]);
                         idx++;
+                        
                     }
                 }
 
                 for (uint j = 9; j < 8 * 8 + 9 * 8; j++)
                 {
+
                     //Triangle 1
                     indicelist.Add(j);
                     indicelist.Add(j - 9);
@@ -147,7 +151,7 @@ namespace WoWOpenGL
             Console.WriteLine("Vertices in array: " + vertices.Count()); //37120, correct
 
             indices = indicelist.ToArray();
-            Console.WriteLine("Indices in array: " + indices.Count()); //196608, should be 65.5k
+            Console.WriteLine("Indices in array: " + indices.Count()); //196608, should be 65.5k which is 196608 / 3. in triangles so its correct?
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Count() * 3 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
@@ -188,24 +192,40 @@ namespace WoWOpenGL
             OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
             OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
 
+            if (keyboardState.IsKeyDown(Key.I))
+            {
+                Console.WriteLine("Camera position: " + ActiveCamera.Pos);
+                Console.WriteLine("Camera direction: " + ActiveCamera.Dir);
+            }
+
+            if (keyboardState.IsKeyDown(Key.O))
+            {
+                camSpeed = camSpeed + 0.025f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.P))
+            {
+                camSpeed = camSpeed - 0.025f;
+            }
+
             if (keyboardState.IsKeyDown(Key.Up))
             {
-                dragY = dragY + 0.01f;
+                dragY = dragY + camSpeed;
             }
 
             if (keyboardState.IsKeyDown(Key.Down))
             {
-                dragY = dragY - 0.01f;
+                dragY = dragY - camSpeed;
             }
 
             if (keyboardState.IsKeyDown(Key.Left))
             {
-                angle = angle + 1.0f;
+                dragX = dragX + camSpeed;
             }
 
             if (keyboardState.IsKeyDown(Key.Right))
             {
-                angle = angle - 1.0f;
+                dragX = dragX - camSpeed;
             }
 
             dragZ = (mouseState.WheelPrecise / 10) - 7.5f; //Startzoom is at -7.5f 
@@ -227,7 +247,7 @@ namespace WoWOpenGL
             GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
 
-            GL.DrawElements(PrimitiveType.TriangleStrip, indices.Count(), DrawElementsType.UnsignedInt, new IntPtr(0));
+            GL.DrawElements(PrimitiveType.Triangles, indices.Count(), DrawElementsType.UnsignedInt, 0);
 
             this.SwapBuffers();
         }

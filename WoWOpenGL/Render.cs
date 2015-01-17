@@ -16,25 +16,18 @@ namespace WoWOpenGL
     public class Render : GameWindow
     {
         Camera ActiveCamera;
-        float mouseScale = 0.001f;
-        bool mouseDragging = false;
-        
+       
         private static float angle = 90.0f;
         private GLControl glControl;
         private bool gLoaded = false;
+        private bool modelLoaded = false;
         private Material[] materials;
-        private bool modelLoaded;
         private RenderBatch[] renderbatches;
         private uint[] VBOid;
         private static float dragX;
         private static float dragY;
         private static float dragZ;
         private static bool isWMO = false;
-        private static bool mouseInRender = false;
-        public Render()
-        {
-            //RenderModel(@"World\ArtTest\Boxtest\xyz.m2");
-        }
 
         public Render(string ModelPath)
         {
@@ -69,9 +62,6 @@ namespace WoWOpenGL
             glControl.Height = (int)wfc.ActualHeight;
             glControl.Left = 0;
             glControl.Top = 0;
-
-            glControl.MouseEnter += glControl_MouseEnter;
-            glControl.MouseLeave += glControl_MouseLeave;
             glControl.Load += glControl_Load;
             glControl.Paint += RenderFrame;
             glControl.Resize += glControl_Resize;
@@ -86,16 +76,6 @@ namespace WoWOpenGL
             
 
             Console.WriteLine(glControl.Width + "x" + glControl.Height);
-        }
-
-        private void glControl_MouseEnter(object sender, EventArgs e)
-        {
-            mouseInRender = true;
-        }
-
-        private void glControl_MouseLeave(object sender, EventArgs e)
-        {
-            mouseInRender = false;
         }
 
         public void DrawAxes()
@@ -218,7 +198,10 @@ namespace WoWOpenGL
                         string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)reader.model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Count(); ti++)
                         {
-                            texturefilename = modelpath.Replace(reader.model.name + ".M2", cdifilenames[ti] + ".blp");
+                            if (WoWFormatLib.Utils.CASC.FileExists(modelpath.Replace(reader.model.name + ".M2", cdifilenames[ti] + ".blp")))
+                            {
+                                texturefilename = modelpath.Replace(reader.model.name + ".M2", cdifilenames[ti] + ".blp");
+                            }
                         }
                         break;
                     default:
@@ -310,6 +293,11 @@ namespace WoWOpenGL
             VBOid = new uint[(reader.wmofile.group.Count() * 2) + 2];
             GL.GenBuffers((reader.wmofile.group.Count() * 2) + 2, VBOid);
 
+            for (int i = 0; i < reader.wmofile.doodadNames.Count(); i++)
+            {
+                //Console.WriteLine(reader.wmofile.doodadNames[i].filename);
+            }
+
             for (int g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 if (reader.wmofile.group[g].mogp.vertices == null) { continue; }
@@ -324,6 +312,7 @@ namespace WoWOpenGL
                     vertices[i].Normal = new Vector3(reader.wmofile.group[g].mogp.normals[i].normal.X, reader.wmofile.group[g].mogp.normals[i].normal.Z, reader.wmofile.group[g].mogp.normals[i].normal.Y);
                     vertices[i].TexCoord = new Vector2(reader.wmofile.group[g].mogp.textureCoords[0][i].X, reader.wmofile.group[g].mogp.textureCoords[0][i].Y);
                 }
+
 
                 //Push to buffer
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 8 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
@@ -428,16 +417,6 @@ namespace WoWOpenGL
             
             OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
             OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
-
-            /*if (keyboardState.IsKeyDown(Key.Up))
-            {
-                dragX = dragX + 0.01f;
-            }
-
-            if (keyboardState.IsKeyDown(Key.Down))
-            {
-                dragX = dragX - 0.01f;
-            }*/
 
             if (keyboardState.IsKeyDown(Key.Up))
             {

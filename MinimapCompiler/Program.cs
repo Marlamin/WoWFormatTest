@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using WoWFormatLib;
 using WoWFormatLib.FileReaders;
 
-namespace WMOMapCompiler
+namespace MinimapCompiler
 {
     internal class Program
     {
@@ -19,7 +19,7 @@ namespace WMOMapCompiler
             string basedir = ConfigurationManager.AppSettings["basedir"];
 
             string mapname = "";
-
+            WoWFormatLib.Utils.CASC.InitCasc();
             bool makemaps = false;
             bool makeWMOmaps = true;
 
