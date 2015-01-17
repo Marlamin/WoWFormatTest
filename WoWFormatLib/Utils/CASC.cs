@@ -17,12 +17,12 @@ namespace WoWFormatLib.Utils
         public static string progressDesc;
         private static bool fIsCASCInit = false;
 
-        public static void InitCasc(AsyncAction bgAction = null, string basedir = null){
+        public static void InitCasc(AsyncAction bgAction = null, string basedir = null, string program = "wowt"){
             CASC.bgAction = bgAction;
             //bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
             if (basedir == null)
             {
-                cascHandler = CASCHandler.OpenOnlineStorage("wow_beta", bgAction);
+                cascHandler = CASCHandler.OpenOnlineStorage(program, bgAction);
             }
             else
             {

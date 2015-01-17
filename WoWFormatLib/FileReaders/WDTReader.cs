@@ -112,6 +112,7 @@ namespace WoWFormatLib.FileReaders
                     case "MWMO": ReadMWMOChunk(bin);
                         continue;
                     case "MPHD":
+                    case "MPLT":
                     case "MODF": continue;
                     default:
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
