@@ -301,6 +301,7 @@ namespace WoWOpenGL
             ModelListBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
             Console.WriteLine("Listfile generated!");
             CASCinitialized = true;
+            Console.WriteLine("BUILD: " + CASC.cascHandler.Config.BuildName);
             FilterBox.Visibility = System.Windows.Visibility.Visible;
             CASCdesc.Visibility = System.Windows.Visibility.Hidden;
             CASCprogress.Visibility = System.Windows.Visibility.Hidden;
@@ -311,7 +312,7 @@ namespace WoWOpenGL
             {
                 tw.Run(30.0, 60.0);
             }*/
-            new Render("World\\wmo\\Draenor\\Human\\6HU_garrison_townhall_v3.wmo");
+            //new Render("World\\wmo\\Draenor\\Human\\6HU_garrison_townhall_v3.wmo");
         }
 
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
