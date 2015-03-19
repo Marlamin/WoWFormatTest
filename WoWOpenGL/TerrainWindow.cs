@@ -19,7 +19,7 @@ namespace WoWOpenGL
         private static float dragY;
         private static float dragZ;
         private static float angle;
-        private static float camSpeed = 0.025f;
+        private static float camSpeed = 0.25f;
         private uint[] VBOid;
 
         private uint[] indices;

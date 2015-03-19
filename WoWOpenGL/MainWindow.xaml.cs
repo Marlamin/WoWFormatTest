@@ -308,10 +308,10 @@ namespace WoWOpenGL
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
             MapsTab.Visibility = System.Windows.Visibility.Visible;
-           /* using (TerrainWindow tw = new TerrainWindow("PVPZone01_31_30"))
-            {
-                tw.Run(30.0, 60.0);
-            }*/
+            using (TerrainWindow tw = new TerrainWindow("Draenor_29_25"))
+             {
+                 tw.Run(30.0, 60.0);
+             }
             //new Render("World\\wmo\\Draenor\\Human\\6HU_garrison_townhall_v3.wmo");
         }
 

@@ -44,14 +44,18 @@ namespace WoWFormatLib.Utils
         public static List<string> GenerateListfile()
         {
             //extract signaturefile and extract list of some files from that
+
+            List<string> files = new List<String>();
+
+
             if (!FileExists("signaturefile"))
             {
                 new MissingFile("signaturefile");
+                return files;
             }
 
             string line;
             string[] linesplit;
-            List<string> files = new List<String>();
 
             System.IO.StreamReader file = new System.IO.StreamReader(CASC.OpenFile("signaturefile"));
             DBCReader<FileDataRecord> filedatareader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");

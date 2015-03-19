@@ -33,7 +33,7 @@ namespace Examples.Tutorial
         /// Setup OpenGL and load resources here.
         /// </summary>
         /// <param name="e">Not used.</param>
-        protected override void OnLoad(EventArgs e)
+        protected override unsafe void OnLoad(EventArgs e)
         {
             GL.ClearColor(Color.MidnightBlue);
             GL.Enable(EnableCap.Texture2D);
@@ -93,14 +93,28 @@ namespace Examples.Tutorial
                                     // ORIGINAL AUTHOR COMMENTS START HERE
                                     // make minimap
                                     // for a 512x512 minimap texture and 64x64 tiles, one tile is 8x8 pixels
+
                                     for (int z = 0; z < 16; ++z)
                                     {
                                         for (int x = 0; x < 16; ++x)
                                         {
                                             Int16 hval = tilebuf[z, x]; // (Author) for now
+                                            
                                             //Console.WriteLine(hval);
                                             // make rgb from height value
                                             byte r, g, b;
+                                            
+                                            int greyness = (int) Math.Round(hval / 1600.0f * 255);
+
+                                            //Console.WriteLine(greyness); 
+                                            r = (byte) greyness;
+                                            g = (byte) greyness;
+                                            b = (byte) greyness;
+
+                                            //if (greyness != 0) { Console.WriteLine(greyness); }
+                                            texbuf[j * 16 + z, i * 16 + x] = (UInt32)((r) | (g << 8) | (b << 16) | (255 << 24));
+
+                                            /*
                                             if (hval <= 0)
                                             {
                                                 // water = blue
@@ -123,10 +137,14 @@ namespace Examples.Tutorial
                                                 // brown: 137, 84, 21  600-1200
                                                 // gray: 96, 96, 96    1200-1600
                                                 // white: 255, 255, 255
+
+                                                /*
                                                 byte r1, r2, g1, g2, b1, b2;
                                                 float t;
+                                                
                                                 if (hval < 600)
                                                 {
+                                                   /*
                                                     r1 = 20;
                                                     r2 = 137;
                                                     g1 = 149;
@@ -145,7 +163,7 @@ namespace Examples.Tutorial
                                                     b1 = 21;
                                                     t = (hval - 600) / 600.0f;
                                                 }
-                                                else /* if (hval < 1600) */
+                                                else
                                                 {
                                                     r1 = 96;
                                                     r2 = 255;
@@ -156,16 +174,20 @@ namespace Examples.Tutorial
                                                     if (hval >= 1600) hval = 1599;
                                                     t = (hval - 1200) / 600.0f;
                                                 }
-
+                                                */
                                                 //! \todo  add a regular palette here
 
-                                                r = (byte)(r2 * t + r1 * (1.0f - t));
-                                                g = (byte)(g2 * t + g1 * (1.0f - t));
-                                                b = (byte)(b2 * t + b1 * (1.0f - t));
-                                                // ORIGINAL AUTHOR COMMENTS END HERE
-                                            }
 
-                                            texbuf[j * 16 + z, i * 16 + x] = (UInt32)((r) | (g << 8) | (b << 16) | (255 << 24));
+                                            /*
+                                            r = (byte)(r2 * t + r1 * (1.0f - t));
+                                            g = (byte)(g2 * t + g1 * (1.0f - t));
+                                            b = (byte)(b2 * t + b1 * (1.0f - t));
+                                                
+
+                                                
+                                            // ORIGINAL AUTHOR COMMENTS END HERE
+                                        }*/
+
                                         }
                                     }
                                 }
@@ -179,6 +201,8 @@ namespace Examples.Tutorial
                         GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, 1024, 1024, 0, OpenTK.Graphics.OpenGL.PixelFormat.Rgba, PixelType.UnsignedByte, texbuf);
                         GL.TexParameterI(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, ref linear);
                         GL.TexParameterI(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, ref linear);
+
+                        
                     }
 
                     // MAHO (MapAreaHOles) parsing (not implemented by author)

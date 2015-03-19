@@ -18,7 +18,7 @@ namespace WoWFormatLib.FileReaders
         {
         }
 
-        public void LoadADT(string filename)
+        public void LoadADT(string filename, bool loadSecondaryADTs = false)
         {
             m2Files = new List<string>();
             wmoFiles = new List<string>();
@@ -81,14 +81,17 @@ namespace WoWFormatLib.FileReaders
             adt.Close();
 
             //OBJ1 and TEX1 are ignored atm
-            using (var adtobj0 = CASC.OpenFile(filename.Replace(".adt", "_obj0.adt")))
+            if (loadSecondaryADTs)
             {
-                ReadObjFile(filename, adtobj0, ref chunk);
-            }
+                using (var adtobj0 = CASC.OpenFile(filename.Replace(".adt", "_obj0.adt")))
+                {
+                    ReadObjFile(filename, adtobj0, ref chunk);
+                }
 
-            using (var adttex0 = CASC.OpenFile(filename.Replace(".adt", "_tex0.adt")))
-            {
-                ReadTexFile(filename, adttex0, ref chunk);
+                using (var adttex0 = CASC.OpenFile(filename.Replace(".adt", "_tex0.adt")))
+                {
+                    ReadTexFile(filename, adttex0, ref chunk);
+                }
             }
         }
 
@@ -96,18 +99,52 @@ namespace WoWFormatLib.FileReaders
         {
             //256 of these chunks per file
             MCNK mapchunk = new MCNK();
+            
             mapchunk.header = bin.Read<MCNKheader>();
-            bin.ReadBytes(8); //read chunk beginning
+
+            MemoryStream stream = new MemoryStream(bin.ReadBytes((int)chunk.Size - 128));
+            
+            var subbin = new BinaryReader(stream);
+            
+            BlizzHeader subchunk;
+            
+            long subpos = 0;
+
+            while (subpos < stream.Length)
+            {
+                subbin.BaseStream.Position = subpos;
+                subchunk = new BlizzHeader(subbin.ReadChars(4), subbin.ReadUInt32());
+                subchunk.Flip();
+                subpos = stream.Position + subchunk.Size;
+
+                switch (subchunk.ToString())
+                {
+                    case "MCVT":
+                        mapchunk.vertices = ReadMCVTSubChunk(subchunk, subbin);
+                        break;
+                    case "MCNR":
+                    case "MCSE":
+                    case "MCCV":
+                    case "MCBB":
+                    case "MCLV":
+                        continue;
+                    default:
+                        throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subchunk.ToString(), subpos.ToString()));
+                }
+            }
+            return mapchunk;
+        }
+
+        public MCVT ReadMCVTSubChunk(BlizzHeader chunk, BinaryReader bin)
+        {
             MCVT vtchunk = new MCVT();
             vtchunk.vertices = new float[145];
             for (int i = 0; i < 145; i++)
             {
                 vtchunk.vertices[i] = bin.ReadSingle();
             }
-            mapchunk.vertices = vtchunk;
-            return mapchunk;
+            return vtchunk;
         }
-
         public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of M2 filenames, but are still named after MDXs internally. Have to rename!

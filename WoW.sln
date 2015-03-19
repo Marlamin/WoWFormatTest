@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDLtexopentk", "WDLtexopent
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimapCompiler", "MinimapCompiler\MinimapCompiler.csproj", "{2E691D58-C03D-416A-A23E-16693862231D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeightmapGenerator", "HeightmapGenerator\HeightmapGenerator.csproj", "{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +157,16 @@ Global
 		{2E691D58-C03D-416A-A23E-16693862231D}.Release|Mixed Platforms.Build.0 = Release|x86
 		{2E691D58-C03D-416A-A23E-16693862231D}.Release|x86.ActiveCfg = Release|x86
 		{2E691D58-C03D-416A-A23E-16693862231D}.Release|x86.Build.0 = Release|x86
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
