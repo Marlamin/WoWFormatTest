@@ -128,6 +128,7 @@ namespace WoWFormatLib.FileReaders
                     case "MCNR":
                     case "MCSE":
                     case "MCBB":
+                    case "MCLQ":
                     case "MCLV":
                         continue;
                     default:
