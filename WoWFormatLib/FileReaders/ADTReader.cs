@@ -122,9 +122,11 @@ namespace WoWFormatLib.FileReaders
                     case "MCVT":
                         mapchunk.vertices = ReadMCVTSubChunk(subchunk, subbin);
                         break;
+                    case "MCCV":
+                        mapchunk.vertexshading = ReadMCCVSubChunk(subchunk, subbin);
+                        break;
                     case "MCNR":
                     case "MCSE":
-                    case "MCCV":
                     case "MCBB":
                     case "MCLV":
                         continue;
@@ -145,6 +147,24 @@ namespace WoWFormatLib.FileReaders
             }
             return vtchunk;
         }
+
+        public MCCV ReadMCCVSubChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            MCCV vtchunk = new MCCV();
+            vtchunk.red = new byte[145];
+            vtchunk.green = new byte[145];
+            vtchunk.blue = new byte[145];
+            vtchunk.alpha = new byte[145];
+            for (int i = 0; i < 145; i++)
+            {
+                vtchunk.red[i] = bin.ReadByte();
+                vtchunk.green[i] = bin.ReadByte();
+                vtchunk.blue[i] = bin.ReadByte();
+                vtchunk.alpha[i] = bin.ReadByte();
+            }
+            return vtchunk;
+        }
+
         public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)
         {
             //List of M2 filenames, but are still named after MDXs internally. Have to rename!

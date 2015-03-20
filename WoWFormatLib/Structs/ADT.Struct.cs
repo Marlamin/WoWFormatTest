@@ -90,10 +90,10 @@ namespace WoWFormatLib.Structs.ADT
     }
     public struct MCCV
     {
-        public byte red;
-        public byte green;
-        public byte blue;
-        public byte alpha;
+        public byte[] red;
+        public byte[] green;
+        public byte[] blue;
+        public byte[] alpha;
     }
 
     public struct MCNR
