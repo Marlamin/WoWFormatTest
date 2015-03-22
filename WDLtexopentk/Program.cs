@@ -33,7 +33,7 @@ namespace Examples.Tutorial
         /// Setup OpenGL and load resources here.
         /// </summary>
         /// <param name="e">Not used.</param>
-        protected override unsafe void OnLoad(EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
             GL.ClearColor(Color.MidnightBlue);
             GL.Enable(EnableCap.Texture2D);

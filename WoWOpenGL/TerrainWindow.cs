@@ -22,7 +22,7 @@ namespace WoWOpenGL
         private static float camSpeed = 0.25f;
         private uint[] VBOid;
 
-        private uint[] indices;
+        private uint[] indices = new uint[768 * 256];
 
         Camera ActiveCamera;
 
@@ -87,9 +87,10 @@ namespace WoWOpenGL
             ADTReader reader = new ADTReader();
             reader.LoadADT("World/Maps/" + map + "/" + map + "_" + xx + "_" + yy + ".adt");
 
-            float TileSize = 1600.0f / 3.0f;
-            float ChunkSize = TileSize / 16.0f;
-            float UnitSize = ChunkSize / 8.0f;
+            float TileSize = 1600.0f / 3.0f; //533.333
+            float ChunkSize = TileSize / 16.0f; //33.333
+            float UnitSize = ChunkSize / 8.0f; //4.166666 //this times 0.5 ends up being pixelspercoord on minimap
+            float MapMidPoint = 32.0f / ChunkSize;
 
             GL.EnableClientState(ArrayCap.VertexArray);
 
@@ -102,19 +103,31 @@ namespace WoWOpenGL
             List<Vector3> verticelist = new List<Vector3>();
             List<uint> indicelist = new List<uint>();
 
-            for (int c = 0; c < reader.adtfile.chunks.Count(); c++)
+            var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
+            var initialChunkX = reader.adtfile.chunks[0].header.position.X;
+
+            for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
             {
+                var chunk = reader.adtfile.chunks[c];
                 //Console.WriteLine("Reading ADT chunk " + c);
                 //Console.WriteLine("ADT is at position " + reader.adtfile.chunks[c].header.position.ToString());
                 //Console.WriteLine("ADT has " + reader.adtfile.chunks[c].vertices.vertices.Count() + " vertices!");
+
+                var posx = chunk.header.position.Y - initialChunkY;
+                var posy = chunk.header.position.X - initialChunkX;
 
                 for (int i = 0, idx = 0; i < 17; i++)
                 {
                     for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                     {
-                        var v = new Vector3(((c / 16) * ChunkSize) - (j * UnitSize), ((c % 16) * ChunkSize) - -(i * UnitSize * 0.5f), reader.adtfile.chunks[c].vertices.vertices[idx] + reader.adtfile.chunks[c].header.position.Z);
-                        //var v = new Vector3(j * UnitSize, i * UnitSize, reader.adtfile.chunks[c].vertices.vertices[idx]); 
-                        if ((i % 2) != 0) v.X += 0.5f * UnitSize;
+                        var height = chunk.vertices.vertices[idx] + chunk.header.position.Z;
+                        var x = posx + j * UnitSize;
+                        if ((i % 2) != 0) x += 0.5f * UnitSize;
+                        var y = posy - i * UnitSize * 0.5f;
+
+                        //var v = new Vector3(((c / 16) * ChunkSize) - (j * UnitSize * 0.5f), ((c % 16) * ChunkSize) - (i * UnitSize * 0.5f), height);
+                        var v = new Vector3(x, y, height); 
+                        
                         verticelist.Add(v);
                         //Console.WriteLine(reader.adtfile.chunks[c].vertices.vertices[idx]);
                         idx++;
@@ -122,27 +135,30 @@ namespace WoWOpenGL
                     }
                 }
 
-                for (uint j = 9; j < 8 * 8 + 9 * 8; j++)
+                for (uint y = 0; y < 8; ++y)
                 {
+                    for (uint x = 0; x < 8; ++x)
+                    {
+                        //var i = ;
+                        var i = y * 8 * 12 + x * 12 + (c * 768);
+                        //Console.WriteLine(i);
+                        indices[i + 0] = y * 17 + x + (c * 145);
+                        indices[i + 1] = y * 17 + x + 9 + (c * 145);
+                        indices[i + 2] = y * 17 + x + 1 + (c * 145);
 
-                    //Triangle 1
-                    indicelist.Add(j);
-                    indicelist.Add(j - 9);
-                    indicelist.Add(j + 8);
-                    //Triangle 2
-                    indicelist.Add(j);
-                    indicelist.Add(j - 8);
-                    indicelist.Add(j - 9);
-                    //Triangle 3
-                    indicelist.Add(j);
-                    indicelist.Add(j + 9);
-                    indicelist.Add(j - 8);
-                    //Triangle 4
-                    indicelist.Add(j);
-                    indicelist.Add(j + 8);
-                    indicelist.Add(j + 9);
+                        indices[i + 3] = y * 17 + x + 1 + (c * 145);
+                        indices[i + 4] = y * 17 + x + 9 + (c * 145);
+                        indices[i + 5] = y * 17 + x + 18 + (c * 145);
 
-                    if ((j + 1) % (9 + 8) == 0) j += 9;
+                        indices[i + 6] = y * 17 + x + 18 + (c * 145);
+                        indices[i + 7] = y * 17 + x + 9 + (c * 145);
+                        indices[i + 8] = y * 17 + x + 17 + (c * 145);
+
+                        indices[i + 9] = y * 17 + x + 17 + (c * 145);
+                        indices[i + 10] = y * 17 + x + 9 + (c * 145);
+                        indices[i + 11] = y * 17 + x + (c * 145);
+                        //Console.WriteLine(indices[i + 11].ToString());
+                    }
                 }
             }
 
@@ -150,7 +166,7 @@ namespace WoWOpenGL
             Vector3[] vertices = verticelist.ToArray();
             Console.WriteLine("Vertices in array: " + vertices.Count()); //37120, correct
 
-            indices = indicelist.ToArray();
+            //indices = indicelist.ToArray();
             Console.WriteLine("Indices in array: " + indices.Count()); //196608, should be 65.5k which is 196608 / 3. in triangles so its correct?
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
