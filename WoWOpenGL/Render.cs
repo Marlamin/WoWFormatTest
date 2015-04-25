@@ -55,8 +55,7 @@ namespace WoWOpenGL
             {
                 modelLoaded = false;
             }
-            
-            
+
             glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default);
             glControl.Width = (int)wfc.ActualWidth;
             glControl.Height = (int)wfc.ActualHeight;
@@ -414,34 +413,38 @@ namespace WoWOpenGL
 
         private static void InputTick(object sender, EventArgs e)
         {
+            float speed = 0.1f * (float) ControlsWindow.camSpeed;
+
+            Console.WriteLine("Speed: " + speed);
+
             
             OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
             OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
 
             if (keyboardState.IsKeyDown(Key.Up))
             {
-                dragY = dragY + 0.01f;
+                dragY = dragY + speed;
             }
 
             if (keyboardState.IsKeyDown(Key.Down))
             {
-                dragY = dragY - 0.01f;
+                dragY = dragY - speed;
             }
 
             if (keyboardState.IsKeyDown(Key.Left))
             {
-                angle = angle + 1.0f;
+                angle = angle + speed;
             }
 
             if (keyboardState.IsKeyDown(Key.Right))
             {
-                angle = angle - 1.0f;
+                angle = angle - speed;
             }
 
 
             //if (mouseInRender)
             //{
-                dragZ = (mouseState.WheelPrecise/ 10) - 7.5f; //Startzoom is at -7.5f 
+            dragZ = (mouseState.WheelPrecise / speed) - (7.5f); //Startzoom is at -7.5f 
             //}
             
         }

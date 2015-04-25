@@ -44,6 +44,7 @@ namespace WoWOpenGL
         public static bool mapsTabLoaded = false;
         public static AsyncAction bgAction;
         public static bool mouseOverRenderArea = false;
+        public static Window controls;
         private static List<string> models = new List<String>();
         public MainWindow()
         {
@@ -254,7 +255,9 @@ namespace WoWOpenGL
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
+            controls = new ControlsWindow();
+            controls.Show();
+
             winFormControl = wfContainer;
             cascProgressBar = CASCprogress;
             cascProgressDesc = CASCdesc;
@@ -308,11 +311,11 @@ namespace WoWOpenGL
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
             MapsTab.Visibility = System.Windows.Visibility.Visible;
-            using (TerrainWindow tw = new TerrainWindow("Draenor_29_25"))
+            /*using (TerrainWindow tw = new TerrainWindow("Draenor_29_25"))
              {
                  tw.Run(30.0, 60.0);
-             }
-            //new Render("World\\wmo\\Draenor\\Human\\6HU_garrison_townhall_v3.wmo");
+             }*/
+            new Render("World\\wmo\\Draenor\\Human\\6HU_garrison_townhall_v3.wmo");
         }
 
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)

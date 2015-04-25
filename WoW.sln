@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatTest", "WoWFormatTest\WoWFormatTest.csproj", "{3ED7F6F2-5A92-496A-9D87-60F56638C2A7}"
 EndProject
@@ -34,6 +34,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimapCompiler", "MinimapCompiler\MinimapCompiler.csproj", "{2E691D58-C03D-416A-A23E-16693862231D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeightmapGenerator", "HeightmapGenerator\HeightmapGenerator.csproj", "{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListfileGenerator", "ListfileGenerator\ListfileGenerator.csproj", "{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CASCbot", "CASCbot\CASCbot.csproj", "{3DD07412-0413-4B88-965C-D0EE3338DA84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -167,6 +171,26 @@ Global
 		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{0D0BD1D9-1FD1-49EE-A128-5792DD128F9E}.Release|x86.ActiveCfg = Release|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}.Release|x86.ActiveCfg = Release|Any CPU
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Debug|x86.ActiveCfg = Debug|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Debug|x86.Build.0 = Debug|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Release|Any CPU.ActiveCfg = Release|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Release|Mixed Platforms.Build.0 = Release|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Release|x86.ActiveCfg = Release|x86
+		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

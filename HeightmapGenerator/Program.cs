@@ -18,15 +18,20 @@ namespace HeightmapGenerator
         static void Main(string[] args)
         {
             Console.WriteLine("Initializing CASC..");
-            CASC.InitCasc(null, "D:/Games/World of Warcraft Public Test", "wowt"); // Use PTR for now
+            CASC.InitCasc(); // Use PTR for now
             Console.WriteLine("CASC initialized!");
 
             var dbcreader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");
 
+            string mapfilter = "TanaanLegionTest";
+            //string mapfilter = null;
             for (int mi = 0; mi < dbcreader.recordCount; mi++)
             {
                 string mapname = dbcreader[mi].Directory;
-
+                if (mapfilter != null)
+                {
+                    if (mapname != mapfilter) { continue; }
+                }
                 Console.WriteLine("Creating image for map " + mapname + " (" + dbcreader[mi].Mapname_lang + ")");
 
                 if (File.Exists("done/" + mapname + ".png"))

@@ -10,15 +10,15 @@ namespace WoWFormatLib.FileReaders
     public class ADTReader
     {
         public ADT adtfile;
-        private List<String> blpFiles;
-        private List<String> m2Files;
-        private List<String> wmoFiles;
+        public List<String> blpFiles;
+        public List<String> m2Files;
+        public List<String> wmoFiles;
 
         public ADTReader()
         {
         }
 
-        public void LoadADT(string filename, bool loadSecondaryADTs = false)
+        public void LoadADT(string filename, bool loadSecondaryADTs = false, bool filenamesOnly = false)
         {
             m2Files = new List<string>();
             wmoFiles = new List<string>();
@@ -34,52 +34,55 @@ namespace WoWFormatLib.FileReaders
 
             var adt = CASC.OpenFile(filename);
 
-            var bin = new BinaryReader(adt);
             BlizzHeader chunk = null;
-            long position = 0;
-            int MCNKi = 0;
-            adtfile.chunks = new MCNK[16 * 16];
-            while (position < adt.Length)
+            if (filenamesOnly == false)
             {
-                adt.Position = position;
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
-                position = adt.Position + chunk.Size;
+                var bin = new BinaryReader(adt);
+                long position = 0;
+                int MCNKi = 0;
+                adtfile.chunks = new MCNK[16 * 16];
 
-                switch (chunk.ToString())
+                while (position < adt.Length)
                 {
-                    case "MVER":
-                        uint version = bin.ReadUInt32();
-                        if (version != 18)
-                        {
-                            throw new Exception("Unsupported ADT version!");
-                        }
-                        else
-                        {
-                            adtfile.version = version;
-                        }
-                        continue;
-                    case "MCNK":
-                        adtfile.chunks[MCNKi] = ReadMCNKChunk(chunk, bin);
-                        MCNKi++;
-                        continue;
-                    case "MHDR":
-                        adtfile.header = ReadMHDRChunk(chunk, bin);
-                        continue;
-                    case "MH2O":
-                    case "MFBO":
-                    //model.blob stuff
-                    case "MBMH":
-                    case "MBBB":
-                    case "MBMI":
-                    case "MBNV": continue;
-                    default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                    adt.Position = position;
+                    chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
+                    chunk.Flip();
+                    position = adt.Position + chunk.Size;
+
+                    switch (chunk.ToString())
+                    {
+                        case "MVER":
+                            uint version = bin.ReadUInt32();
+                            if (version != 18)
+                            {
+                                throw new Exception("Unsupported ADT version!");
+                            }
+                            else
+                            {
+                                adtfile.version = version;
+                            }
+                            continue;
+                        case "MCNK":
+                            adtfile.chunks[MCNKi] = ReadMCNKChunk(chunk, bin);
+                            MCNKi++;
+                            continue;
+                        case "MHDR":
+                            adtfile.header = ReadMHDRChunk(chunk, bin);
+                            continue;
+                        case "MH2O":
+                        case "MFBO":
+                        //model.blob stuff
+                        case "MBMH":
+                        case "MBBB":
+                        case "MBMI":
+                        case "MBNV": continue;
+                        default:
+                            throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                    }
                 }
+
+                adt.Close();
             }
-
-            adt.Close();
-
             //OBJ1 and TEX1 are ignored atm
             if (loadSecondaryADTs)
             {

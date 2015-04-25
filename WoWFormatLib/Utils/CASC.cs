@@ -48,16 +48,16 @@ namespace WoWFormatLib.Utils
             List<string> files = new List<String>();
 
 
-            if (!FileExists("signaturefile"))
+           /* if (!FileExists("signaturefile"))
             {
                 new MissingFile("signaturefile");
                 return files;
             }
-
+            */
             string line;
             string[] linesplit;
 
-            System.IO.StreamReader file = new System.IO.StreamReader(CASC.OpenFile("signaturefile"));
+           // System.IO.StreamReader file = new System.IO.StreamReader(CASC.OpenFile("signaturefile"));
             DBCReader<FileDataRecord> filedatareader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
 
             for (int i = 0; i < filedatareader.recordCount; i++)
@@ -68,7 +68,7 @@ namespace WoWFormatLib.Utils
                     files.Add(filename);
                 }
             }
-
+            /*
             while ((line = file.ReadLine()) != null)
             {
                 linesplit = line.Split(';');
@@ -78,7 +78,7 @@ namespace WoWFormatLib.Utils
                     files.Add(linesplit[3]);
                 }
             }
-
+            */
             List<string> unwantedExtensions = new List<String>();
             for (int i = 0; i < 1024; i++)
             {
