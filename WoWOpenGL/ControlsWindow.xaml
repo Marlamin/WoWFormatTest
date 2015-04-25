@@ -1,0 +1,9 @@
+﻿<Window x:Class="WoWOpenGL.ControlsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Controls" Height="300" Width="300" ResizeMode="NoResize">
+    <Grid>
+        <Slider x:Name="CameraSpeedSlider" ValueChanged="CameraSpeedSlider_ValueChanged" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="272" Maximum="100" Minimum="1" Value="50"/>
+        <Label x:Name="CameraSpeedLabel" Content="Camera speed: 50%" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Height="26" Width="272"/>
+    </Grid>
+</Window>
