@@ -33,7 +33,7 @@ namespace MinimapCompiler
             }
 
             Console.WriteLine("CASC initialized!");
-            Console.WriteLine("Current patch: " + CASC.cascHandler.Config.Build);
+            Console.WriteLine("Current patch: " + CASC.cascHandler.Config.BuildName);
             if (buildmaps == true)
             {
                 DBCReader<MapRecord> reader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");

@@ -19,3 +19,5 @@ Packages/*
 WoWJsonDumper/*
 WoWOpenGL/Data/*
 WoWOpenGL/*.log
+CascBot
+ListFileGenerator
