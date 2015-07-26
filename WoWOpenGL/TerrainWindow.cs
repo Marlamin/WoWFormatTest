@@ -22,16 +22,16 @@ namespace WoWOpenGL
         private static float camSpeed = 0.25f;
         private uint[] VBOid;
 
-        private uint[] indices = new uint[768 * 256];
+        private int[] indices;
 
         Camera ActiveCamera;
 
         public TerrainWindow(string modelPath)
-            : base(800, 600, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Terrain test", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default)
+            : base(1920, 1080, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Terrain test", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default)
         {
-            dragX = 0.0f;
-            dragY = 0.0f;
-            dragZ = -7.5f;
+            dragX = 227;
+            dragY = 152;
+            dragZ = 2868;
             angle = 90.0f;
 
             Keyboard.KeyDown += Keyboard_KeyDown;
@@ -44,7 +44,8 @@ namespace WoWOpenGL
             string[] adt = modelPath.Split('_');
 
             Console.WriteLine("MAP {0}, X {1}, Y {2}", adt[0], adt[1], adt[2]);
-            LoadADT(adt[0], adt[1], adt[2]);
+            //LoadADT(adt[0], adt[1], adt[2]);
+            LoadMap(adt[0], int.Parse(adt[1]), int.Parse(adt[2]), 2);
 
             modelLoaded = true;
         }
@@ -81,17 +82,12 @@ namespace WoWOpenGL
 
         }
 
-        private void LoadADT(string map, string xx, string yy)
+        private void LoadMap(string map, int centerx, int centery, int distance)
         {
-   
-            ADTReader reader = new ADTReader();
-            reader.LoadADT("World/Maps/" + map + "/" + map + "_" + xx + "_" + yy + ".adt");
-
             float TileSize = 1600.0f / 3.0f; //533.333
             float ChunkSize = TileSize / 16.0f; //33.333
-            float UnitSize = ChunkSize / 8.0f; //4.166666 //this times 0.5 ends up being pixelspercoord on minimap
+            float UnitSize = ChunkSize / 8.0f; //4.166666 // ~~fun fact time with marlamin~~ this times 0.5 ends up being pixelspercoord on minimap
             float MapMidPoint = 32.0f / ChunkSize;
-
             GL.EnableClientState(ArrayCap.VertexArray);
 
             VBOid = new uint[2];
@@ -101,68 +97,66 @@ namespace WoWOpenGL
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
 
             List<Vector3> verticelist = new List<Vector3>();
-            List<uint> indicelist = new List<uint>();
+            List<Int32> indicelist = new List<Int32>();
 
-            var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
-            var initialChunkX = reader.adtfile.chunks[0].header.position.X;
-
-            for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
+            for (int x = centerx; x < centerx + distance; x++)
             {
-                var chunk = reader.adtfile.chunks[c];
-                //Console.WriteLine("Reading ADT chunk " + c);
-                //Console.WriteLine("ADT is at position " + reader.adtfile.chunks[c].header.position.ToString());
-                //Console.WriteLine("ADT has " + reader.adtfile.chunks[c].vertices.vertices.Count() + " vertices!");
-
-                var posx = chunk.header.position.Y - initialChunkY;
-                var posy = chunk.header.position.X - initialChunkX;
-
-                for (int i = 0, idx = 0; i < 17; i++)
+                for (int y = centery; y < centery + distance; y++)
                 {
-                    for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
+                    string filename = "World/Maps/" + map + "/" + map + "_" + y + "_" + x + ".adt";
+
+                    if (WoWFormatLib.Utils.CASC.FileExists(filename))
                     {
-                        var height = chunk.vertices.vertices[idx] + chunk.header.position.Z;
-                        var x = posx + j * UnitSize;
-                        if ((i % 2) != 0) x += 0.5f * UnitSize;
-                        var y = posy - i * UnitSize * 0.5f;
+                        ADTReader reader = new ADTReader();
+                        reader.LoadADT(filename);
+                        var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
+                        var initialChunkX = reader.adtfile.chunks[0].header.position.X;
 
-                        //var v = new Vector3(((c / 16) * ChunkSize) - (j * UnitSize * 0.5f), ((c % 16) * ChunkSize) - (i * UnitSize * 0.5f), height);
-                        var v = new Vector3(x, y, height); 
-                        
-                        verticelist.Add(v);
-                        //Console.WriteLine(reader.adtfile.chunks[c].vertices.vertices[idx]);
-                        idx++;
-                        
-                    }
-                }
+                        for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
+                        {
+                            var chunk = reader.adtfile.chunks[c];
+                            //Console.WriteLine("Reading ADT chunk " + c);
+                            //Console.WriteLine("ADT is at position " + reader.adtfile.chunks[c].header.position.ToString());
+                            //Console.WriteLine("ADT has " + reader.adtfile.chunks[c].vertices.vertices.Count() + " vertices!");
 
-                for (uint y = 0; y < 8; ++y)
-                {
-                    for (uint x = 0; x < 8; ++x)
-                    {
-                        //var i = ;
-                        var i = y * 8 * 12 + x * 12 + (c * 768);
-                        //Console.WriteLine(i);
-                        indices[i + 0] = y * 17 + x + (c * 145);
-                        indices[i + 1] = y * 17 + x + 9 + (c * 145);
-                        indices[i + 2] = y * 17 + x + 1 + (c * 145);
+                            //int off = chunk.vertices.vertices.Count();
 
-                        indices[i + 3] = y * 17 + x + 1 + (c * 145);
-                        indices[i + 4] = y * 17 + x + 9 + (c * 145);
-                        indices[i + 5] = y * 17 + x + 18 + (c * 145);
+                            int off = verticelist.Count();
 
-                        indices[i + 6] = y * 17 + x + 18 + (c * 145);
-                        indices[i + 7] = y * 17 + x + 9 + (c * 145);
-                        indices[i + 8] = y * 17 + x + 17 + (c * 145);
+                            for (int i = 0, idx = 0; i < 17; i++)
+                            {
+                                for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
+                                {
+                                    //var v = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
+                                    var v = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, -(chunk.header.position.X - (i * UnitSize * 0.5f)));
+                                    if ((i % 2) != 0) v.X -= 0.5f * UnitSize;
+                                    verticelist.Add(v);
+                                }
+                            }
 
-                        indices[i + 9] = y * 17 + x + 17 + (c * 145);
-                        indices[i + 10] = y * 17 + x + 9 + (c * 145);
-                        indices[i + 11] = y * 17 + x + (c * 145);
-                        //Console.WriteLine(indices[i + 11].ToString());
+                            //Console.WriteLine("First vertice at " + verticelist.First().X + "x" + verticelist.First().Y);
+
+                            for (int j = 9; j < 145; j++)
+                            {
+                                
+                                // if (!MCNK.HasHole(unitidx % 8, unitidx++ / 8))
+                                // {
+                                indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
+                                indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
+                                indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j });
+                                indicelist.AddRange(new Int32[] { off + j + 9, off + j + 8, off + j });
+                                // }
+                                if ((j + 1) % (9 + 8) == 0) j += 9;
+                            }
+
+                        }
+
+
                     }
                 }
             }
 
-
+            indices = indicelist.ToArray();
             Vector3[] vertices = verticelist.ToArray();
             Console.WriteLine("Vertices in array: " + vertices.Count()); //37120, correct
 
@@ -173,7 +167,7 @@ namespace WoWOpenGL
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Count() * 3 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(int)), indices, BufferUsageHint.StaticDraw);
 
             int verticeBufferSize = 0;
             int indiceBufferSize = 0;
@@ -185,7 +179,7 @@ namespace WoWOpenGL
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out indiceBufferSize);
 
             Console.WriteLine("Vertices in buffer: " + verticeBufferSize / 3 / sizeof(float));
-            Console.WriteLine("Indices in buffer: " + indiceBufferSize / sizeof(uint));
+            Console.WriteLine("Indices in buffer: " + indiceBufferSize / sizeof(int));
         }
 
         protected override void OnLoad(EventArgs e)
@@ -205,13 +199,23 @@ namespace WoWOpenGL
         }
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
-            OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
+            MouseState mouseState = OpenTK.Input.Mouse.GetState();
+            KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
 
             if (keyboardState.IsKeyDown(Key.I))
             {
                 Console.WriteLine("Camera position: " + ActiveCamera.Pos);
                 Console.WriteLine("Camera direction: " + ActiveCamera.Dir);
+            }
+
+            if (keyboardState.IsKeyDown(Key.Q))
+            {
+                angle = angle + 0.5f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.E))
+            {
+                angle = angle - 0.5f;
             }
 
             if (keyboardState.IsKeyDown(Key.O))
@@ -244,7 +248,7 @@ namespace WoWOpenGL
                 dragX = dragX - camSpeed;
             }
 
-            dragZ = (mouseState.WheelPrecise / 10) - 7.5f; //Startzoom is at -7.5f 
+            dragZ = (mouseState.WheelPrecise / 10) - 2868; //Startzoom is at -7.5f 
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -253,7 +257,7 @@ namespace WoWOpenGL
 
             ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
             ActiveCamera.setupGLRenderMatrix();
-            GL.Rotate(angle, 0.0, 1.0, 0.0);
+            GL.Rotate(angle, 0.0, 1.0f, 0.0);
             DrawAxes();
 
             GL.Enable(EnableCap.VertexArray);
@@ -263,8 +267,9 @@ namespace WoWOpenGL
             GL.VertexPointer(3, VertexPointerType.Float, 0, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
 
+            Console.WriteLine("Drawing " + indices.Count() + " indices");
             GL.DrawElements(PrimitiveType.Triangles, indices.Count(), DrawElementsType.UnsignedInt, 0);
-
+            //GL.DrawArrays(PrimitiveType.Points, 0, indices.Count());
             this.SwapBuffers();
         }
 
@@ -274,32 +279,5 @@ namespace WoWOpenGL
             base.OnUnload(e);
             System.Windows.Application.Current.Shutdown();
         }
-
-        public struct Triangle<T>
-        {
-            public T V0;
-            public T V1;
-            public T V2;
-
-            public TriangleType Type;
-
-            public Triangle(TriangleType type, T v0, T v1, T v2)
-            {
-                V0 = v0;
-                V1 = v1;
-                V2 = v2;
-                Type = type;
-            }
-        }
-
-        public enum TriangleType : byte
-        {
-            Unknown,
-            Terrain,
-            Water,
-            Doodad,
-            Wmo
-        }
-
     }
 }
