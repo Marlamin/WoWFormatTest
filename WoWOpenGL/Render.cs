@@ -15,7 +15,7 @@ namespace WoWOpenGL
 {
     public class Render : GameWindow
     {
-        Camera ActiveCamera;
+        OldCamera ActiveCamera;
        
         private static float angle = 90.0f;
         private GLControl glControl;
@@ -37,7 +37,7 @@ namespace WoWOpenGL
 
             System.Windows.Forms.Integration.WindowsFormsHost wfc = MainWindow.winFormControl;
 
-            ActiveCamera = new Camera((int)wfc.ActualWidth, (int)wfc.ActualHeight);
+            ActiveCamera = new OldCamera((int)wfc.ActualWidth, (int)wfc.ActualHeight);
             ActiveCamera.Pos = new Vector3(10.0f, -10.0f, -7.5f);
             Console.WriteLine(ModelPath);
 
@@ -85,7 +85,7 @@ namespace WoWOpenGL
             GL.Vertex3(-10, 0, 0);
             GL.Vertex3(10, 0, 0);
 
-            GL.Color3(Color.ForestGreen);  // y axis
+            GL.Color3(Color.ForestGreen);  // y axis    
             GL.Vertex3(0, -10, 0);
             GL.Vertex3(0, 10, 0);
 
@@ -99,12 +99,15 @@ namespace WoWOpenGL
 
         private void glControl_Load(object sender, EventArgs e)
         {
+
             Console.WriteLine("Loading GLcontrol..");
             glControl.MakeCurrent();
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
+            GL.ShadeModel(ShadingModel.Smooth);
             GL.ClearColor(OpenTK.Graphics.Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            
             InitializeInputTick();
             ActiveCamera.setupGLRenderMatrix();
             Console.WriteLine("GLcontrol is done loading!");
@@ -261,7 +264,7 @@ namespace WoWOpenGL
                         renderbatches[i].blendType = reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode;
                         //Console.WriteLine("Material ID: " + renderbatches[i].materialID);
                         //Console.WriteLine("BlendType: " +renderbatches[i].blendType);
-                       renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
+                        renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
                     }
                 }
             }
@@ -455,10 +458,10 @@ namespace WoWOpenGL
             glControl.MakeCurrent();
 
             ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
-
             ActiveCamera.setupGLRenderMatrix();
 
             if (!gLoaded) return;
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
             GL.Enable(EnableCap.Texture2D);
@@ -466,6 +469,21 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.NormalArray);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
 
+            GL.Light(LightName.Light0, LightParameter.Position, new float[] { 1.0f, 1.0f, 0.0f, 1.0f });
+            GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.0f, 0.0f, 0.0f, 1.0f });
+            GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+            GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+            GL.Light(LightName.Light0, LightParameter.SpotExponent, 0.0f);
+            GL.LightModel(LightModelParameter.LightModelAmbient, new float[] { 0.2f, 0.2f, 0.2f, 1.0f });
+
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light0);
+            GL.Enable(EnableCap.ColorMaterial);
+
+            GL.ColorMaterial(MaterialFace.Front, ColorMaterialParameter.AmbientAndDiffuse);
+
+            GL.Material(MaterialFace.Front, MaterialParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+            GL.Material(MaterialFace.Front, MaterialParameter.Shininess, new float[] { 1.0f, 1.0f, 0.0f, 1.0f });
             GL.Rotate(angle, 0.0, 1.0, 0.0);
 
             for (int i = 0; i < renderbatches.Count(); i++)

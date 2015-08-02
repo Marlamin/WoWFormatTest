@@ -22,10 +22,12 @@ namespace WoWFormatLib.Utils
             //bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
             if (basedir == null)
             {
+                Console.WriteLine("Initializing CASC from web with program " + program);
                 cascHandler = CASCHandler.OpenOnlineStorage(program, bgAction);
             }
             else
             {
+                Console.WriteLine("Initializing CASC from local disk with basedir " + basedir);
                 cascHandler = CASCHandler.OpenLocalStorage(basedir, bgAction);
             }
             

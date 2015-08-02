@@ -255,8 +255,8 @@ namespace WoWOpenGL
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            controls = new ControlsWindow();
-            controls.Show();
+        //    controls = new ControlsWindow();
+        //    controls.Show();
 
             winFormControl = wfContainer;
             cascProgressBar = CASCprogress;
@@ -279,6 +279,7 @@ namespace WoWOpenGL
 
             if (ConfigurationManager.AppSettings["basedir"] != "" && Directory.Exists(ConfigurationManager.AppSettings["basedir"]))
             {
+                Console.WriteLine("Using basedir " + ConfigurationManager.AppSettings["basedir"] + " to load..");
                 bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction, ConfigurationManager.AppSettings["basedir"]));
             }
             else
@@ -311,17 +312,17 @@ namespace WoWOpenGL
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
             MapsTab.Visibility = System.Windows.Visibility.Visible;
-            /*using (TerrainWindow tw = new TerrainWindow("Draenor_29_25"))
-             {
-                 tw.Run(30.0, 60.0);
-             }*/
-            new Render("World\\wmo\\Draenor\\Human\\6HU_garrison_townhall_v3.wmo");
+            using (TerrainWindow tw = new TerrainWindow("Draenor_30_31"))
+            {
+                tw.Run(30.0, 60.0);
+            }
+            //new Render(@"WORLD\EXPANSION05\DOODADS\SHADOWMOON\DOODADS\6SM_ROCK_C01.M2");
         }
 
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
         {
             CASCprogress.Value = progress.Progress;
-            if (progress.UserData != null) { CASCdesc.Content = progress.UserData;}
+            if (progress.UserData != null) { CASCdesc.Content = progress.UserData; Console.WriteLine(CASCdesc.Content);  }
         }
 
         private void MapsTab_Focused(object sender, RoutedEventArgs e)

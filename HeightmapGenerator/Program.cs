@@ -23,7 +23,7 @@ namespace HeightmapGenerator
 
             var dbcreader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");
 
-            string mapfilter = "TanaanLegionTest";
+            string mapfilter = "Draenor";
             //string mapfilter = null;
             for (int mi = 0; mi < dbcreader.recordCount; mi++)
             {

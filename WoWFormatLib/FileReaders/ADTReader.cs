@@ -10,15 +10,15 @@ namespace WoWFormatLib.FileReaders
     public class ADTReader
     {
         public ADT adtfile;
-        public List<String> blpFiles;
-        public List<String> m2Files;
-        public List<String> wmoFiles;
+        public List<string> blpFiles;
+        public List<string> m2Files;
+        public List<string> wmoFiles;
 
         public ADTReader()
         {
         }
 
-        public void LoadADT(string filename, bool loadSecondaryADTs = false, bool filenamesOnly = false)
+        public void LoadADT(string filename, bool loadSecondaryADTs = true, bool filenamesOnly = false)
         {
             m2Files = new List<string>();
             wmoFiles = new List<string>();
@@ -129,6 +129,8 @@ namespace WoWFormatLib.FileReaders
                         mapchunk.vertexshading = ReadMCCVSubChunk(subchunk, subbin);
                         break;
                     case "MCNR":
+                        mapchunk.normals = ReadMCNRSubChunk(subchunk, subbin);
+                        break;
                     case "MCSE":
                     case "MCBB":
                     case "MCLQ":
@@ -141,6 +143,56 @@ namespace WoWFormatLib.FileReaders
             return mapchunk;
         }
 
+        public TexMCNK ReadTexMCNKChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //256 of these chunks per file
+            TexMCNK mapchunk = new TexMCNK();
+
+            MemoryStream stream = new MemoryStream(bin.ReadBytes((int)chunk.Size));
+
+            var subbin = new BinaryReader(stream);
+
+            BlizzHeader subchunk;
+
+            long subpos = 0;
+
+            while (subpos < stream.Length)
+            {
+                subbin.BaseStream.Position = subpos;
+                subchunk = new BlizzHeader(subbin.ReadChars(4), subbin.ReadUInt32());
+                subchunk.Flip();
+                subpos = stream.Position + subchunk.Size;
+
+                switch (subchunk.ToString())
+                {
+                    case "MCLY":
+                        mapchunk.layers = ReadMCLYSubChunk(subchunk, subbin);
+                        break;
+                    case "MCSH":
+                    case "MCAL":
+                        continue;
+                    default:
+                        throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subchunk.ToString(), subpos.ToString()));
+                }
+            }
+            return mapchunk;
+        }
+
+        public MCLY[] ReadMCLYSubChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            var count = chunk.Size / 16;
+            MCLY[] mclychunks = new MCLY[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                mclychunks[i].textureId = bin.ReadUInt32();
+                mclychunks[i].flags = bin.ReadUInt32();
+                mclychunks[i].offsetInMCAL = bin.ReadUInt32();
+                mclychunks[i].effectId = bin.ReadInt32();
+            }
+
+            return mclychunks;
+        }
         public MCVT ReadMCVTSubChunk(BlizzHeader chunk, BinaryReader bin)
         {
             MCVT vtchunk = new MCVT();
@@ -150,6 +202,21 @@ namespace WoWFormatLib.FileReaders
                 vtchunk.vertices[i] = bin.ReadSingle();
             }
             return vtchunk;
+        }
+
+        public MCNR ReadMCNRSubChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            MCNR nrchunk = new MCNR();
+            nrchunk.normal_0 = new short[145];
+            nrchunk.normal_1 = new short[145];
+            nrchunk.normal_2 = new short[145];
+            for (int i = 0; i < 145; i++)
+            {
+                nrchunk.normal_0[i] = bin.ReadSByte();
+                nrchunk.normal_1[i] = bin.ReadSByte();
+                nrchunk.normal_2[i] = bin.ReadSByte();
+            }
+            return nrchunk;
         }
 
         public MCCV ReadMCCVSubChunk(BlizzHeader chunk, BinaryReader bin)
@@ -169,51 +236,26 @@ namespace WoWFormatLib.FileReaders
             return vtchunk;
         }
 
-        public void ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)
+        
+
+        public MTEX ReadMTEXChunk(BlizzHeader chunk, BinaryReader bin)
         {
-            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
-            var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
+            MTEX txchunk = new MTEX();
 
-            var str = new StringBuilder();
-
-            for (var i = 0; i < m2FilesChunk.Length; i++)
-            {
-                if (m2FilesChunk[i] == '\0')
-                {
-                    if (str.Length > 1)
-                    {
-                        var m2reader = new M2Reader();
-                        m2reader.LoadM2(str.ToString());
-                        m2Files.Add(str.ToString());
-                    }
-                    str = new StringBuilder();
-                }
-                else
-                {
-                    str.Append((char)m2FilesChunk[i]);
-                }
-            }
-        }
-
-        public void ReadMTEXChunk(BlizzHeader chunk, BinaryReader bin)
-        {
             //List of BLP filenames
             var blpFilesChunk = bin.ReadBytes((int)chunk.Size);
-
+            
             var str = new StringBuilder();
 
             for (var i = 0; i < blpFilesChunk.Length; i++)
             {
                 if (blpFilesChunk[i] == '\0')
                 {
-                    if (str.Length > 1)
+                    blpFiles.Add(str.ToString());
+                    if (!CASC.FileExists(str.ToString()))
                     {
-                        blpFiles.Add(str.ToString());
-                        if (!CASC.FileExists(str.ToString()))
-                        {
-                            Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
-                            new WoWFormatLib.Utils.MissingFile(str.ToString());
-                        }
+                        Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
+                        new WoWFormatLib.Utils.MissingFile(str.ToString());
                     }
                     str = new StringBuilder();
                 }
@@ -222,32 +264,10 @@ namespace WoWFormatLib.FileReaders
                     str.Append((char)blpFilesChunk[i]);
                 }
             }
-        }
 
-        public void ReadMWMOChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-            //List of WMO filenames
-            var wmoFilesChunk = bin.ReadBytes((int)chunk.Size);
+            txchunk.filenames = blpFiles.ToArray();
+            return txchunk;
 
-            var str = new StringBuilder();
-
-            for (int i = 0; i < wmoFilesChunk.Length; i++)
-            {
-                if (wmoFilesChunk[i] == '\0')
-                {
-                    if (str.Length > 1)
-                    {
-                        wmoFiles.Add(str.ToString());
-                        //var wmoreader = new WMOReader();
-                        //wmoreader.LoadWMO(str.ToString());
-                    }
-                    str = new StringBuilder();
-                }
-                else
-                {
-                    str.Append((char)wmoFilesChunk[i]);
-                }
-            }
         }
 
         private MHDR ReadMHDRChunk(BlizzHeader chunk, BinaryReader bin)
@@ -260,6 +280,8 @@ namespace WoWFormatLib.FileReaders
             var bin = new BinaryReader(adtObjStream);
             long position = 0;
 
+            adtfile.objects = new Obj();
+
             while (position < adtObjStream.Length)
             {
                 adtObjStream.Position = position;
@@ -268,22 +290,145 @@ namespace WoWFormatLib.FileReaders
                 position = adtObjStream.Position + chunk.Size;
 
                 if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
-                if (chunk.Is("MMDX")) { ReadMMDXChunk(chunk, bin); continue; }
-                if (chunk.Is("MMID")) { continue; }
-                if (chunk.Is("MWMO")) { ReadMWMOChunk(chunk, bin); continue; }
-                if (chunk.Is("MWID")) { continue; }
-                if (chunk.Is("MDDF")) { continue; }
-                if (chunk.Is("MODF")) { continue; }
-                if (chunk.Is("MCNK")) { continue; }
+                if (chunk.Is("MMDX")) { adtfile.objects.m2Names = ReadMMDXChunk(chunk, bin); continue; }
+                if (chunk.Is("MMID")) { adtfile.objects.m2NameOffsets = ReadMMIDChunk(chunk, bin); continue; }
+                if (chunk.Is("MWMO")) { adtfile.objects.wmoNames = ReadMWMOChunk(chunk, bin); continue; }
+                if (chunk.Is("MWID")) { adtfile.objects.wmoNameOffsets = readMWIDChunk(chunk, bin);  continue; }
+                if (chunk.Is("MDDF")) { adtfile.objects.models = ReadMWIDChunk(chunk, bin); continue; }
+                if (chunk.Is("MODF")) { adtfile.objects.worldModels = ReadMODFChunk(chunk, bin); continue; }
+                if (chunk.Is("MCNK")) { continue; } // Only has MCRD and other useless things nobody cares about!
 
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
             }
+        }
+
+        private MMDX ReadMMDXChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
+            var m2FilesChunk = bin.ReadBytes((int)chunk.Size);
+            MMDX mmdx = new MMDX();
+            var str = new StringBuilder();
+
+            List<uint> offsets = new List<uint>();
+
+            for (var i = 0; i < m2FilesChunk.Length; i++)
+            {
+                if (m2FilesChunk[i] == '\0')
+                {
+                    m2Files.Add(str.ToString());
+                    offsets.Add((uint)(i - str.ToString().Length));
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)m2FilesChunk[i]);
+                }
+            }
+
+            mmdx.filenames = m2Files.ToArray();
+            mmdx.offsets = offsets.ToArray();
+            return mmdx;
+        }
+
+        private MMID ReadMMIDChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            var count = chunk.Size / 4;
+
+            MMID mmid = new MMID();
+
+            mmid.offsets = new uint[count];
+            for(int i = 0; i < count; i++)
+            {
+                mmid.offsets[i] = bin.ReadUInt32();
+            }
+
+            return mmid;
+        }
+
+        private MWID readMWIDChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            var count = chunk.Size / 4;
+
+            MWID mwid = new MWID();
+
+            mwid.offsets = new uint[count];
+            for (int i = 0; i < count; i++)
+            {
+                mwid.offsets[i] = bin.ReadUInt32();
+            }
+
+            return mwid;
+        }
+
+        private MWMO ReadMWMOChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            //List of WMO filenames
+            var wmoFilesChunk = bin.ReadBytes((int)chunk.Size);
+
+            MWMO mwmo = new MWMO();
+            var str = new StringBuilder();
+
+            List<uint> offsets = new List<uint>();
+
+            for (int i = 0; i < wmoFilesChunk.Length; i++)
+            {
+                if (wmoFilesChunk[i] == '\0')
+                {
+                    wmoFiles.Add(str.ToString());
+                    offsets.Add((uint)(i - str.ToString().Length));
+                    str = new StringBuilder();
+                }
+                else
+                {
+                    str.Append((char)wmoFilesChunk[i]);
+                }
+            }
+
+            mwmo.offsets = offsets.ToArray();
+            mwmo.filenames = wmoFiles.ToArray();
+            return mwmo;
+        }
+        private MDDF ReadMWIDChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            MDDF mddf = new MDDF();
+
+            var count = chunk.Size / 36; //36 bytes per entry?
+
+            Console.WriteLine(count + " MDDF entries!");
+
+            mddf.entries = new MDDFEntry[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                mddf.entries[i] = bin.Read<MDDFEntry>();
+            }
+
+            return mddf;
+        }
+
+        private MODF ReadMODFChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            MODF modf = new MODF();
+
+            var count = chunk.Size / 64; //64 bytes per entry?
+
+            Console.WriteLine(count + " MODF entries!");
+
+            modf.entries = new MODFEntry[count];
+            for(int i = 0; i < count; i++)
+            {
+                modf.entries[i] = bin.Read<MODFEntry>();
+            }
+
+            return modf;
         }
 
         private void ReadTexFile(string filename, Stream adtTexStream, ref BlizzHeader chunk)
         {
             var bin = new BinaryReader(adtTexStream);
             long position = 0;
+            int MCNKi = 0;
+            adtfile.texChunks = new TexMCNK[16 * 16];
 
             while (position < adtTexStream.Length)
             {
@@ -294,8 +439,8 @@ namespace WoWFormatLib.FileReaders
 
                 if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
                 if (chunk.Is("MAMP")) { continue; }
-                if (chunk.Is("MTEX")) { ReadMTEXChunk(chunk, bin); continue; }
-                if (chunk.Is("MCNK")) { continue; }
+                if (chunk.Is("MTEX")) { adtfile.textures = ReadMTEXChunk(chunk, bin); continue; }
+                if (chunk.Is("MCNK")) { adtfile.texChunks[MCNKi] = ReadTexMCNKChunk(chunk, bin); MCNKi++;  continue; }
                 if (chunk.Is("MTXP")) { continue; }
 
                 throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));

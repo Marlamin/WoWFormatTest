@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatTest", "WoWFormatTest\WoWFormatTest.csproj", "{3ED7F6F2-5A92-496A-9D87-60F56638C2A7}"
 EndProject
@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenderTestWPF", "RenderTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWRenderLib", "WoWRenderLib\WoWRenderLib.csproj", "{57271A6C-A992-4F83-A6C5-8EEEA32C7960}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWOpenGL", "WoWOpenGL\WoWOpenGL.csproj", "{0354826D-EC58-4216-A0BF-26B78F6E90D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWOpenGL_FF", "WoWOpenGL\WoWOpenGL_FF.csproj", "{0354826D-EC58-4216-A0BF-26B78F6E90D6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWJsonDumper", "WoWJsonDumper\WoWJsonDumper.csproj", "{BA4100B7-ACB9-4F1A-B0BE-328CBFE9E0FD}"
 EndProject
@@ -38,6 +38,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListfileGenerator", "ListfileGenerator\ListfileGenerator.csproj", "{80D8C866-F31B-4D28-9BDC-D5CFE02EB4D4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CASCbot", "CASCbot\CASCbot.csproj", "{3DD07412-0413-4B88-965C-D0EE3338DA84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWOpenGL_SH", "WoWOpenGL_SH\WoWOpenGL_SH.csproj", "{80764950-B35D-4321-8B22-E8C76272523A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderTest", "ShaderTest\ShaderTest.csproj", "{07085D5D-4736-4E53-B4E9-7BD058DDA47F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -191,6 +195,30 @@ Global
 		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Release|Mixed Platforms.Build.0 = Release|x86
 		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Release|x86.ActiveCfg = Release|x86
 		{3DD07412-0413-4B88-965C-D0EE3338DA84}.Release|x86.Build.0 = Release|x86
+		{80764950-B35D-4321-8B22-E8C76272523A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Debug|x86.Build.0 = Debug|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Release|x86.ActiveCfg = Release|Any CPU
+		{80764950-B35D-4321-8B22-E8C76272523A}.Release|x86.Build.0 = Release|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Debug|x86.Build.0 = Debug|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|x86.ActiveCfg = Release|Any CPU
+		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

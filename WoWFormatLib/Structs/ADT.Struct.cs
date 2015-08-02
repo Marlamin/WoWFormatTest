@@ -1,11 +1,16 @@
-﻿using WoWFormatLib.Utils;
+﻿using System;
+using System.Collections.Generic;
+using WoWFormatLib.Utils;
 namespace WoWFormatLib.Structs.ADT
 {
     public struct ADT
     {
         public uint version;
         public MHDR header;
+        public MTEX textures;
         public MCNK[] chunks;
+        public TexMCNK[] texChunks;
+        public Obj objects;
     }
 
     public enum MHDRFlags{
@@ -79,6 +84,99 @@ namespace WoWFormatLib.Structs.ADT
         public MCLV colors;
         public MCCV vertexshading;
     }
+
+    public struct TexMCNK
+    {
+        public MCLY[] layers;
+    }
+
+    public struct Obj
+    {
+        public MDDF models;
+        public MMDX m2Names;
+        public MMID m2NameOffsets;
+
+        public MODF worldModels;
+        public MWMO wmoNames;
+        public MWID wmoNameOffsets;
+
+    }
+
+    //WMO placement
+    public struct MODF
+    {
+        public MODFEntry[] entries;
+    }
+
+    public struct MODFEntry
+    {
+        public uint mwidEntry;
+        public uint uniqueId;
+        public Vector3 position;
+        public Vector3 rotation;
+        public Vector3 lowerBounds;
+        public Vector3 upperBounds;
+        public UInt16 flags;
+        public UInt16 doodadSet;
+        public UInt16 nameSet;
+        public UInt16 padding;
+    }
+
+    [Flags]
+    public enum MODFFlags
+    {
+        modf_destroyable = 0x1, //who cares
+    }
+
+    //M2 placement
+    public struct MDDF
+    {
+        public MDDFEntry[] entries;
+    }
+
+    public struct MDDFEntry
+    {
+        public uint mmidEntry;
+        public uint uniqueId;
+        public Vector3 position;
+        public Vector3 rotation;
+        public UInt16 scale;
+        public UInt16 flags;
+    }
+
+    [Flags]
+    public enum MDDFFlags
+    {
+        mddf_biodome = 0x1,
+        mddf_shrubbery = 0x2, //probably deprecated
+    }
+
+    //List of filenames for M2 models that appear in this map tile.
+    public struct MMDX
+    {
+        public string[] filenames; // zero-terminated strings with complete paths to models. Referenced in MMID.
+        public uint[] offsets; //not part of official struct, filled manually during parsing with where the string started
+    }
+
+    //List of offsets of M2 filenames in the MMDX chunk.
+    public struct MMID
+    {
+        public uint[] offsets; // filename starting position in MMDX chunk. These entries are getting referenced in the MDDF chunk.
+    }
+
+    //List of offsets of WMO filenames in the MWMO chunk.
+    public struct MWID
+    {
+        public uint[] offsets; // filename starting position in MWMO chunk. These entries are getting referenced in the MODF chunk.
+    }
+
+    //List of filenames for WMOs (world map objects) that appear in this map tile.
+    public struct MWMO
+    {
+        public string[] filenames;
+        public uint[] offsets; //not part of official struct, filled manually during parsing with where the string started
+    }
+
     public struct MCVT
     {
         public float[] vertices; //make manually, 145
@@ -88,6 +186,15 @@ namespace WoWFormatLib.Structs.ADT
     {
         public ushort[] color; //make manually, 145
     }
+
+    public struct MCLY
+    {
+        public uint textureId;
+        public uint flags;
+        public uint offsetInMCAL;
+        public int effectId;
+    }
+
     public struct MCCV
     {
         public byte[] red;
@@ -98,10 +205,14 @@ namespace WoWFormatLib.Structs.ADT
 
     public struct MCNR
     {
-        public short normal_0;
-        public short normal_1;
-        public short normal_2;
-        //has entries too
+        public short[] normal_0;
+        public short[] normal_1;
+        public short[] normal_2;
+    }
+
+    public struct MTEX
+    {
+        public string[] filenames;
     }
 
 }
