@@ -255,8 +255,8 @@ namespace WoWOpenGL
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-        //    controls = new ControlsWindow();
-        //    controls.Show();
+            controls = new ControlsWindow();
+            controls.Show();
 
             winFormControl = wfContainer;
             cascProgressBar = CASCprogress;
@@ -276,7 +276,7 @@ namespace WoWOpenGL
             CASCdesc.Visibility = System.Windows.Visibility.Visible;
             CASCprogress.Visibility = System.Windows.Visibility.Visible;
             FilterBox.Visibility = System.Windows.Visibility.Hidden;
-
+            
             if (ConfigurationManager.AppSettings["basedir"] != "" && Directory.Exists(ConfigurationManager.AppSettings["basedir"]))
             {
                 Console.WriteLine("Using basedir " + ConfigurationManager.AppSettings["basedir"] + " to load..");
@@ -286,7 +286,6 @@ namespace WoWOpenGL
             {
                 bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction));
             }
-            
             bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
 
             try
@@ -312,11 +311,11 @@ namespace WoWOpenGL
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
             MapsTab.Visibility = System.Windows.Visibility.Visible;
-            using (TerrainWindow tw = new TerrainWindow("Draenor_30_31"))
-            {
-                tw.Run(30.0, 60.0);
-            }
-            //new Render(@"WORLD\EXPANSION05\DOODADS\SHADOWMOON\DOODADS\6SM_ROCK_C01.M2");
+           // using (TerrainWindow tw = new TerrainWindow("Draenor_30_31"))
+           // {
+           //     tw.Run(30.0, 60.0);
+           // }
+           // new Render(@"World\wmo\Draenor\Orc\6OC_OrcClans_HouseSmall.wmo");
         }
 
         private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)

@@ -25,9 +25,9 @@ namespace WoWOpenGL
         private uint[] modelVBOid = new uint[2];
         private int[] indices;
         private List<Terrain> adts = new List<Terrain>();
-        private Dictionary<uint, WoWFormatLib.Structs.M2.M2Model> models = new Dictionary<uint, WoWFormatLib.Structs.M2.M2Model>();
+        private Dictionary<string, WoWFormatLib.Structs.M2.M2Model> models = new Dictionary<string, WoWFormatLib.Structs.M2.M2Model>();
         private Dictionary<string, int> materialCache = new Dictionary<string, int>();
-        private Dictionary<uint, WoWFormatLib.Structs.WMO.WMO> worldModels = new Dictionary<uint, WoWFormatLib.Structs.WMO.WMO>();
+        private Dictionary<string, WoWFormatLib.Structs.WMO.WMO> worldModels = new Dictionary<string, WoWFormatLib.Structs.WMO.WMO>();
         OldCamera ActiveCamera;
 
         public TerrainWindow(string modelPath)
@@ -151,7 +151,7 @@ namespace WoWOpenGL
                             else
                             {
                                 GL.BindTexture(TextureTarget.Texture2D, material.textureID);
-                                //materialCache.Add(material.filename, material.textureID);
+                                materialCache.Add(material.filename, material.textureID);
                                 System.Drawing.Imaging.BitmapData bmp_data = blp.bmp.LockBits(new Rectangle(0, 0, blp.bmp.Width, blp.bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
                                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
@@ -212,7 +212,7 @@ namespace WoWOpenGL
 
                             //Console.WriteLine("First vertice at " + verticelist.First().X + "x" + verticelist.First().Y);
 
-                            batch.firstFace = indicelist.Count();
+                            batch.firstFace = (uint) indicelist.Count();
                             for (int j = 9; j < 145; j++)
                             {
                                 // if (!MCNK.HasHole(unitidx % 8, unitidx++ / 8))
@@ -224,11 +224,14 @@ namespace WoWOpenGL
                                 // }
                                 if ((j + 1) % (9 + 8) == 0) j += 9;
                             }
-                            batch.numFaces = (indicelist.Count()) - batch.firstFace;
+                            batch.numFaces = (uint)(indicelist.Count()) - batch.firstFace;
 
-                            batch.materialID = reader.adtfile.texChunks[c].layers[0].textureId;
+                            if (!materialCache.ContainsKey(reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId]))
+                            {
+                                throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId]);
+                            }
 
-                            Console.WriteLine(materials[(int) batch.materialID].filename);
+                            batch.materialID = (uint) materialCache[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId]];
 
                             renderBatches.Add(batch);
                         }
@@ -244,10 +247,10 @@ namespace WoWOpenGL
                             {
                                 if (reader.adtfile.objects.m2Names.offsets[mmi] == mmid)
                                 {
-                                    if (models.ContainsKey(reader.adtfile.objects.m2Names.offsets[mmi]))
+                                    if (models.ContainsKey(reader.adtfile.objects.m2Names.filenames[mmi]))
                                     {
                                         //Load model from memory
-                                        model = models[reader.adtfile.objects.m2Names.offsets[mmi]];
+                                        model = models[reader.adtfile.objects.m2Names.filenames[mmi]];
                                         Console.WriteLine("Loaded M2 from memory " + model.filename + " which as " + model.vertices.Count() + " vertices");
                                     }
                                     else
@@ -258,7 +261,7 @@ namespace WoWOpenGL
                                         {
                                             var modelreader = new M2Reader();
                                             modelreader.LoadM2(reader.adtfile.objects.m2Names.filenames[mmi]);
-                                            models.Add(reader.adtfile.objects.m2Names.offsets[mmi], modelreader.model);
+                                            models.Add(reader.adtfile.objects.m2Names.filenames[mmi], modelreader.model);
                                             model = modelreader.model;
                                             Console.WriteLine("Loaded M2 from disk " + modelreader.model.filename + " which as " + modelreader.model.vertices.Count() + " vertices");
                                         }
@@ -279,31 +282,28 @@ namespace WoWOpenGL
 
                             // Textures
                             ddBatch.mats = new Material[model.textures.Count()];
+
                             Console.WriteLine("Loading textures..");
                             for (int i = 0; i < model.textures.Count(); i++)
                             {
-                                Console.WriteLine("Loading texture " + i);
-                                string texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
-                                //materials[i].flags = model.textures[i].flags;
-                                Console.WriteLine("      Requires type " + model.textures[i].type + " texture");
-                                switch (model.textures[i].type)
-                                {
-                                    case 0:
-                                        Console.WriteLine("      Texture given in file!");
-                                        texturefilename = model.textures[i].filename;
-                                        break;
-                                    default:
-                                        Console.WriteLine("      Falling back to placeholder texture");
-                                        break;
-                                }
+                                string texturefilename = model.textures[i].filename;
 
-                                Console.WriteLine("      Eventual filename is " + texturefilename);
+                                if (materialCache.ContainsKey(texturefilename))
+                                {
+                                    Console.WriteLine("Texture " + texturefilename + " is cached!");
+                                    ddBatch.mats[i].textureID = materialCache[texturefilename];
+                                    ddBatch.mats[i].filename = texturefilename;
+                                    continue;
+                                }
+                                
+                                Console.WriteLine("Loading texture " + texturefilename + " from disk!");
+
                                 ddBatch.mats[i].textureID = GL.GenTexture();
 
                                 var blp = new BLPReader();
 
                                 ddBatch.mats[i].filename = texturefilename;
-
+                                
                                 blp.LoadBLP(texturefilename);
 
                                 if (blp.bmp == null)
@@ -323,6 +323,8 @@ namespace WoWOpenGL
                                     Console.WriteLine("Created texture \"" + texturefilename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
                                     blp.bmp.UnlockBits(bmp_data);
                                 }
+
+                                materialCache.Add(texturefilename, ddBatch.mats[i].textureID);
                             }
 
                             // Submeshes
@@ -349,10 +351,17 @@ namespace WoWOpenGL
                                     if (model.skins[0].textureunit[tu].submeshIndex == i)
                                     {
                                         //Console.WriteLine("SubmeshIndex: " + i);
-                                        //ddBatch.submeshes[i].blendType = model.renderflags[model.skins[0].textureunit[tu].renderFlags].blendingMode;
+                                        ddBatch.submeshes[i].blendType = model.renderflags[model.skins[0].textureunit[tu].renderFlags].blendingMode;
                                         //Console.WriteLine("Material ID: " + renderbatches[i].materialID);
                                         //Console.WriteLine("BlendType: " +renderbatches[i].blendType);
-                                        ddBatch.submeshes[i].material = model.texlookup[model.skins[0].textureunit[tu].texture].textureID;
+                                        if (!materialCache.ContainsKey(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename))
+                                        {
+                                           throw new Exception("MaterialCache does not have texture " + model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename);
+                                        }
+
+                                       // ddBatch.submeshes[i].material = (uint)materialCache[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId]];
+
+                                        ddBatch.submeshes[i].material = (uint) materialCache[model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename];
                                     }
                                 }
                             }
@@ -364,7 +373,7 @@ namespace WoWOpenGL
                             GL.BindBuffer(BufferTarget.ArrayBuffer, ddBatch.vertexBuffer);
                             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ddBatch.indiceBuffer);
 
-                            List<int> modelindicelist = new List<int>();
+                            List<uint> modelindicelist = new List<uint>();
                             for (int i = 0; i < model.skins[0].triangles.Count(); i++)
                             {
                                 modelindicelist.Add(model.skins[0].triangles[i].pt1);
@@ -372,23 +381,23 @@ namespace WoWOpenGL
                                 modelindicelist.Add(model.skins[0].triangles[i].pt3);
                             }
 
-                            int[] modelindices = modelindicelist.ToArray();
+                            uint[] modelindices = modelindicelist.ToArray();
 
                             Console.WriteLine(modelindicelist.Count() + " indices!");
                             ddBatch.indices = modelindices;
 
                             ddBatch.position = new Vector3(-(modelentry.position.X - 17066), modelentry.position.Y, -(modelentry.position.Z - 17066));
+                            ddBatch.rotation = new Vector3(modelentry.rotation.X, modelentry.rotation.Y, modelentry.rotation.Z);
 
                             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ddBatch.indiceBuffer);
-                            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ddBatch.indices.Length * sizeof(int)), ddBatch.indices, BufferUsageHint.StaticDraw);
+                            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ddBatch.indices.Length * sizeof(uint)), ddBatch.indices, BufferUsageHint.StaticDraw);
 
-                            Vertex[] modelvertices = new Vertex[model.vertices.Count()];
+                            M2Vertex[] modelvertices = new M2Vertex[model.vertices.Count()];
 
                             for (int i = 0; i < model.vertices.Count(); i++)
                             {
-                                modelvertices[i].Position = new Vector3(model.vertices[i].position.Y, model.vertices[i].position.Z, model.vertices[i].position.X);
-                                modelvertices[i].Color = new Vector3(1.0f, 0.0f, 0.0f);
-                                modelvertices[i].Normal = new Vector3(model.vertices[i].normal.Y, model.vertices[i].normal.Z, model.vertices[i].normal.X);
+                                modelvertices[i].Position = new Vector3(model.vertices[i].position.X, model.vertices[i].position.Z, model.vertices[i].position.Y);
+                                modelvertices[i].Normal = new Vector3(model.vertices[i].normal.X, model.vertices[i].normal.Z, model.vertices[i].normal.Y);
                                 modelvertices[i].TexCoord = new Vector2(model.vertices[i].textureCoordX, model.vertices[i].textureCoordY);
                             }
                             GL.BindBuffer(BufferTarget.ArrayBuffer, ddBatch.vertexBuffer);
@@ -400,11 +409,181 @@ namespace WoWOpenGL
                         List<WorldModelBatch> worldModelBatches = new List<WorldModelBatch>();
 
                         // WMO loading goes here
+                        for(int wmi = 0; wmi < reader.adtfile.objects.worldModels.entries.Count(); wmi++)
+                        {
 
-                        adt.materials = materials.ToArray();
+                            string wmofilename = "";
+
+                            var wmobatch = new WorldModelBatch();
+
+                            var wmodelentry = reader.adtfile.objects.worldModels.entries[wmi];
+                            var mwid = reader.adtfile.objects.wmoNameOffsets.offsets[wmodelentry.mwidEntry];
+
+                            for (int wmfi = 0; wmfi < reader.adtfile.objects.wmoNames.offsets.Count(); wmfi++)
+                            {
+                                if (reader.adtfile.objects.wmoNames.offsets[wmfi] == mwid) {
+                                    wmofilename = reader.adtfile.objects.wmoNames.filenames[wmfi];
+                                }
+
+                            }
+
+                            if(wmofilename.Length == 0)
+                            {
+                                throw new Exception("Unable to find filename for WMO!");
+                            }
+
+                            WMOReader wmoreader = new WMOReader();
+
+                            if (worldModels.ContainsKey(wmofilename))
+                            {
+                                Console.WriteLine("Loading WMO " + wmofilename + " from cache!");
+                                wmoreader.wmofile = worldModels[wmofilename];
+                            }
+                            else
+                            {
+                                Console.WriteLine("Loading WMO " + wmofilename + " from disk");
+                                wmoreader.LoadWMO(wmofilename);
+                                worldModels.Add(wmofilename, wmoreader.wmofile);
+                            }
+
+                            if(wmoreader.wmofile.group.Count() == 0)
+                            {
+                                throw new Exception("WMO groups not found!");
+                            }
+
+                            //WMO doodads
+                            //for (int i = 0; i < wmoreader.wmofile.doodadNames.Count(); i++)
+                            //{
+                            //Console.WriteLine(reader.wmofile.doodadNames[i].filename);
+                            //}
+
+                            wmobatch.groupBatches = new WorldModelGroupBatches[wmoreader.wmofile.group.Count()];
+
+                            for (int g = 0; g < wmoreader.wmofile.group.Count(); g++)
+                            {
+                                if (wmoreader.wmofile.group[g].mogp.vertices == null) { continue; }
+
+                                wmobatch.groupBatches[g].vertexBuffer = GL.GenBuffer();
+                                wmobatch.groupBatches[g].indiceBuffer = GL.GenBuffer();
+                                GL.BindBuffer(BufferTarget.ArrayBuffer, wmobatch.groupBatches[g].vertexBuffer);
+
+                                M2Vertex[] wmovertices = new M2Vertex[wmoreader.wmofile.group[g].mogp.vertices.Count()];
+
+                                for (int i = 0; i < wmoreader.wmofile.group[g].mogp.vertices.Count(); i++)
+                                {
+                                    wmovertices[i].Position = new Vector3(wmoreader.wmofile.group[g].mogp.vertices[i].vector.X, wmoreader.wmofile.group[g].mogp.vertices[i].vector.Z, wmoreader.wmofile.group[g].mogp.vertices[i].vector.Y);
+                                    wmovertices[i].Normal = new Vector3(wmoreader.wmofile.group[g].mogp.normals[i].normal.X, wmoreader.wmofile.group[g].mogp.normals[i].normal.Z, wmoreader.wmofile.group[g].mogp.normals[i].normal.Y);
+                                    wmovertices[i].TexCoord = new Vector2(wmoreader.wmofile.group[g].mogp.textureCoords[0][i].X, wmoreader.wmofile.group[g].mogp.textureCoords[0][i].Y);
+                                }
+
+                                //Push to buffer
+                                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(wmovertices.Length * 8 * sizeof(float)), wmovertices, BufferUsageHint.StaticDraw);
+
+                                //Switch to Index buffer
+                                GL.BindBuffer(BufferTarget.ElementArrayBuffer, wmobatch.groupBatches[g].indiceBuffer);
+
+                                List<uint> wmoindicelist = new List<uint>();
+                                for (int i = 0; i < wmoreader.wmofile.group[g].mogp.indices.Count(); i++)
+                                {
+                                    wmoindicelist.Add(wmoreader.wmofile.group[g].mogp.indices[i].indice);
+                                }
+
+                                wmobatch.groupBatches[g].indices = wmoindicelist.ToArray();
+
+                                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(wmobatch.groupBatches[g].indices.Length * sizeof(uint)), wmobatch.groupBatches[g].indices, BufferUsageHint.StaticDraw);
+                            }
+
+                            GL.Enable(EnableCap.Texture2D);
+
+                            wmobatch.mats = new Material[wmoreader.wmofile.materials.Count()];
+                            for (int i = 0; i < wmoreader.wmofile.materials.Count(); i++)
+                            {
+                                for (int ti = 0; ti < wmoreader.wmofile.textures.Count(); ti++)
+                                {
+
+                                    if (wmoreader.wmofile.textures[ti].startOffset == wmoreader.wmofile.materials[i].texture1)
+                                    {
+
+                                        if (materialCache.ContainsKey(wmoreader.wmofile.textures[ti].filename))
+                                        {
+                                            Console.WriteLine("Texture " + wmoreader.wmofile.textures[ti].filename + " is cached!");
+                                            wmobatch.mats[i].textureID = materialCache[wmoreader.wmofile.textures[ti].filename];
+                                            wmobatch.mats[i].filename = wmoreader.wmofile.textures[ti].filename;
+                                            wmobatch.mats[i].texture1 = wmoreader.wmofile.materials[i].texture1;
+                                            continue;
+                                        }
+
+                                        wmobatch.mats[i].textureID = GL.GenTexture();
+                                        wmobatch.mats[i].filename = wmoreader.wmofile.textures[ti].filename;
+                                        materialCache.Add(wmobatch.mats[i].filename, wmobatch.mats[i].textureID);
+
+                                        var blp = new BLPReader();
+                                        blp.LoadBLP(wmoreader.wmofile.textures[ti].filename);
+                                        if (blp.bmp == null)
+                                        {
+                                            throw new Exception("BMP is null!");
+                                        }
+                                        else
+                                        {
+                                            GL.BindTexture(TextureTarget.Texture2D, materialCache[wmobatch.mats[i].filename]);
+                                            System.Drawing.Imaging.BitmapData bmp_data = blp.bmp.LockBits(new Rectangle(0, 0, blp.bmp.Width, blp.bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                                            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+                                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+                                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+                                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+
+                                            Console.WriteLine("Created texture \"" + wmoreader.wmofile.textures[ti].filename + "\" (ID " + wmobatch.mats[i].textureID + ") of " + bmp_data.Width + "x" + bmp_data.Height);
+                                            blp.bmp.UnlockBits(bmp_data);
+                                        }
+                                        
+                                        
+                                    }
+                                }
+                            }
+
+                            wmobatch.position = new Vector3(-(wmodelentry.position.X - 17066), wmodelentry.position.Y, -(wmodelentry.position.Z - 17066));
+                            wmobatch.rotation = new Vector3(wmodelentry.rotation.X, wmodelentry.rotation.Y, wmodelentry.rotation.Z);
+
+                            int numRenderbatches = 0;
+                            //Get total amount of render batches
+                            for (int i = 0; i < wmoreader.wmofile.group.Count(); i++)
+                            {
+                                if (wmoreader.wmofile.group[i].mogp.renderBatches == null) { continue; }
+                                numRenderbatches = numRenderbatches + wmoreader.wmofile.group[i].mogp.renderBatches.Count();
+                            }
+
+                            wmobatch.wmoRenderBatch = new WMORenderBatch[numRenderbatches];
+
+                            int rb = 0;
+                            for (int g = 0; g < wmoreader.wmofile.group.Count(); g++)
+                            {
+                                var group = wmoreader.wmofile.group[g];
+                                if (group.mogp.renderBatches == null) { continue; }
+                                for (int i = 0; i < group.mogp.renderBatches.Count(); i++)
+                                {
+                                    wmobatch.wmoRenderBatch[rb].firstFace = group.mogp.renderBatches[i].firstFace;
+                                    wmobatch.wmoRenderBatch[rb].numFaces = group.mogp.renderBatches[i].numFaces;
+                                    for (int ti = 0; ti < wmobatch.mats.Count(); ti++)
+                                    {
+                                        if(wmoreader.wmofile.materials[group.mogp.renderBatches[i].materialID].texture1 == wmobatch.mats[ti].texture1)
+                                        {
+                                            wmobatch.wmoRenderBatch[rb].materialID = (uint) wmobatch.mats[ti].textureID;
+                                        }
+                                    }
+                                    wmobatch.wmoRenderBatch[rb].blendType = wmoreader.wmofile.materials[group.mogp.renderBatches[i].materialID].blendMode;
+                                    wmobatch.wmoRenderBatch[rb].groupID = (uint)g;
+                                    rb++;
+                                }
+                            }
+
+                            worldModelBatches.Add(wmobatch);
+                        }
+
                         adt.renderBatches = renderBatches.ToArray();
                         adt.doodadBatches = doodadBatches.ToArray();
                         adt.worldModelBatches = worldModelBatches.ToArray();
+
                         adts.Add(adt);
                     }
                 }
@@ -443,7 +622,7 @@ namespace WoWOpenGL
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
             GL.ShadeModel(ShadingModel.Smooth);
-            GL.ClearColor(Color.Black);
+            GL.ClearColor(Color.White);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
@@ -532,6 +711,7 @@ namespace WoWOpenGL
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            GL.AlphaFunc(AlphaFunction.Greater, 0.5f);
             GL.Enable(EnableCap.VertexArray);
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.Enable(EnableCap.NormalArray);
@@ -540,26 +720,27 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.ColorArray);
             GL.Enable(EnableCap.Texture2D);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
-            
+            GL.Enable(EnableCap.AlphaTest);
+
             // GL.Enable(EnableCap.Blend);
             // GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
 
-            // GL.Light(LightName.Light0, LightParameter.Position, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
-            // GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
-            // GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
-            // GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
-            // GL.Light(LightName.Light0, LightParameter.SpotExponent, 0.0f);
-            // GL.LightModel(LightModelParameter.LightModelAmbient, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
-            // GL.ShadeModel(ShadingModel.Smooth);
+            //GL.Light(LightName.Light0, LightParameter.Position, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
+            //GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
+            //GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
+            //GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
+            //GL.Light(LightName.Light0, LightParameter.SpotExponent, 0.0f);
+            //GL.LightModel(LightModelParameter.LightModelAmbient, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
+            //GL.ShadeModel(ShadingModel.Smooth);
 
-            
-            // GL.Enable(EnableCap.Lighting);
-            // GL.Enable(EnableCap.Light0);
-            // GL.Enable(EnableCap.ColorMaterial);
-            // GL.ColorMaterial(MaterialFace.Front, ColorMaterialParameter.AmbientAndDiffuse);
+            //GL.Enable(EnableCap.Lighting);
+            //GL.Enable(EnableCap.Light0);
+            //GL.Enable(EnableCap.ColorMaterial);
+            //GL.ColorMaterial(MaterialFace.Front, ColorMaterialParameter.AmbientAndDiffuse);
 
-            // GL.Material(MaterialFace.Front, MaterialParameter.Specular, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
-            // GL.Material(MaterialFace.Front, MaterialParameter.Shininess, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
+            //GL.Material(MaterialFace.Front, MaterialParameter.Specular, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
+            //GL.Material(MaterialFace.Front, MaterialParameter.Shininess, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
             GL.NormalPointer(NormalPointerType.Float, 11 * sizeof(float), (IntPtr) 0);
             GL.ColorPointer(3, ColorPointerType.Float, 11 * sizeof(float), (IntPtr)(3 * sizeof(float)));
@@ -572,38 +753,153 @@ namespace WoWOpenGL
                 for (int rb = 0; rb < adts[adti].renderBatches.Count(); rb++)
                 {
                     //GL.DrawElements(PrimitiveType.Triangles, indices.Count(), DrawElementsType.UnsignedInt, 0);
-                    GL.BindTexture(TextureTarget.Texture2D, adts[adti].materials[(int)adts[adti].renderBatches[rb].materialID].textureID);
-                    GL.DrawRangeElements(PrimitiveType.Triangles, adts[adti].renderBatches[rb].firstFace, adts[adti].renderBatches[rb].firstFace + adts[adti].renderBatches[rb].numFaces, adts[adti].renderBatches[rb].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].renderBatches[rb].firstFace * 4));
+                    GL.BindTexture(TextureTarget.Texture2D, (int)adts[adti].renderBatches[rb].materialID);
+                    GL.DrawRangeElements(PrimitiveType.Triangles, (int)adts[adti].renderBatches[rb].firstFace, (int)adts[adti].renderBatches[rb].firstFace + (int)adts[adti].renderBatches[rb].numFaces, (int)adts[adti].renderBatches[rb].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].renderBatches[rb].firstFace * 4));
                     //GL.DrawArrays(PrimitiveType.Triangles, renderBatches[rb].firstFace, renderBatches[rb].numFaces);
                 }
 
-                
+                GL.Disable(EnableCap.ColorArray);
+                GL.DisableClientState(ArrayCap.ColorArray);
 
                 for (int db = 0; db < adts[adti].doodadBatches.Count(); db++)
                 {
                     GL.PushMatrix();
 
                     GL.Translate(adts[adti].doodadBatches[db].position.X, adts[adti].doodadBatches[db].position.Y, adts[adti].doodadBatches[db].position.Z);
+                    //GL.Rotate(Math.Atan2(adts[adti].doodadBatches[db].rotation.X, adts[adti].doodadBatches[db].rotation.Z), adts[adti].doodadBatches[db].rotation.Z, adts[adti].doodadBatches[db].rotation.X, adts[adti].doodadBatches[db].rotation.Z + Math.PI);
+
+                    GL.Rotate(-adts[adti].doodadBatches[db].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
+                    GL.Rotate((adts[adti].doodadBatches[db].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
+                    GL.Rotate(-adts[adti].doodadBatches[db].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
+       
+
                     GL.BindBuffer(BufferTarget.ArrayBuffer, adts[adti].doodadBatches[db].vertexBuffer);
 
                     //int verticeBufferSize = 0;
                     //GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out verticeBufferSize);
                     //Console.WriteLine("Vertices in buffer: " + verticeBufferSize / 11 / sizeof(float));
 
-                    GL.NormalPointer(NormalPointerType.Float, 11 * sizeof(float), (IntPtr)0);
-                    GL.ColorPointer(3, ColorPointerType.Float, 11 * sizeof(float), (IntPtr)(3 * sizeof(float)));
-                    GL.TexCoordPointer(2, TexCoordPointerType.Float, 11 * sizeof(float), (IntPtr)(6 * sizeof(float)));
-                    GL.VertexPointer(3, VertexPointerType.Float, 11 * sizeof(float), (IntPtr)(8 * sizeof(float)));
+                    GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr) 0);
+                    GL.TexCoordPointer(2, TexCoordPointerType.Float, 8 * sizeof(float), (IntPtr)(3 * sizeof(float)));
+                    GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, adts[adti].doodadBatches[db].indiceBuffer);
 
                     //int indiceBufferSize = 0;
                     //GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out indiceBufferSize);
                     //Console.WriteLine("Indices in buffer: " + indiceBufferSize / sizeof(int));
-
-                    GL.DrawElements(PrimitiveType.Triangles, adts[adti].doodadBatches[db].indices.Count(), DrawElementsType.UnsignedInt, 0);
+                    for(int si = 0; si < adts[adti].doodadBatches[db].submeshes.Count(); si++)
+                    {
+                        switch (adts[adti].doodadBatches[db].submeshes[si].blendType)
+                        {
+                            case 0: //Combiners_Opaque (Blend disabled)
+                                GL.Disable(EnableCap.Blend);
+                                break;
+                            case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
+                                GL.Enable(EnableCap.Blend);
+                                //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
+                                //GL.BlendFuncSeparate(BlendingFactorSrc.One, BlendingFactorDest.Zero, BlendingFactorSrc.One, BlendingFactorDest.Zero);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                break;
+                            case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                //Tried:
+                                //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha
+                                //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha
+                                //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusDstAlpha
+                                break;
+                            case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
+                                break;
+                            case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                                break;
+                            case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                break;
+                            case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                                break;
+                            case 7: //World\Expansion05\Doodads\Shadowmoon\Doodads\6FX_Fire_Grassline_Doodad_blue_LARGE.m2
+                                break;
+                            default:
+                                throw new Exception("Unknown blend type " + adts[adti].doodadBatches[db].submeshes[si].blendType);
+                        }
+                        GL.BindTexture(TextureTarget.Texture2D, adts[adti].doodadBatches[db].submeshes[si].material);
+                        GL.DrawRangeElements(PrimitiveType.Triangles, adts[adti].doodadBatches[db].submeshes[si].firstFace, (adts[adti].doodadBatches[db].submeshes[si].firstFace + adts[adti].doodadBatches[db].submeshes[si].numFaces), (int)adts[adti].doodadBatches[db].submeshes[si].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].doodadBatches[db].submeshes[si].firstFace * 4));
+                    }
 
                     GL.PopMatrix();
                 }
+
+                for (int wb = 0; wb < adts[adti].worldModelBatches.Count(); wb++)
+                {
+                    for (int wrb = 0; wrb < adts[adti].worldModelBatches[wb].groupBatches.Count(); wrb++)
+                    {
+                        GL.PushMatrix();
+
+                        GL.Translate(adts[adti].worldModelBatches[wb].position.X, adts[adti].worldModelBatches[wb].position.Y, adts[adti].worldModelBatches[wb].position.Z);
+
+                        GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
+                        GL.Rotate((adts[adti].worldModelBatches[wb].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
+                        GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
+
+                        
+                        for (int si = 0; si < adts[adti].worldModelBatches[wb].wmoRenderBatch.Count(); si++)
+                        {
+                            GL.BindBuffer(BufferTarget.ArrayBuffer, adts[adti].worldModelBatches[wb].groupBatches[adts[adti].worldModelBatches[wb].wmoRenderBatch[si].groupID].vertexBuffer);
+                            GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
+                            GL.TexCoordPointer(2, TexCoordPointerType.Float, 8 * sizeof(float), (IntPtr)(3 * sizeof(float)));
+                            GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
+                            GL.BindBuffer(BufferTarget.ElementArrayBuffer, adts[adti].worldModelBatches[wb].groupBatches[adts[adti].worldModelBatches[wb].wmoRenderBatch[si].groupID].indiceBuffer);
+                            switch (adts[adti].worldModelBatches[wb].wmoRenderBatch[si].blendType)
+                            {
+                                case 0:
+                                    GL.Disable(EnableCap.Blend);
+                                    break;
+                                case 1:
+                                    GL.Enable(EnableCap.Blend);
+                                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                    break;
+                                case 2: 
+                                    GL.Enable(EnableCap.Blend);
+                                    GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                    break;
+                                case 3:
+                                    GL.Enable(EnableCap.Blend);
+                                    GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
+                                    break;
+                                case 4:
+                                    GL.Enable(EnableCap.Blend);
+                                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                                    break;
+                                case 5:
+                                    GL.Enable(EnableCap.Blend);
+                                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                    break;
+                                case 6:
+                                    GL.Enable(EnableCap.Blend);
+                                    GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                                    break;
+                                case 7: 
+                                    break;
+                                default:
+                                    throw new Exception("Unknown blend type " + adts[adti].worldModelBatches[wb].wmoRenderBatch[si].blendType);
+                            }
+                            GL.BindTexture(TextureTarget.Texture2D, adts[adti].worldModelBatches[wb].wmoRenderBatch[si].materialID);
+                            GL.DrawRangeElements(PrimitiveType.Triangles, adts[adti].worldModelBatches[wb].wmoRenderBatch[si].firstFace, (adts[adti].worldModelBatches[wb].wmoRenderBatch[si].firstFace + adts[adti].worldModelBatches[wb].wmoRenderBatch[si].numFaces), (int)adts[adti].worldModelBatches[wb].wmoRenderBatch[si].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].worldModelBatches[wb].wmoRenderBatch[si].firstFace * 4));
+                        }
+
+                        GL.PopMatrix();
+                    }
+                }
+
+                GL.Enable(EnableCap.ColorArray);
+                GL.EnableClientState(ArrayCap.ColorArray);
             }
 
 
@@ -634,7 +930,6 @@ namespace WoWOpenGL
             public RenderBatch[] renderBatches;
             public DoodadBatch[] doodadBatches;
             public WorldModelBatch[] worldModelBatches;
-            public Material[] materials;
         }
 
         struct Vertex
@@ -645,25 +940,43 @@ namespace WoWOpenGL
             public Vector3 Position;
         }
 
+        struct M2Vertex
+        {
+            public Vector3 Normal;
+            public Vector2 TexCoord;
+            public Vector3 Position;
+
+        }
         public struct Material
         {
             public string filename;
             public int textureID;
+            internal uint texture1;
         }
 
         public struct RenderBatch
         {
-            public int firstFace;
-            public int numFaces;
+            public uint firstFace;
+            public uint numFaces;
             public uint materialID;
+        }
+
+        public struct WMORenderBatch
+        {
+            public uint firstFace;
+            public uint materialID;
+            public uint numFaces;
+            public uint groupID;
+            public uint blendType;
         }
 
         public struct DoodadBatch
         {
             public int vertexBuffer;
             public int indiceBuffer;
-            public int[] indices;
+            public uint[] indices;
             public Vector3 position;
+            public Vector3 rotation;
             public Submesh[] submeshes;
             public Material[] mats;
         }
@@ -673,14 +986,23 @@ namespace WoWOpenGL
             public uint firstFace;
             public uint numFaces;
             public uint material;
+            public uint blendType;
         }
 
         public struct WorldModelBatch
         {
+            public WorldModelGroupBatches[] groupBatches;
+            public Material[] mats;
+            public WMORenderBatch[] wmoRenderBatch;
+            public Vector3 position;
+            public Vector3 rotation;
+        }
+
+        public struct WorldModelGroupBatches
+        {
             public int vertexBuffer;
             public int indiceBuffer;
-            public int[] indices;
-            public Vector3 position;
+            public uint[] indices;
         }
     }
 }

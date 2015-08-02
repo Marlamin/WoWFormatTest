@@ -5,17 +5,17 @@
     <Grid>
         <Slider x:Name="CameraSpeedSlider" ValueChanged="CameraSpeedSlider_ValueChanged" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="272" Maximum="100" Minimum="1" Value="50"/>
         <Label x:Name="CameraSpeedLabel" Content="Camera speed: 50%" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Height="26" Width="272"/>
-        <Slider x:Name="amb1" HorizontalAlignment="Left" Margin="53,76,0,0" VerticalAlignment="Top" Width="56" ValueChanged="amb1_ValueChanged"/>
-        <Slider x:Name="amb2" HorizontalAlignment="Left" Margin="109,76,0,0" VerticalAlignment="Top" Width="56" ValueChanged="amb2_ValueChanged"/>
-        <Slider x:Name="amb3" HorizontalAlignment="Left" Margin="165,76,0,0" VerticalAlignment="Top" Width="56" ValueChanged="amb3_ValueChanged"/>
-        <Slider x:Name="amb4" HorizontalAlignment="Left" Margin="221,76,0,0" VerticalAlignment="Top" Width="56" ValueChanged="amb4_ValueChanged"/>
+        <TextBox x:Name="amb1" HorizontalAlignment="Left" Margin="53,76,0,0" VerticalAlignment="Top" Width="56" TextChanged="amb1_ValueChanged"/>
+        <TextBox x:Name="amb2" HorizontalAlignment="Left" Margin="109,76,0,0" VerticalAlignment="Top" Width="56" TextChanged="amb2_ValueChanged"/>
+        <TextBox x:Name="amb3" HorizontalAlignment="Left" Margin="165,76,0,0" VerticalAlignment="Top" Width="56" TextChanged="amb3_ValueChanged"/>
+        <TextBox x:Name="amb4" HorizontalAlignment="Left" Margin="221,76,0,0" VerticalAlignment="Top" Width="56" TextChanged="amb4_ValueChanged"/>
         <Label x:Name="label" Content="Amb" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label_Copy" Content="Diff" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label_Copy1" Content="Pos" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top"/>
-        <Slider x:Name="diff1" HorizontalAlignment="Left" Margin="53,107,0,0" VerticalAlignment="Top" Width="56" ValueChanged="diff1_ValueChanged"/>
-        <Slider x:Name="diff2" HorizontalAlignment="Left" Margin="109,107,0,0" VerticalAlignment="Top" Width="56" ValueChanged="diff2_ValueChanged"/>
-        <Slider x:Name="diff3" HorizontalAlignment="Left" Margin="165,107,0,0" VerticalAlignment="Top" Width="56" ValueChanged="diff3_ValueChanged"/>
-        <Slider x:Name="diff4" HorizontalAlignment="Left" Margin="221,107,0,0" VerticalAlignment="Top" Width="56" ValueChanged="diff4_ValueChanged"/>
+        <CheckBox x:Name="diff1" HorizontalAlignment="Left" Margin="53,107,0,0" VerticalAlignment="Top" Width="56" Click="diff1_ValueChanged"/>
+        <CheckBox x:Name="diff2" HorizontalAlignment="Left" Margin="109,107,0,0" VerticalAlignment="Top" Width="56" Click="diff2_ValueChanged"/>
+        <CheckBox x:Name="diff3" HorizontalAlignment="Left" Margin="165,107,0,0" VerticalAlignment="Top" Width="56" Click="diff3_ValueChanged"/>
+        <CheckBox x:Name="diff4" HorizontalAlignment="Left" Margin="221,107,0,0" VerticalAlignment="Top" Width="56" Click="diff4_ValueChanged"/>
         <Slider x:Name="pos1" HorizontalAlignment="Left" Margin="53,138,0,0" VerticalAlignment="Top" Width="56" ValueChanged="pos1_ValueChanged"/>
         <Slider x:Name="pos2" HorizontalAlignment="Left" Margin="109,138,0,0" VerticalAlignment="Top" Width="56" ValueChanged="pos2_ValueChanged"/>
         <Slider x:Name="pos3" HorizontalAlignment="Left" Margin="165,138,0,0" VerticalAlignment="Top" Width="56" ValueChanged="pos3_ValueChanged"/>

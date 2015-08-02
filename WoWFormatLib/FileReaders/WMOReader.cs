@@ -233,16 +233,14 @@ namespace WoWFormatLib.FileReaders
             {
                 if (blpFilesChunk[i] == '\0')
                 {
-                    if (str.Length > 1)
+                    str.Replace("..", ".");
+                    blpFiles.Add(str.ToString());
+                    blpOffset.Add(i - str.ToString().Length);
+                    if (!CASC.FileExists(str.ToString()))
                     {
-                        str.Replace("..", ".");
-                        blpFiles.Add(str.ToString());
-                        blpOffset.Add(i - str.ToString().Length);
-                        if (!CASC.FileExists(str.ToString()))
-                        {
-                            new WoWFormatLib.Utils.MissingFile(str.ToString());
-                        }
+                        new WoWFormatLib.Utils.MissingFile(str.ToString());
                     }
+                   
                     str = new StringBuilder();
                 }
                 else
@@ -356,7 +354,7 @@ namespace WoWFormatLib.FileReaders
                         wmofile.version = bin.Read<MVER>();
                         if (wmofile.version.version != 17)
                         {
-                            throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
+                            throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ") (" + filename + ")");
                         }
                         continue;
                     case "MOTX":

@@ -24,9 +24,9 @@ namespace WoWOpenGL
         public static float amb_2;
         public static float amb_3;
         public static float amb_4;
-        public static float diff_1;
-        public static float diff_2;
-        public static float diff_3;
+        public static bool diff_1;
+        public static bool diff_2;
+        public static bool diff_3;
         public static float diff_4;
         public static float pos_1;
         public static float pos_2;
@@ -46,44 +46,48 @@ namespace WoWOpenGL
             }
         }
 
-        private void amb1_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void amb1_ValueChanged(object sender, TextChangedEventArgs e)
         {
-            amb_1 = (float) Math.Round(amb1.Value, 0);
+            amb_1 = 0.0f;
+            float.TryParse(amb1.Text, out amb_1);
         }
 
-        private void amb2_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void amb2_ValueChanged(object sender, TextChangedEventArgs e)
         {
-            amb_2 = (float)Math.Round(amb2.Value, 0);
+            amb_2 = 0.0f;
+            float.TryParse(amb2.Text, out amb_2);
         }
 
-        private void amb3_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void amb3_ValueChanged(object sender, TextChangedEventArgs e)
         {
-            amb_3 = (float)Math.Round(amb3.Value, 0);
+            amb_3 = 0.0f;
+            float.TryParse(amb3.Text, out amb_3);
         }
 
-        private void amb4_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void amb4_ValueChanged(object sender, TextChangedEventArgs e)
         {
-            amb_4 = (float)Math.Round(amb4.Value, 0);
+            amb_4 = 0.0f;
+            float.TryParse(amb4.Text, out amb_4);
         }
 
-        private void diff1_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void diff1_ValueChanged(object sender, RoutedEventArgs e)
         {
-            diff_1 = (float)Math.Round(diff1.Value, 0);
+            diff_1 = diff1.IsChecked.Value;
         }
 
-        private void diff2_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void diff2_ValueChanged(object sender, RoutedEventArgs e)
         {
-            diff_2 = (float)Math.Round(diff2.Value, 0);
+            diff_2 = diff2.IsChecked.Value;
         }
 
-        private void diff3_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void diff3_ValueChanged(object sender, RoutedEventArgs e)
         {
-            diff_3 = (float)Math.Round(diff3.Value, 0);
+            diff_3 = diff3.IsChecked.Value;
         }
 
-        private void diff4_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void diff4_ValueChanged(object sender, RoutedEventArgs e)
         {
-            diff_4 = (float)Math.Round(diff4.Value, 0);
+          //  diff_4 = (float)Math.Round(diff4.Value, 0);
         }
 
         private void pos1_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
