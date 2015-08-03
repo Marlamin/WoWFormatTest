@@ -311,10 +311,10 @@ namespace WoWOpenGL
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
             MapsTab.Visibility = System.Windows.Visibility.Visible;
-           // using (TerrainWindow tw = new TerrainWindow("Draenor_30_31"))
-           // {
-           //     tw.Run(30.0, 60.0);
-           // }
+            using (TerrainWindow tw = new TerrainWindow("Draenor_28_26"))
+            {
+                tw.Run(30.0, 60.0);
+            }
            // new Render(@"World\wmo\Draenor\Orc\6OC_OrcClans_HouseSmall.wmo");
         }
 
