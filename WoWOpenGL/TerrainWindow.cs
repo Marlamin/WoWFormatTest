@@ -23,6 +23,9 @@ namespace WoWOpenGL
         private static float camSpeed = 0.25f;
         private List<Terrain> adts = new List<Terrain>();
 
+        private bool mouseDragging = true;
+        private Point mouseOldCoords;
+
         private Dictionary<string, WoWFormatLib.Structs.M2.M2Model> models = new Dictionary<string, WoWFormatLib.Structs.M2.M2Model>();
         private Dictionary<string, int> materialCache = new Dictionary<string, int>();
         private Dictionary<string, WoWFormatLib.Structs.WMO.WMO> worldModels = new Dictionary<string, WoWFormatLib.Structs.WMO.WMO>();
@@ -644,6 +647,44 @@ namespace WoWOpenGL
             {
                 lightHeight = lightHeight - 50f;
             }
+
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (!mouseDragging)
+                {
+                    mouseDragging = true;
+                    mouseOldCoords = new Point(mouseState.X, mouseState.Y);
+                }
+
+                Point mouseNewCoords = new Point(mouseState.X, mouseState.Y);
+
+                int mouseMovementY = (mouseNewCoords.Y - mouseOldCoords.Y);
+                int mouseMovementX = (mouseNewCoords.X - mouseOldCoords.X);
+
+                if (keyboardState.IsKeyDown(Key.ShiftLeft))
+                {
+                    dragY = dragY + mouseMovementY / 2;
+                    dragX = dragX + mouseMovementX / 2;
+
+                }
+                else
+                {
+                    //if(mouseMovementX < 0)
+                    //{
+                    //    dragX = dragX + mouseMovementX * angle;
+                    //}
+
+                    angle = angle + mouseMovementX / 10f;
+                }
+
+                mouseOldCoords = mouseNewCoords;
+            }
+
+            if (mouseState.LeftButton == ButtonState.Released)
+            {
+                mouseDragging = false;
+            }
+
             dragZ = (mouseState.WheelPrecise / 2) - 1068; //Startzoom is at -7.5f 
         }
 
