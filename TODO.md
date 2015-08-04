@@ -1,6 +1,6 @@
 == TODO ==
-* Alpha issues (maybe disabling brazier smoke texture <-- this is bad)
-* Rotation issues (both WMOs and M2s, some are fine, some are not)
+* Alpha issues
+* Rotation issues (some small rotation issues remain)
 * Water
 * Multiple texture layers (shader magic or rendering everything 4 times)
 * Optimization

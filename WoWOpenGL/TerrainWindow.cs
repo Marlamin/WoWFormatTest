@@ -87,6 +87,9 @@ namespace WoWOpenGL
 
         private int LoadTexture(string filename)
         {
+
+            filename = filename.ToLower();
+
             if (materialCache.ContainsKey(filename))
             {
                 Console.WriteLine("[CACHE HIT] " + filename);
@@ -118,8 +121,9 @@ namespace WoWOpenGL
                 blp.bmp.UnlockBits(bmp_data);
             }
 
-            return textureId;
+            Console.WriteLine("[CACHE ADD] " + filename);
 
+            return textureId;
         }
 
         private void LoadMap(string map, int centerx, int centery, int distance)
@@ -221,9 +225,9 @@ namespace WoWOpenGL
                             }
                             batch.numFaces = (uint)(indicelist.Count()) - batch.firstFace;
 
-                            if (!materialCache.ContainsKey(reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId]))
+                            if (!materialCache.ContainsKey(reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower()))
                             {
-                                throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId]);
+                                throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower());
                             }
 
                             batch.materialID = (uint) materialCache[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId]];
@@ -273,6 +277,7 @@ namespace WoWOpenGL
                             doodad.filename = model.filename;
                             doodad.position = new Vector3(-(modelentry.position.X - 17066), modelentry.position.Y, -(modelentry.position.Z - 17066));
                             doodad.rotation = new Vector3(modelentry.rotation.X, modelentry.rotation.Y, modelentry.rotation.Z);
+                            doodad.scale = modelentry.scale;
                             doodads.Add(doodad);
 
                             if (doodadBatches.ContainsKey(model.filename))
@@ -324,12 +329,12 @@ namespace WoWOpenGL
                                     if (model.skins[0].textureunit[tu].submeshIndex == i)
                                     {
                                         ddBatch.submeshes[i].blendType = model.renderflags[model.skins[0].textureunit[tu].renderFlags].blendingMode;
-                                        if (!materialCache.ContainsKey(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename))
+                                        if (!materialCache.ContainsKey(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower()))
                                         {
-                                           throw new Exception("MaterialCache does not have texture " + model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename);
+                                           throw new Exception("MaterialCache does not have texture " + model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower());
                                         }
 
-                                        ddBatch.submeshes[i].material = (uint) materialCache[model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename];
+                                        ddBatch.submeshes[i].material = (uint) materialCache[model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower()];
                                     }
                                 }
                             }
@@ -485,7 +490,7 @@ namespace WoWOpenGL
 
                             wmobatch.position = new Vector3(-(wmodelentry.position.X - 17066), wmodelentry.position.Y, -(wmodelentry.position.Z - 17066));
                             wmobatch.rotation = new Vector3(wmodelentry.rotation.X, wmodelentry.rotation.Y, wmodelentry.rotation.Z);
-
+                            
                             int numRenderbatches = 0;
                             //Get total amount of render batches
                             for (int i = 0; i < wmoreader.wmofile.group.Count(); i++)
@@ -512,6 +517,7 @@ namespace WoWOpenGL
                                             wmobatch.wmoRenderBatch[rb].materialID = (uint) wmobatch.mats[ti].textureID;
                                         }
                                     }
+
                                     wmobatch.wmoRenderBatch[rb].blendType = wmoreader.wmofile.materials[group.mogp.renderBatches[i].materialID].blendMode;
                                     wmobatch.wmoRenderBatch[rb].groupID = (uint)g;
                                     rb++;
@@ -714,10 +720,17 @@ namespace WoWOpenGL
                     GL.Translate(adts[adti].doodads[di].position.X, adts[adti].doodads[di].position.Y, adts[adti].doodads[di].position.Z);
                     //GL.Rotate(Math.Atan2(adts[adti].doodadBatches[db].rotation.X, adts[adti].doodadBatches[db].rotation.Z), adts[adti].doodadBatches[db].rotation.Z, adts[adti].doodadBatches[db].rotation.X, adts[adti].doodadBatches[db].rotation.Z + Math.PI);
 
-                    GL.Rotate(-adts[adti].doodads[di].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
-                    GL.Rotate((adts[adti].doodads[di].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
-                    GL.Rotate(-adts[adti].doodads[di].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
-                    
+                    //GL.Rotate(-adts[adti].doodads[di].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
+                    //GL.Rotate((adts[adti].doodads[di].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
+                    //GL.Rotate(-adts[adti].doodads[di].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
+
+                    GL.Rotate(adts[adti].doodads[di].rotation.Y - 90.0f, 0.0f, 1.0f, 0.0f);
+                    GL.Rotate(-adts[adti].doodads[di].rotation.X, 0.0f, 0.0f, 1.0f);
+                    GL.Rotate(adts[adti].doodads[di].rotation.Z, 1.0f, 0.0f, 0.0f);
+
+                    var scale = adts[adti].doodads[di].scale / 1024f;
+                    GL.Scale(-scale, scale, scale);
+
                     GL.BindBuffer(BufferTarget.ArrayBuffer, activeDoodadBatch.vertexBuffer);
 
                     //int verticeBufferSize = 0;
@@ -789,11 +802,14 @@ namespace WoWOpenGL
 
                         GL.Translate(adts[adti].worldModelBatches[wb].position.X, adts[adti].worldModelBatches[wb].position.Y, adts[adti].worldModelBatches[wb].position.Z);
 
-                        GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
-                        GL.Rotate((adts[adti].worldModelBatches[wb].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
-                        GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
+                        // GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
+                        //  GL.Rotate((adts[adti].worldModelBatches[wb].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
+                        //  GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
+                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Y - 90.0f, 0.0f, 1.0f, 0.0f);
+                        GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X, 0.0f, 0.0f, 1.0f);
+                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Z, 1.0f, 0.0f, 0.0f);
 
-                        
+                        GL.Scale(-1.0f, 1.0f, 1.0f);
                         for (int si = 0; si < adts[adti].worldModelBatches[wb].wmoRenderBatch.Count(); si++)
                         {
                             GL.BindBuffer(BufferTarget.ArrayBuffer, adts[adti].worldModelBatches[wb].groupBatches[adts[adti].worldModelBatches[wb].wmoRenderBatch[si].groupID].vertexBuffer);
@@ -915,6 +931,7 @@ namespace WoWOpenGL
             public string filename;
             public Vector3 position;
             public Vector3 rotation;
+            public float scale;
         }
 
         public struct DoodadBatch
