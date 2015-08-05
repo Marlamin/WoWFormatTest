@@ -110,11 +110,27 @@ namespace WoWFormatLib.Utils
 
         public static bool FileExists(string filename)
         {
+            if (string.IsNullOrEmpty(filename)) { return false; }
+
+            if(File.Exists(Path.Combine(@"Z:\18983_fulla", filename)))
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine(Path.Combine(@"Z:\18983_fulla", filename) + " does not exist!");
+            }
+
             return cascHandler.FileExists(filename);
         }
 
         public static Stream OpenFile(string filename)
         {
+
+            var stream = File.OpenRead(Path.Combine(@"Z:\18983_fulla", filename));
+
+            if (stream.CanRead) { return stream; }
+
             return cascHandler.OpenFile(filename);
         }
 

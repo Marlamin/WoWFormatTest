@@ -28,6 +28,7 @@ namespace WoWOpenGL
         private static float dragY;
         private static float dragZ;
         private static bool isWMO = false;
+        private static float zoom;
 
         public Render(string ModelPath)
         {
@@ -418,9 +419,6 @@ namespace WoWOpenGL
         {
             float speed = 0.1f * (float) ControlsWindow.camSpeed;
 
-            Console.WriteLine("Speed: " + speed);
-
-            
             OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
             OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
 
@@ -444,12 +442,21 @@ namespace WoWOpenGL
                 angle = angle - speed;
             }
 
+            if (keyboardState.IsKeyDown(Key.Z))
+            {
+                dragZ = dragZ - 1.0f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.X))
+            {
+                dragZ = dragZ + 1.0f;
+            }
 
             //if (mouseInRender)
             //{
-            dragZ = (mouseState.WheelPrecise / speed) - (7.5f); //Startzoom is at -7.5f 
+            //dragZ = (mouseState.WheelPrecise / speed) - (7.5f); //Startzoom is at -7.5f 
             //}
-            
+
         }
 
         private void RenderFrame(object sender, EventArgs e) //This is called every frame

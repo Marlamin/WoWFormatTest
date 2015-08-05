@@ -246,55 +246,46 @@ namespace WoWOpenGL
                             WoWFormatLib.Structs.M2.M2Model model = new WoWFormatLib.Structs.M2.M2Model();
                             var modelentry = reader.adtfile.objects.models.entries[mi];
                             var mmid = reader.adtfile.objects.m2NameOffsets.offsets[modelentry.mmidEntry];
-                            var doodad = new Doodad();
-
+                            
+                            var modelfilename = "";
                             for (int mmi = 0; mmi < reader.adtfile.objects.m2Names.offsets.Count(); mmi++)
                             {
                                 if (reader.adtfile.objects.m2Names.offsets[mmi] == mmid)
                                 {
-
-                                    if (models.ContainsKey(reader.adtfile.objects.m2Names.filenames[mmi]))
-                                    {
-                                        //Load model from memory
-                                        model = models[reader.adtfile.objects.m2Names.filenames[mmi]];
-                                       // Console.WriteLine("Loaded M2 from memory " + model.filename + " which as " + model.vertices.Count() + " vertices");
-                                    }
-                                    else
-                                    {
-                                        //Load model from file
-                                        if (WoWFormatLib.Utils.CASC.FileExists(reader.adtfile.objects.m2Names.filenames[mmi]))
-                                        {
-                                            var modelreader = new M2Reader();
-                                            modelreader.LoadM2(reader.adtfile.objects.m2Names.filenames[mmi]);
-                                            models.Add(reader.adtfile.objects.m2Names.filenames[mmi], modelreader.model);
-                                            model = modelreader.model;
-                                           // Console.WriteLine("Loaded M2 from disk " + modelreader.model.filename + " which as " + modelreader.model.vertices.Count() + " vertices");
-                                        }
-                                        else
-                                        {
-                                            throw new Exception("Model " + reader.adtfile.objects.m2Names.filenames[mmi] + " does not exist!");
-                                        }
-                                    }
+                                    modelfilename = reader.adtfile.objects.m2Names.filenames[mmi].ToLower();
                                 }
                             }
 
-                            doodad.filename = model.filename;
+                            var doodad = new Doodad();
+                            doodad.filename = modelfilename;
                             doodad.position = new Vector3(-(modelentry.position.X - 17066), modelentry.position.Y, -(modelentry.position.Z - 17066));
                             doodad.rotation = new Vector3(modelentry.rotation.X, modelentry.rotation.Y, modelentry.rotation.Z);
                             doodad.scale = modelentry.scale;
                             doodads.Add(doodad);
 
-                            if (doodadBatches.ContainsKey(model.filename))
+                            if (doodadBatches.ContainsKey(modelfilename))
                             {
-                                //Console.WriteLine("Loading doodadbatch from cache " + model.filename + "!");
                                 continue;
                             }
 
-                           // Console.WriteLine("Parsing model " + model.filename + "!");
-
-                            if (model.filename == null)
+                            if (models.ContainsKey(modelfilename))
                             {
-                                throw new Exception("Model isn't loaded!!!!!");
+                                model = models[modelfilename];
+                            }
+                            else
+                            {
+                                //Load model from file
+                                if (WoWFormatLib.Utils.CASC.FileExists(modelfilename))
+                                {
+                                    var modelreader = new M2Reader();
+                                    modelreader.LoadM2(modelfilename);
+                                    models.Add(modelfilename, modelreader.model);
+                                    model = modelreader.model;
+                                }
+                                else
+                                {
+                                    throw new Exception("Model " + modelfilename + " does not exist!");
+                                }
                             }
 
                             var ddBatch = new DoodadBatch();
@@ -322,8 +313,6 @@ namespace WoWOpenGL
                                             continue;
                                         }
                                     }
-
-                                    //Console.WriteLine("Loading submesh " + model.skins[0].submeshes[i].submeshID + "(" + model.skins[0].submeshes[i].unk2 + ")");
                                 }
 
                                 ddBatch.submeshes[i].firstFace = model.skins[0].submeshes[i].startTriangle;
@@ -377,7 +366,7 @@ namespace WoWOpenGL
                             GL.BindBuffer(BufferTarget.ArrayBuffer, ddBatch.vertexBuffer);
                             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(modelvertices.Length * 8 * sizeof(float)), modelvertices, BufferUsageHint.StaticDraw);
 
-                            doodadBatches.Add(model.filename, ddBatch);
+                            doodadBatches.Add(modelfilename, ddBatch);
                         }
 
                         List<WorldModelBatch> worldModelBatches = new List<WorldModelBatch>();
@@ -396,7 +385,7 @@ namespace WoWOpenGL
                             for (int wmfi = 0; wmfi < reader.adtfile.objects.wmoNames.offsets.Count(); wmfi++)
                             {
                                 if (reader.adtfile.objects.wmoNames.offsets[wmfi] == mwid) {
-                                    wmofilename = reader.adtfile.objects.wmoNames.filenames[wmfi];
+                                    wmofilename = reader.adtfile.objects.wmoNames.filenames[wmfi].ToLower();
                                 }
 
                             }
