@@ -242,6 +242,7 @@ namespace WoWOpenGL
 
                         for (int mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
                         {
+                            Console.WriteLine("Loading model #" + mi);
                             WoWFormatLib.Structs.M2.M2Model model = new WoWFormatLib.Structs.M2.M2Model();
                             var modelentry = reader.adtfile.objects.models.entries[mi];
                             var mmid = reader.adtfile.objects.m2NameOffsets.offsets[modelentry.mmidEntry];
@@ -384,7 +385,7 @@ namespace WoWOpenGL
                         // WMO loading goes here
                         for(int wmi = 0; wmi < reader.adtfile.objects.worldModels.entries.Count(); wmi++)
                         {
-
+                            Console.WriteLine("Loading WMO #" + wmi);
                             string wmofilename = "";
 
                             var wmobatch = new WorldModelBatch();
@@ -590,6 +591,11 @@ namespace WoWOpenGL
         }
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            if (!this.Focused)
+            {
+                return;
+            }
+
             MouseState mouseState = OpenTK.Input.Mouse.GetState();
             KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
 

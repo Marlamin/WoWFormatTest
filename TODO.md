@@ -4,3 +4,4 @@
 * Water
 * Multiple texture layers (shader magic or rendering everything 4 times)
 * Optimization
+* Local file loading
