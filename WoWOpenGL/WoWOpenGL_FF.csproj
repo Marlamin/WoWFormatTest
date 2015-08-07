@@ -72,6 +72,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CacheStorage.cs" />
+    <Compile Include="Loaders\BLPLoader.cs" />
+    <Compile Include="Loaders\M2Loader.cs" />
+    <Compile Include="Loaders\WMOLoader.cs" />
     <Compile Include="OldCamera.cs" />
     <Compile Include="ControlsWindow.xaml.cs">
       <DependentUpon>ControlsWindow.xaml</DependentUpon>

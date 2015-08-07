@@ -11,6 +11,8 @@ using System.Text;
 using WoWFormatLib.FileReaders;
 using OpenTK.Input;
 using System.Timers;
+using WoWOpenGL.Loaders;
+
 namespace WoWOpenGL
 {
     public class Render : GameWindow
@@ -29,7 +31,7 @@ namespace WoWOpenGL
         private static float dragZ;
         private static bool isWMO = false;
         private static float zoom;
-
+        private CacheStorage cache = new CacheStorage();
         public Render(string ModelPath)
         {
             dragX = 0.0f;
@@ -121,6 +123,8 @@ namespace WoWOpenGL
 
         private void LoadM2(string modelpath)
         {
+            //M2Loader.LoadM2(modelpath, cache);
+            
             Console.WriteLine("Loading M2 file ("+modelpath+")..");
             M2Reader reader = new M2Reader();
 
@@ -213,31 +217,8 @@ namespace WoWOpenGL
                 }
 
                 Console.WriteLine("      Eventual filename is " + texturefilename);
-                materials[i].textureID = GL.GenTexture();
-                
-                var blp = new BLPReader();
-
+                materials[i].textureID = BLPLoader.LoadTexture(texturefilename, cache);
                 materials[i].filename = texturefilename;
-
-                blp.LoadBLP(texturefilename);
-
-                if (blp.bmp == null)
-                {
-                    throw new Exception("BMP is null!");
-                }
-                else
-                {
-                    GL.BindTexture(TextureTarget.Texture2D, materials[i].textureID);
-                    BitmapData bmp_data = blp.bmp.LockBits(new Rectangle(0, 0, blp.bmp.Width, blp.bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-                    //Console.WriteLine(blp.bmp.PixelFormat);
-                    Console.WriteLine("Created texture \"" + texturefilename + "\" of " + bmp_data.Width + "x" + bmp_data.Height);
-                    blp.bmp.UnlockBits(bmp_data);
-                }
             }
             
             renderbatches = new RenderBatch[reader.model.skins[0].submeshes.Count()];
@@ -273,6 +254,7 @@ namespace WoWOpenGL
             Console.WriteLine("  " + renderbatches.Count() + " renderbatches");
             Console.WriteLine("  " + reader.model.vertices.Count() + " vertices");
             Console.WriteLine("Done loading M2 file!");
+            
             
             gLoaded = true;
         }
@@ -475,22 +457,6 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
-
-            GL.Light(LightName.Light0, LightParameter.Position, new float[] { 1.0f, 1.0f, 0.0f, 1.0f });
-            GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.0f, 0.0f, 0.0f, 1.0f });
-            GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
-            GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
-            GL.Light(LightName.Light0, LightParameter.SpotExponent, 0.0f);
-            GL.LightModel(LightModelParameter.LightModelAmbient, new float[] { 0.2f, 0.2f, 0.2f, 1.0f });
-
-            GL.Enable(EnableCap.Lighting);
-            GL.Enable(EnableCap.Light0);
-            GL.Enable(EnableCap.ColorMaterial);
-
-            GL.ColorMaterial(MaterialFace.Front, ColorMaterialParameter.AmbientAndDiffuse);
-
-            GL.Material(MaterialFace.Front, MaterialParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
-            GL.Material(MaterialFace.Front, MaterialParameter.Shininess, new float[] { 1.0f, 1.0f, 0.0f, 1.0f });
             GL.Rotate(angle, 0.0, 1.0, 0.0);
 
             for (int i = 0; i < renderbatches.Count(); i++)
