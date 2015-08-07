@@ -31,6 +31,8 @@ namespace WoWOpenGL
         private Dictionary<string, WoWFormatLib.Structs.WMO.WMO> worldModels = new Dictionary<string, WoWFormatLib.Structs.WMO.WMO>();
         private Dictionary<string, DoodadBatch> doodadBatches = new Dictionary<string, DoodadBatch>();
 
+        private Vector3 firstLocation;
+
         OldCamera ActiveCamera;
 
         public TerrainWindow(string modelPath)
@@ -181,6 +183,12 @@ namespace WoWOpenGL
                         var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
                         var initialChunkX = reader.adtfile.chunks[0].header.position.X;
 
+                        if(firstLocation.X == 0)
+                        {
+                            firstLocation = new Vector3(initialChunkY, initialChunkX, 1.0f);
+                            Console.WriteLine("Setting first location to " + firstLocation.ToString());
+                        }
+
                         List<RenderBatch> renderBatches = new List<RenderBatch>();
 
                         for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
@@ -233,7 +241,7 @@ namespace WoWOpenGL
                                 throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower());
                             }
 
-                            batch.materialID = (uint) materialCache[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId]];
+                            batch.materialID = (uint) materialCache[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower()];
 
                             renderBatches.Add(batch);
                         }
@@ -434,7 +442,6 @@ namespace WoWOpenGL
 
                                 for (int i = 0; i < wmoreader.wmofile.group[g].mogp.vertices.Count(); i++)
                                 {
-                                    float f;
                                     wmovertices[i].Position = new Vector3(wmoreader.wmofile.group[g].mogp.vertices[i].vector.X, wmoreader.wmofile.group[g].mogp.vertices[i].vector.Z, wmoreader.wmofile.group[g].mogp.vertices[i].vector.Y);
                                     wmovertices[i].Normal = new Vector3(wmoreader.wmofile.group[g].mogp.normals[i].normal.X, wmoreader.wmofile.group[g].mogp.normals[i].normal.Z, wmoreader.wmofile.group[g].mogp.normals[i].normal.Y);
                                     if (wmoreader.wmofile.group[g].mogp.textureCoords[0] == null)
@@ -567,7 +574,9 @@ namespace WoWOpenGL
             GL.ClearColor(Color.White);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
+            ActiveCamera.Pos = firstLocation;
+            dragX = firstLocation.X;
+            dragY = firstLocation.Y;
             ActiveCamera.setupGLRenderMatrix();
         }
 
@@ -643,6 +652,16 @@ namespace WoWOpenGL
                 lightHeight = lightHeight - 50f;
             }
 
+            if (keyboardState.IsKeyDown(Key.X))
+            {
+                dragZ = dragZ + 10f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.Z))
+            {
+                dragZ = dragZ - 10f;
+            }
+
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
                 if (!mouseDragging)
@@ -680,7 +699,7 @@ namespace WoWOpenGL
                 mouseDragging = false;
             }
 
-            dragZ = (mouseState.WheelPrecise / 2) - 1068; //Startzoom is at -7.5f 
+            //dragZ = (mouseState.WheelPrecise / 2) - 1068; //Startzoom is at -7.5f 
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
