@@ -42,7 +42,7 @@ namespace WoWOpenGL
             Keyboard.KeyDown += Keyboard_KeyDown;
 
             ActiveCamera = new OldCamera(Width, Height);
-            ActiveCamera.Pos = new Vector3(10.0f, -10.0f, -7.5f);
+            //ActiveCamera.Pos = new Vector3(10.0f, -10.0f, -7.5f);
 
             Console.WriteLine(modelPath);
 
@@ -480,9 +480,9 @@ namespace WoWOpenGL
             ActiveCamera.setupGLRenderMatrix();
 
 
-            GL.Translate(-dragX, -dragY, -dragZ);
+            GL.Translate(-(dragX - 267), -(dragY - 267), -(dragZ - 267)); //267 is from 533,33..(adtsize) / 2
             GL.Rotate(angle, 0.0, 1.0f, 0.0);
-            GL.Translate(dragX, dragY, dragZ);
+            GL.Translate(dragX - 267, dragY - 267, dragZ - 267);
             DrawAxes();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
