@@ -22,6 +22,8 @@ namespace WoWOpenGL
         private static float camSpeed = 0.25f;
         private List<Terrain> adts = new List<Terrain>();
 
+        private Dictionary<Key, int> CoolOffKeys = new Dictionary<Key, int>();
+
         private bool mouseDragging = true;
         private Point mouseOldCoords;
 
@@ -32,10 +34,10 @@ namespace WoWOpenGL
         public TerrainWindow(string modelPath)
             : base(1920, 1080, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Terrain test", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default)
         {
-            dragX = 227;
-            dragY = 152;
-            dragZ = 2868;
-            angle = 90.0f;
+            dragX = 0;
+            dragY = 0;
+            dragZ = 0;
+            angle = 0.0f;
 
             Keyboard.KeyDown += Keyboard_KeyDown;
 
@@ -50,7 +52,7 @@ namespace WoWOpenGL
             //LoadADT(adt[0], adt[1], adt[2]);
             LoadMap(adt[0], int.Parse(adt[1]), int.Parse(adt[2]), 1);
         }
-        
+
         void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
         {
             if (e.Key == Key.Escape)
@@ -117,7 +119,7 @@ namespace WoWOpenGL
                         GL.BindBuffer(BufferTarget.ElementArrayBuffer, adt.indiceBuffer);
 
                         List<Material> materials = new List<Material>();
-        
+
                         //Check if textures are already loaded or not, multiple ADTs close together probably use the same ones mostly
                         for (int ti = 0; ti < reader.adtfile.textures.filenames.Count(); ti++)
                         {
@@ -127,19 +129,19 @@ namespace WoWOpenGL
                             if (!WoWFormatLib.Utils.CASC.FileExists(material.filename)) { continue; }
 
                             material.textureID = BLPLoader.LoadTexture(reader.adtfile.textures.filenames[ti], cache);
-  
+
                             materials.Add(material);
                         }
-                       
+
                         var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
                         var initialChunkX = reader.adtfile.chunks[0].header.position.X;
 
-                      /*  if(firstLocation.X == 0)
-                        {
-                            firstLocation = new Vector3(initialChunkY, initialChunkX, 1.0f);
-                            Console.WriteLine("Setting first location to " + firstLocation.ToString());
-                        }
-                        */
+                        /*  if(firstLocation.X == 0)
+                          {
+                              firstLocation = new Vector3(initialChunkY, initialChunkX, 1.0f);
+                              Console.WriteLine("Setting first location to " + firstLocation.ToString());
+                          }
+                          */
                         List<RenderBatch> renderBatches = new List<RenderBatch>();
 
                         for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
@@ -176,7 +178,7 @@ namespace WoWOpenGL
                                 }
                             }
 
-                            batch.firstFace = (uint) indicelist.Count();
+                            batch.firstFace = (uint)indicelist.Count();
                             for (int j = 9; j < 145; j++)
                             {
                                 indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
@@ -192,7 +194,7 @@ namespace WoWOpenGL
                                 throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower());
                             }
 
-                            batch.materialID = (uint) cache.materials[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower()];
+                            batch.materialID = (uint)cache.materials[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower()];
 
                             renderBatches.Add(batch);
                         }
@@ -202,10 +204,10 @@ namespace WoWOpenGL
                         for (int mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
                         {
                             Console.WriteLine("Loading model #" + mi);
-                            
+
                             var modelentry = reader.adtfile.objects.models.entries[mi];
                             var mmid = reader.adtfile.objects.m2NameOffsets.offsets[modelentry.mmidEntry];
-                            
+
                             var modelfilename = "";
                             for (int mmi = 0; mmi < reader.adtfile.objects.m2Names.offsets.Count(); mmi++)
                             {
@@ -233,7 +235,7 @@ namespace WoWOpenGL
                         List<WorldModelBatch> worldModelBatches = new List<WorldModelBatch>();
 
                         // WMO loading goes here
-                        for(int wmi = 0; wmi < reader.adtfile.objects.worldModels.entries.Count(); wmi++)
+                        for (int wmi = 0; wmi < reader.adtfile.objects.worldModels.entries.Count(); wmi++)
                         {
                             Console.WriteLine("Loading WMO #" + wmi);
                             string wmofilename = "";
@@ -243,13 +245,14 @@ namespace WoWOpenGL
 
                             for (int wmfi = 0; wmfi < reader.adtfile.objects.wmoNames.offsets.Count(); wmfi++)
                             {
-                                if (reader.adtfile.objects.wmoNames.offsets[wmfi] == mwid) {
+                                if (reader.adtfile.objects.wmoNames.offsets[wmfi] == mwid)
+                                {
                                     wmofilename = reader.adtfile.objects.wmoNames.filenames[wmfi].ToLower();
                                 }
 
                             }
 
-                            if(wmofilename.Length == 0)
+                            if (wmofilename.Length == 0)
                             {
                                 throw new Exception("Unable to find filename for WMO!");
                             }
@@ -355,24 +358,27 @@ namespace WoWOpenGL
                 camSpeed = camSpeed - 0.025f;
             }
 
-            if (keyboardState.IsKeyDown(Key.Up))
+            if (keyboardState.IsKeyDown(Key.ShiftLeft))
             {
-                dragY = dragY + camSpeed;
-            }
+                if (keyboardState.IsKeyDown(Key.Up))
+                {
+                    dragY = dragY + camSpeed;
+                }
 
-            if (keyboardState.IsKeyDown(Key.Down))
-            {
-                dragY = dragY - camSpeed;
-            }
+                if (keyboardState.IsKeyDown(Key.Down))
+                {
+                    dragY = dragY - camSpeed;
+                }
 
-            if (keyboardState.IsKeyDown(Key.Left))
-            {
-                dragX = dragX + camSpeed;
-            }
+                if (keyboardState.IsKeyDown(Key.Left))
+                {
+                    dragX = dragX + camSpeed;
+                }
 
-            if (keyboardState.IsKeyDown(Key.Right))
-            {
-                dragX = dragX - camSpeed;
+                if (keyboardState.IsKeyDown(Key.Right))
+                {
+                    dragX = dragX - camSpeed;
+                }
             }
 
             if (keyboardState.IsKeyDown(Key.L))
@@ -433,7 +439,31 @@ namespace WoWOpenGL
                 mouseDragging = false;
             }
 
-            dragZ = (mouseState.WheelPrecise / 2) - 1068; //Startzoom is at -7.5f 
+            if (keyboardState.IsKeyDown(Key.R))//Reset
+            {
+                dragX = dragY = dragZ = angle = 0;
+            }
+
+            if (!CoolOffKeys.ContainsKey(Key.Right) && keyboardState.IsKeyDown(Key.Right))
+            {
+                angle += 90;
+                CoolOffKey(Key.Right);
+            }
+
+            if (!CoolOffKeys.ContainsKey(Key.Left) && keyboardState.IsKeyDown(Key.Left))
+            {
+                angle -= 90;
+                CoolOffKey(Key.Left);
+            }
+
+            dragZ = (mouseState.WheelPrecise / 2) - 500; //Startzoom is at -7.5f 
+        }
+
+        private void CoolOffKey(Key kKey)
+        {
+            if (CoolOffKeys.ContainsKey(kKey))
+                CoolOffKeys[kKey] = 1000;
+            else CoolOffKeys.Add(kKey, 1000);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -441,9 +471,18 @@ namespace WoWOpenGL
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);  
+            angle = angle % 360;
+
+            //int dragXa = angle % 90
+
+            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
+
             ActiveCamera.setupGLRenderMatrix();
+
+
+            GL.Translate(-dragX, -dragY, -dragZ);
             GL.Rotate(angle, 0.0, 1.0f, 0.0);
+            GL.Translate(dragX, dragY, dragZ);
             DrawAxes();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -500,7 +539,7 @@ namespace WoWOpenGL
                 GL.DisableClientState(ArrayCap.ColorArray);
 
                 for (int di = 0; di < adts[adti].doodads.Count(); di++)
-                { 
+                {
                     GL.PushMatrix();
 
                     var activeDoodadBatch = cache.doodadBatches[adts[adti].doodads[di].filename];
@@ -568,7 +607,7 @@ namespace WoWOpenGL
 
                     GL.PopMatrix();
                 }
-                
+
                 for (int wb = 0; wb < adts[adti].worldModelBatches.Count(); wb++)
                 {
                     for (int wrb = 0; wrb < adts[adti].worldModelBatches[wb].worldModel.groupBatches.Count(); wrb++)
@@ -601,7 +640,7 @@ namespace WoWOpenGL
                                     GL.Enable(EnableCap.Blend);
                                     GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                                     break;
-                                case 2: 
+                                case 2:
                                     GL.Enable(EnableCap.Blend);
                                     GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                                     break;
@@ -621,7 +660,7 @@ namespace WoWOpenGL
                                     GL.Enable(EnableCap.Blend);
                                     GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
                                     break;
-                                case 7: 
+                                case 7:
                                     break;
                                 default:
                                     throw new Exception("Unknown blend type " + adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].blendType);
@@ -645,6 +684,18 @@ namespace WoWOpenGL
 
             this.SwapBuffers();
 
+            Key[] keys = CoolOffKeys.Keys.ToArray();
+            int decreasevalue = (int)(base.RenderTime * 3000d);//TERRIBLE
+            for (int i = 0; i < keys.Length; i++)
+            {
+                Key k = keys[i];
+
+                CoolOffKeys[k] -= decreasevalue;
+
+                if (CoolOffKeys[k] <= 0)
+                    CoolOffKeys.Remove(k);
+            }
+            
         }
 
         protected override void OnUnload(EventArgs e)
