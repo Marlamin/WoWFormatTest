@@ -59,17 +59,22 @@ namespace WoWFormatLib.Utils
             string line;
             string[] linesplit;
 
-           // System.IO.StreamReader file = new System.IO.StreamReader(CASC.OpenFile("signaturefile"));
-            DBCReader<FileDataRecord> filedatareader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
+            // System.IO.StreamReader file = new System.IO.StreamReader(CASC.OpenFile("signaturefile"));
 
-            for (int i = 0; i < filedatareader.recordCount; i++)
+            if (CASC.FileExists("DBFilesClient\\FileData.dbc"))
             {
-                string filename = filedatareader[i].FilePath + filedatareader[i].FileName;
-                if (filename.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || filename.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+                DBCReader<FileDataRecord> filedatareader = new DBCReader<FileDataRecord>("DBFilesClient\\FileData.dbc");
+
+                for (int i = 0; i < filedatareader.recordCount; i++)
                 {
-                    files.Add(filename);
+                    string filename = filedatareader[i].FilePath + filedatareader[i].FileName;
+                    if (filename.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || filename.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+                    {
+                        files.Add(filename);
+                    }
                 }
             }
+
             /*
             while ((line = file.ReadLine()) != null)
             {
@@ -112,13 +117,13 @@ namespace WoWFormatLib.Utils
         {
             if (string.IsNullOrEmpty(filename)) { return false; }
 
-            if(File.Exists(Path.Combine(@"Z:\18983_fulla", filename)))
+            if (File.Exists(Path.Combine(@"Z:\WoW extracts\18983_full", filename)))
             {
                 return true;
             }
             else
             {
-                Console.WriteLine(Path.Combine(@"Z:\18983_fulla", filename) + " does not exist!");
+                Console.WriteLine(Path.Combine(@"Z:\WoW extracts\18983_full", filename) + " does not exist!");
             }
 
             return cascHandler.FileExists(filename);
@@ -127,7 +132,7 @@ namespace WoWFormatLib.Utils
         public static Stream OpenFile(string filename)
         {
 
-            var stream = File.OpenRead(Path.Combine(@"Z:\18983_fulla", filename));
+            var stream = File.OpenRead(Path.Combine(@"Z:\WoW extracts\18983_full", filename));
 
             if (stream.CanRead) { return stream; }
 

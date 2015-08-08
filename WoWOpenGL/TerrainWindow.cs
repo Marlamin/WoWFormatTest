@@ -561,6 +561,78 @@ namespace WoWOpenGL
 
                     for (int si = 0; si < activeDoodadBatch.submeshes.Count(); si++)
                     {
+                        //Render opaque first
+                        if (activeDoodadBatch.submeshes[si].blendType != 0) { continue; }
+                        GL.BindTexture(TextureTarget.Texture2D, activeDoodadBatch.submeshes[si].material);
+                        GL.DrawRangeElements(PrimitiveType.Triangles, activeDoodadBatch.submeshes[si].firstFace, (activeDoodadBatch.submeshes[si].firstFace + activeDoodadBatch.submeshes[si].numFaces), (int)activeDoodadBatch.submeshes[si].numFaces, DrawElementsType.UnsignedInt, new IntPtr(activeDoodadBatch.submeshes[si].firstFace * 4));
+                    }
+
+                    GL.PopMatrix();
+                }
+
+                for (int wb = 0; wb < adts[adti].worldModelBatches.Count(); wb++)
+                {
+                    for (int wrb = 0; wrb < adts[adti].worldModelBatches[wb].worldModel.groupBatches.Count(); wrb++)
+                    {
+                        GL.PushMatrix();
+
+                        GL.Translate(adts[adti].worldModelBatches[wb].position.X, adts[adti].worldModelBatches[wb].position.Y, adts[adti].worldModelBatches[wb].position.Z);
+
+                        // GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
+                        //  GL.Rotate((adts[adti].worldModelBatches[wb].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
+                        //  GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
+                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Y - 90.0f, 0.0f, 1.0f, 0.0f);
+                        GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X, 0.0f, 0.0f, 1.0f);
+                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Z, 1.0f, 0.0f, 0.0f);
+
+                        GL.Scale(-1.0f, 1.0f, 1.0f);
+                        for (int si = 0; si < adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch.Count(); si++)
+                        {
+                            //Render opaque first
+                            if (adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].blendType != 0) { continue; }
+                            GL.BindBuffer(BufferTarget.ArrayBuffer, adts[adti].worldModelBatches[wb].worldModel.groupBatches[adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].groupID].vertexBuffer);
+                            GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
+                            GL.TexCoordPointer(2, TexCoordPointerType.Float, 8 * sizeof(float), (IntPtr)(3 * sizeof(float)));
+                            GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
+                            GL.BindBuffer(BufferTarget.ElementArrayBuffer, adts[adti].worldModelBatches[wb].worldModel.groupBatches[adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].groupID].indiceBuffer);
+                            GL.BindTexture(TextureTarget.Texture2D, adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].materialID);
+                            GL.DrawRangeElements(PrimitiveType.Triangles, adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace, (adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace + adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].numFaces), (int)adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace * 4));
+                        }
+
+                        GL.PopMatrix();
+                    }
+                }
+
+                GL.Enable(EnableCap.ColorArray);
+                GL.EnableClientState(ArrayCap.ColorArray);
+            }
+
+            for (int adti = 0; adti < adts.Count(); adti++)
+            {
+                for (int di = 0; di < adts[adti].doodads.Count(); di++)
+                {
+                    GL.PushMatrix();
+
+                    var activeDoodadBatch = cache.doodadBatches[adts[adti].doodads[di].filename];
+
+                    GL.Translate(adts[adti].doodads[di].position.X, adts[adti].doodads[di].position.Y, adts[adti].doodads[di].position.Z);
+
+                    GL.Rotate(adts[adti].doodads[di].rotation.Y - 90.0f, 0.0f, 1.0f, 0.0f);
+                    GL.Rotate(-adts[adti].doodads[di].rotation.X, 0.0f, 0.0f, 1.0f);
+                    GL.Rotate(adts[adti].doodads[di].rotation.Z, 1.0f, 0.0f, 0.0f);
+
+                    var scale = adts[adti].doodads[di].scale / 1024f;
+                    GL.Scale(-scale, scale, scale);
+
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, activeDoodadBatch.vertexBuffer);
+                    GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
+                    GL.TexCoordPointer(2, TexCoordPointerType.Float, 8 * sizeof(float), (IntPtr)(3 * sizeof(float)));
+                    GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, activeDoodadBatch.indiceBuffer);
+
+                    for (int si = 0; si < activeDoodadBatch.submeshes.Count(); si++)
+                    {
+                        if(activeDoodadBatch.submeshes[si].blendType == 0) { continue; }
                         switch (activeDoodadBatch.submeshes[si].blendType)
                         {
                             case 0: //Combiners_Opaque (Blend disabled)
@@ -626,6 +698,7 @@ namespace WoWOpenGL
                         GL.Scale(-1.0f, 1.0f, 1.0f);
                         for (int si = 0; si < adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch.Count(); si++)
                         {
+                            if (adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].blendType == 0) { continue; }
                             GL.BindBuffer(BufferTarget.ArrayBuffer, adts[adti].worldModelBatches[wb].worldModel.groupBatches[adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].groupID].vertexBuffer);
                             GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
                             GL.TexCoordPointer(2, TexCoordPointerType.Float, 8 * sizeof(float), (IntPtr)(3 * sizeof(float)));
@@ -639,28 +712,6 @@ namespace WoWOpenGL
                                 case 1:
                                     GL.Enable(EnableCap.Blend);
                                     GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                                    break;
-                                case 2:
-                                    GL.Enable(EnableCap.Blend);
-                                    GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                                    break;
-                                case 3:
-                                    GL.Enable(EnableCap.Blend);
-                                    GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
-                                    break;
-                                case 4:
-                                    GL.Enable(EnableCap.Blend);
-                                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
-                                    break;
-                                case 5:
-                                    GL.Enable(EnableCap.Blend);
-                                    GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                                    break;
-                                case 6:
-                                    GL.Enable(EnableCap.Blend);
-                                    GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
-                                    break;
-                                case 7:
                                     break;
                                 default:
                                     throw new Exception("Unknown blend type " + adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].blendType);
@@ -676,7 +727,6 @@ namespace WoWOpenGL
                 GL.Enable(EnableCap.ColorArray);
                 GL.EnableClientState(ArrayCap.ColorArray);
             }
-
             if (GL.GetError().ToString() != "NoError")
             {
                 Console.WriteLine(GL.GetError().ToString());
@@ -764,19 +814,19 @@ namespace WoWOpenGL
             public Material[] mats;
         }
 
+        public struct WorldModelBatch
+        {
+            public Vector3 position;
+            public Vector3 rotation;
+            public WorldModel worldModel;
+        }
+
         public struct Submesh
         {
             public uint firstFace;
             public uint numFaces;
             public uint material;
             public uint blendType;
-        }
-
-        public struct WorldModelBatch
-        {
-            public Vector3 position;
-            public Vector3 rotation;
-            public WorldModel worldModel;
         }
 
         public struct WorldModel
