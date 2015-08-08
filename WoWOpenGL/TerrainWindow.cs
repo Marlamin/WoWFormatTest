@@ -362,22 +362,22 @@ namespace WoWOpenGL
             {
                 if (keyboardState.IsKeyDown(Key.Up))
                 {
-                    dragY = dragY + camSpeed;
+                    dragY = dragY - camSpeed;
                 }
 
                 if (keyboardState.IsKeyDown(Key.Down))
                 {
-                    dragY = dragY - camSpeed;
+                    dragY = dragY + camSpeed;
                 }
 
                 if (keyboardState.IsKeyDown(Key.Left))
                 {
-                    dragX = dragX + camSpeed;
+                    dragX = dragX - camSpeed;
                 }
 
                 if (keyboardState.IsKeyDown(Key.Right))
                 {
-                    dragX = dragX - camSpeed;
+                    dragX = dragX + camSpeed;
                 }
             }
 
@@ -444,13 +444,13 @@ namespace WoWOpenGL
                 dragX = dragY = dragZ = angle = 0;
             }
 
-            if (!CoolOffKeys.ContainsKey(Key.Right) && keyboardState.IsKeyDown(Key.Right))
+            if (!CoolOffKeys.ContainsKey(Key.Right) && keyboardState.IsKeyDown(Key.Right) && keyboardState.IsKeyUp(Key.ShiftLeft))
             {
                 angle += 90;
                 CoolOffKey(Key.Right);
             }
 
-            if (!CoolOffKeys.ContainsKey(Key.Left) && keyboardState.IsKeyDown(Key.Left))
+            if (!CoolOffKeys.ContainsKey(Key.Left) && keyboardState.IsKeyDown(Key.Left) && keyboardState.IsKeyUp(Key.ShiftLeft))
             {
                 angle -= 90;
                 CoolOffKey(Key.Left);
