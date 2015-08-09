@@ -82,12 +82,13 @@ namespace WoWFormatLib.Structs.ADT
         public MCVT vertices;
         public MCNR normals;
         public MCLV colors;
-        public MCCV vertexshading;
+        public MCCV vertexShading;
     }
 
     public struct TexMCNK
     {
         public MCLY[] layers;
+        public MCAL alphaLayer;
     }
 
     public struct Obj
@@ -190,9 +191,32 @@ namespace WoWFormatLib.Structs.ADT
     public struct MCLY
     {
         public uint textureId;
-        public uint flags;
+        public mclyFlags flags;
         public uint offsetInMCAL;
         public int effectId;
+    }
+
+    [Flags]
+    public enum mclyFlags
+    {
+        Flag_0x1 = 0x1,
+        Flag_0x2 = 0x2,
+        Flag_0x4 = 0x4,
+        Flag_0x8 = 0x8,
+        Flag_0x10 = 0x10,
+        Flag_0x20 = 0x20,
+        Flag_0x40 = 0x40,
+        Flag_0x80 = 0x80,
+        Flag_0x100 = 0x100,
+        Flag_0x200 = 0x200,
+        Flag_0x400 = 0x400,
+        Flag_0x800 = 0x800,
+        Flag_0x1000 = 0x1000
+    }
+
+    public struct MCAL
+    {
+        public byte[][] alpha;
     }
 
     public struct MCCV

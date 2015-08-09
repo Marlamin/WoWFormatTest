@@ -159,9 +159,9 @@ namespace WoWOpenGL
                                     //var v = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, -(chunk.header.position.X - (i * UnitSize * 0.5f)));
                                     Vertex v = new Vertex();
                                     v.Normal = new Vector3(chunk.normals.normal_0[idx], chunk.normals.normal_1[idx], chunk.normals.normal_2[idx]);
-                                    if (chunk.vertexshading.red != null && chunk.vertexshading.red[idx] != 127)
+                                    if (chunk.vertexShading.red != null && chunk.vertexShading.red[idx] != 127)
                                     {
-                                        v.Color = new Vector3(chunk.vertexshading.blue[idx] / 255.0f, chunk.vertexshading.green[idx] / 255.0f, chunk.vertexshading.red[idx] / 255.0f);
+                                        v.Color = new Vector3(chunk.vertexShading.blue[idx] / 255.0f, chunk.vertexShading.green[idx] / 255.0f, chunk.vertexShading.red[idx] / 255.0f);
                                         //v.Color = new Vector3(1.0f, 1.0f, 1.0f);
                                     }
                                     else
@@ -194,7 +194,13 @@ namespace WoWOpenGL
                                 throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower());
                             }
 
-                            batch.materialID = (uint)cache.materials[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower()];
+                            var layermats = new List<uint>();
+                            for(int li = 0; li < reader.adtfile.texChunks[c].layers.Count(); li++)
+                            {
+                                layermats.Add((uint)cache.materials[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[li].textureId].ToLower()]);
+                            }
+
+                            batch.materialID = layermats.ToArray();
 
                             renderBatches.Add(batch);
                         }
@@ -529,9 +535,12 @@ namespace WoWOpenGL
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, adts[adti].indiceBuffer);
                 for (int rb = 0; rb < adts[adti].renderBatches.Count(); rb++)
                 {
+                    for (int li = 0; li < adts[adti].renderBatches[rb].materialID.Count(); li++)
+                    {
+                        GL.BindTexture(TextureTarget.Texture2D, (int)adts[adti].renderBatches[rb].materialID[li]);
+                        GL.DrawRangeElements(PrimitiveType.Triangles, (int)adts[adti].renderBatches[rb].firstFace, (int)adts[adti].renderBatches[rb].firstFace + (int)adts[adti].renderBatches[rb].numFaces, (int)adts[adti].renderBatches[rb].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].renderBatches[rb].firstFace * 4));
+                    }
                     //GL.DrawElements(PrimitiveType.Triangles, indices.Count(), DrawElementsType.UnsignedInt, 0);
-                    GL.BindTexture(TextureTarget.Texture2D, (int)adts[adti].renderBatches[rb].materialID);
-                    GL.DrawRangeElements(PrimitiveType.Triangles, (int)adts[adti].renderBatches[rb].firstFace, (int)adts[adti].renderBatches[rb].firstFace + (int)adts[adti].renderBatches[rb].numFaces, (int)adts[adti].renderBatches[rb].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].renderBatches[rb].firstFace * 4));
                     //GL.DrawArrays(PrimitiveType.Triangles, renderBatches[rb].firstFace, renderBatches[rb].numFaces);
                 }
 
@@ -595,7 +604,7 @@ namespace WoWOpenGL
                             GL.TexCoordPointer(2, TexCoordPointerType.Float, 8 * sizeof(float), (IntPtr)(3 * sizeof(float)));
                             GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
                             GL.BindBuffer(BufferTarget.ElementArrayBuffer, adts[adti].worldModelBatches[wb].worldModel.groupBatches[adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].groupID].indiceBuffer);
-                            GL.BindTexture(TextureTarget.Texture2D, adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].materialID);
+                            GL.BindTexture(TextureTarget.Texture2D, adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].materialID[0]);
                             GL.DrawRangeElements(PrimitiveType.Triangles, adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace, (adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace + adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].numFaces), (int)adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace * 4));
                         }
 
@@ -716,7 +725,7 @@ namespace WoWOpenGL
                                 default:
                                     throw new Exception("Unknown blend type " + adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].blendType);
                             }
-                            GL.BindTexture(TextureTarget.Texture2D, adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].materialID);
+                            GL.BindTexture(TextureTarget.Texture2D, adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].materialID[0]);
                             GL.DrawRangeElements(PrimitiveType.Triangles, adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace, (adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace + adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].numFaces), (int)adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch[si].firstFace * 4));
                         }
 
@@ -791,10 +800,11 @@ namespace WoWOpenGL
         {
             public uint firstFace;
             public uint numFaces;
-            public uint materialID;
+            public uint[] materialID;
             /* WMO ONLY */
             public uint groupID;
             public uint blendType;
+
         }
 
         public struct Doodad

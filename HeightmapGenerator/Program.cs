@@ -137,10 +137,10 @@ namespace HeightmapGenerator
                                             //Console.Write("(" + j +" " + i + ")" + counter + " |" );
                                             //int greyness = (int)Math.Round(((reader.adtfile.chunks[a].vertices.vertices[counter] + reader.adtfile.chunks[a].header.position.Z) + lowest) / highest * 255);
                                            // if (greyness > 255) { greyness = 255; } //those edge cases where rounding just makes it go over 255
-                                            if (reader.adtfile.chunks[a].vertexshading.red != null && reader.adtfile.chunks[a].vertexshading.red[counter] != 127)
+                                            if (reader.adtfile.chunks[a].vertexShading.red != null && reader.adtfile.chunks[a].vertexShading.red[counter] != 127)
                                             {   
                                                 fullmap.SetPixel(img_x + (int)(reader.adtfile.chunks[a].header.indexX * 9), img_y + (int)(reader.adtfile.chunks[a].header.indexY * 9),
-                                                Color.FromArgb(reader.adtfile.chunks[a].vertexshading.blue[counter], reader.adtfile.chunks[a].vertexshading.green[counter], reader.adtfile.chunks[a].vertexshading.red[counter])
+                                                Color.FromArgb(reader.adtfile.chunks[a].vertexShading.blue[counter], reader.adtfile.chunks[a].vertexShading.green[counter], reader.adtfile.chunks[a].vertexShading.red[counter])
                                                 );
                                             }
                                             else

@@ -117,13 +117,13 @@ namespace WoWFormatLib.Utils
         {
             if (string.IsNullOrEmpty(filename)) { return false; }
 
-            if (File.Exists(Path.Combine(@"Z:\WoW extracts\18983_full", filename)))
+            if (File.Exists(Path.Combine(@"Z:\WoW extracts\20363_full", filename)))
             {
                 return true;
             }
             else
             {
-                Console.WriteLine(Path.Combine(@"Z:\WoW extracts\18983_full", filename) + " does not exist!");
+                Console.WriteLine(Path.Combine(@"Z:\WoW extracts\20363_full", filename) + " does not exist!");
             }
 
             return cascHandler.FileExists(filename);
@@ -132,7 +132,7 @@ namespace WoWFormatLib.Utils
         public static Stream OpenFile(string filename)
         {
 
-            var stream = File.OpenRead(Path.Combine(@"Z:\WoW extracts\18983_full", filename));
+            var stream = File.OpenRead(Path.Combine(@"Z:\WoW extracts\20363_full", filename));
 
             if (stream.CanRead) { return stream; }
 

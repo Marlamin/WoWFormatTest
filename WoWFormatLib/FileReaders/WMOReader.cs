@@ -46,12 +46,10 @@ namespace WoWFormatLib.FileReaders
                     if (str.Length > 1)
                     {
                         str.Replace("..", ".");
+                        str.Replace(".mdx", ".m2");
+                        
                         m2Files.Add(str.ToString());
                         m2Offset.Add(i - str.ToString().Length);
-                        if (!CASC.FileExists(str.ToString()))
-                        {
-                            new WoWFormatLib.Utils.MissingFile(str.ToString());
-                        }
                     }
                     str = new StringBuilder();
                 }

@@ -13,6 +13,7 @@ namespace WoWFormatLib.FileReaders
         public List<string> blpFiles;
         public List<string> m2Files;
         public List<string> wmoFiles;
+        private WoWFormatLib.Structs.WDT.WDT wdt;
 
         public ADTReader()
         {
@@ -30,7 +31,21 @@ namespace WoWFormatLib.FileReaders
             if (!CASC.FileExists(filename.Replace(".adt", "_obj0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
             if (!CASC.FileExists(filename.Replace(".adt", "_obj1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
             if (!CASC.FileExists(filename.Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
-            if (!CASC.FileExists(filename.Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; } 
+            if (!CASC.FileExists(filename.Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; }
+
+            var mapname = filename.Replace("World/Maps/", "").Substring(0, filename.Replace("World/Maps/", "").IndexOf("/"));
+
+            if(CASC.FileExists("World/Maps/" + mapname + "/" + mapname + ".wdt"))
+            {
+                var wdtr = new WDTReader();
+                wdtr.LoadWDT("World/Maps/" + mapname + "/" + mapname + ".wdt");
+                wdt = wdtr.wdtfile;
+            }
+            else
+            {
+                throw new Exception("WDT does not exist, need this for MCAL flags!");
+            }
+
 
             var adt = CASC.OpenFile(filename);
 
@@ -126,7 +141,7 @@ namespace WoWFormatLib.FileReaders
                         mapchunk.vertices = ReadMCVTSubChunk(subchunk, subbin);
                         break;
                     case "MCCV":
-                        mapchunk.vertexshading = ReadMCCVSubChunk(subchunk, subbin);
+                        mapchunk.vertexShading = ReadMCCVSubChunk(subchunk, subbin);
                         break;
                     case "MCNR":
                         mapchunk.normals = ReadMCNRSubChunk(subchunk, subbin);
@@ -168,8 +183,10 @@ namespace WoWFormatLib.FileReaders
                     case "MCLY":
                         mapchunk.layers = ReadMCLYSubChunk(subchunk, subbin);
                         break;
-                    case "MCSH":
                     case "MCAL":
+                        mapchunk.alphaLayer = ReadMCALSubChunk(subchunk, subbin, mapchunk);
+                        break;
+                    case "MCSH":
                         continue;
                     default:
                         throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subchunk.ToString(), subpos.ToString()));
@@ -178,15 +195,45 @@ namespace WoWFormatLib.FileReaders
             return mapchunk;
         }
 
+        private MCAL ReadMCALSubChunk(BlizzHeader subchunk, BinaryReader subbin, TexMCNK mapchunk)
+        {
+            var mcal = new MCAL();
+
+            var mphdFlag = false;
+            var mclyFlag = false;
+
+            if (wdt.mphd.flags.HasFlag(WoWFormatLib.Structs.WDT.mphdFlags.Flag_0x4)){
+                mphdFlag = true;
+            }
+
+            if (mapchunk.layers[0].flags.HasFlag(mclyFlags.Flag_0x200)){
+                mclyFlag = true;
+            }
+
+            if(!mphdFlag && !mclyFlag)
+            {
+                //var alphaLayer = new byte[4096];
+                for(int bi = 0; bi < 4096; bi++)
+                {
+                 ///   alphaLayer[bi] = subbin.ReadByte();
+                }
+            }
+            else
+            {
+                throw new Exception("Unsupported MCAL detected!");
+            }
+
+            return mcal;
+        }
+
         public MCLY[] ReadMCLYSubChunk(BlizzHeader chunk, BinaryReader bin)
         {
             var count = chunk.Size / 16;
             MCLY[] mclychunks = new MCLY[count];
-
             for (int i = 0; i < count; i++)
             {
                 mclychunks[i].textureId = bin.ReadUInt32();
-                mclychunks[i].flags = bin.ReadUInt32();
+                mclychunks[i].flags = (mclyFlags) bin.ReadUInt32();
                 mclychunks[i].offsetInMCAL = bin.ReadUInt32();
                 mclychunks[i].effectId = bin.ReadInt32();
             }

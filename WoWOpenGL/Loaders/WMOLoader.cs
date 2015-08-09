@@ -122,7 +122,7 @@ namespace WoWOpenGL.Loaders
                     {
                         if (wmo.materials[group.mogp.renderBatches[i].materialID].texture1 == wmobatch.mats[ti].texture1)
                         {
-                            wmobatch.wmoRenderBatch[rb].materialID = (uint)wmobatch.mats[ti].textureID;
+                            wmobatch.wmoRenderBatch[rb].materialID = new uint[] { (uint)wmobatch.mats[ti].textureID };
                         }
                     }
 

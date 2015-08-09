@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using WoWFormatLib.Utils;
+using WoWFormatLib.Structs.WDT;
 
 namespace WoWFormatLib.FileReaders
 {
     public class WDTReader
     {
         public List<int[]> tiles;
+        public WDT wdtfile;
+
         public WDTReader()
         {
         }
@@ -88,6 +91,15 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
+        private MPHD ReadMPHDChunk(BinaryReader bin)
+        {
+            var mphd = new MPHD();
+            mphd.flags = (mphdFlags) bin.ReadUInt32();
+            mphd.something = bin.ReadUInt32();
+            mphd.unused = new uint[] { bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32() };
+            return mphd;
+        }
+
         private void ReadWDT(string filename, Stream wdt)
         {
             filename = Path.ChangeExtension(filename, "WDT");
@@ -111,7 +123,8 @@ namespace WoWFormatLib.FileReaders
                         continue;
                     case "MWMO": ReadMWMOChunk(bin);
                         continue;
-                    case "MPHD":
+                    case "MPHD": wdtfile.mphd = ReadMPHDChunk(bin);
+                        continue;
                     case "MPLT":
                     case "MODF": continue;
                     default:
@@ -119,5 +132,6 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
+
     }
 }

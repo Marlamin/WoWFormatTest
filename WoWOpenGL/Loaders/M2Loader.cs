@@ -16,6 +16,7 @@ namespace WoWOpenGL.Loaders
         {
             WoWFormatLib.Structs.M2.M2Model model = new WoWFormatLib.Structs.M2.M2Model();
 
+            filename = filename.ToLower().Replace(".mdx", ".m2");
             if (cache.models.ContainsKey(filename))
             {
                 model = cache.models[filename];

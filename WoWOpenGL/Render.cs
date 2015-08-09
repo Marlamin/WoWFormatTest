@@ -242,10 +242,7 @@ namespace WoWOpenGL
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
-                        //Console.WriteLine("SubmeshIndex: " + i);
                         renderbatches[i].blendType = reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode;
-                        //Console.WriteLine("Material ID: " + renderbatches[i].materialID);
-                        //Console.WriteLine("BlendType: " +renderbatches[i].blendType);
                         renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
                     }
                 }
@@ -327,26 +324,7 @@ namespace WoWOpenGL
                     
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
                     {
-                        materials[i].textureID = GL.GenTexture();
-                        var blp = new BLPReader();
-                        blp.LoadBLP(reader.wmofile.textures[ti].filename);
-                        if (blp.bmp == null)
-                        {
-                            throw new Exception("BMP is null!");
-                        }
-                        else
-                        {
-                            GL.BindTexture(TextureTarget.Texture2D, materials[i].textureID);
-                            BitmapData bmp_data = blp.bmp.LockBits(new Rectangle(0, 0, blp.bmp.Width, blp.bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
-                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-                            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-
-                            Console.WriteLine("Created texture \"" + reader.wmofile.textures[ti].filename + "\" (ID "+materials[i].textureID+") of " + bmp_data.Width + "x" + bmp_data.Height);
-                            blp.bmp.UnlockBits(bmp_data);
-                        }
+                        materials[i].textureID = BLPLoader.LoadTexture(reader.wmofile.textures[ti].filename, cache);
                         materials[i].filename = reader.wmofile.textures[ti].filename;
                     }
                 }
