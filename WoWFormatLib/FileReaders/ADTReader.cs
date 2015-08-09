@@ -195,8 +195,87 @@ namespace WoWFormatLib.FileReaders
             return mapchunk;
         }
 
-        private MCAL ReadMCALSubChunk(BlizzHeader subchunk, BinaryReader subbin, TexMCNK mapchunk)
+        private MCAL[] ReadMCALSubChunk(BlizzHeader subchunk, BinaryReader subbin, TexMCNK mapchunk)
         {
+            var mcal = new MCAL[mapchunk.layers.Length];
+
+            mcal[0].layer = new byte[64 * 64];
+            for(int i = 0; i < 64 * 64; i++)
+            {
+                mcal[0].layer[i] = 255;
+            }
+
+            uint read_offset = 0;
+
+            for (int layer = 1; layer < mapchunk.layers.Length; ++layer)
+            {
+                // we assume that we have read as many bytes as this next layer's mcal offset. we then read depending on encoding
+                if (mapchunk.layers[layer].offsetInMCAL != read_offset)
+                {
+                   throw new Exception("mismatch: layer before required more / less bytes than expected");
+                }
+                if (mapchunk.layers[layer].flags.HasFlag (mclyFlags.Flag_0x200))
+                {
+                     // first layer is always fully opaque -> you can let that out
+                    // array of 3 x array of 64*64 chars: unpacked alpha values
+                    mcal[layer].layer = new byte[64 * 64];
+
+                    // sorry, I have no god damn idea about c#
+                    // *x = value at x. x = pointer to data. ++x = advance üpointer a byte
+                    uint in_offset = 0;
+                    uint out_offset = 0;
+                    while (out_offset < 4096)
+                    {
+                        byte info = subbin.ReadByte(); ++in_offset;
+                        uint mode = (uint)(info & 0x80) >> 7; // 0 = copy, 1 = fill
+                        uint count = (uint)(info & 0x7f); // do mode operation count times
+                        
+                        if (mode != 0)
+                        {
+                            byte val = subbin.ReadByte(); ++in_offset;
+                            while (count --> 0 && out_offset < 4096)
+                            {
+                                mcal[layer].layer[out_offset] = val;
+                                ++out_offset;
+                            }
+                           
+                        }
+                        else // mode == 1
+                        {
+                            while (count --> 0 && out_offset < 4096)
+                            {
+                                var val = subbin.ReadByte(); ++in_offset; 
+                                mcal[layer].layer[out_offset] = val;
+                                ++out_offset;
+                            }
+                        }
+                    }
+                    read_offset += in_offset;
+                    if (out_offset != 4096) throw new Exception("we somehow overshoot. this should not be the case, except for broken adts");
+                }
+                else if (wdt.mphd.flags.HasFlag(WoWFormatLib.Structs.WDT.mphdFlags.Flag_0x4) || wdt.mphd.flags.HasFlag(WoWFormatLib.Structs.WDT.mphdFlags.Flag_0x80))
+                {
+                    mcal[layer].layer = subbin.ReadBytes(4096);
+                    read_offset += 4096;
+                }
+                else
+                {
+                    mcal[layer].layer = new byte[64 * 64];  //uncompressed_2048
+                    var mcal_data = subbin.ReadBytes(2048);
+                    read_offset += 2048;
+                    for (int i = 0; i < 2048; ++i)
+                    {
+                        // maybe nibbles swapped
+                        mcal[layer].layer[2 * i + 0] = (byte) (((mcal_data[i] & 0x0F) >> 0) * 17);
+                        mcal[layer].layer[2 * i + 1] = (byte) (((mcal_data[i] & 0xF0) >> 4) * 17);
+                    }
+                }
+            }
+
+            if (read_offset != subchunk.Size) throw new Exception("Haven't finished reading chunk but should be");
+
+            return mcal;
+            /*
             var mcal = new MCAL();
 
             var mphdFlag = false;
@@ -210,12 +289,17 @@ namespace WoWFormatLib.FileReaders
                 mclyFlag = true;
             }
 
+            mcal.alpha = new byte[64][];
+
             if(!mphdFlag && !mclyFlag)
             {
-                //var alphaLayer = new byte[4096];
-                for(int bi = 0; bi < 4096; bi++)
+                for(int x = 0; x < 64; x++)
                 {
-                 ///   alphaLayer[bi] = subbin.ReadByte();
+                    mcal.alpha[x] = new byte[64];
+                    for(int y = 0; y < 64; y++)
+                    {
+                        mcal.alpha[x][y] = subbin.ReadByte();
+                    }
                 }
             }
             else
@@ -224,6 +308,8 @@ namespace WoWFormatLib.FileReaders
             }
 
             return mcal;
+            */
+
         }
 
         public MCLY[] ReadMCLYSubChunk(BlizzHeader chunk, BinaryReader bin)
@@ -483,7 +569,7 @@ namespace WoWFormatLib.FileReaders
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
                 position = adtTexStream.Position + chunk.Size;
-
+                Console.WriteLine("Chunk " + MCNKi);
                 if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
                 if (chunk.Is("MAMP")) { continue; }
                 if (chunk.Is("MTEX")) { adtfile.textures = ReadMTEXChunk(chunk, bin); continue; }

@@ -195,13 +195,16 @@ namespace WoWOpenGL
                             }
 
                             var layermats = new List<uint>();
-                            for(int li = 0; li < reader.adtfile.texChunks[c].layers.Count(); li++)
+                            var alphalayermats = new List<int>();
+
+                            for (int li = 0; li < reader.adtfile.texChunks[c].layers.Count(); li++)
                             {
+                                alphalayermats.Add(BLPLoader.GenerateAlphaTexture(reader.adtfile.texChunks[c].alphaLayer[li].layer);
                                 layermats.Add((uint)cache.materials[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[li].textureId].ToLower()]);
                             }
 
                             batch.materialID = layermats.ToArray();
-
+                            batch.alphaMaterialID = alphalayermats.ToArray();
                             renderBatches.Add(batch);
                         }
 
@@ -804,7 +807,8 @@ namespace WoWOpenGL
             /* WMO ONLY */
             public uint groupID;
             public uint blendType;
-
+            /* ADT ONLY */
+            internal int[] alphaMaterialID;
         }
 
         public struct Doodad

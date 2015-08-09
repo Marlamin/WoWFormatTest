@@ -88,7 +88,7 @@ namespace WoWFormatLib.Structs.ADT
     public struct TexMCNK
     {
         public MCLY[] layers;
-        public MCAL alphaLayer;
+        public MCAL[] alphaLayer;
     }
 
     public struct Obj
@@ -216,7 +216,7 @@ namespace WoWFormatLib.Structs.ADT
 
     public struct MCAL
     {
-        public byte[][] alpha;
+        public byte[] layer;
     }
 
     public struct MCCV
