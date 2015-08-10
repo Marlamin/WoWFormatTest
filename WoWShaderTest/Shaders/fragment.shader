@@ -1,10 +1,15 @@
 ﻿#version 150
 
-in vec3 Color;
+in vec2 TexCoord;
 
 out vec4 outColor;
 
+uniform sampler2D shaneCube;
+uniform sampler2D shaneCubeNew;
+
 void main()
 {
-	outColor = vec4(Color, 1.0);
+	vec4 colKitten = texture(shaneCube, TexCoord);
+	vec4 colPuppy = texture(shaneCubeNew, TexCoord);
+	outColor = mix(colKitten, colPuppy, 0.5);
 }

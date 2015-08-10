@@ -8,6 +8,8 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System.Drawing;
+using WoWFormatLib;
+using WoWFormatLib.FileReaders;
 
 namespace WoWShaderTest
 {
@@ -39,10 +41,10 @@ namespace WoWShaderTest
 
             // Vertices
             float[] vertices = new float[] {
-                    -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // Top-left
-                    0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // Top-right
-                    0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // Bottom-right
-                    -0.5f, -0.5f, 1.0f, 1.0f, 1.0f  // Bottom-left
+                    -0.5f,  0.5f, 0.0f, 0.0f, // Top-left
+				     0.5f,  0.5f, 1.0f, 0.0f, // Top-right
+				     0.5f, -0.5f, 1.0f, 1.0f, // Bottom-right
+				    -0.5f, -0.5f, 0.0f, 1.0f  // Bottom-left
             };
 
             vertexBuffer = GL.GenBuffer();
@@ -121,12 +123,12 @@ namespace WoWShaderTest
 
             // Shader settings
             int posAttrib = GL.GetAttribLocation(shaderProgram, "position");
-            GL.VertexAttribPointer(posAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 5, 0);
             GL.EnableVertexAttribArray(posAttrib);
+            GL.VertexAttribPointer(posAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
 
-            int colorAttrib = GL.GetAttribLocation(shaderProgram, "color");
-            GL.VertexAttribPointer(colorAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 5, sizeof(float) * 2);
-            GL.EnableVertexAttribArray(colorAttrib);
+            int texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
+            GL.EnableVertexAttribArray(texCoordAttrib);
+            GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 4, sizeof(float) * 2);
 
             // Clear 
             GL.ClearColor(Color.Black);
@@ -135,6 +137,52 @@ namespace WoWShaderTest
             int uniColor = GL.GetUniformLocation(shaderProgram, "triangleColor");
             Vector3 uniCol3 = new Vector3(1.0f, 0.0f, 0.0f);
             GL.Uniform3(uniColor, uniCol3);
+
+            // Textures
+            int[] textureIds = new int[2];
+            GL.GenTextures(2, textureIds);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, textureIds[0]);
+
+            var blp = new BLPReader();
+
+            blp.LoadBLP(File.OpenRead(@"Z:\WoW extracts\20363_full\Textures\ShaneCube.blp"));
+
+            System.Drawing.Imaging.BitmapData bmp_data = blp.bmp.LockBits(new System.Drawing.Rectangle(0, 0, blp.bmp.Width, blp.bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+
+            blp.bmp.UnlockBits(bmp_data);
+
+            GL.Uniform1(GL.GetUniformLocation(shaderProgram, "tex"), 0);
+
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, textureIds[1]);
+
+            var blp2 = new BLPReader();
+
+            blp2.LoadBLP(File.OpenRead(@"Z:\WoW extracts\20363_full\Textures\ShaneCube_new.blp"));
+
+            System.Drawing.Imaging.BitmapData bmp_data2 = blp2.bmp.LockBits(new System.Drawing.Rectangle(0, 0, blp2.bmp.Width, blp2.bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data2.Width, bmp_data2.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data2.Scan0);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+
+            blp2.bmp.UnlockBits(bmp_data2);
+
+            GL.Uniform1(GL.GetUniformLocation(shaderProgram, "shaneCubeNew"), 1);
         }
 
 

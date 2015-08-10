@@ -38,5 +38,12 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
+
+        public void LoadBLP(Stream file) { 
+            using (var blp = new BlpFile(file))
+            {
+                bmp = blp.GetBitmap(0);
+            }
+       }
     }
 }
