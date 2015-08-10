@@ -2,6 +2,8 @@
 Messing around with parsing WoW file formats for educational purposes.
 Built from the ground up, but with lots of copy pasta from older projects (noted in thanks paragraph).
 
+- [Official site](https://marlam.in/mv/)
+
 ## Supported expansions
 Built for (latest) Warlords of Draenor files. Backwards compatibility with Mists of Pandaria not guaranteed. Cataclysm and lower probably won't work at all.
 
@@ -31,6 +33,8 @@ App used to test CASC (file system) related things.
 App used to test DBC structures.
 #### WoWFormatTest  
 First app used to test some formats with.
+#### WoWShaderTest
+Eventual replacement project for WoWOpenGL.
 
 ### Discontinued/archived projects
 #### WoWRenderLib 
@@ -40,16 +44,21 @@ Initial test of rendering, gets data from WoWRenderLib and tries to display it i
 #### RenderTestWPF 
 Rendering test with WPF.
 	
-## Thanks
+## Thanks (in no particular order)
 - TOM_RUS
+- Schlumpf
+- Thoorium
+- Miceiken
+- Kirth
+- relaxok
+- Blizzard Entertainment
+- Gredys
 - flippy84
 - JustMak
 - Xalcon
 - BoogieMan 
 - Everyone in #modcraft on QuakeNet
 - WoWDev wiki authors (especially schlumpf!!!!)
-- Miceiken
 - ..and all the people the above people base their work on
-- also Thoorium
 
-Last updated on October 23rd 2014
+Last updated on August 10th 2015

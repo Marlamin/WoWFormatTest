@@ -4,7 +4,7 @@
         Title="Controls" Height="300" Width="300" ResizeMode="NoResize">
     <Grid>
         <Slider x:Name="CameraSpeedSlider" ValueChanged="CameraSpeedSlider_ValueChanged" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="272" Maximum="100" Minimum="1" Value="10"/>
-        <Label x:Name="CameraSpeedLabel" Content="Camera speed: 50%" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Height="26" Width="272"/>
+        <Label x:Name="CameraSpeedLabel" Content="Camera speed: 10%" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Height="26" Width="272"/>
         <!--<TextBox x:Name="amb1" HorizontalAlignment="Left" Margin="53,76,0,0" VerticalAlignment="Top" Width="56" TextChanged="amb1_ValueChanged"/>
         <TextBox x:Name="amb2" HorizontalAlignment="Left" Margin="109,76,0,0" VerticalAlignment="Top" Width="56" TextChanged="amb2_ValueChanged"/>
         <TextBox x:Name="amb3" HorizontalAlignment="Left" Margin="165,76,0,0" VerticalAlignment="Top" Width="56" TextChanged="amb3_ValueChanged"/>

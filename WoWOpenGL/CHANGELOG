@@ -1,15 +1,22 @@
-﻿v0.12
+﻿v0.12 (10-08-2015)
+- Finally! Added very slow unfinished/unstable single tile terrain rendering
+- Many camera changes by Thoorium
+- Some keys changed, see usage section
+- Added controls window with only camera speed control for now
+- Added model and texture caching causing better performance when rendering terrain
+- More file parsing changes
+- Updated CascLib, file caching might be better now
 - Solved texture issues for many WoD WMOs (https://github.com/Marlamin/WoWFormatTest/issues/9)
 - Fix some WMOs crashing 
 
-v0.11
+v0.11 (24-10-2014)
 - Added ability to use local data instead of web data
 - Character models now have their naked skins and only required geosets
 - More textures should now be detected, still much to do though
 - No longer caching downloaded files locally, caused slowdowns (so stuff is now faster!!) and issues with patches
 - Some file parsing prep for displaying terrain
 
-v0.10
+v0.10 (20-10-2014)
 - Listfile generation is now ran on startup
 - Added filter box to filter model list
 - More texture lookups (less blue)
