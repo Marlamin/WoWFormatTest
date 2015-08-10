@@ -46,68 +46,68 @@ namespace WoWOpenGL
             }
         }
 
-        private void amb1_ValueChanged(object sender, TextChangedEventArgs e)
-        {
-            amb_1 = 0.0f;
-            float.TryParse(amb1.Text, out amb_1);
-        }
+        //private void amb1_ValueChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    amb_1 = 0.0f;
+        //    float.TryParse(amb1.Text, out amb_1);
+        //}
 
-        private void amb2_ValueChanged(object sender, TextChangedEventArgs e)
-        {
-            amb_2 = 0.0f;
-            float.TryParse(amb2.Text, out amb_2);
-        }
+        //private void amb2_ValueChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    amb_2 = 0.0f;
+        //    float.TryParse(amb2.Text, out amb_2);
+        //}
 
-        private void amb3_ValueChanged(object sender, TextChangedEventArgs e)
-        {
-            amb_3 = 0.0f;
-            float.TryParse(amb3.Text, out amb_3);
-        }
+        //private void amb3_ValueChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    amb_3 = 0.0f;
+        //    float.TryParse(amb3.Text, out amb_3);
+        //}
 
-        private void amb4_ValueChanged(object sender, TextChangedEventArgs e)
-        {
-            amb_4 = 0.0f;
-            float.TryParse(amb4.Text, out amb_4);
-        }
+        //private void amb4_ValueChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    amb_4 = 0.0f;
+        //    float.TryParse(amb4.Text, out amb_4);
+        //}
 
-        private void diff1_ValueChanged(object sender, RoutedEventArgs e)
-        {
-            diff_1 = diff1.IsChecked.Value;
-        }
+        //private void diff1_ValueChanged(object sender, RoutedEventArgs e)
+        //{
+        //    diff_1 = diff1.IsChecked.Value;
+        //}
 
-        private void diff2_ValueChanged(object sender, RoutedEventArgs e)
-        {
-            diff_2 = diff2.IsChecked.Value;
-        }
+        //private void diff2_ValueChanged(object sender, RoutedEventArgs e)
+        //{
+        //    diff_2 = diff2.IsChecked.Value;
+        //}
 
-        private void diff3_ValueChanged(object sender, RoutedEventArgs e)
-        {
-            diff_3 = diff3.IsChecked.Value;
-        }
+        //private void diff3_ValueChanged(object sender, RoutedEventArgs e)
+        //{
+        //    diff_3 = diff3.IsChecked.Value;
+        //}
 
-        private void diff4_ValueChanged(object sender, RoutedEventArgs e)
-        {
-          //  diff_4 = (float)Math.Round(diff4.Value, 0);
-        }
+        //private void diff4_ValueChanged(object sender, RoutedEventArgs e)
+        //{
+        //  //  diff_4 = (float)Math.Round(diff4.Value, 0);
+        //}
 
-        private void pos1_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            pos_1 = (float)Math.Round(pos1.Value, 0) / 100;
-        }
+        //private void pos1_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    pos_1 = (float)Math.Round(pos1.Value, 0) / 100;
+        //}
 
-        private void pos2_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            pos_2 = (float)Math.Round(pos2.Value, 0) / 100;
-        }
+        //private void pos2_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    pos_2 = (float)Math.Round(pos2.Value, 0) / 100;
+        //}
 
-        private void pos3_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            pos_3 = (float)Math.Round(pos3.Value, 0) / 100;
-        }
+        //private void pos3_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    pos_3 = (float)Math.Round(pos3.Value, 0) / 100;
+        //}
 
-        private void pos4_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            pos_4 = (float)Math.Round(pos4.Value, 0) / 100;
-        }
+        //private void pos4_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        //{
+        //    pos_4 = (float)Math.Round(pos4.Value, 0) / 100;
+        //}
     }
 }

@@ -107,7 +107,7 @@ namespace WoWOpenGL
             glControl.MakeCurrent();
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
-            GL.ShadeModel(ShadingModel.Smooth);
+            
             GL.ClearColor(OpenTK.Graphics.Color4.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             
@@ -404,12 +404,12 @@ namespace WoWOpenGL
 
             if (keyboardState.IsKeyDown(Key.Z))
             {
-                dragZ = dragZ - 1.0f;
+                dragZ = dragZ - speed;
             }
 
             if (keyboardState.IsKeyDown(Key.X))
             {
-                dragZ = dragZ + 1.0f;
+                dragZ = dragZ + speed;
             }
 
             //if (mouseInRender)
