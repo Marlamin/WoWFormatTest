@@ -126,7 +126,7 @@ namespace WoWOpenGL
                             Material material = new Material();
                             material.filename = reader.adtfile.textures.filenames[ti];
 
-                            if (!WoWFormatLib.Utils.CASC.FileExists(material.filename)) { continue; }
+                            //if (!WoWFormatLib.Utils.CASC.FileExists(material.filename)) { continue; }
 
                             material.textureID = BLPLoader.LoadTexture(reader.adtfile.textures.filenames[ti], cache);
 
@@ -199,7 +199,7 @@ namespace WoWOpenGL
 
                             for (int li = 0; li < reader.adtfile.texChunks[c].layers.Count(); li++)
                             {
-                                alphalayermats.Add(BLPLoader.GenerateAlphaTexture(reader.adtfile.texChunks[c].alphaLayer[li].layer);
+                                alphalayermats.Add(BLPLoader.GenerateAlphaTexture(reader.adtfile.texChunks[c].alphaLayer[li].layer)); 
                                 layermats.Add((uint)cache.materials[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[li].textureId].ToLower()]);
                             }
 
@@ -526,8 +526,6 @@ namespace WoWOpenGL
             //GL.Material(MaterialFace.Front, MaterialParameter.Specular, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
             //GL.Material(MaterialFace.Front, MaterialParameter.Shininess, new float[] { 0.0f, 0.0f, 0.0f, 0.0f });
 
-
-
             for (int adti = 0; adti < adts.Count(); adti++)
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, adts[adti].vertexBuffer);
@@ -536,20 +534,32 @@ namespace WoWOpenGL
                 GL.TexCoordPointer(2, TexCoordPointerType.Float, 11 * sizeof(float), (IntPtr)(6 * sizeof(float)));
                 GL.VertexPointer(3, VertexPointerType.Float, 11 * sizeof(float), (IntPtr)(8 * sizeof(float)));
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, adts[adti].indiceBuffer);
+                
                 for (int rb = 0; rb < adts[adti].renderBatches.Count(); rb++)
                 {
                     for (int li = 0; li < adts[adti].renderBatches[rb].materialID.Count(); li++)
                     {
+                        if (li > 0)
+                        {
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            GL.ActiveTexture(TextureUnit.Texture1);
+                            GL.BindTexture(TextureTarget.Texture2D, (int)adts[adti].renderBatches[rb].alphaMaterialID[li]);
+                            GL.DrawRangeElements(PrimitiveType.Triangles, (int)adts[adti].renderBatches[rb].firstFace, (int)adts[adti].renderBatches[rb].firstFace + (int)adts[adti].renderBatches[rb].numFaces, (int)adts[adti].renderBatches[rb].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].renderBatches[rb].firstFace * 4));
+                        }
+
+                        GL.ActiveTexture(TextureUnit.Texture0);
                         GL.BindTexture(TextureTarget.Texture2D, (int)adts[adti].renderBatches[rb].materialID[li]);
                         GL.DrawRangeElements(PrimitiveType.Triangles, (int)adts[adti].renderBatches[rb].firstFace, (int)adts[adti].renderBatches[rb].firstFace + (int)adts[adti].renderBatches[rb].numFaces, (int)adts[adti].renderBatches[rb].numFaces, DrawElementsType.UnsignedInt, new IntPtr(adts[adti].renderBatches[rb].firstFace * 4));
                     }
-                    //GL.DrawElements(PrimitiveType.Triangles, indices.Count(), DrawElementsType.UnsignedInt, 0);
-                    //GL.DrawArrays(PrimitiveType.Triangles, renderBatches[rb].firstFace, renderBatches[rb].numFaces);
                 }
+                GL.Disable(EnableCap.Blend);
+
+                GL.ActiveTexture(TextureUnit.Texture0);
 
                 GL.Disable(EnableCap.ColorArray);
                 GL.DisableClientState(ArrayCap.ColorArray);
-
+                GL.Enable(EnableCap.Texture2D);
                 for (int di = 0; di < adts[adti].doodads.Count(); di++)
                 {
                     GL.PushMatrix();
@@ -808,7 +818,7 @@ namespace WoWOpenGL
             public uint groupID;
             public uint blendType;
             /* ADT ONLY */
-            internal int[] alphaMaterialID;
+            public int[] alphaMaterialID;
         }
 
         public struct Doodad

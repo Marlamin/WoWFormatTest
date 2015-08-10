@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWOpenGL_SH", "WoWOpenGL_S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderTest", "ShaderTest\ShaderTest.csproj", "{07085D5D-4736-4E53-B4E9-7BD058DDA47F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWShaderTest", "WoWShaderTest\WoWShaderTest.csproj", "{9EB777C1-830D-4B06-9C73-53BD42552E18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -219,6 +221,18 @@ Global
 		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|x86.ActiveCfg = Release|Any CPU
 		{07085D5D-4736-4E53-B4E9-7BD058DDA47F}.Release|x86.Build.0 = Release|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Debug|x86.Build.0 = Debug|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Release|x86.ActiveCfg = Release|Any CPU
+		{9EB777C1-830D-4B06-9C73-53BD42552E18}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
