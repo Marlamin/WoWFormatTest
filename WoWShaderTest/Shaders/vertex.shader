@@ -1,12 +1,15 @@
 ﻿#version 150
 
-in vec2 position;
+uniform mat4 modelview_matrix;
+uniform mat4 projection_matrix;
+
+in vec3 position;
 in vec2 texCoord;
 
 out vec2 TexCoord;
 
 void main()
 {
-	gl_Position = vec4(position, 0.0, 1.0);
+	gl_Position = projection_matrix * modelview_matrix * vec4(position, 1);
 	TexCoord = texCoord;
 }

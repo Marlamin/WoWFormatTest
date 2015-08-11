@@ -199,7 +199,10 @@ namespace WoWOpenGL
 
                             for (int li = 0; li < reader.adtfile.texChunks[c].layers.Count(); li++)
                             {
-                                alphalayermats.Add(BLPLoader.GenerateAlphaTexture(reader.adtfile.texChunks[c].alphaLayer[li].layer)); 
+                                if(reader.adtfile.texChunks[c].alphaLayer != null){
+                                    alphalayermats.Add(BLPLoader.GenerateAlphaTexture(reader.adtfile.texChunks[c].alphaLayer[li].layer));
+
+                                }
                                 layermats.Add((uint)cache.materials[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[li].textureId].ToLower()]);
                             }
 

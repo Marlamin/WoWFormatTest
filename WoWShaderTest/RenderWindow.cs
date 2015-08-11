@@ -24,7 +24,23 @@ namespace WoWShaderTest
         private int fragmentShader;
         private int shaderProgram;
 
-        public RenderWindow() : base(800, 600, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Shader test", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default)
+        OldCamera ActiveCamera;
+        private float dragX;
+        private float dragY;
+        private float dragZ;
+        private float angle;
+
+        private float camSpeed;
+
+        private float lightHeight;
+
+        private bool mouseDragging = true;
+
+        private Dictionary<Key, int> CoolOffKeys = new Dictionary<Key, int>();
+
+        private Point mouseOldCoords;
+
+        public RenderWindow() : base(800, 600, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Shader test", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Debug)
         {
             Keyboard.KeyDown += Keyboard_KeyDown;
         }
@@ -35,16 +51,20 @@ namespace WoWShaderTest
             Console.WriteLine("OpenGL version: " + GL.GetString(StringName.Version));
             Console.WriteLine("OpenGL vendor: " + GL.GetString(StringName.Vendor));
 
+            // Set up camera
+            ActiveCamera = new OldCamera(Width, Height);
+            ActiveCamera.Pos = new Vector3(0, 0, 0);
+
             // Vertex Attribute Object
             vertexAttribObject = GL.GenVertexArray();
             GL.BindVertexArray(vertexAttribObject);
 
             // Vertices
             float[] vertices = new float[] {
-                    -0.5f,  0.5f, 0.0f, 0.0f, // Top-left
-				     0.5f,  0.5f, 1.0f, 0.0f, // Top-right
-				     0.5f, -0.5f, 1.0f, 1.0f, // Bottom-right
-				    -0.5f, -0.5f, 0.0f, 1.0f  // Bottom-left
+                    -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, // Top-left
+				     0.5f,  0.5f, 1.0f, 1.0f, 0.0f, // Top-right
+				     0.5f, -0.5f, 0.0f, 1.0f, 1.0f, // Bottom-right
+				    -0.5f, -0.5f, 0.0f, 0.0f, 1.0f  // Bottom-left
             };
 
             vertexBuffer = GL.GenBuffer();
@@ -58,7 +78,7 @@ namespace WoWShaderTest
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out verticeBufferSize);
 
-            Console.WriteLine("Vertices in buffer: " + verticeBufferSize / 2 / sizeof(float));
+            Console.WriteLine("Vertices in buffer: " + verticeBufferSize / 5 / sizeof(float));
 
             // Elements
             int[] elements = new int[] {
@@ -121,14 +141,17 @@ namespace WoWShaderTest
             Console.WriteLine("[FRAGMENT] Program link status: " + programStatus);
             GL.UseProgram(shaderProgram);
 
+            // Set up matrix
+            ActiveCamera.setupGLRenderMatrix(shaderProgram);
+
             // Shader settings
             int posAttrib = GL.GetAttribLocation(shaderProgram, "position");
             GL.EnableVertexAttribArray(posAttrib);
-            GL.VertexAttribPointer(posAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 4, 0);
+            GL.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 5, 0);
 
             int texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
             GL.EnableVertexAttribArray(texCoordAttrib);
-            GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 4, sizeof(float) * 2);
+            GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 5, sizeof(float) * 3);
 
             // Clear 
             GL.ClearColor(Color.Black);
@@ -166,23 +189,6 @@ namespace WoWShaderTest
             GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, textureIds[1]);
 
-            var blp2 = new BLPReader();
-
-            blp2.LoadBLP(File.OpenRead(@"Z:\WoW extracts\20363_full\Textures\ShaneCube_new.blp"));
-
-            System.Drawing.Imaging.BitmapData bmp_data2 = blp2.bmp.LockBits(new System.Drawing.Rectangle(0, 0, blp2.bmp.Width, blp2.bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data2.Width, bmp_data2.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data2.Scan0);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-
-            blp2.bmp.UnlockBits(bmp_data2);
-
-            GL.Uniform1(GL.GetUniformLocation(shaderProgram, "shaneCubeNew"), 1);
         }
 
 
@@ -213,12 +219,154 @@ namespace WoWShaderTest
             {
                 return;
             }
+
+            MouseState mouseState = OpenTK.Input.Mouse.GetState();
+            KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
+
+            if (keyboardState.IsKeyDown(Key.I))
+            {
+                Console.WriteLine("Camera position: " + ActiveCamera.Pos);
+                Console.WriteLine("Camera direction: " + ActiveCamera.Dir);
+            }
+
+            if (keyboardState.IsKeyDown(Key.Q))
+            {
+                angle = angle + 0.5f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.E))
+            {
+                angle = angle - 0.5f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.O))
+            {
+                camSpeed = camSpeed + 0.025f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.P))
+            {
+                camSpeed = camSpeed - 0.025f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.ShiftLeft))
+            {
+                if (keyboardState.IsKeyDown(Key.Up))
+                {
+                    dragY = dragY - camSpeed;
+                }
+
+                if (keyboardState.IsKeyDown(Key.Down))
+                {
+                    dragY = dragY + camSpeed;
+                }
+
+                if (keyboardState.IsKeyDown(Key.Left))
+                {
+                    dragX = dragX - camSpeed;
+                }
+
+                if (keyboardState.IsKeyDown(Key.Right))
+                {
+                    dragX = dragX + camSpeed;
+                }
+            }
+
+            if (keyboardState.IsKeyDown(Key.L))
+            {
+                lightHeight = lightHeight + 50f;
+            }
+            if (keyboardState.IsKeyDown(Key.K))
+            {
+                lightHeight = lightHeight - 50f;
+            }
+
+            /*
+            if (keyboardState.IsKeyDown(Key.X))
+            {
+                dragZ = (dragZ + 10f) - 1068;
+            }
+
+            if (keyboardState.IsKeyDown(Key.Z))
+            {
+                dragZ = (dragZ - 10f) - 1068;
+            }
+            */
+
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (!mouseDragging)
+                {
+                    mouseDragging = true;
+                    mouseOldCoords = new Point(mouseState.X, mouseState.Y);
+                }
+
+                Point mouseNewCoords = new Point(mouseState.X, mouseState.Y);
+
+                int mouseMovementY = (mouseNewCoords.Y - mouseOldCoords.Y);
+                int mouseMovementX = (mouseNewCoords.X - mouseOldCoords.X);
+
+                if (keyboardState.IsKeyDown(Key.ShiftLeft))
+                {
+                    dragY = dragY + mouseMovementY / 2;
+                    dragX = dragX + mouseMovementX / 2;
+
+                }
+                else
+                {
+                    //if(mouseMovementX < 0)
+                    //{
+                    //    dragX = dragX + mouseMovementX * angle;
+                    //}
+
+                    angle = angle + mouseMovementX / 10f;
+                }
+
+                mouseOldCoords = mouseNewCoords;
+            }
+
+            if (mouseState.LeftButton == ButtonState.Released)
+            {
+                mouseDragging = false;
+            }
+
+            if (keyboardState.IsKeyDown(Key.R))//Reset
+            {
+                dragX = dragY = dragZ = angle = 0;
+            }
+
+            if (!CoolOffKeys.ContainsKey(Key.Right) && keyboardState.IsKeyDown(Key.Right) && keyboardState.IsKeyUp(Key.ShiftLeft))
+            {
+                angle += 90;
+                CoolOffKey(Key.Right);
+            }
+
+            if (!CoolOffKeys.ContainsKey(Key.Left) && keyboardState.IsKeyDown(Key.Left) && keyboardState.IsKeyUp(Key.ShiftLeft))
+            {
+                angle -= 90;
+                CoolOffKey(Key.Left);
+            }
+
+            dragZ = (mouseState.WheelPrecise / 2) - 500; //Startzoom is at -7.5f 
         }
 
+        private void CoolOffKey(Key kKey)
+        {
+            if (CoolOffKeys.ContainsKey(kKey))
+                CoolOffKeys[kKey] = 1000;
+            else CoolOffKeys.Add(kKey, 1000);
+
+        }
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            angle = angle % 360;
+
+            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
+
+            ActiveCamera.setupGLRenderMatrix(shaderProgram);
 
             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
             //DrawAxes();
@@ -229,6 +377,18 @@ namespace WoWShaderTest
             }
 
             this.SwapBuffers();
+
+            Key[] keys = CoolOffKeys.Keys.ToArray();
+            int decreasevalue = (int)(base.RenderTime * 3000d);//TERRIBLE
+            for (int i = 0; i < keys.Length; i++)
+            {
+                Key k = keys[i];
+
+                CoolOffKeys[k] -= decreasevalue;
+
+                if (CoolOffKeys[k] <= 0)
+                    CoolOffKeys.Remove(k);
+            }
         }
 
         protected override void OnUnload(EventArgs e)
