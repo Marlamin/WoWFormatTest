@@ -10,7 +10,7 @@
 * WMO doodads
 * Refactor WMO, M2 and BLP loading to be the same code in both TerrainWindow.cs and Render.cs
 * Ortho camera 
-
+* Character geosets 
 
 pseudo code by Mirth
  (layer l : layers ) { float a = texture(l.alpha); vec4 col = texture(l.color); finalColor += col * a; }

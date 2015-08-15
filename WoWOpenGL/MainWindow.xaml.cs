@@ -311,7 +311,7 @@ namespace WoWOpenGL
             contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
             ModelListBox.Visibility = System.Windows.Visibility.Visible;
             MapsTab.Visibility = System.Windows.Visibility.Visible;
-            using (TerrainWindow tw = new TerrainWindow("TanaanLegionTest_21_34"))
+            using (TerrainWindow tw = new TerrainWindow("Draenor_30_31"))
             {
                 tw.Run(30.0, 60.0);
             }

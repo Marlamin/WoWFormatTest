@@ -22,6 +22,10 @@ namespace WoWOpenGL
         private static float camSpeed = 0.25f;
         private List<Terrain> adts = new List<Terrain>();
 
+        private static float maxSize = 51200 / 3; //17066,66666666667
+	    private static float mapSize = maxSize * 2; //34133,33333333333
+	    private static float adtSize = mapSize / 64; //533,3333333333333
+
         private Dictionary<Key, int> CoolOffKeys = new Dictionary<Key, int>();
 
         private bool mouseDragging = true;
@@ -491,10 +495,10 @@ namespace WoWOpenGL
 
             ActiveCamera.setupGLRenderMatrix();
 
-
-            GL.Translate(-(dragX - 267), -(dragY - 267), -(dragZ - 267)); //267 is from 533,33..(adtsize) / 2
-            GL.Rotate(angle, 0.0, 1.0f, 0.0);
-            GL.Translate(dragX - 267, dragY - 267, dragZ - 267);
+            GL.Translate(-(dragX - (adtSize / 2)), -(dragY - (adtSize / 2)), -(dragZ - (adtSize / 2))); //267 is from 533,33..(adtsize) / 2
+            //GL.Rotate(angle, 0.0, 1.0f, 0.0);
+            GL.Rotate(angle, 1.0f, 0.0f, 0.0);
+            GL.Translate(dragX - (adtSize / 2), dragY - (adtSize / 2), dragZ - (adtSize / 2));
             DrawAxes();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
