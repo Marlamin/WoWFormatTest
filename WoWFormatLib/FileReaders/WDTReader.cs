@@ -16,7 +16,6 @@ namespace WoWFormatLib.FileReaders
         {
         }
 
-        //TODO there's probably a better way to do this
         public List<int[]> getTiles()
         {
             return tiles;

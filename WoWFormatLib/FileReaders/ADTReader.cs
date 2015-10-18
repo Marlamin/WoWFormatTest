@@ -19,7 +19,7 @@ namespace WoWFormatLib.FileReaders
         {
         }
 
-        public void LoadADT(string filename, bool loadSecondaryADTs = true, bool filenamesOnly = false)
+        public void LoadADT(string filename, bool loadSecondaryADTs = true, bool filenamesOnly = false, bool localFile = false)
         {
             m2Files = new List<string>();
             wmoFiles = new List<string>();
@@ -27,27 +27,44 @@ namespace WoWFormatLib.FileReaders
 
             filename = Path.ChangeExtension(filename, ".adt");
 
-            if (!CASC.FileExists(filename)) { new WoWFormatLib.Utils.MissingFile(filename); return; }
-            if (!CASC.FileExists(filename.Replace(".adt", "_obj0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
-            if (!CASC.FileExists(filename.Replace(".adt", "_obj1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
-            if (!CASC.FileExists(filename.Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
-            if (!CASC.FileExists(filename.Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; }
-
-            var mapname = filename.Replace("World/Maps/", "").Substring(0, filename.Replace("World/Maps/", "").IndexOf("/"));
-
-            if(CASC.FileExists("World/Maps/" + mapname + "/" + mapname + ".wdt"))
+            if (!localFile)
             {
-                var wdtr = new WDTReader();
-                wdtr.LoadWDT("World/Maps/" + mapname + "/" + mapname + ".wdt");
-                wdt = wdtr.wdtfile;
+                if (!CASC.FileExists(filename)) { new WoWFormatLib.Utils.MissingFile(filename); return; }
+                if (!CASC.FileExists(filename.Replace(".adt", "_obj0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
+                if (!CASC.FileExists(filename.Replace(".adt", "_obj1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
+                if (!CASC.FileExists(filename.Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
+                if (!CASC.FileExists(filename.Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; }
             }
             else
             {
-                throw new Exception("WDT does not exist, need this for MCAL flags!");
+                if (!File.Exists(filename)) { throw new Exception("Missing file!"); }
             }
 
+            Stream adt;
 
-            var adt = CASC.OpenFile(filename);
+            if (!localFile)
+            {
+                var mapname = filename.Replace("World/Maps/", "").Substring(0, filename.Replace("World/Maps/", "").IndexOf("/"));
+
+                if (CASC.FileExists("World/Maps/" + mapname + "/" + mapname + ".wdt"))
+                {
+                    var wdtr = new WDTReader();
+                    wdtr.LoadWDT("World/Maps/" + mapname + "/" + mapname + ".wdt");
+                    wdt = wdtr.wdtfile;
+                }
+                else
+                {
+                    throw new Exception("WDT does not exist, need this for MCAL flags!");
+                }
+
+
+                adt = CASC.OpenFile(filename);
+            }
+            else
+            {
+                adt = File.OpenRead(filename);
+            }
+
 
             BlizzHeader chunk = null;
             if (filenamesOnly == false)
@@ -147,7 +164,11 @@ namespace WoWFormatLib.FileReaders
                         mapchunk.normals = ReadMCNRSubChunk(subchunk, subbin);
                         break;
                     case "MCSE":
+                        mapchunk.soundEmitters = ReadMCSESubChunk(subchunk, subbin);
+                        break;
                     case "MCBB":
+                        mapchunk.blendBatches = ReadMCBBSubChunk(subchunk, subbin);
+                        break;
                     case "MCLQ":
                     case "MCLV":
                         continue;
@@ -369,7 +390,23 @@ namespace WoWFormatLib.FileReaders
             return vtchunk;
         }
 
-        
+        public MCSE ReadMCSESubChunk(BlizzHeader subchunk, BinaryReader subbin)
+        {
+            MCSE sechunk = new MCSE();
+            sechunk.raw = subbin.ReadBytes((int)subchunk.Size);
+            return sechunk;
+        }
+
+        public MCBB[] ReadMCBBSubChunk(BlizzHeader subchunk, BinaryReader subbin)
+        {
+            var count = subchunk.Size / 20;
+            MCBB[] bbchunk = new MCBB[count];
+            for(int i = 0; i < count; i++)
+            {
+                bbchunk[i] = subbin.Read<MCBB>();
+            }
+            return bbchunk;
+        }
 
         public MTEX ReadMTEXChunk(BlizzHeader chunk, BinaryReader bin)
         {
@@ -527,7 +564,7 @@ namespace WoWFormatLib.FileReaders
 
             var count = chunk.Size / 36; //36 bytes per entry?
 
-            Console.WriteLine(count + " MDDF entries!");
+           // Console.WriteLine(count + " MDDF entries!");
 
             mddf.entries = new MDDFEntry[count];
 
@@ -545,7 +582,7 @@ namespace WoWFormatLib.FileReaders
 
             var count = chunk.Size / 64; //64 bytes per entry?
 
-            Console.WriteLine(count + " MODF entries!");
+           // Console.WriteLine(count + " MODF entries!");
 
             modf.entries = new MODFEntry[count];
             for(int i = 0; i < count; i++)
@@ -569,7 +606,7 @@ namespace WoWFormatLib.FileReaders
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
                 position = adtTexStream.Position + chunk.Size;
-                Console.WriteLine("Chunk " + MCNKi);
+                //Console.WriteLine("Chunk " + MCNKi);
                 if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
                 if (chunk.Is("MAMP")) { continue; }
                 if (chunk.Is("MTEX")) { adtfile.textures = ReadMTEXChunk(chunk, bin); continue; }

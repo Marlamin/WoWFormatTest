@@ -200,7 +200,6 @@ namespace WoWShaderTest
                 return;
             }
 
-            // TODO: refine controls
             // ActiveCamera.processMouseInput(e.X, e.Y);
         }
 

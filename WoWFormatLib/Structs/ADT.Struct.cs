@@ -83,6 +83,8 @@ namespace WoWFormatLib.Structs.ADT
         public MCNR normals;
         public MCLV colors;
         public MCCV vertexShading;
+        public MCSE soundEmitters;
+        public MCBB[] blendBatches;
     }
 
     public struct TexMCNK
@@ -194,6 +196,20 @@ namespace WoWFormatLib.Structs.ADT
         public mclyFlags flags;
         public uint offsetInMCAL;
         public int effectId;
+    }
+
+    public struct MCSE
+    {
+        public byte[] raw; //TODO
+    }
+
+    public struct MCBB
+    {
+        public uint mbmhIndex;
+        public uint indexCount;
+        public uint indexFirst;
+        public uint vertexCount;
+        public uint vertexFirst;
     }
 
     [Flags]

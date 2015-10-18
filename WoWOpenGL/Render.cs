@@ -412,6 +412,16 @@ namespace WoWOpenGL
                 dragZ = dragZ + speed;
             }
 
+            if (keyboardState.IsKeyDown(Key.Q))
+            {
+                angle = angle + 0.5f;
+            }
+
+            if (keyboardState.IsKeyDown(Key.E))
+            {
+                angle = angle - 0.5f;
+            }
+
             //if (mouseInRender)
             //{
             //dragZ = (mouseState.WheelPrecise / speed) - (7.5f); //Startzoom is at -7.5f 

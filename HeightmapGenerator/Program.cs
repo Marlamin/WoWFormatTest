@@ -18,7 +18,7 @@ namespace HeightmapGenerator
         static void Main(string[] args)
         {
             Console.WriteLine("Initializing CASC..");
-            CASC.InitCasc(); // Use PTR for now
+            CASC.InitCasc(null, @"C:\World of Warcraft", "wow");
             Console.WriteLine("CASC initialized!");
 
             var dbcreader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");
