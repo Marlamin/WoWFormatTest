@@ -124,7 +124,11 @@ namespace WoWOpenGL
         private void LoadM2(string modelpath)
         {
             //M2Loader.LoadM2(modelpath, cache);
-            
+
+            if (!WoWFormatLib.Utils.CASC.FileExists(modelpath))
+            {
+                throw new Exception("Model does not exist!");
+            }
             Console.WriteLine("Loading M2 file ("+modelpath+")..");
             M2Reader reader = new M2Reader();
 
@@ -347,9 +351,17 @@ namespace WoWOpenGL
                 if (group.mogp.renderBatches == null) { continue; }
                 for (int i = 0; i < group.mogp.renderBatches.Count(); i++)
                 {
-                    renderbatches[rb].firstFace = group.mogp.renderBatches[i].firstFace;
-                    renderbatches[rb].numFaces = group.mogp.renderBatches[i].numFaces;
-                    renderbatches[rb].materialID = group.mogp.renderBatches[i].materialID;
+                    var batch = group.mogp.renderBatches[i];
+                    renderbatches[rb].firstFace = batch.firstFace;
+                    renderbatches[rb].numFaces = batch.numFaces;
+                    if (batch.flags == 2)
+                    {
+                        renderbatches[rb].materialID = (uint) group.mogp.renderBatches[i].possibleBox2_3;
+                    }
+                    else
+                    {
+                        renderbatches[rb].materialID = group.mogp.renderBatches[i].materialID;
+                    }
                     renderbatches[rb].blendType = reader.wmofile.materials[group.mogp.renderBatches[i].materialID].blendMode;
                     renderbatches[rb].groupID = (uint)g;
                     rb++;
@@ -377,7 +389,7 @@ namespace WoWOpenGL
 
         private static void InputTick(object sender, EventArgs e)
         {
-            float speed = 0.1f * (float) ControlsWindow.camSpeed;
+            float speed = 0.01f * (float) ControlsWindow.camSpeed;
 
             OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
             OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
@@ -524,7 +536,7 @@ namespace WoWOpenGL
                 }
             }
 
-            DrawAxes();
+           // DrawAxes();
             glControl.SwapBuffers();
             glControl.Invalidate();
         }

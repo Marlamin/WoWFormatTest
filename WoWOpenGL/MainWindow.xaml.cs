@@ -42,7 +42,6 @@ namespace WoWOpenGL
         public static bool useCASC = false;
         public static bool CASCinitialized = false;
         public static bool mapsTabLoaded = false;
-        public static AsyncAction bgAction;
         public static bool mouseOverRenderArea = false;
         public static Window controls;
         private static List<string> models = new List<String>();
@@ -268,7 +267,7 @@ namespace WoWOpenGL
             }
         }
 
-        private async void SwitchToCASC()
+        private void SwitchToCASC()
         {
             Console.WriteLine("Intializing CASC filesystem..");
             ModelListBox.Visibility = System.Windows.Visibility.Hidden;
@@ -280,22 +279,13 @@ namespace WoWOpenGL
             if (ConfigurationManager.AppSettings["basedir"] != "" && Directory.Exists(ConfigurationManager.AppSettings["basedir"]))
             {
                 Console.WriteLine("Using basedir " + ConfigurationManager.AppSettings["basedir"] + " to load..");
-                bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction, ConfigurationManager.AppSettings["basedir"]));
+                CASC.InitCasc(null, ConfigurationManager.AppSettings["basedir"], "wow_beta");
             }
             else
             {
-                bgAction = new AsyncAction(() => WoWFormatLib.Utils.CASC.InitCasc(bgAction));
+                CASC.InitCasc();
             }
-            bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
 
-            try
-            {
-                await bgAction.DoAction();
-            }
-            catch
-            {
-
-            }
             Console.WriteLine("CASC filesystem initialized.");
             Console.WriteLine("Generating listfile..");
             List<string> files = new List<String>();
@@ -316,12 +306,6 @@ namespace WoWOpenGL
            //     tw.Run(30.0, 60.0);
            // }
             // new Render(@"World\wmo\Draenor\Orc\6OC_OrcClans_HouseSmall.wmo");
-        }
-
-        private void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
-        {
-            CASCprogress.Value = progress.Progress;
-            if (progress.UserData != null) { CASCdesc.Content = progress.UserData; Console.WriteLine(CASCdesc.Content);  }
         }
 
         private void MapsTab_Focused(object sender, RoutedEventArgs e)

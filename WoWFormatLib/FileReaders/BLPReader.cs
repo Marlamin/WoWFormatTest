@@ -28,7 +28,12 @@ namespace WoWFormatLib.FileReaders
             if (!CASC.FileExists(filename))
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
-                return;
+
+                // @TODO Quick fix to get texture working when it doesn't exist. Happened because Blizzard accidentally referenced a texture on their shares instead of in files.
+                using (var blp = new BlpFile(CASC.OpenFile(@"World\Expansion05\Doodads\IronHorde\Ember_Offset_Streak.blp")))
+                {
+                    bmp = blp.GetBitmap(0);
+                }
             }
             else
             {

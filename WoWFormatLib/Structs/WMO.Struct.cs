@@ -81,6 +81,7 @@ namespace WoWFormatLib.Structs.WMO
     public struct MOGN
     {
         public string name;
+        public int offset;
     }
 
     //Group information
@@ -211,7 +212,7 @@ namespace WoWFormatLib.Structs.WMO
         public ushort numFaces;
         public ushort firstVertex;
         public ushort lastVertex;
-        public byte unused;
+        public byte flags;
         public byte materialID;
     }
 

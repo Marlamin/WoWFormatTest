@@ -12,23 +12,21 @@ namespace WoWFormatLib.Utils
     public class CASC
     {
         public static CASCHandler cascHandler;
-        private static AsyncAction bgAction;
-        public static int progressNum;
-        public static string progressDesc;
         private static bool fIsCASCInit = false;
+        public static Dictionary<int, string> rootList;
+        public static void InitCasc(BackgroundWorkerEx worker = null, string basedir = null, string program = "wowt"){
 
-        public static void InitCasc(AsyncAction bgAction = null, string basedir = null, string program = "wowt"){
-            CASC.bgAction = bgAction;
-            //bgAction.ProgressChanged += new EventHandler<AsyncActionProgressChangedEventArgs>(bgAction_ProgressChanged);
+            CASCConfig.LoadFlags &= ~(LoadFlags.Download | LoadFlags.Install);
+
             if (basedir == null)
             {
                 Console.WriteLine("Initializing CASC from web with program " + program);
-                cascHandler = CASCHandler.OpenOnlineStorage(program, bgAction);
+                cascHandler = CASCHandler.OpenOnlineStorage(program, worker);
             }
             else
             {
                 Console.WriteLine("Initializing CASC from local disk with basedir " + basedir);
-                cascHandler = CASCHandler.OpenLocalStorage(basedir, bgAction);
+                cascHandler = CASCHandler.OpenLocalStorage(basedir, worker);
             }
             
             cascHandler.Root.SetFlags(LocaleFlags.enUS, ContentFlags.None, false);
@@ -36,28 +34,11 @@ namespace WoWFormatLib.Utils
             fIsCASCInit = true;
         }
 
-        private static void bgAction_ProgressChanged(object sender, AsyncActionProgressChangedEventArgs progress)
-        {
-            if (bgAction.IsCancellationRequested) { return; }
-            progressNum = progress.Progress;
-            if (progress.UserData != null) { progressDesc = progress.UserData.ToString(); }
-        }
-
         public static List<string> GenerateListfile()
         {
-            //extract signaturefile and extract list of some files from that
-
             List<string> files = new List<String>();
 
-
-           /* if (!FileExists("signaturefile"))
-            {
-                new MissingFile("signaturefile");
-                return files;
-            }
-            */
             string line;
-            string[] linesplit;
 
             // System.IO.StreamReader file = new System.IO.StreamReader(CASC.OpenFile("signaturefile"));
 
@@ -75,17 +56,18 @@ namespace WoWFormatLib.Utils
                 }
             }
 
-            /*
-            while ((line = file.ReadLine()) != null)
+            if (File.Exists("wow-live-listfile-seed.txt"))
             {
-                linesplit = line.Split(';');
-                if (linesplit.Count() != 4) { continue; } //filter out junk 
-                if (linesplit[3].EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || linesplit[3].EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+                var file = new System.IO.StreamReader("wow-live-listfile-seed.txt");
+                while ((line = file.ReadLine()) != null)
                 {
-                    files.Add(linesplit[3]);
+                    if (line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+                    {
+                        files.Add(line);
+                    }
                 }
             }
-            */
+            
             List<string> unwantedExtensions = new List<String>();
             for (int i = 0; i < 1024; i++)
             {
@@ -117,24 +99,11 @@ namespace WoWFormatLib.Utils
         {
             if (string.IsNullOrEmpty(filename)) { return false; }
 
-//#if DEBUG
-//            if (Directory.Exists(@"Z:\WoW extracts") && File.Exists(Path.Combine(@"Z:\WoW extracts\20363_full", filename)))
-//            {
-//                return true;
-//            }
-//#endif
-
             return cascHandler.FileExists(filename);
         }
 
         public static Stream OpenFile(string filename)
         {
-
-//#if DEBUG
-//            var stream = File.OpenRead(Path.Combine(@"Z:\WoW extracts\20363_full", filename));
-
-//            if (stream.CanRead) { return stream; }
-//#endif
             return cascHandler.OpenFile(filename);
         }
 

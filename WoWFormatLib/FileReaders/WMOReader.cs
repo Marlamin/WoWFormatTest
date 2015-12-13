@@ -84,12 +84,14 @@ namespace WoWFormatLib.FileReaders
             var wmoGroupsChunk = bin.ReadBytes((int)chunk.Size);
             var str = new StringBuilder();
             var nameList = new List<String>();
+            List<int> nameOffset = new List<int>();
             for (var i = 0; i < wmoGroupsChunk.Length; i++)
             {
                 if (wmoGroupsChunk[i] == '\0')
                 {
                     if (str.Length > 1)
                     {
+                        nameOffset.Add(i - str.ToString().Length);
                         nameList.Add(str.ToString());
                     }
                     str = new StringBuilder();
@@ -107,8 +109,8 @@ namespace WoWFormatLib.FileReaders
             var groupNames = new MOGN[nameList.Count];
             for (var i = 0; i < nameList.Count; i++)
             {
-                //Console.WriteLine(nameList[i]);
                 groupNames[i].name = nameList[i];
+                groupNames[i].offset = nameOffset[i];
             }
             return groupNames;
         }
@@ -188,6 +190,7 @@ namespace WoWFormatLib.FileReaders
                         throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subchunk.ToString(), position.ToString()));
                 }
             }
+            //if(MOTVi == 0) { throw new Exception("Didn't parse any MOTV??");  } // antiportal groups have no motv
             return mogp;
         }
 
@@ -390,6 +393,7 @@ namespace WoWFormatLib.FileReaders
                     
                     case "MFOG":
                     case "MCVP":
+                    case "GFID": // Legion
                         continue;
                     default:
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));

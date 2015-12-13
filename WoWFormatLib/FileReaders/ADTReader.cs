@@ -115,7 +115,7 @@ namespace WoWFormatLib.FileReaders
 
                 adt.Close();
             }
-            //OBJ1 and TEX1 are ignored atm
+
             if (loadSecondaryADTs)
             {
                 using (var adtobj0 = CASC.OpenFile(filename.Replace(".adt", "_obj0.adt")))
@@ -606,7 +606,6 @@ namespace WoWFormatLib.FileReaders
                 chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
                 chunk.Flip();
                 position = adtTexStream.Position + chunk.Size;
-                //Console.WriteLine("Chunk " + MCNKi);
                 if (chunk.Is("MVER")) { if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); } continue; }
                 if (chunk.Is("MAMP")) { continue; }
                 if (chunk.Is("MTEX")) { adtfile.textures = ReadMTEXChunk(chunk, bin); continue; }

@@ -193,10 +193,10 @@ namespace WoWOpenGL
                             }
                             batch.numFaces = (uint)(indicelist.Count()) - batch.firstFace;
 
-                            if (!cache.materials.ContainsKey(reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower()))
-                            {
-                                throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower());
-                            }
+                            //if (!cache.materials.ContainsKey(reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower()))
+                            //{
+                            //    throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower());
+                            //}
 
                             var layermats = new List<uint>();
                             var alphalayermats = new List<int>();
@@ -205,7 +205,6 @@ namespace WoWOpenGL
                             {
                                 if(reader.adtfile.texChunks[c].alphaLayer != null){
                                     alphalayermats.Add(BLPLoader.GenerateAlphaTexture(reader.adtfile.texChunks[c].alphaLayer[li].layer));
-
                                 }
                                 layermats.Add((uint)cache.materials[reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[li].textureId].ToLower()]);
                             }

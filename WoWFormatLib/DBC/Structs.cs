@@ -59,6 +59,14 @@ namespace WoWFormatLib.DBC
         public int Tile_X { get; private set; }
         public int Tile_Y { get; private set; }
     }
+    
+    public class AreaAssignmentRecordLegion
+    {
+        public short MapID { get; private set; }
+        public short AreaID { get; private set; }
+        public byte Tile_X { get; private set; }
+        public byte Tile_Y { get; private set; }
+    }
 
     public class AreaGroupRecord
     {
@@ -117,6 +125,38 @@ namespace WoWFormatLib.DBC
         public int uwZoneMusic { get; private set; }
         public int uwAmbience { get; private set; }
         public int world_pvp_id { get; private set; }
+        public int pvpCombatWorldStateID { get; private set; }
+        public int wildBattlePetLevelMin { get; private set; }
+        public int wildBattlePetLevelMax { get; private set; }
+        public int windSettingsID { get; private set; }
+    }
+
+    public class AreaTableRecordLegion
+    {
+        public int ID { get; private set; }
+        public int ContinentID { get; private set; }
+        public int ParentAreaID { get; private set; }
+        public int AreaBit { get; private set; }
+        public int flags_0 { get; private set; }
+        public int flags_1 { get; private set; }
+        public int SoundProviderPref { get; private set; }
+        public int SoundProviderPrefUnderwater { get; private set; }
+        public int AmbienceID { get; private set; }
+        public int ZoneMusic { get; private set; }
+        public string ZoneName { get; private set; }
+        public int IntroSound { get; private set; }
+        public int ExplorationLevel { get; private set; }
+        public string AreaName_lang { get; private set; }
+        public int factionGroupMask { get; private set; }
+        public int liquidTypeID_0 { get; private set; }
+        public int liquidTypeID_1 { get; private set; }
+        public int liquidTypeID_2 { get; private set; }
+        public int liquidTypeID_3 { get; private set; }
+        public float ambient_multiplier { get; private set; }
+        public int mountFlags { get; private set; }
+        public int uwIntroSound { get; private set; }
+        public int uwZoneMusic { get; private set; }
+        public int uwAmbience { get; private set; }
         public int pvpCombatWorldStateID { get; private set; }
         public int wildBattlePetLevelMin { get; private set; }
         public int wildBattlePetLevelMax { get; private set; }
