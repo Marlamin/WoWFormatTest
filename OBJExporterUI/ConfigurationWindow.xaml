@@ -11,7 +11,7 @@
     <Grid>
         <Button x:Name="button" Content="Confirm settings" HorizontalAlignment="Center" Margin="0,230,0,0" VerticalAlignment="Top" Width="125" Click="button_Click"/>
         <ComboBox x:Name="programSelect" Loaded="programSelect_Loaded" HorizontalAlignment="Center" Margin="00,116,0,0" VerticalAlignment="Top" MinWidth="100"/>
-        <Label x:Name="programLabel" Content="Select the version of WoW to use:" HorizontalAlignment="Center" Margin="0,74,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="programLabel" Content="Select the branch of WoW to use:" HorizontalAlignment="Center" Margin="0,74,0,0" VerticalAlignment="Top"/>
         <RadioButton Checked="mode_Checked" x:Name="localMode" GroupName="ContentSource" Content="Local mode" HorizontalAlignment="Left" Margin="169,32,0,0" VerticalAlignment="Top"/>
         <RadioButton Checked="mode_Checked" x:Name="onlineMode" GroupName="ContentSource" Content="Online mode" HorizontalAlignment="Left" Margin="39,32,0,0" IsChecked="True" VerticalAlignment="Top"/>
         <Label x:Name="basedirLabel" Content="No WoW directory set" Visibility="Hidden" HorizontalAlignment="Center" Margin="0,92,0,0" VerticalAlignment="Top"/>
