@@ -9,7 +9,7 @@
         ContentRendered="Window_ContentRendered"
         Title="OBJ Exporter" Height="600" Width="600">
     <Grid>
-        <ListBox x:Name="modelListBox" Visibility="Hidden" HorizontalAlignment="Stretch" Margin="10,70,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
+        <ListBox x:Name="modelListBox" Visibility="Hidden" SelectionMode="Extended" HorizontalAlignment="Stretch" Margin="10,70,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
         <Image x:Name="loadingImage" Source="Resources/icon.png" Margin="244,38,259,597"/>
         <TextBox x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="10" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged"/>
         <Button x:Name="exportButton" Visibility="Hidden" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Bottom" Click="button_Click"/>

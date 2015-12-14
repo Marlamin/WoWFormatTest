@@ -43,6 +43,8 @@ namespace OBJExporterUI
             {
                 var cfgWindow = new ConfigurationWindow();
                 cfgWindow.ShowDialog();
+
+                ConfigurationManager.RefreshSection("appSettings");
             }
 
             InitializeComponent();
@@ -96,8 +98,10 @@ namespace OBJExporterUI
             m2CheckBox.IsEnabled = false;
             buildsBox.IsEnabled = false;
             exportButton.IsEnabled = false;
+            modelListBox.IsEnabled = false;
             buildsBox.Visibility = Visibility.Hidden; // Hide for now, overlap with progress bar
-            exportworker.RunWorkerAsync(modelListBox.SelectedValue);
+
+            exportworker.RunWorkerAsync(modelListBox.SelectedItems);
         }
 
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -155,6 +159,7 @@ namespace OBJExporterUI
             adtCheckBox.IsEnabled = true;
             wmoCheckBox.IsEnabled = true;
             m2CheckBox.IsEnabled = true;
+            modelListBox.IsEnabled = true;
             //buildsBox.Visibility = Visibility.Visible;
             buildsBox.IsEnabled = true;
         }
@@ -173,18 +178,23 @@ namespace OBJExporterUI
 
         private void exportworker_DoWork(object sender, DoWorkEventArgs e)
         {
-            string file = (string) e.Argument;
+            var selectedFiles = (System.Collections.IList) e.Argument;
 
-            if (!CASC.FileExists(file)) { return; }
-            if (file.EndsWith(".wmo")){
-                WMOtoOBJ(file);
-            }
-            else if(file.EndsWith(".m2")){
-                M2toOBJ(file);
-            }
-            else if (file.EndsWith(".adt"))
+            foreach (string selectedFile in selectedFiles)
             {
-                ADTtoOBJ(file);
+                if (!CASC.FileExists(selectedFile)) { continue; }
+                if (selectedFile.EndsWith(".wmo"))
+                {
+                    WMOtoOBJ(selectedFile);
+                }
+                else if (selectedFile.EndsWith(".m2"))
+                {
+                    M2toOBJ(selectedFile);
+                }
+                else if (selectedFile.EndsWith(".adt"))
+                {
+                    ADTtoOBJ(selectedFile);
+                }
             }
         }
 
@@ -640,8 +650,10 @@ namespace OBJExporterUI
             float MapMidPoint = 32.0f / ChunkSize;
 
             var mapname = file.Replace("world\\maps\\", "").Substring(0, file.Replace("world\\maps\\", "").IndexOf("\\"));
-            var centerx = int.Parse(file.Substring(file.Length - 9, 2));
-            var centery = int.Parse(file.Substring(file.Length - 6, 2));
+            var coord = file.Replace("world\\maps\\" + mapname + "\\" + mapname, "").Replace(".adt", "").Split('_');
+
+            var centerx = int.Parse(coord[1]);
+            var centery = int.Parse(coord[2]);
 
             List<RenderBatch> renderBatches = new List<RenderBatch>();
             List<Vertex> verticelist = new List<Vertex>();
@@ -664,6 +676,7 @@ namespace OBJExporterUI
 
                     if (!CASC.FileExists(file))
                     {
+                        Console.WriteLine("File " + file + " does not exist");
                         continue;
                     }
 
@@ -693,11 +706,6 @@ namespace OBJExporterUI
                         {
                             Console.WriteLine(e.Message);
                         }
-                    }
-                    else
-                    {
-                        //ADT exporting requires Legion! If Legion, map does not support new view distance tech so we can't export textures either.
-                        continue;
                     }
                    
                     //List<Material> materials = new List<Material>();
@@ -773,7 +781,7 @@ namespace OBJExporterUI
                 }
             }
 
-            var mtlsw = new StreamWriter(Path.Combine(outdir, file.Replace(".adt", ".mtl")));
+            var mtlsw = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".mtl"));
 
             //No idea how MTL files really work yet. Needs more investigation.
             foreach(var material in materials)
@@ -794,7 +802,7 @@ namespace OBJExporterUI
             var objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".adt", ".obj")));
 
             objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
-            objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file) + ".mtl");
+            objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".mtl");
             objsw.WriteLine("g " + adtname);
 
             foreach (var vertex in verticelist)
