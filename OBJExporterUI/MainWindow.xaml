@@ -1,0 +1,22 @@
+﻿<Window x:Class="OBJExporterUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OBJExporterUI"
+        mc:Ignorable="d"
+        Icon="Resources/icon32.png"
+        ContentRendered="Window_ContentRendered"
+        Title="OBJ Exporter" Height="600" Width="600">
+    <Grid>
+        <ListBox x:Name="modelListBox" Visibility="Hidden" HorizontalAlignment="Stretch" Margin="10,70,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
+        <Image x:Name="loadingImage" Source="Resources/icon.png" Margin="244,38,259,597"/>
+        <TextBox x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="10" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged"/>
+        <Button x:Name="exportButton" Visibility="Hidden" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Bottom" Click="button_Click"/>
+        <ProgressBar x:Name="progressBar" Visibility="Visible" HorizontalAlignment="Stretch" Height="36" Margin="10" VerticalAlignment="Top" />
+        <Label x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="0,7,0,0" VerticalAlignment="Top"/>
+        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="adtCheckBox" Content="ADTs" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top"/>
+        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="61,46,0,0" VerticalAlignment="Top"/>
+        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="False" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="122,46,0,0" VerticalAlignment="Top"/>
+    </Grid>
+</Window>
