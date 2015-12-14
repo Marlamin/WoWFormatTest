@@ -107,7 +107,7 @@ namespace WoWOpenGL
             {
                 for (int y = centery; y < centery + distance; y++)
                 {
-                    string filename = "World/Maps/" + map + "/" + map + "_" + y + "_" + x + ".adt";
+                    string filename = "world\\maps\\" + map + "\\" + map + "_" + y + "_" + x + ".adt";
 
                     if (WoWFormatLib.Utils.CASC.FileExists(filename))
                     {
@@ -125,27 +125,26 @@ namespace WoWOpenGL
                         List<Material> materials = new List<Material>();
 
                         //Check if textures are already loaded or not, multiple ADTs close together probably use the same ones mostly
-                        for (int ti = 0; ti < reader.adtfile.textures.filenames.Count(); ti++)
-                        {
+                        //for (int ti = 0; ti < reader.adtfile.textures.filenames.Count(); ti++)
+                        //{
+                            /*
                             Material material = new Material();
                             material.filename = reader.adtfile.textures.filenames[ti];
+                            material.textureID = BLPLoader.LoadTexture(reader.adtfile.textures.filenames[ti], cache);*/
 
-                            //if (!WoWFormatLib.Utils.CASC.FileExists(material.filename)) { continue; }
-
-                            material.textureID = BLPLoader.LoadTexture(reader.adtfile.textures.filenames[ti], cache);
+                            /* MAPTEXTURE TEXTURE HACKFIX STUFF STARTS HERE */
+                            Material material = new Material();
+                            material.filename = filename.Replace("maps", "maptextures").Replace(".adt", ".blp");
+                            material.textureID = BLPLoader.LoadTexture(filename.Replace("maps", "maptextures").Replace(".adt", ".blp"), cache);
+                            /* MAPTEXTURE TEXTURE HACKFIX STUFF STOPS HERE */
 
                             materials.Add(material);
-                        }
+                        //}
+                        
 
                         var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
                         var initialChunkX = reader.adtfile.chunks[0].header.position.X;
 
-                        /*  if(firstLocation.X == 0)
-                          {
-                              firstLocation = new Vector3(initialChunkY, initialChunkX, 1.0f);
-                              Console.WriteLine("Setting first location to " + firstLocation.ToString());
-                          }
-                          */
                         List<RenderBatch> renderBatches = new List<RenderBatch>();
 
                         for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
@@ -173,11 +172,16 @@ namespace WoWOpenGL
                                         v.Color = new Vector3(1.0f, 1.0f, 1.0f);
                                     }
 
-                                    v.TexCoord = new Vector2(((float)j + (((i % 2) != 0) ? 0.5f : 0f)) / 8f, ((float)i * 0.5f) / 8f);
+                                    // Commented out for maptexture hack
+                                    //v.TexCoord = new Vector2(((float)j + (((i % 2) != 0) ? 0.5f : 0f)) / 8f, ((float)i * 0.5f) / 8f);
 
                                     v.Position = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
 
                                     if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
+
+                                    //Maptexture hackfix
+                                    v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize);
+
                                     verticelist.Add(v);
                                 }
                             }
@@ -198,6 +202,8 @@ namespace WoWOpenGL
                             //    throw new Exception("MaterialCache does not have texture " + reader.adtfile.textures.filenames[reader.adtfile.texChunks[c].layers[0].textureId].ToLower());
                             //}
 
+                            //Commented out for maptexture hackfix
+                            /*
                             var layermats = new List<uint>();
                             var alphalayermats = new List<int>();
 
@@ -211,6 +217,11 @@ namespace WoWOpenGL
 
                             batch.materialID = layermats.ToArray();
                             batch.alphaMaterialID = alphalayermats.ToArray();
+
+                            */
+                            var layermats = new List<uint>();
+                            layermats.Add((uint) material.textureID);
+                            batch.materialID = layermats.ToArray();
                             renderBatches.Add(batch);
                         }
 

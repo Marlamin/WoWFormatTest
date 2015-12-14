@@ -44,12 +44,12 @@ namespace WoWFormatLib.FileReaders
 
             if (!localFile)
             {
-                var mapname = filename.Replace("World/Maps/", "").Substring(0, filename.Replace("World/Maps/", "").IndexOf("/"));
+                var mapname = filename.Replace("world\\maps\\", "").Substring(0, filename.Replace("world\\maps\\", "").IndexOf("\\"));
 
-                if (CASC.FileExists("World/Maps/" + mapname + "/" + mapname + ".wdt"))
+                if (CASC.FileExists("world\\maps\\" + mapname + "\\" + mapname + ".wdt"))
                 {
                     var wdtr = new WDTReader();
-                    wdtr.LoadWDT("World/Maps/" + mapname + "/" + mapname + ".wdt");
+                    wdtr.LoadWDT("world\\maps\\" + mapname + "\\" + mapname + ".wdt");
                     wdt = wdtr.wdtfile;
                 }
                 else
@@ -208,6 +208,7 @@ namespace WoWFormatLib.FileReaders
                         mapchunk.alphaLayer = ReadMCALSubChunk(subchunk, subbin, mapchunk);
                         break;
                     case "MCSH":
+                    case "MCMT":
                         continue;
                     default:
                         throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subchunk.ToString(), subpos.ToString()));
