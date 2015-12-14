@@ -33,7 +33,7 @@ namespace OBJExporterUI
 
         private bool showADT = true;
         private bool showM2 = false;
-        private bool showWMO = false;
+        private bool showWMO = true;
 
         private List<String> files;
 
