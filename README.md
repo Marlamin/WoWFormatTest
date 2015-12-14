@@ -2,8 +2,6 @@
 Messing around with parsing WoW file formats for educational purposes.
 Built from the ground up, but with lots of copy pasta from older projects (noted in thanks paragraph).
 
-- [Official site](https://marlam.in/mv/)
-
 ## Supported expansions
 Built for (latest) Warlords of Draenor files. Backwards compatibility with Mists of Pandaria not guaranteed. Cataclysm and lower probably won't work at all.
 
@@ -17,14 +15,14 @@ If you have World of Warcraft (6.0 or higher) fully installed you can use your i
 
 ## Projects
 ### Main projects
+#### OBJExporterUI ([Official site](https://marlam.in/obj/))
+Exports various WoW model formats to Wavefront .obj. 
+#### WoWOpenGL ([Official site](https://marlam.in/mv/))
+After some issues and annoyances with DirectX I decided to switch over to OpenTK/OpenGL.
 #### WoWFormatLib 
 Does parsing of WoW's raw data files and returns them in a object that other applications can use. Handles CASC (WoW's filesystem), file parsing, DBC reading.
-#### WoWOpenGL 
-After some issues and annoyances with DirectX I decided to switch over to OpenTK/OpenGL.
 #### MinimapCompiler 
-Compiles minimaps. Not important, but still developed as I will need it for my other projects soon.
-#### WDLtextopentk
-Making a color heightmap from a WDL file, code ported from Noggit to C#. Based on a simple OpenTK example.
+Compiles minimaps. Not important, but still actively developed as I will need it for my other projects soon.
 
 ### Test projects
 #### CASCtest 
@@ -35,6 +33,10 @@ App used to test DBC structures.
 First app used to test some formats with.
 #### WoWShaderTest
 Eventual replacement project for WoWOpenGL.
+#### HeightmapGenerator
+Generates heightmaps. ¯\_(ツ)_/¯
+#### WDLtextopentk
+Making a color heightmap from a WDL file, code ported from Noggit to C#. Based on a simple OpenTK example.
 
 ### Discontinued/archived projects
 #### WoWRenderLib 
@@ -61,4 +63,4 @@ Rendering test with WPF.
 - WoWDev wiki authors (especially schlumpf!!!!)
 - ..and all the people the above people base their work on
 
-Last updated on August 10th 2015
+Last updated on December 14th 2015
