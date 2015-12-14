@@ -18,5 +18,6 @@
         <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="adtCheckBox" Content="ADTs" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top"/>
         <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="61,46,0,0" VerticalAlignment="Top"/>
         <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="False" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="122,46,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="buildsBox" Visibility="Hidden" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Width="185"/>
     </Grid>
 </Window>

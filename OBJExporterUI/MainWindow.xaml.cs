@@ -39,6 +39,12 @@ namespace OBJExporterUI
 
         public MainWindow()
         {
+            if (bool.Parse(ConfigurationManager.AppSettings["firstrun"]) == true)
+            {
+                var cfgWindow = new ConfigurationWindow();
+                cfgWindow.ShowDialog();
+            }
+
             InitializeComponent();
 
             worker.DoWork += worker_DoWork;
@@ -85,7 +91,12 @@ namespace OBJExporterUI
             progressBar.Visibility = Visibility.Visible;
             loadingLabel.Content = "";
             loadingLabel.Visibility = Visibility.Visible;
+            adtCheckBox.IsEnabled = false;
+            wmoCheckBox.IsEnabled = false;
+            m2CheckBox.IsEnabled = false;
+            buildsBox.IsEnabled = false;
             exportButton.IsEnabled = false;
+            buildsBox.Visibility = Visibility.Hidden; // Hide for now, overlap with progress bar
             exportworker.RunWorkerAsync(modelListBox.SelectedValue);
         }
 
@@ -131,6 +142,7 @@ namespace OBJExporterUI
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
             adtCheckBox.Visibility = Visibility.Visible;
+            //buildsBox.Visibility = Visibility.Visible;
 
             modelListBox.DataContext = files;
         }
@@ -140,6 +152,11 @@ namespace OBJExporterUI
             exportButton.IsEnabled = true;
             progressBar.Visibility = Visibility.Hidden;
             loadingLabel.Visibility = Visibility.Hidden;
+            adtCheckBox.IsEnabled = true;
+            wmoCheckBox.IsEnabled = true;
+            m2CheckBox.IsEnabled = true;
+            //buildsBox.Visibility = Visibility.Visible;
+            buildsBox.IsEnabled = true;
         }
 
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -631,7 +648,7 @@ namespace OBJExporterUI
             List<int> indicelist = new List<Int32>();
             Dictionary<int, string> materials = new Dictionary<int, string>();
 
-            var distance = 4;
+            var distance = 1;
 
             // Create output directory
             if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))

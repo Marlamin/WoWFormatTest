@@ -1,0 +1,20 @@
+﻿<Window x:Class="OBJExporterUI.ConfigurationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OBJExporterUI"
+        mc:Ignorable="d"
+        Icon="Resources/icon32.png"
+        ResizeMode="NoResize"
+        Title="Initial Configuration" Height="300" Width="300">
+    <Grid>
+        <Button x:Name="button" Content="Confirm settings" HorizontalAlignment="Center" Margin="0,230,0,0" VerticalAlignment="Top" Width="125" Click="button_Click"/>
+        <ComboBox x:Name="programSelect" Loaded="programSelect_Loaded" HorizontalAlignment="Center" Margin="00,116,0,0" VerticalAlignment="Top" MinWidth="100"/>
+        <Label x:Name="programLabel" Content="Select the version of WoW to use:" HorizontalAlignment="Center" Margin="0,74,0,0" VerticalAlignment="Top"/>
+        <RadioButton Checked="mode_Checked" x:Name="localMode" GroupName="ContentSource" Content="Local mode" HorizontalAlignment="Left" Margin="169,32,0,0" VerticalAlignment="Top"/>
+        <RadioButton Checked="mode_Checked" x:Name="onlineMode" GroupName="ContentSource" Content="Online mode" HorizontalAlignment="Left" Margin="39,32,0,0" IsChecked="True" VerticalAlignment="Top"/>
+        <Label x:Name="basedirLabel" Content="No WoW directory set" Visibility="Hidden" HorizontalAlignment="Center" Margin="0,92,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="basedirBrowse" Content="Browse.." Visibility="Hidden" Click="basedirBrowse_Click" HorizontalAlignment="Center" Margin="0,118,0,0" VerticalAlignment="Top" Width="75"/>
+    </Grid>
+</Window>
