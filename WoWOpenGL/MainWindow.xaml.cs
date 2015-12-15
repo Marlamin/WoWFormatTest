@@ -68,7 +68,7 @@ namespace WoWOpenGL
             pbLoadMap.Value = 0d;
 
             var wdt = new WDTReader();
-            if (CASC.FileExists(System.IO.Path.Combine("World\\Maps\\", _SelectedMapName, _SelectedMapName + ".wdt")))
+            if (CASC.FileExists(System.IO.Path.Combine(@"world\maps\", _SelectedMapName, _SelectedMapName + ".wdt")))
             {
                 Stopwatch _SW = new Stopwatch();
                 BackgroundWorker _BackgroundWorker = new BackgroundWorker();
@@ -79,7 +79,7 @@ namespace WoWOpenGL
                     {
                         _SW.Start();
                         BackgroundWorker _Worker = o as BackgroundWorker;
-                        wdt.LoadWDT(System.IO.Path.Combine("World\\Maps\\", _SelectedMapName, _SelectedMapName + ".wdt"));
+                        wdt.LoadWDT(System.IO.Path.Combine(@"world\maps\", _SelectedMapName, _SelectedMapName + ".wdt"));
                         List<int[]> tiles = wdt.getTiles();
 
                         for (int i = 0; i < tiles.Count; i++)
@@ -125,7 +125,7 @@ namespace WoWOpenGL
             rect.VerticalAlignment = VerticalAlignment.Top;
             rect.HorizontalAlignment = HorizontalAlignment.Left;
 
-            if (CASC.FileExists(System.IO.Path.Combine("World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp")))
+            if (CASC.FileExists(System.IO.Path.Combine(@"world\minimaps\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp")))
             {
                 rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
                 var xmargin = x * rect.Width;
@@ -134,7 +134,7 @@ namespace WoWOpenGL
                 var blp = new BLPReader();
 
                 //Kalimdor takes a few seconds to load, and takes up about ~4xxMB of memory after its loaded, this can be much improved
-                blp.LoadBLP("World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                blp.LoadBLP(@"world\minimaps\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
                 BitmapImage bitmapImage = new BitmapImage();
                 using (MemoryStream bitmap = blp.asBitmapStream())
                 {
@@ -151,7 +151,7 @@ namespace WoWOpenGL
             else
             {
                 rect.Fill = new SolidColorBrush(Color.FromRgb(0, 111, 0));
-                Console.WriteLine("World\\Minimaps\\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
+                Console.WriteLine(@"world\minimaps\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp");
             }
             WDTGrid.Children.Add(rect);
         }
@@ -184,40 +184,66 @@ namespace WoWOpenGL
         /* MODEL STUFF */
         private void ModelListBox_Loaded(object sender, RoutedEventArgs e)
         {
-            models.Add(@"Character\Human\Male\HumanMale_HD.m2");
-            models.Add(@"Character\Troll\Male\TrollMale_HD.m2");
-            models.Add(@"Creature\Serpent\Serpent.M2");
-            models.Add(@"Creature\Deathwing\Deathwing.M2");
-            models.Add(@"Creature\Anduin\Anduin.M2");
-            models.Add(@"Creature\Arthas\Arthas.M2");
-            models.Add(@"Creature\Etherial\Etherial.M2");
-            models.Add(@"Creature\Arakkoa2\Arakkoa2.m2");
-            models.Add(@"Creature\Garrosh\Garrosh.M2");
-            models.Add(@"Item\ObjectComponents\Weapon\sword_1h_garrison_a_01.m2");
-            models.Add(@"World\Expansion05\Doodads\IronHorde\6ih_ironhorde_scaffolding13.M2");
-            models.Add(@"Environments\Stars\CavernsOfTimeSky.m2");
-            models.Add(@"World\WMO\Kalimdor\Ogrimmar\Ogrimmar.wmo");
-            models.Add(@"World\WMO\Azeroth\Buildings\StormWind\Stormwind2.wmo");
-            models.Add(@"World\WMO\Draenor\IronHorde\6ih_ironhorde_tower01.wmo");
-            models.Add(@"World\WMO\transports\Icebreaker\Transport_Icebreaker_ship_stationary.wmo");
-            models.Add(@"World\WMO\Azeroth\Buildings\TownHall\TownHall.wmo");
-            models.Add(@"World\WMO\transports\passengership\transportship_A.wmo");
-            models.Add(@"World\WMO\Azeroth\Buildings\AltarOfStorms\AltarOfStorms.wmo");
-            models.Add(@"World\WMO\Northrend\Dalaran\ND_Dalaran.wmo");
-            models.Add(@"World\WMO\Northrend\HowlingFjord\RadioTower\RadioTower.wmo");
-            models.Add(@"World\WMO\Outland\DarkPortal\DarkPortal.wmo");
-            models.Add(@"World\WMO\transports\Alliance_Battleship\Transport_Alliance_Battleship.wmo");
-            models.Add(@"World\WMO\Draenor\TanaanJungle\6TJ_DarkPortal_Broken.wmo");
+            models.Add(@"character\human\male\humanmale_hd.m2");
+            models.Add(@"character\troll\male\trollmale_hd.m2");
+            models.Add(@"creature\serpent\serpent.m2");
+            models.Add(@"creature\deathwing\deathwing.m2");
+            models.Add(@"creature\anduin\anduin.m2");
+            models.Add(@"creature\arthas\arthas.m2");
+            models.Add(@"creature\etherial\etherial.m2");
+            models.Add(@"creature\arakkoa2\arakkoa2.m2");
+            models.Add(@"creature\garrosh\garrosh.m2");
+            models.Add(@"item\objectcomponents\weapon\sword_1h_garrison_a_01.m2");
+            models.Add(@"world\expansion05\doodads\ironhorde\6ih_ironhorde_scaffolding13.m2");
+            models.Add(@"environments\stars\cavernsoftimesky.m2");
+            models.Add(@"world\wmo\kalimdor\ogrimmar\ogrimmar.wmo");
+            models.Add(@"world\wmo\azeroth\buildings\stormwind\stormwind2.wmo");
+            models.Add(@"world\wmo\draenor\ironhorde\6ih_ironhorde_tower01.wmo");
+            models.Add(@"world\wmo\transports\icebreaker\transport_icebreaker_ship_stationary.wmo");
+            models.Add(@"world\wmo\azeroth\buildings\townhall\townhall.wmo");
+            models.Add(@"world\wmo\transports\passengership\transportship_a.wmo");
+            models.Add(@"world\wmo\azeroth\buildings\altarofstorms\altarofstorms.wmo");
+            models.Add(@"world\wmo\northrend\dalaran\nd_dalaran.wmo");
+            models.Add(@"world\wmo\northrend\howlingfjord\radiotower\radiotower.wmo");
+            models.Add(@"world\wmo\outland\darkportal\darkportal.wmo");
+            models.Add(@"world\wmo\transports\alliance_battleship\transport_alliance_battleship.wmo");
+            models.Add(@"world\wmo\draenor\tanaanjungle\6tj_darkportal_broken.wmo");
 
             if (File.Exists("listfile.txt"))
             {
                 string line;
-                StreamReader file = new System.IO.StreamReader("listfile.txt");
-                while ((line = file.ReadLine()) != null)
+                string[] lines = File.ReadAllLines("listfile.txt");
+
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    if (line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase) || line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase))
+                    lines[i] = lines[i].ToLower();
+                }
+
+
+                List<string> unwantedExtensions = new List<String>();
+                for (int u = 0; u < 512; u++)
+                {
+                    unwantedExtensions.Add("_" + u.ToString().PadLeft(3, '0') + ".wmo");
+                }
+
+                string[] unwanted = unwantedExtensions.ToArray();
+
+                for (int i = 0; i < lines.Count(); i++)
+                {
+                    if (!CASC.FileExists(lines[i])) { continue; }
+                    if (lines[i].EndsWith(".m2"))
                     {
-                        models.Add(line);
+                        if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera") && !lines[i].StartsWith("spells"))
+                        {
+                            models.Add(lines[i]);
+                        }
+                    }
+                    else if (lines[i].EndsWith(".wmo"))
+                    {
+                        if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo"))
+                        {
+                            models.Add(lines[i]);
+                        }
                     }
                 }
             }
@@ -305,7 +331,7 @@ namespace WoWOpenGL
            // {
            //     tw.Run(30.0, 60.0);
            // }
-            // new Render(@"World\wmo\Draenor\Orc\6OC_OrcClans_HouseSmall.wmo");
+            // new Render(@"world\wmo\draenor\orc\6Oc_orcclans_housesmall.wmo");
         }
 
         private void MapsTab_Focused(object sender, RoutedEventArgs e)
@@ -315,7 +341,7 @@ namespace WoWOpenGL
                 return;
             }
 
-            var reader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");
+            var reader = new DBCReader<MapRecord>(@"dbfilesclient\map.dbc");
             
             for(int i = 0; i < reader.recordCount; i++){
                 MapListBox.Items.Add(new KeyValuePair<int, string>(reader[i].ID, reader[i].Directory));

@@ -174,7 +174,7 @@ namespace WoWOpenGL
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
                 Console.WriteLine("Loading texture " + i);
-                string texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
+                string texturefilename = @"dungeons\textures\testing\color_13.blp";
                 materials[i].flags = reader.model.textures[i].flags;
                 Console.WriteLine("      Requires type " + reader.model.textures[i].type + " texture");
                 switch (reader.model.textures[i].type)
