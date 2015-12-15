@@ -37,7 +37,6 @@ namespace WoWOpenGL
         public static ProgressBar cascProgressBar;
         public static Label cascProgressDesc;
         private volatile bool fCancelMapLoading = false;
-        private bool loaded = false;
         public static int curlogentry = 0;
         public static bool useCASC = false;
         public static bool CASCinitialized = false;
@@ -119,7 +118,7 @@ namespace WoWOpenGL
             var y = tile[1];
             string _SelectedMapName = ((KeyValuePair<int, string>)MapListBox.SelectedValue).Value;
             Rectangle rect = new Rectangle();
-            rect.Name = _SelectedMapName.Replace("'", string.Empty).Replace(" ", string.Empty) + "_" + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts, this breaks when the mapname has special characters (zg)D:
+            rect.Name = _SelectedMapName.Replace("'", string.Empty).Replace(" ", string.Empty) + "_" + x.ToString("D2") + "_" + y.ToString("D2"); //leading zeros just like adts (TODO: NOT REALLY), this breaks when the mapname has special characters (zg)D: 
             rect.Width = WDTGrid.Width / 64;
             rect.Height = WDTGrid.Height / 64;
             rect.VerticalAlignment = VerticalAlignment.Top;
@@ -211,7 +210,6 @@ namespace WoWOpenGL
 
             if (File.Exists("listfile.txt"))
             {
-                string line;
                 string[] lines = File.ReadAllLines("listfile.txt");
 
                 for (int i = 0; i < lines.Length; i++)
@@ -256,7 +254,7 @@ namespace WoWOpenGL
             e.Handled = true;
         }
 
-        private void ModelListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void ModelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBoxItem item = ModelListBox.SelectedValue as ListBoxItem;
 
@@ -296,12 +294,13 @@ namespace WoWOpenGL
         private void SwitchToCASC()
         {
             Console.WriteLine("Intializing CASC filesystem..");
-            ModelListBox.Visibility = System.Windows.Visibility.Hidden;
-            contentTypeLoading.Visibility = System.Windows.Visibility.Visible;
-            CASCdesc.Visibility = System.Windows.Visibility.Visible;
-            CASCprogress.Visibility = System.Windows.Visibility.Visible;
-            FilterBox.Visibility = System.Windows.Visibility.Hidden;
+            ModelListBox.Visibility = Visibility.Hidden;
+            contentTypeLoading.Visibility = Visibility.Visible;
+            CASCdesc.Visibility = Visibility.Visible;
+            CASCprogress.Visibility = Visibility.Visible;
+            FilterBox.Visibility = Visibility.Hidden;
             
+
             if (ConfigurationManager.AppSettings["basedir"] != "" && Directory.Exists(ConfigurationManager.AppSettings["basedir"]))
             {
                 Console.WriteLine("Using basedir " + ConfigurationManager.AppSettings["basedir"] + " to load..");
@@ -315,18 +314,18 @@ namespace WoWOpenGL
             Console.WriteLine("CASC filesystem initialized.");
             Console.WriteLine("Generating listfile..");
             List<string> files = new List<String>();
-            models = CASC.GenerateListfile();
+            //models = CASC.GenerateListfile(); // Let's ship listfile instead now!
             ModelListBox.DataContext = models;
-            ModelListBox.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", System.ComponentModel.ListSortDirection.Ascending));
+            ModelListBox.Items.SortDescriptions.Add(new SortDescription("", ListSortDirection.Ascending));
             Console.WriteLine("Listfile generated!");
             CASCinitialized = true;
             Console.WriteLine("BUILD: " + CASC.cascHandler.Config.BuildName);
-            FilterBox.Visibility = System.Windows.Visibility.Visible;
-            CASCdesc.Visibility = System.Windows.Visibility.Hidden;
-            CASCprogress.Visibility = System.Windows.Visibility.Hidden;
-            contentTypeLoading.Visibility = System.Windows.Visibility.Collapsed;
-            ModelListBox.Visibility = System.Windows.Visibility.Visible;
-            MapsTab.Visibility = System.Windows.Visibility.Visible;
+            FilterBox.Visibility = Visibility.Visible;
+            CASCdesc.Visibility = Visibility.Hidden;
+            CASCprogress.Visibility = Visibility.Hidden;
+            contentTypeLoading.Visibility = Visibility.Collapsed;
+            ModelListBox.Visibility = Visibility.Visible;
+            MapsTab.Visibility = Visibility.Visible;
            // using (TerrainWindow tw = new TerrainWindow("draenor_30_31"))
            // {
            //     tw.Run(30.0, 60.0);
