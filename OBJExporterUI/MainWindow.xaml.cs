@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using WoWFormatLib.DBC;
 using WoWFormatLib.FileReaders;
 using WoWFormatLib.Utils;
 using CASCExplorer;
@@ -200,15 +201,46 @@ namespace OBJExporterUI
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
+            worker.ReportProgress(0, "Loading listfile..");
+            List<string> linelist = new List<string>();
 
-            if (!File.Exists("listfile.txt"))
+            if (CASC.FileExists("dbfilesclient/filedatacomplete.dbc"))
             {
-                throw new Exception("Listfile not found. Unable to continue.");
+                var reader = new DBCReader<FileDataRecord>("dbfilesclient/filedatacomplete.dbc");
+
+                if (reader.recordCount > 0)
+                {
+                    worker.ReportProgress(50, "Loading complete listfile..");
+
+                    for (int i = 0; i < reader.recordCount; i++)
+                    {
+                        linelist.Add(reader[i].FileName + reader[i].FilePath);
+                    }
+                }
+            }
+            
+            if(linelist.Count() == 0)
+            {
+                // Fall back
+
+                if (!File.Exists("listfile.txt"))
+                {
+                    throw new Exception("Listfile not found. Unable to continue.");
+                }
+
+                worker.ReportProgress(50, "Loading listfile from disk..");
+
+                linelist.AddRange(File.ReadAllLines("listfile.txt"));
             }
 
-            string[] lines = File.ReadAllLines("listfile.txt");
-            
-            for(int i = 0; i < lines.Length; i++)
+            worker.ReportProgress(0, "Sorting listfile..");
+
+            linelist.Sort();
+
+            string[] lines = linelist.ToArray();
+
+
+            for (int i = 0; i < lines.Length; i++)
             {
                 lines[i] = lines[i].ToLower();
             }

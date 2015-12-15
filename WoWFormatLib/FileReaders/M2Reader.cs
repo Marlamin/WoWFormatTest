@@ -29,10 +29,21 @@ namespace WoWFormatLib.FileReaders
             BinaryReader bin = new BinaryReader(m2);
 
             var header = new string(bin.ReadChars(4));
-            if (header != "MD20")
+            if(header == "MD21")
             {
-                Console.WriteLine("Invalid M2 file!");
-                Console.ReadLine();
+                Console.WriteLine("MD21 detected. Welp!");
+                bin.ReadBytes(4);
+                MemoryStream md21 = new MemoryStream(bin.ReadBytes((int) bin.BaseStream.Length - (int) bin.BaseStream.Position));
+                bin = new BinaryReader(md21);
+                bin.ReadBytes(4); //MD20
+            }
+            else if(header == "MD20")
+            {
+                // All is fine in the world! Except for this awful hackfix that needs a fix! TODO
+            }
+            else
+            {
+                throw new Exception("Invalid M2 file!");
             }
 
             model.version = bin.ReadUInt32();
@@ -112,6 +123,7 @@ namespace WoWFormatLib.FileReaders
             }
 
             bin.BaseStream.Position = ofsModelname;
+
             model.name = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
             model.name = model.name.Remove(model.name.Length - 1); //remove last char, empty
             model.filename = filename;

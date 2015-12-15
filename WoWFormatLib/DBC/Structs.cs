@@ -378,15 +378,12 @@ namespace WoWFormatLib.DBC
         public int flags { get; private set; }
     }
 
-
-
     public class FileDataRecord
     {
         public int ID { get; private set; }
         public string FileName { get; private set; }
         public string FilePath { get; private set; }
     }
-
 
     public class MapRecord
     {
