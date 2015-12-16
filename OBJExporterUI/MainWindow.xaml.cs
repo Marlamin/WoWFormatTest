@@ -97,10 +97,8 @@ namespace OBJExporterUI
             adtCheckBox.IsEnabled = false;
             wmoCheckBox.IsEnabled = false;
             m2CheckBox.IsEnabled = false;
-            buildsBox.IsEnabled = false;
             exportButton.IsEnabled = false;
             modelListBox.IsEnabled = false;
-            buildsBox.Visibility = Visibility.Hidden; // Hide for now, overlap with progress bar
 
             exportworker.RunWorkerAsync(modelListBox.SelectedItems);
         }
@@ -147,7 +145,6 @@ namespace OBJExporterUI
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
             adtCheckBox.Visibility = Visibility.Visible;
-            //buildsBox.Visibility = Visibility.Visible;
 
             modelListBox.DataContext = files;
         }
@@ -161,8 +158,6 @@ namespace OBJExporterUI
             wmoCheckBox.IsEnabled = true;
             m2CheckBox.IsEnabled = true;
             modelListBox.IsEnabled = true;
-            //buildsBox.Visibility = Visibility.Visible;
-            buildsBox.IsEnabled = true;
         }
 
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -370,7 +365,7 @@ namespace OBJExporterUI
 
             exportworker.ReportProgress(65, "Exporting textures..");
 
-            var mtlsb = new StringBuilder();
+            var mtlsb = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".mtl")));
             var textureID = 0;
             var materials = new Material[reader.model.textures.Count()];
 
@@ -445,13 +440,13 @@ namespace OBJExporterUI
 
             foreach (var material in materials)
             {
-                mtlsb.Append("newmtl " + material.filename);
-                mtlsb.Append("illum 2");
-                mtlsb.Append("map_Ka " + material.filename + ".png");
-                mtlsb.Append("map_Kd " + material.filename + ".png");
+                mtlsb.WriteLine("newmtl " + material.filename);
+                mtlsb.WriteLine("illum 2");
+                mtlsb.WriteLine("map_Ka " + material.filename + ".png");
+                mtlsb.WriteLine("map_Kd " + material.filename + ".png");
             }
 
-            File.WriteAllText(Path.Combine(outdir, file.Replace(".m2", ".mtl")), mtlsb.ToString());
+            mtlsb.Close();
 
             objsw.WriteLine("g " + Path.GetFileNameWithoutExtension(file));
 
@@ -777,7 +772,7 @@ namespace OBJExporterUI
                             for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                             {
                                 Vertex v = new Vertex();
-                                v.Normal = new Vector3(chunk.normals.normal_0[idx], chunk.normals.normal_1[idx], chunk.normals.normal_2[idx]);
+                                v.Normal = new Vector3(chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
                                 v.Position = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
                                 if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
                                 v.TexCoord = new Vector3(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize, 0.0f);

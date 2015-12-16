@@ -60,7 +60,7 @@ namespace WoWFormatLib.Utils
 
             if (File.Exists("wow-live-listfile-seed.txt"))
             {
-                var file = new System.IO.StreamReader("wow-live-listfile-seed.txt");
+                var file = new StreamReader("wow-live-listfile-seed.txt");
                 while ((line = file.ReadLine()) != null)
                 {
                     if (line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
