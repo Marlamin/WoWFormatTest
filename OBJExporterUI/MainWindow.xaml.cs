@@ -214,7 +214,10 @@ namespace OBJExporterUI
 
                     for (int i = 0; i < reader.recordCount; i++)
                     {
-                        linelist.Add(reader[i].FileName + reader[i].FilePath);
+                        if (CASC.cascHandler.FileExists(reader[i].ID))
+                        {
+                            linelist.Add(reader[i].FileName + reader[i].FilePath);
+                        }
                     }
                 }
             }
@@ -230,7 +233,13 @@ namespace OBJExporterUI
 
                 worker.ReportProgress(50, "Loading listfile from disk..");
 
-                linelist.AddRange(File.ReadAllLines("listfile.txt"));
+                foreach(var line in File.ReadAllLines("listfile.txt"))
+                {
+                    if (CASC.FileExists(line))
+                    {
+                        linelist.Add(line);
+                    }
+                }
             }
 
             worker.ReportProgress(0, "Sorting listfile..");
@@ -255,8 +264,6 @@ namespace OBJExporterUI
 
             for (int i = 0; i < lines.Count(); i++)
             {
-                if (!CASC.FileExists(lines[i])) { continue; }
-
                 if (showADT && lines[i].EndsWith(".adt")) {
                     if(!lines[i].EndsWith("obj0.adt") && !lines[i].EndsWith("obj1.adt") && !lines[i].EndsWith("tex0.adt") && !lines[i].EndsWith("tex1.adt") && !lines[i].EndsWith("_lod.adt"))
                     {
@@ -279,7 +286,7 @@ namespace OBJExporterUI
                 if (i % 100 == 0)
                 {
                     var progress = (i * 100) / lines.Count();
-                    worker.ReportProgress(progress, "Loading listfile..");
+                    worker.ReportProgress(progress, "Filtering listfile..");
                 }
             }
         }
