@@ -12,6 +12,7 @@ using WoWFormatLib.FileReaders;
 using OpenTK.Input;
 using System.Timers;
 using WoWOpenGL.Loaders;
+using System.ComponentModel;
 
 namespace WoWOpenGL
 {
@@ -19,30 +20,47 @@ namespace WoWOpenGL
     {
         OldCamera ActiveCamera;
        
-        private static float angle = 90.0f;
         private GLControl glControl;
         private bool gLoaded = false;
-        private bool modelLoaded = false;
+
         private Material[] materials;
         private RenderBatch[] renderbatches;
         private uint[] VBOid;
+
+        private static bool isWMO = false;
+
+        private static float angle = 90.0f;
         private static float dragX;
         private static float dragY;
         private static float dragZ;
-        private static bool isWMO = false;
         private static float zoom;
+
+        private bool modelLoaded = false;
+
+        private BackgroundWorker worker;
+
         private CacheStorage cache = new CacheStorage();
-        public Render(string ModelPath)
+
+        public Render(string ModelPath, BackgroundWorker worker = null)
         {
             dragX = 0.0f;
             dragY = 0.0f;
             dragZ = -7.5f;
 
+            if(worker == null)
+            {
+                Console.WriteLine("Didn't get a backgroundworker, creating one!");
+                this.worker = new BackgroundWorker();
+            }
+            else
+            {
+                this.worker = worker;
+            }
+
             System.Windows.Forms.Integration.WindowsFormsHost wfc = MainWindow.winFormControl;
 
             ActiveCamera = new OldCamera((int)wfc.ActualWidth, (int)wfc.ActualHeight);
             ActiveCamera.Pos = new Vector3(10.0f, -10.0f, -7.5f);
-            Console.WriteLine(ModelPath);
 
             if (ModelPath.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
             {
@@ -67,17 +85,10 @@ namespace WoWOpenGL
             glControl.Load += glControl_Load;
             glControl.Paint += RenderFrame;
             glControl.Resize += glControl_Resize;
-           /*glControl.MouseMove += new MouseEventHandler(glControl_MouseMove);
-            glControl.MouseDown += new MouseEventHandler(glControl_MouseDown);
-            glControl.MouseUp += new MouseEventHandler(glControl_MouseUp);
-            */
             glControl_Resize(glControl, EventArgs.Empty);
             glControl.MakeCurrent();
 
             wfc.Child = glControl;
-            
-
-            Console.WriteLine(glControl.Width + "x" + glControl.Height);
         }
 
         public void DrawAxes()
@@ -97,7 +108,6 @@ namespace WoWOpenGL
             GL.Vertex3(0, 0, 10);
 
             GL.End();
-
         }
 
         private void glControl_Load(object sender, EventArgs e)
@@ -123,16 +133,17 @@ namespace WoWOpenGL
 
         private void LoadM2(string modelpath)
         {
-            //M2Loader.LoadM2(modelpath, cache);
-
             if (!WoWFormatLib.Utils.CASC.FileExists(modelpath))
             {
                 throw new Exception("Model does not exist!");
             }
-            Console.WriteLine("Loading M2 file ("+modelpath+")..");
+
+            worker.ReportProgress(0, "Loading model..");
+
             M2Reader reader = new M2Reader();
 
             string filename = modelpath;
+
             reader.LoadM2(filename);
             VBOid = new uint[2];
             GL.GenBuffers(2, VBOid);
@@ -142,6 +153,8 @@ namespace WoWOpenGL
 
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
+
+            worker.ReportProgress(20, "Reading model indices..");
 
             List<uint> indicelist = new List<uint>();
             for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
@@ -155,7 +168,9 @@ namespace WoWOpenGL
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(uint)), indices, BufferUsageHint.StaticDraw);
-            
+
+            worker.ReportProgress(30, "Reading model vertices..");
+
             Vertex[] vertices = new Vertex[reader.model.vertices.Count()];
 
             for (int i = 0; i < reader.model.vertices.Count(); i++)
@@ -169,8 +184,9 @@ namespace WoWOpenGL
 
             GL.Enable(EnableCap.Texture2D);
 
+            worker.ReportProgress(40, "Loading textures..");
+
             materials = new Material[reader.model.textures.Count()];
-            Console.WriteLine("Loading textures..");
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
                 Console.WriteLine("Loading texture " + i);
@@ -224,7 +240,8 @@ namespace WoWOpenGL
                 materials[i].textureID = BLPLoader.LoadTexture(texturefilename, cache);
                 materials[i].filename = texturefilename;
             }
-            
+
+            worker.ReportProgress(60, "Loading renderbatches..");
             renderbatches = new RenderBatch[reader.model.skins[0].submeshes.Count()];
             for (int i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
             {
@@ -251,12 +268,9 @@ namespace WoWOpenGL
                     }
                 }
             }
-            Console.WriteLine("  " + reader.model.skins.Count() + " skins");
-            Console.WriteLine("  " + renderbatches.Count() + " renderbatches");
-            Console.WriteLine("  " + reader.model.vertices.Count() + " vertices");
-            Console.WriteLine("Done loading M2 file!");
-            
-            
+
+            worker.ReportProgress(100, "Done.");
+
             gLoaded = true;
         }
 

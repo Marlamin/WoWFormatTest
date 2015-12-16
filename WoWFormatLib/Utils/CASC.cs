@@ -104,6 +104,12 @@ namespace WoWFormatLib.Utils
             return cascHandler.FileExists(filename);
         }
 
+        //Why do I even do this shit
+        public static bool FileExists(int fileDataID)
+        {
+            return cascHandler.FileExists(fileDataID);
+        }
+
         public static Stream OpenFile(string filename)
         {
             return cascHandler.OpenFile(filename);
