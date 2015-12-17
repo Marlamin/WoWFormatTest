@@ -301,7 +301,7 @@ namespace OBJExporterUI
 
             for (int i = 0; i < reader.model.vertices.Count(); i++)
             {
-                vertices[i].Position = new Vector3(reader.model.vertices[i].position.X, reader.model.vertices[i].position.Z, reader.model.vertices[i].position.Y);
+                vertices[i].Position = new Vector3(reader.model.vertices[i].position.X, reader.model.vertices[i].position.Z, reader.model.vertices[i].position.Y * -1);
                 vertices[i].Normal = new Vector3(reader.model.vertices[i].normal.X, reader.model.vertices[i].normal.Z, reader.model.vertices[i].normal.Y);
                 vertices[i].TexCoord = new Vector3(reader.model.vertices[i].textureCoordX, reader.model.vertices[i].textureCoordY, (float)0.0);
             }
@@ -772,7 +772,7 @@ namespace OBJExporterUI
                             for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                             {
                                 Vertex v = new Vertex();
-                                v.Normal = new Vector3(chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
+                                v.Normal = new Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
                                 v.Position = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
                                 if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
                                 v.TexCoord = new Vector3(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize, 0.0f);
