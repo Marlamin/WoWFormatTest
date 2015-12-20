@@ -154,7 +154,7 @@ namespace WoWOpenGL.Loaders
 
             for (int i = 0; i < model.vertices.Count(); i++)
             {
-                modelvertices[i].Position = new Vector3(model.vertices[i].position.X, model.vertices[i].position.Z, model.vertices[i].position.Y);
+                modelvertices[i].Position = new Vector3(model.vertices[i].position.X, model.vertices[i].position.Z, model.vertices[i].position.Y * -1);
                 modelvertices[i].Normal = new Vector3(model.vertices[i].normal.X, model.vertices[i].normal.Z, model.vertices[i].normal.Y);
                 modelvertices[i].TexCoord = new Vector2(model.vertices[i].textureCoordX, model.vertices[i].textureCoordY);
             }
