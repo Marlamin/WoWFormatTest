@@ -13,9 +13,9 @@ namespace WoWOpenGL
         int Width, Height; // window viewport size
         Matrix4 projectionMatrix;
 
-        public Vector3 Pos = new Vector3(0, 0, -1);
-        public Vector3 Dir = new Vector3(0, 0, 1);
-        public Vector3 Up = Vector3.UnitY;
+        public Vector3 Pos = new Vector3(0, 0, 0);
+        public Vector3 Dir = new Vector3(1, 0, 0);
+        public Vector3 Up = Vector3.UnitZ;
 
         public OldCamera(int viewportWidth, int viewportHeight)
         {
@@ -41,6 +41,44 @@ namespace WoWOpenGL
             Matrix4 cameraViewMatrix = Matrix4.LookAt(Pos, Pos + Dir, Up);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref cameraViewMatrix);
+        }
+
+        public void tick(float timeDelta, float dragX, float dragY, float MDHorizontal, float MDDepth, float MDVertical) {
+            Vector3 dir = new Vector3(1, 0, 0);
+            float moveSpeed = 60f;
+
+            float dTime = timeDelta;
+
+            /* Calc look at position */
+            
+            Matrix4 rotationY = Matrix4.CreateRotationY(DegreeToRadian(dragY));
+            Vector3.Transform(ref dir, ref rotationY, out dir);
+            Matrix4 rotationZ = Matrix4.CreateRotationZ(DegreeToRadian(-dragX));
+            Vector3.Transform(ref dir, ref rotationZ, out dir);
+
+            /* Calc camera position */
+            if (MDHorizontal != 0.0f) {
+                Vector3 right;
+                rotationZ = Matrix4.CreateRotationZ(DegreeToRadian(-90));
+                Vector3.Transform(ref dir, ref rotationZ, out right);
+                right.Z = 0.0f;
+                right.Normalize();
+                Vector3.Multiply(ref right, dTime * moveSpeed * MDHorizontal, out right);
+                
+                Pos = Pos + right;
+            }
+
+            if (MDDepth != 0.0) {
+                Vector3 movDir = new Vector3(dir);
+                Vector3.Multiply(ref movDir, dTime * moveSpeed * MDDepth, out movDir);
+                
+                Pos = Pos + movDir;
+            }
+            if (MDVertical != 0.0f) {
+                Pos.Z = Pos.Z + dTime * moveSpeed * MDVertical;
+            }
+
+            Dir = dir;
         }
 
         public void Dolly(float distance)
