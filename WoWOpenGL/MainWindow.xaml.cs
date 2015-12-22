@@ -34,15 +34,22 @@ namespace WoWOpenGL
     {
         public static GLControl glc;
         public static System.Windows.Forms.Integration.WindowsFormsHost winFormControl;
+        public static TextBox filterBox;
+        public static ListBox modelListBox;
         public static ProgressBar cascProgressBar;
         public static Label cascProgressDesc;
+        public static TabItem mapsTab;
+
         private volatile bool fCancelMapLoading = false;
+
         public static int curlogentry = 0;
+
         public static bool useCASC = false;
         public static bool CASCinitialized = false;
         public static bool mapsTabLoaded = false;
-        public static bool mouseOverRenderArea = false;
+
         public static Window controls;
+
         private static List<string> models = new List<String>();
 
         private BackgroundWorkerEx cascWorker = new BackgroundWorkerEx();
@@ -66,6 +73,10 @@ namespace WoWOpenGL
             renderWorker.RunWorkerCompleted += RenderWorker_RunWorkerCompleted;
             renderWorker.ProgressChanged += worker_ProgressChanged;
             renderWorker.WorkerReportsProgress = true;
+
+            filterBox = FilterBox;
+            modelListBox = ModelListBox;
+            mapsTab = MapsTab;
         }
 
         private void RenderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -413,16 +424,6 @@ namespace WoWOpenGL
             MapListBox.DisplayMemberPath = "Value";
 
             mapsTabLoaded = true;
-        }
-
-        private void glControl_MouseEnter(object sender, MouseEventArgs e)
-        {
-            mouseOverRenderArea = true;
-        }
-
-        private void glControl_MouseLeave(object sender, MouseEventArgs e)
-        {
-            mouseOverRenderArea = false;
         }
 
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)

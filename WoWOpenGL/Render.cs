@@ -33,7 +33,7 @@ namespace WoWOpenGL
 
         private static bool mouseDragging = true;
         private static Point mouseOldCoords;
-
+        private static bool mouseOverRenderArea = false;
         private static float MDDepth = 0;
         private static float MDHorizontal = 0;
         private static float MDVertical = 0;
@@ -82,6 +82,8 @@ namespace WoWOpenGL
             glControl.Top = 0;
             glControl.Load += glControl_Load;
             glControl.Paint += RenderFrame;
+            glControl.MouseEnter += glControl_MouseEnter;
+            glControl.MouseLeave += glControl_MouseLeave;
             glControl.MakeCurrent();
 
             sw.Start();
@@ -108,6 +110,22 @@ namespace WoWOpenGL
             GL.Vertex3(0, 0, 10);
 
             GL.End();
+        }
+
+        private void glControl_MouseEnter(object sender, EventArgs e)
+        {
+            mouseOverRenderArea = true;
+            MainWindow.filterBox.IsEnabled = false;
+            MainWindow.modelListBox.IsEnabled = false;
+            MainWindow.mapsTab.IsEnabled = false;
+        }
+
+        private void glControl_MouseLeave(object sender, EventArgs e)
+        {
+            mouseOverRenderArea = false;
+            MainWindow.filterBox.IsEnabled = true;
+            MainWindow.modelListBox.IsEnabled = true;
+            MainWindow.mapsTab.IsEnabled = true;
         }
 
         private void glControl_Load(object sender, EventArgs e)
@@ -422,47 +440,45 @@ namespace WoWOpenGL
             MDDepth = 0;
             MDHorizontal = 0;
 
-            if (keyboardState.IsKeyDown(Key.Q))
+            if (mouseOverRenderArea)
             {
-                MDVertical = 1;
+                if (keyboardState.IsKeyDown(Key.Q))
+                {
+                    MDVertical = 1;
+                }
+
+                if (keyboardState.IsKeyDown(Key.E))
+                {
+                    MDVertical = -1;
+                }
+
+                if (keyboardState.IsKeyDown(Key.W))
+                {
+                    MDDepth = 1;
+                }
+
+                if (keyboardState.IsKeyDown(Key.S))
+                {
+                    MDDepth = -1;
+                }
+
+                if (keyboardState.IsKeyDown(Key.A))
+                {
+                    MDHorizontal = -1;
+                }
+
+                if (keyboardState.IsKeyDown(Key.D))
+                {
+                    MDHorizontal = 1;
+                }
+
+                if (keyboardState.IsKeyDown(Key.I))
+                {
+                    Console.WriteLine(ActiveCamera.Pos.ToString());
+                }
             }
 
-            if (keyboardState.IsKeyDown(Key.E))
-            {
-                MDVertical = -1;
-            }
-
-            if (keyboardState.IsKeyDown(Key.W))
-            {
-                MDDepth = 1;
-            }
-
-            if (keyboardState.IsKeyDown(Key.S))
-            {
-                MDDepth = -1;
-            }
-
-            if (keyboardState.IsKeyDown(Key.A))
-            {
-                MDHorizontal = -1;
-            }
-
-            if (keyboardState.IsKeyDown(Key.D))
-            {
-                MDHorizontal = 1;
-            }
-
-            if (keyboardState.IsKeyDown(Key.I))
-            {
-                Console.WriteLine(ActiveCamera.Pos.ToString());
-            }
-
-            //if (mouseInRender)
-            //{
-            //dragZ = (mouseState.WheelPrecise / speed) - (7.5f); //Startzoom is at -7.5f 
-            //}
-
-            if (mouseState.LeftButton == ButtonState.Pressed)
+            if (mouseOverRenderArea && mouseState.LeftButton == ButtonState.Pressed)
             {
                 if (!mouseDragging)
                 {
@@ -490,12 +506,10 @@ namespace WoWOpenGL
                 mouseOldCoords = mouseNewCoords;
             }
 
-            if (mouseState.LeftButton == ButtonState.Released)
+            if (!mouseOverRenderArea || mouseState.LeftButton == ButtonState.Released)
             {
                 mouseDragging = false;
             }
-
-
         }
 
         void RenderFrame(object sender, EventArgs e) //This is called every frame
