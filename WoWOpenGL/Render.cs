@@ -2,23 +2,21 @@
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
 using WoWFormatLib.FileReaders;
 using OpenTK.Input;
 using System.Timers;
 using WoWOpenGL.Loaders;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace WoWOpenGL
 {
     public class Render : GameWindow
     {
-        OldCamera ActiveCamera;
+        private static OldCamera ActiveCamera;
        
         private GLControl glControl;
         private bool gLoaded = false;
@@ -29,23 +27,29 @@ namespace WoWOpenGL
 
         private static bool isWMO = false;
 
-        private static float angle = 90.0f;
         private static float dragX;
         private static float dragY;
         private static float dragZ;
-        private static float zoom;
 
-        private bool modelLoaded = false;
+        private static bool mouseDragging = true;
+        private static Point mouseOldCoords;
+
+        private static float MDDepth = 0;
+        private static float MDHorizontal = 0;
+        private static float MDVertical = 0;
 
         private BackgroundWorker worker;
 
         private CacheStorage cache = new CacheStorage();
 
+        private Stopwatch sw = new Stopwatch();
+        private double spentTime;
+
         public Render(string ModelPath, BackgroundWorker worker = null)
         {
             dragX = 0.0f;
             dragY = 0.0f;
-            dragZ = -7.5f;
+            dragZ = 0.0f;
 
             if(worker == null)
             {
@@ -60,21 +64,15 @@ namespace WoWOpenGL
             System.Windows.Forms.Integration.WindowsFormsHost wfc = MainWindow.winFormControl;
 
             ActiveCamera = new OldCamera((int)wfc.ActualWidth, (int)wfc.ActualHeight);
-            ActiveCamera.Pos = new Vector3(10.0f, -10.0f, -7.5f);
+            ActiveCamera.Pos = new Vector3(-15.0f, 0.0f, 4.0f);
 
-            if (ModelPath.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
+            if (ModelPath.EndsWith(".m2"))
             {
-                modelLoaded = true;
                 LoadM2(ModelPath);
             }
-            else if (ModelPath.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase))
+            else if (ModelPath.EndsWith(".wmo"))
             {
-                modelLoaded = true;
                 LoadWMO(ModelPath);
-            }
-            else
-            {
-                modelLoaded = false;
             }
 
             glControl = new GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default);
@@ -84,9 +82,11 @@ namespace WoWOpenGL
             glControl.Top = 0;
             glControl.Load += glControl_Load;
             glControl.Paint += RenderFrame;
-            glControl.Resize += glControl_Resize;
-            glControl_Resize(glControl, EventArgs.Empty);
             glControl.MakeCurrent();
+
+            sw.Start();
+
+            spentTime = 0.00;
 
             wfc.Child = glControl;
         }
@@ -125,10 +125,6 @@ namespace WoWOpenGL
             ActiveCamera.setupGLRenderMatrix();
             Console.WriteLine("GLcontrol is done loading!");
 
-        }
-
-        private void glControl_Resize(object sender, EventArgs e)
-        {
         }
 
         private void LoadM2(string modelpath)
@@ -175,8 +171,8 @@ namespace WoWOpenGL
 
             for (int i = 0; i < reader.model.vertices.Count(); i++)
             {
-                vertices[i].Position = new Vector3(reader.model.vertices[i].position.X, reader.model.vertices[i].position.Z, reader.model.vertices[i].position.Y * -1);
-                vertices[i].Normal = new Vector3(reader.model.vertices[i].normal.X, reader.model.vertices[i].normal.Z, reader.model.vertices[i].normal.Y);
+                vertices[i].Position = new Vector3(reader.model.vertices[i].position.X, reader.model.vertices[i].position.Y, reader.model.vertices[i].position.Z);
+                vertices[i].Normal = new Vector3(reader.model.vertices[i].normal.X, reader.model.vertices[i].normal.Y, reader.model.vertices[i].normal.Z);
                 vertices[i].TexCoord = new Vector2(reader.model.vertices[i].textureCoordX, reader.model.vertices[i].textureCoordY);
             }
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
@@ -271,6 +267,8 @@ namespace WoWOpenGL
 
             worker.ReportProgress(100, "Done.");
 
+            ActiveCamera.Pos = new Vector3(-15.0f, 0.0f, 4.0f);
+
             gLoaded = true;
         }
 
@@ -298,9 +296,22 @@ namespace WoWOpenGL
                 //Console.WriteLine(reader.wmofile.doodadNames[i].filename);
             }
 
+            string[] groupNames = new string[reader.wmofile.group.Count()];
+
             for (int g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 if (reader.wmofile.group[g].mogp.vertices == null) { continue; }
+
+                for (int i = 0; i < reader.wmofile.groupNames.Count(); i++)
+                {
+                    if (reader.wmofile.group[g].mogp.nameOffset == reader.wmofile.groupNames[i].offset)
+                    {
+                        groupNames[g] = reader.wmofile.groupNames[i].name.Replace(" ", "_");
+                    }
+                }
+
+                if (groupNames[g] == "antiportal") { continue; }
+
                 //Switch to Vertex buffer
                 GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[g * 2]);
 
@@ -308,11 +319,10 @@ namespace WoWOpenGL
 
                 for (int i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
                 {
-                    vertices[i].Position = new Vector3(reader.wmofile.group[g].mogp.vertices[i].vector.X, reader.wmofile.group[g].mogp.vertices[i].vector.Z, reader.wmofile.group[g].mogp.vertices[i].vector.Y);
-                    vertices[i].Normal = new Vector3(reader.wmofile.group[g].mogp.normals[i].normal.X, reader.wmofile.group[g].mogp.normals[i].normal.Z, reader.wmofile.group[g].mogp.normals[i].normal.Y);
+                    vertices[i].Position = new Vector3(reader.wmofile.group[g].mogp.vertices[i].vector.X, reader.wmofile.group[g].mogp.vertices[i].vector.Y, reader.wmofile.group[g].mogp.vertices[i].vector.Z);
+                    vertices[i].Normal = new Vector3(reader.wmofile.group[g].mogp.normals[i].normal.X, reader.wmofile.group[g].mogp.normals[i].normal.Y, reader.wmofile.group[g].mogp.normals[i].normal.Z);
                     vertices[i].TexCoord = new Vector2(reader.wmofile.group[g].mogp.textureCoords[0][i].X, reader.wmofile.group[g].mogp.textureCoords[0][i].Y);
                 }
-
 
                 //Push to buffer
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * 8 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
@@ -405,47 +415,46 @@ namespace WoWOpenGL
         {
             float speed = 0.01f * (float) ControlsWindow.camSpeed;
 
-            OpenTK.Input.MouseState mouseState = OpenTK.Input.Mouse.GetState();
-            OpenTK.Input.KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
+            MouseState mouseState = OpenTK.Input.Mouse.GetState();
+            KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
 
-            if (keyboardState.IsKeyDown(Key.Up))
-            {
-                dragY = dragY + speed;
-            }
-
-            if (keyboardState.IsKeyDown(Key.Down))
-            {
-                dragY = dragY - speed;
-            }
-
-            if (keyboardState.IsKeyDown(Key.Left))
-            {
-                angle = angle + speed;
-            }
-
-            if (keyboardState.IsKeyDown(Key.Right))
-            {
-                angle = angle - speed;
-            }
-
-            if (keyboardState.IsKeyDown(Key.Z))
-            {
-                dragZ = dragZ - speed;
-            }
-
-            if (keyboardState.IsKeyDown(Key.X))
-            {
-                dragZ = dragZ + speed;
-            }
+            MDVertical = 0;
+            MDDepth = 0;
+            MDHorizontal = 0;
 
             if (keyboardState.IsKeyDown(Key.Q))
             {
-                angle = angle + 0.5f;
+                MDVertical = 1;
             }
 
             if (keyboardState.IsKeyDown(Key.E))
             {
-                angle = angle - 0.5f;
+                MDVertical = -1;
+            }
+
+            if (keyboardState.IsKeyDown(Key.W))
+            {
+                MDDepth = 1;
+            }
+
+            if (keyboardState.IsKeyDown(Key.S))
+            {
+                MDDepth = -1;
+            }
+
+            if (keyboardState.IsKeyDown(Key.A))
+            {
+                MDHorizontal = -1;
+            }
+
+            if (keyboardState.IsKeyDown(Key.D))
+            {
+                MDHorizontal = 1;
+            }
+
+            if (keyboardState.IsKeyDown(Key.I))
+            {
+                Console.WriteLine(ActiveCamera.Pos.ToString());
             }
 
             //if (mouseInRender)
@@ -453,14 +462,51 @@ namespace WoWOpenGL
             //dragZ = (mouseState.WheelPrecise / speed) - (7.5f); //Startzoom is at -7.5f 
             //}
 
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (!mouseDragging)
+                {
+                    mouseDragging = true;
+                    mouseOldCoords = new Point(mouseState.X, mouseState.Y);
+                }
+
+                Point mouseNewCoords = new Point(mouseState.X, mouseState.Y);
+
+                int mouseMovementY = (mouseNewCoords.Y - mouseOldCoords.Y);
+                int mouseMovementX = (mouseNewCoords.X - mouseOldCoords.X);
+
+                dragY = dragY + mouseMovementY / 20.0f;
+                dragX = dragX + mouseMovementX / 20.0f;
+
+                if (dragY < -89)
+                {
+                    dragY = -89;
+                }
+                else if (dragY > 89)
+                {
+                    dragY = 89;
+                }
+
+                mouseOldCoords = mouseNewCoords;
+            }
+
+            if (mouseState.LeftButton == ButtonState.Released)
+            {
+                mouseDragging = false;
+            }
+
+
         }
 
-        private void RenderFrame(object sender, EventArgs e) //This is called every frame
+        void RenderFrame(object sender, EventArgs e) //This is called every frame
         {
             if (!gLoaded) { return; }
             glControl.MakeCurrent();
 
-            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
+            //ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
+
+            ActiveCamera.tick(0.001f, dragX, dragY, MDHorizontal, MDDepth, MDVertical);
+
             ActiveCamera.setupGLRenderMatrix();
 
             if (!gLoaded) return;
@@ -471,7 +517,8 @@ namespace WoWOpenGL
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
-            GL.Rotate(angle, 0.0, 1.0, 0.0);
+
+            GL.Rotate(180f, 0.0, 0.0, 1.0);
 
             for (int i = 0; i < renderbatches.Count(); i++)
             {

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using WoWFormatLib.FileReaders;
 using WoWOpenGL.Loaders;
+using System.ComponentModel;
 
 namespace WoWOpenGL
 {
@@ -36,11 +35,21 @@ namespace WoWOpenGL
 
         private CacheStorage cache = new CacheStorage();
 
+        private BackgroundWorker worker;
+
         OldCamera ActiveCamera;
 
-        public TerrainWindow(string modelPath)
+        public TerrainWindow(string modelPath, BackgroundWorker renderWorker)
             : base(1920, 1080, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Terrain test", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default)
         {
+            if(renderWorker == null)
+            {
+                renderWorker = new BackgroundWorker();
+                renderWorker.WorkerReportsProgress = true;
+            }
+
+            worker = renderWorker;
+
             dragX = 0;
             dragY = 0;
             dragZ = 0;
@@ -106,6 +115,7 @@ namespace WoWOpenGL
 
             GL.Enable(EnableCap.Texture2D);
 
+            worker.ReportProgress(0, "Loading ADT..");
             for (int x = centerx; x < centerx + distance; x++)
             {
                 for (int y = centery; y < centery + distance; y++)
@@ -180,10 +190,10 @@ namespace WoWOpenGL
 
                                     v.Position = new Vector3(chunk.header.position.X - (i * UnitSize * 0.5f), chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z);
 
-                                    if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
+                                    if ((i % 2) != 0) v.Position.Y -= 0.5f * UnitSize;
 
                                     //Maptexture hackfix
-                                    v.TexCoord = new Vector2((v.Position.X - initialChunkX) / TileSize, (v.Position.Z - initialChunkY) / TileSize);
+                                    v.TexCoord = new Vector2(-(v.Position.Y - initialChunkX) / TileSize, -(v.Position.X - initialChunkY) / TileSize);
 
                                     verticelist.Add(v);
                                 }
@@ -323,13 +333,7 @@ namespace WoWOpenGL
                         Console.WriteLine("Vertices in buffer: " + verticeBufferSize / 11 / sizeof(float));
                         Console.WriteLine("Indices in buffer: " + indiceBufferSize / sizeof(int));
 
-                        adts.Add(adt);
-
-                        ActiveCamera.Pos = new Vector3(
-                            -(reader.adtfile.chunks[0].header.position.Z - 17066.666f), 
-                            -(reader.adtfile.chunks[0].header.position.X - 17066.666f),
-                            reader.adtfile.chunks[0].header.position.Y + 100 
-                            ); 
+                        adts.Add(adt);                       
                     }
                 }
             }
@@ -374,7 +378,6 @@ namespace WoWOpenGL
             if (keyboardState.IsKeyDown(Key.I))
             {
                 Console.WriteLine("Camera position: " + ActiveCamera.Pos);
-                Console.WriteLine("Camera direction: " + ActiveCamera.Dir);
             }
 
             if (keyboardState.IsKeyDown(Key.Q))
@@ -528,12 +531,6 @@ namespace WoWOpenGL
 
             //Position math
 
-
-
-            //int dragXa = angle % 90
-
-            //ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
-
             ActiveCamera.tick((float)e.Time, dragX, dragY, MDHorizontal, MDDepth, MDVertical);
             ActiveCamera.setupGLRenderMatrix();
 
@@ -546,13 +543,9 @@ namespace WoWOpenGL
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.AlphaFunc(AlphaFunction.Greater, 0.5f);
-            GL.Enable(EnableCap.VertexArray);
             GL.EnableClientState(ArrayCap.VertexArray);
-            GL.Enable(EnableCap.NormalArray);
             GL.EnableClientState(ArrayCap.NormalArray);
-            GL.Enable(EnableCap.ColorArray);
             GL.EnableClientState(ArrayCap.ColorArray);
-            GL.Enable(EnableCap.Texture2D);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
             GL.Enable(EnableCap.AlphaTest);
 
@@ -606,8 +599,8 @@ namespace WoWOpenGL
 
                 GL.ActiveTexture(TextureUnit.Texture0);
 
-                GL.Disable(EnableCap.ColorArray);
                 GL.DisableClientState(ArrayCap.ColorArray);
+
                 GL.Enable(EnableCap.Texture2D);
                 for (int di = 0; di < adts[adti].doodads.Count(); di++)
                 {
@@ -680,7 +673,6 @@ namespace WoWOpenGL
                     }
                 }
 
-                GL.Enable(EnableCap.ColorArray);
                 GL.EnableClientState(ArrayCap.ColorArray);
             }
 
@@ -808,7 +800,6 @@ namespace WoWOpenGL
                     }
                 }
 
-                GL.Enable(EnableCap.ColorArray);
                 GL.EnableClientState(ArrayCap.ColorArray);
             }
             if (GL.GetError().ToString() != "NoError")

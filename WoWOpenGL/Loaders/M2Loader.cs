@@ -50,7 +50,7 @@ namespace WoWOpenGL.Loaders
                 switch (model.textures[i].type)
                 {
                     case 0:
-                        Console.WriteLine("      Texture given in file!");
+                        // Console.WriteLine("      Texture given in file!");
                         texturefilename = model.textures[i].filename;
                         break;
                     case 1:
@@ -61,18 +61,18 @@ namespace WoWOpenGL.Loaders
                         }
                         else
                         {
-                            Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
+                            //Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
                         }
                         break;
                     case 2:
                         if (WoWFormatLib.Utils.CASC.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
                         {
-                            Console.WriteLine("      BLP exists!");
+                            // Console.WriteLine("      BLP exists!");
                             texturefilename = System.IO.Path.ChangeExtension(filename, ".blp");
                         }
                         else
                         {
-                            Console.WriteLine("      Type 2 does not exist!");
+                            //Console.WriteLine("      Type 2 does not exist!");
                             //needs lookup?
                         }
                         break;
@@ -87,7 +87,7 @@ namespace WoWOpenGL.Loaders
                         }
                         break;
                     default:
-                        Console.WriteLine("      Falling back to placeholder texture");
+                        //Console.WriteLine("      Falling back to placeholder texture");
                         texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
                         break;
                 }

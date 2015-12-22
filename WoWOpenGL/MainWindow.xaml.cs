@@ -174,7 +174,7 @@ namespace WoWOpenGL
 
                 if (lines[i].EndsWith(".m2"))
                 {
-                    if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera") && !lines[i].StartsWith("spells"))
+                    if (!lines[i].StartsWith("character") && !lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera") && !lines[i].StartsWith("spells"))
                     {
                        models.Add(lines[i]);
                     }
@@ -334,7 +334,7 @@ namespace WoWOpenGL
             string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
             Console.WriteLine("Detected mouse event on " + name + "!");
 
-            using (TerrainWindow tw = new TerrainWindow(name))
+            using (TerrainWindow tw = new TerrainWindow(name, renderWorker))
             {
                 tw.Run(30.0, 60.0);
             }
