@@ -30,7 +30,7 @@
                     <Grid x:Name="WDTGrid" HorizontalAlignment="Left" Height="640" Margin="40,50,0,0" VerticalAlignment="Top" Width="640" Grid.Column="1" />
                     <RadioButton x:Name="rbSortMapId" Content="Sort by Map Id" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" GroupName="MapListSort" IsChecked="True" Checked="rbSortMapId_Checked"/>
                     <RadioButton x:Name="rbSortName" Content="Sort by Name" HorizontalAlignment="Left" Margin="120,0,0,10" VerticalAlignment="Bottom" GroupName="MapListSort" Checked="rbSortName_Checked" />
-                    <Button x:Name="btnLoadMap" Content="Load Map" HorizontalAlignment="Left" Margin="20,0,0,10" VerticalAlignment="Bottom" Width="640" Click="Button_Click" Height="32" Grid.Column="1" />
+                    <Button x:Name="btnLoadMap" Content="Load Map" HorizontalAlignment="Stretch" Margin="20,0,20,10" VerticalAlignment="Bottom" Click="Button_Click" Height="32" Grid.Column="1" />
                 </Grid>
             </TabItem>
         </TabControl>
