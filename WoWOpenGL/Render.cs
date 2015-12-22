@@ -84,13 +84,20 @@ namespace WoWOpenGL
             glControl.Paint += RenderFrame;
             glControl.MouseEnter += glControl_MouseEnter;
             glControl.MouseLeave += glControl_MouseLeave;
+            glControl.Resize += glControl_Resize;
             glControl.MakeCurrent();
+            glControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
 
             sw.Start();
 
             spentTime = 0.00;
 
             wfc.Child = glControl;
+        }
+
+        private void glControl_Resize(object sender, EventArgs e)
+        {
+            Console.WriteLine("GLControl resized. Please load a different model to have the viewport resize as well.");
         }
 
         public void DrawAxes()

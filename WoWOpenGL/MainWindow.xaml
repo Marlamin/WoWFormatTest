@@ -3,19 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:WF="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:GL="clr-namespace:OpenTK;assembly=OpenTK.GLControl"
-        Title="WoW Format Test UI (OpenGL)" Height="931.5" Width="1086.5" Background="White" ResizeMode="CanMinimize"
+        Title="WoW Format Test UI (OpenGL)" Height="931.5" Width="1086.5" Background="White" 
         Loaded="Window_Loaded"
         Closed="Window_Closed">
-
-    <Grid Margin="0,0,4,5">
+    <Grid Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <ProgressBar x:Name="progressBar" Margin="10" Height="36" HorizontalAlignment="Stretch" VerticalAlignment="Top" Visibility="Visible" Panel.ZIndex="1" />
         <Label x:Name="progressLabel" Content="Initializing.." HorizontalAlignment="Center" Margin="0,7,0,0" Visibility="Visible" VerticalAlignment="Top" Panel.ZIndex="1"/>
-        <TabControl x:Name="tabs" HorizontalAlignment="Left" Height="837" Margin="10,51,0,0" VerticalAlignment="Top" Width="1050" Visibility="Visible">
+        <TabControl x:Name="tabs" Margin="10,51,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Visible">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
                     <TextBox x:Name="FilterBox" Margin="5,5,705,781" TextChanged="FilterBox_TextChanged" ToolTip="Type something here to filter"/>
                     <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Margin="5,28,0,0" VerticalAlignment="Stretch" SelectionChanged="ModelListBox_SelectionChanged" ItemsSource="{Binding}" Width="334" />
-                    <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0">
+                    <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                         <WF:Label Text="Select something from the left to make it show up!" ForeColor="White" TextAlign="MiddleCenter"></WF:Label>
                     </WindowsFormsHost>
                 </Grid>
@@ -23,16 +22,15 @@
             <TabItem x:Name="MapsTab" Header="Maps" Visibility="Visible" GotFocus="MapsTab_Focused">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="73*" />
-                        <ColumnDefinition Width="972*" />
+                        <ColumnDefinition Width="2*" MaxWidth="275"/>
+                        <ColumnDefinition Width="4*" />
                     </Grid.ColumnDefinitions>
-                    <ListBox x:Name="MapListBox" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="10,10,0,40" Width="315" Grid.ColumnSpan="2">
-                    </ListBox>
-                    <Button x:Name="btnLoadMap" Content="Load Map" HorizontalAlignment="Left" Margin="291,772,0,0" VerticalAlignment="Top" Width="640" Click="Button_Click" Height="32" Grid.Column="1" />
-                    <Grid x:Name="WDTGrid" HorizontalAlignment="Left" Height="640" Margin="257.5,122,0,0" VerticalAlignment="Top" Width="640" Grid.Column="1" />
-                    <RadioButton x:Name="rbSortMapId" Content="Sort by Map Id" HorizontalAlignment="Left" Margin="10,773,0,0" VerticalAlignment="Top" GroupName="MapListSort" IsChecked="True" Checked="rbSortMapId_Checked" Grid.ColumnSpan="2" />
-                    <RadioButton x:Name="rbSortName" Content="Sort by Name" HorizontalAlignment="Left" Margin="76,773,0,0" VerticalAlignment="Top" GroupName="MapListSort" Checked="rbSortName_Checked" Grid.Column="1" />
-                    <Label x:Name="label" Content="The map viewer is highly unstable and very much unfinished at the moment. Be warned!" Grid.Column="1" HorizontalAlignment="Stretch" Margin="280,0,0,0" VerticalAlignment="Top" />
+                    <Label x:Name="label" Content="The map viewer is highly unstable and very much unfinished at the moment. Be warned!" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top" />
+                    <ListBox x:Name="MapListBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,40" Grid.Column="0"></ListBox>
+                    <Grid x:Name="WDTGrid" HorizontalAlignment="Left" Height="640" Margin="40,50,0,0" VerticalAlignment="Top" Width="640" Grid.Column="1" />
+                    <RadioButton x:Name="rbSortMapId" Content="Sort by Map Id" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" GroupName="MapListSort" IsChecked="True" Checked="rbSortMapId_Checked"/>
+                    <RadioButton x:Name="rbSortName" Content="Sort by Name" HorizontalAlignment="Left" Margin="120,0,0,10" VerticalAlignment="Bottom" GroupName="MapListSort" Checked="rbSortName_Checked" />
+                    <Button x:Name="btnLoadMap" Content="Load Map" HorizontalAlignment="Left" Margin="20,0,0,10" VerticalAlignment="Bottom" Width="640" Click="Button_Click" Height="32" Grid.Column="1" />
                 </Grid>
             </TabItem>
         </TabControl>
