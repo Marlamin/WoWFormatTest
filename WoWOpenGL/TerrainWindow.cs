@@ -898,12 +898,23 @@ namespace WoWOpenGL
             public WorldModel worldModel;
         }
 
+        public struct WMODoodad
+        {
+            public string filename;
+            public short flags;
+            public Vector3 position;
+            public Quaternion rotation;
+            public float scale;
+            public Vector4 color;
+        }
+
         public struct Submesh
         {
             public uint firstFace;
             public uint numFaces;
             public uint material;
             public uint blendType;
+            public uint groupID;
         }
 
         public struct WorldModel
@@ -911,6 +922,7 @@ namespace WoWOpenGL
             public WorldModelGroupBatches[] groupBatches;
             public Material[] mats;
             public RenderBatch[] wmoRenderBatch;
+            public WMODoodad[] doodads;
         }
 
         public struct WorldModelGroupBatches

@@ -331,6 +331,23 @@ namespace WoWFormatLib.FileReaders
             return indices;
         }
 
+        private MODD[] ReadMODDChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            var numDoodads = chunk.Size / 40;
+            var doodads = new MODD[numDoodads];
+            for (var i = 0; i < numDoodads; i++)
+            {
+                var raw_offset = bin.ReadBytes(3);
+                doodads[i].offset = (uint) (raw_offset[0] | raw_offset[1] << 8 | raw_offset[2] << 16);
+                doodads[i].flags = bin.ReadByte();
+                doodads[i].position = bin.Read<Vector3>();
+                doodads[i].rotation = bin.Read<Quaternion>();
+                doodads[i].scale = bin.ReadSingle();
+                doodads[i].color = bin.ReadBytes(4);
+            }
+            return doodads;
+        }
+
         private object ReadMOVVChunk(BlizzHeader chunk, BinaryReader bin)
         {
             throw new NotImplementedException();
@@ -377,7 +394,7 @@ namespace WoWFormatLib.FileReaders
                         wmofile.doodadNames = ReadMODNChunk(chunk, bin, wmofile.header.nModels);
                         continue;
                     case "MODD":
-                        //wmofile.doodadDefinitions = ReadMODDChunk(chunk, bin);
+                        wmofile.doodadDefinitions = ReadMODDChunk(chunk, bin);
                         continue;
                     case "MOGP":
                     //ReadMOGPChunk(chunk, bin);
@@ -420,11 +437,6 @@ namespace WoWFormatLib.FileReaders
             }
 
             wmofile.group = groupFiles;
-        }
-
-        private MODD[] ReadMODDChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-            throw new NotImplementedException();
         }
 
         private WMOGroupFile ReadWMOGroupFile(string filename, Stream wmo)

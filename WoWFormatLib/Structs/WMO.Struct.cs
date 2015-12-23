@@ -46,10 +46,11 @@ namespace WoWFormatLib.Structs.WMO
     public struct MODD
     {
         public uint offset;
+        public byte flags;
         public Vector3 position;
         public Quaternion rotation;
         public float scale;
-        public uint color;
+        public byte[] color;
     }
 
     //Texture filenames

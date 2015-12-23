@@ -14,9 +14,15 @@ namespace WoWOpenGL.Loaders
     {
         public static void LoadM2(string filename, CacheStorage cache)
         {
+            filename = filename.ToLower().Replace(".mdx", ".m2");
+
+            if (cache.doodadBatches.ContainsKey(filename))
+            {
+                return;
+            }
+
             WoWFormatLib.Structs.M2.M2Model model = new WoWFormatLib.Structs.M2.M2Model();
 
-            filename = filename.ToLower().Replace(".mdx", ".m2");
             if (cache.models.ContainsKey(filename))
             {
                 model = cache.models[filename];
@@ -99,7 +105,7 @@ namespace WoWOpenGL.Loaders
             ddBatch.submeshes = new TerrainWindow.Submesh[model.skins[0].submeshes.Count()];
             for (int i = 0; i < model.skins[0].submeshes.Count(); i++)
             {
-                if (filename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
+                if (filename.StartsWith("character"))
                 {
                     if (model.skins[0].submeshes[i].submeshID != 0)
                     {
