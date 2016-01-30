@@ -15,6 +15,7 @@ namespace WoWOpenGL.Loaders
         public static void LoadM2(string filename, CacheStorage cache)
         {
             filename = filename.ToLower().Replace(".mdx", ".m2");
+            filename = filename.ToLower().Replace(".mdl", ".m2");
 
             if (cache.doodadBatches.ContainsKey(filename))
             {

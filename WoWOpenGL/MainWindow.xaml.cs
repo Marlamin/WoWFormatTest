@@ -96,7 +96,6 @@ namespace WoWOpenGL
             progressLabel.Content = "Done.";
 
             ModelListBox.DataContext = models;
-            ModelListBox.Items.SortDescriptions.Add(new SortDescription("", ListSortDirection.Ascending));
 
             winFormControl = wfContainer;
         }
@@ -362,16 +361,18 @@ namespace WoWOpenGL
         {
             ListBoxItem item = ModelListBox.SelectedValue as ListBoxItem;
 
+            Render rw;
+
             if (item == null)//Let's assume its a string
             {
                 if (ModelListBox.SelectedValue != null)
                 {
-                    new Render(ModelListBox.SelectedValue.ToString(), renderWorker);
+                    rw = new Render(ModelListBox.SelectedValue.ToString(), renderWorker);
                 }
             }
             else
             {
-                new Render(item.Content.ToString(), renderWorker);
+                rw = new Render(item.Content.ToString(), renderWorker);
             }
         }
 

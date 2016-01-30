@@ -31,7 +31,6 @@ namespace WoWFormatLib.FileReaders
             var header = new string(bin.ReadChars(4));
             if(header == "MD21")
             {
-                Console.WriteLine("MD21 detected. Welp!");
                 bin.ReadBytes(4);
                 MemoryStream md21 = new MemoryStream(bin.ReadBytes((int) bin.BaseStream.Length - (int) bin.BaseStream.Position));
                 bin = new BinaryReader(md21);

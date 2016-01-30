@@ -120,7 +120,7 @@ namespace WoWFormatLib.FileReaders
             MOGP mogp = new MOGP();
             mogp.nameOffset = bin.ReadUInt32();
             mogp.descriptiveNameOffset = bin.ReadUInt32();
-            mogp.flags = bin.ReadUInt32();
+            mogp.flags = (MOGPFlags) bin.ReadUInt32();
             mogp.boundingBox1 = bin.Read<Vector3>();
             mogp.boundingBox2 = bin.Read<Vector3>();
             mogp.ofsPortals = bin.ReadUInt16();
@@ -139,7 +139,16 @@ namespace WoWFormatLib.FileReaders
             BlizzHeader subchunk;
             long position = 0;
             int MOTVi = 0;
-            mogp.textureCoords = new MOTV[2][];
+
+            if (mogp.flags.HasFlag(MOGPFlags.Flag_0x40000000))
+            {
+                mogp.textureCoords = new MOTV[3][];
+            }
+            else
+            {
+                mogp.textureCoords = new MOTV[2][];
+            }
+            
 
             while (position < stream.Length)
             {

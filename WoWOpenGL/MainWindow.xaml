@@ -13,7 +13,9 @@
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
                     <TextBox x:Name="FilterBox" Margin="5,5,705,781" TextChanged="FilterBox_TextChanged" ToolTip="Type something here to filter"/>
-                    <ListBox x:Name="ModelListBox" HorizontalAlignment="Left" Margin="5,28,0,0" VerticalAlignment="Stretch" SelectionChanged="ModelListBox_SelectionChanged" ItemsSource="{Binding}" Width="334" />
+                    <ListBox x:Name="ModelListBox" VirtualizingStackPanel.IsVirtualizing="True" HorizontalAlignment="Left" Margin="5,28,0,0" VerticalAlignment="Stretch" SelectionChanged="ModelListBox_SelectionChanged" ItemsSource="{Binding}" Width="334" >
+
+                    </ListBox>
                     <WindowsFormsHost x:Name="wfContainer" Background="Black" Margin="344,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                         <WF:Label Text="Select something from the left to make it show up!" ForeColor="White" TextAlign="MiddleCenter"></WF:Label>
                     </WindowsFormsHost>

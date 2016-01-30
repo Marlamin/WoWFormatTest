@@ -21,10 +21,6 @@ namespace WoWOpenGL
         private GLControl glControl;
         private bool gLoaded = false;
 
-        private TerrainWindow.Material[] materials;
-        private TerrainWindow.Submesh[] renderbatches;
-        private uint[] VBOid;
-
         private static bool isWMO = false;
 
         private static float dragX;
@@ -56,7 +52,6 @@ namespace WoWOpenGL
 
             if (worker == null)
             {
-                Console.WriteLine("Didn't get a backgroundworker, creating one!");
                 this.worker = new BackgroundWorker();
             }
             else
@@ -77,24 +72,13 @@ namespace WoWOpenGL
 
                 ActiveCamera.Pos = new Vector3(-15.0f, 0.0f, 4.0f);
 
-                // The next few hackfixes can be removed once WMOs are done as well
-                renderbatches = cache.doodadBatches[filename].submeshes;
-                materials = cache.doodadBatches[filename].mats;
-
-                VBOid = new uint[2];
-
-                VBOid[0] = (uint)cache.doodadBatches[filename].vertexBuffer;
-                VBOid[1] = (uint)cache.doodadBatches[filename].indiceBuffer;
-
                 gLoaded = true;
             }
             else if (filename.EndsWith(".wmo"))
             {
                 WMOLoader.LoadWMO(filename, cache);
                 
-                //TODO
-
-                //gLoaded = true;
+                gLoaded = true;
                 isWMO = true;
             }
 
@@ -270,96 +254,131 @@ namespace WoWOpenGL
 
             GL.Rotate(180f, 0.0, 0.0, 1.0);
 
-            for (int i = 0; i < renderbatches.Count(); i++)
+            if (!isWMO)
             {
-                if (!isWMO)
+                // M2
+                GL.BindBuffer(BufferTarget.ArrayBuffer, cache.doodadBatches[filename].vertexBuffer);
+                GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
+                GL.TexCoordPointer(2, TexCoordPointerType.Float, 8 * sizeof(float), (IntPtr)(3 * sizeof(float)));
+                GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.doodadBatches[filename].indiceBuffer);
+
+                for (int i = 0; i < cache.doodadBatches[filename].submeshes.Count(); i++)
                 {
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[0]);
+                    switch (cache.doodadBatches[filename].submeshes[i].blendType)
+                    {
+                        case 0: //Combiners_Opaque (Blend disabled)
+                            GL.Disable(EnableCap.Blend);
+                            break;
+                        case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
+                            GL.Enable(EnableCap.Blend);
+                            //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
+                            //GL.BlendFuncSeparate(BlendingFactorSrc.One, BlendingFactorDest.Zero, BlendingFactorSrc.One, BlendingFactorDest.Zero);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            break;
+                        case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            //Tried:
+                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha
+                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha
+                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusDstAlpha
+                            break;
+                        case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
+                            break;
+                        case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                            break;
+                        case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            break;
+                        case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
+                            GL.Enable(EnableCap.Blend);
+                            GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                            break;
+                        case 7: //World\Expansion05\Doodads\Shadowmoon\Doodads\6FX_Fire_Grassline_Doodad_blue_LARGE.m2
+                            break;
+                        default:
+                            throw new Exception("Unknown blend type " + cache.doodadBatches[filename].submeshes[i].blendType);
+                    }
+                    GL.BindTexture(TextureTarget.Texture2D, cache.doodadBatches[filename].submeshes[i].material);
+                    GL.DrawRangeElements(PrimitiveType.Triangles, cache.doodadBatches[filename].submeshes[i].firstFace, (cache.doodadBatches[filename].submeshes[i].firstFace + cache.doodadBatches[filename].submeshes[i].numFaces), (int)cache.doodadBatches[filename].submeshes[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.doodadBatches[filename].submeshes[i].firstFace * 4));
+                }
+            }
+            else
+            {
+                // WMO 
+
+                for (int i = 0; i < cache.worldModelBatches[filename].groupBatches.Count(); i++)
+                {
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, cache.worldModelBatches[filename].groupBatches[i].vertexBuffer);
                     GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
                     GL.TexCoordPointer(2, TexCoordPointerType.Float, 8 * sizeof(float), (IntPtr)(3 * sizeof(float)));
                     GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
-                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[1]);
-                }
-                else
-                {
-                    //Console.WriteLine("Switching to buffer " + renderbatches[i].groupID * 2);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, VBOid[renderbatches[i].groupID * 2]);
-                    GL.VertexPointer(3, VertexPointerType.Float, 32, 0);
-                    GL.NormalPointer(NormalPointerType.Float, 32, 12);
-                    GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, 24);
-                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOid[(renderbatches[i].groupID * 2) + 1]);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.worldModelBatches[filename].groupBatches[i].indiceBuffer);
+
+                    for (int j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Count(); j++)
+                    {
+                        switch (cache.worldModelBatches[filename].wmoRenderBatch[i].blendType)
+                        {
+                            case 0: //Combiners_Opaque (Blend disabled)
+                                GL.Disable(EnableCap.Blend);
+                                break;
+                            case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
+                                GL.Enable(EnableCap.Blend);
+                                //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
+                                //GL.BlendFuncSeparate(BlendingFactorSrc.One, BlendingFactorDest.Zero, BlendingFactorSrc.One, BlendingFactorDest.Zero);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                break;
+                            case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                //Tried:
+                                //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha
+                                //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha
+                                //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusDstAlpha
+                                break;
+                            case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
+                                break;
+                            case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                                break;
+                            case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                                break;
+                            case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
+                                GL.Enable(EnableCap.Blend);
+                                GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                                break;
+                            case 7: //World\Expansion05\Doodads\Shadowmoon\Doodads\6FX_Fire_Grassline_Doodad_blue_LARGE.m2
+                                break;
+                            default:
+                                throw new Exception("Unknown blend type " + cache.worldModelBatches[filename].wmoRenderBatch[i].blendType);
+                        }
+                        GL.BindTexture(TextureTarget.Texture2D, cache.worldModelBatches[filename].wmoRenderBatch[j].materialID[0]);
+                        GL.DrawRangeElements(PrimitiveType.Triangles, cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace, (cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace + cache.worldModelBatches[filename].wmoRenderBatch[j].numFaces), (int)cache.worldModelBatches[filename].wmoRenderBatch[j].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace * 4));
+                    }
                 }
 
-               
-                switch (renderbatches[i].blendType)
-                {
-                    case 0: //Combiners_Opaque (Blend disabled)
-                        GL.Disable(EnableCap.Blend);
-                        break;
-                    case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
-                        GL.Enable(EnableCap.Blend);
-                        //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
-                        //GL.BlendFuncSeparate(BlendingFactorSrc.One, BlendingFactorDest.Zero, BlendingFactorSrc.One, BlendingFactorDest.Zero);
-                        GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                        break;
-                    case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
-                        GL.Enable(EnableCap.Blend);
-                        GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                        //Tried:
-                        //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha
-                        //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha
-                        //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusDstAlpha
-                        break;
-                    case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
-                        GL.Enable(EnableCap.Blend);
-                        GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
-                        break;
-                    case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
-                        GL.Enable(EnableCap.Blend);
-                        GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
-                        break;
-                    case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
-                        GL.Enable(EnableCap.Blend);
-                        GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                        break;
-                    case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
-                        GL.Enable(EnableCap.Blend);
-                        GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
-                        break;
-                    case 7: //World\Expansion05\Doodads\Shadowmoon\Doodads\6FX_Fire_Grassline_Doodad_blue_LARGE.m2
-                        break;
-                    default:
-                        throw new Exception("Unknown blend type " + renderbatches[i].blendType);
-                }
-                GL.BindTexture(TextureTarget.Texture2D, renderbatches[i].material);
-                
-
-                GL.DrawRangeElements(PrimitiveType.Triangles, renderbatches[i].firstFace, (renderbatches[i].firstFace + renderbatches[i].numFaces), (int)renderbatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(renderbatches[i].firstFace * 4));
-                if (GL.GetError().ToString() != "NoError")
-                {
-                    Console.WriteLine(GL.GetError().ToString());
-                }
             }
 
-            // DrawAxes();
+            var error = GL.GetError().ToString();
+
+            if (error != "NoError")
+            {
+                Console.WriteLine(error);
+            }
+
             glControl.SwapBuffers();
             glControl.Invalidate();
-        }
-
-        public struct RenderBatch
-        {
-            public uint firstFace;
-            public uint materialID;
-            public uint numFaces;
-            public uint groupID;
-            public uint blendType;
-        }
-
-        private struct Vertex
-        {
-            public Vector3 Position;
-            public Vector3 Normal;
-            public Vector2 TexCoord;
         }
     }
 }
