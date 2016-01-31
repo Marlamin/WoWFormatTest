@@ -79,8 +79,10 @@ namespace MinimapCompiler
 
                     Console.WriteLine("[" + mapname + "] " + "Creating new image of " + res_x + "x" + res_y);
 
+
                     Bitmap bmp = new Bitmap(res_x, res_y);
                     Graphics g = Graphics.FromImage(bmp);
+
                     Font drawFont = new Font("Arial", 16);
 
                     for (int cur_x = 0; cur_x < 64; cur_x++)
@@ -98,8 +100,9 @@ namespace MinimapCompiler
                     g.Dispose();
                     if (!Directory.Exists("done")) { Directory.CreateDirectory("done"); }
                     bmp.Save("done/" + mapname + ".png");
-
+                    
                     // SUPER MINIMAP COMPILER TIME!!!!!!!!!!!!!!!
+                    /*
                     var super_res_x = (((max_x - min_x) * 512) + 512);
                     var super_res_y = (((max_y - min_y) * 512) + 512);
 
@@ -129,6 +132,7 @@ namespace MinimapCompiler
                     super_g.Dispose();
                     if (!Directory.Exists("done")) { Directory.CreateDirectory("done"); }
                     super_bmp.Save("done/SUPER_" + mapname + ".png");
+                    */
                 }
             }
                 

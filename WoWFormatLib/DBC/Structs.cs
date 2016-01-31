@@ -424,17 +424,17 @@ namespace WoWFormatLib.DBC
         public string Mapname_lang { get; private set; }
         public string MapDescription0_lang { get; private set; }
         public string MapDescription1_lang { get; private set; }
-        public int areaTableID { get; private set; }
-        public int loadingScreenID { get; private set; }
-        public int corpseMapID { get; private set; }
-        public int timeOfDayoverride { get; private set; }
-        public int parentMapID { get; private set; }
-        public int cosmeticParentMapID { get; private set; }
-        public int instanceType { get; private set; }
-        public int MapType { get; private set; }
-        public int expansionID { get; private set; }
-        public int maxPlayers { get; private set; }
-        public int timeOffset { get; private set; }
+        public ushort areaTableID { get; private set; }
+        public short loadingScreenID { get; private set; }
+        public short corpseMapID { get; private set; }
+        public short timeOfDayoverride { get; private set; }
+        public short parentMapID { get; private set; }
+        public short cosmeticParentMapID { get; private set; }
+        public byte instanceType { get; private set; }
+        public byte MapType { get; private set; }
+        public byte expansionID { get; private set; }
+        public byte maxPlayers { get; private set; }
+        public byte timeOffset { get; private set; }
     }
 }
 

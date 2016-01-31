@@ -117,6 +117,15 @@ namespace WoWFormatLib.DBC
                     {
                         switch (Type.GetTypeCode(props[j].PropertyType))
                         {
+                            case TypeCode.Byte:
+                                props[j].SetValue(row, reader.ReadByte());
+                                break;
+                            case TypeCode.Int16:
+                                props[j].SetValue(row, reader.ReadInt16());
+                                break;
+                            case TypeCode.UInt16:
+                                props[j].SetValue(row, reader.ReadUInt16());
+                                break;
                             case TypeCode.Int32:
                                 props[j].SetValue(row, reader.ReadInt32());
                                 break;
