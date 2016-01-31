@@ -30,7 +30,7 @@ namespace WoWOpenGL.Loaders
                 if (WoWFormatLib.Utils.CASC.FileExists(filename))
                 {
                     var wmoreader = new WMOReader();
-                    wmoreader.LoadWMO(filename);
+                    wmoreader.LoadWMO(filename, false);
                     cache.worldModels.Add(filename, wmoreader.wmofile);
                     wmo = wmoreader.wmofile;
                 }

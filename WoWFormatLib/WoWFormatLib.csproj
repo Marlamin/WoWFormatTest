@@ -42,7 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DBC\DB3Reader.cs" />
     <Compile Include="DBC\DBCHelper.cs" />
     <Compile Include="DBC\DB2Reader.cs" />
     <Compile Include="DBC\DBCReader.cs" />

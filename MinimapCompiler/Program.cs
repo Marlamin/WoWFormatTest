@@ -37,7 +37,7 @@ namespace MinimapCompiler
 
             if (buildmaps == true)
             {
-                DB2Reader<MapRecord> reader = new DB2Reader<MapRecord>("DBFilesClient\\Map.db2");
+                DB2Reader<MapRecordLegion> reader = new DB2Reader<MapRecordLegion>("DBFilesClient\\Map.db2");
                 for (int i = 0; i < reader.recordCount; i++)
                 {
                     //I used to check if WDT existed, but sometimes minimaps for maps without WDTs slip through the cracks
