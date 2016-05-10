@@ -62,8 +62,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Exporters\ADTExporter.cs" />
-    <Compile Include="Exporters\M2Exporter.cs" />
+    <Compile Include="Exporters\DAE\collada_schema_1_4.cs" />
+    <Compile Include="Exporters\DAE\WMOExporter.cs" />
+    <Compile Include="Exporters\OBJ\ADTExporter.cs" />
+    <Compile Include="Exporters\OBJ\M2Exporter.cs" />
     <Compile Include="Structs.cs" />
     <Page Include="ConfigurationWindow.xaml">
       <SubType>Designer</SubType>
@@ -80,7 +82,7 @@
     <Compile Include="ConfigurationWindow.xaml.cs">
       <DependentUpon>ConfigurationWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Exporters\WMOExporter.cs" />
+    <Compile Include="Exporters\OBJ\WMOExporter.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

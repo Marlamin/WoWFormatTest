@@ -4,16 +4,14 @@ using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using WoWFormatLib.DBC;
-using WoWFormatLib.FileReaders;
 using WoWFormatLib.Utils;
 using CASCExplorer;
-using OpenTK;
 using System.Threading;
 using System.Threading.Tasks;
+
 
 namespace OBJExporterUI
 {
@@ -27,9 +25,12 @@ namespace OBJExporterUI
         private readonly BackgroundWorker exportworker = new BackgroundWorker();
         private readonly BackgroundWorkerEx cascworker = new BackgroundWorkerEx();
 
-        private bool showADT = true;
-        private bool showM2 = false;
+        private bool showADT = false;
+        private bool showM2 = true;
         private bool showWMO = true;
+
+        private bool exportOBJ = false;
+        private bool exportDAE = true;
 
         private List<String> files;
 
@@ -44,12 +45,7 @@ namespace OBJExporterUI
             }
 
             InitializeComponent();
-
-            worker.DoWork += worker_DoWork;
-            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            worker.ProgressChanged += worker_ProgressChanged;
-            worker.WorkerReportsProgress = true;
-
+            
             exportworker.DoWork += exportworker_DoWork;
             exportworker.RunWorkerCompleted += exportworker_RunWorkerCompleted;
             exportworker.ProgressChanged += worker_ProgressChanged;
@@ -122,6 +118,16 @@ namespace OBJExporterUI
 
         private void cascworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+
+//            Exporters.DAE.WMOExporter.exportWMO(@"world\wmo\azeroth\buildings\stormwind\sw_tradedistrict.wmo", exportworker);
+
+  //          return;
+
+            worker.DoWork += worker_DoWork;
+            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            worker.ProgressChanged += worker_ProgressChanged;
+            worker.WorkerReportsProgress = true;
+
             files = new List<String>();
 
             loadingImage.Visibility = Visibility.Hidden;
@@ -140,6 +146,8 @@ namespace OBJExporterUI
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
             adtCheckBox.Visibility = Visibility.Visible;
+            objCheckBox.Visibility = Visibility.Visible;
+            daeCheckBox.Visibility = Visibility.Visible;
 
             modelListBox.DataContext = files;
         }
@@ -176,15 +184,15 @@ namespace OBJExporterUI
                 if (!CASC.FileExists(selectedFile)) { continue; }
                 if (selectedFile.EndsWith(".wmo"))
                 {
-                    WMOExporter.exportWMO(selectedFile, exportworker);
+                    Exporters.OBJ.WMOExporter.exportWMO(selectedFile, exportworker);
                 }
                 else if (selectedFile.EndsWith(".m2"))
                 {
-                    M2Exporter.exportM2(selectedFile, exportworker);
+                    Exporters.OBJ.M2Exporter.exportM2(selectedFile, exportworker);
                 }
                 else if (selectedFile.EndsWith(".adt"))
                 {
-                    ADTExporter.exportADT(selectedFile, exportworker);
+                    Exporters.OBJ.ADTExporter.exportADT(selectedFile);
                 }
             }
         }
@@ -230,6 +238,9 @@ namespace OBJExporterUI
                         linelist.Add(line);
                     }
                 }
+            }else
+            {
+                Console.WriteLine("Linelist count" + linelist.Count());
             }
 
             worker.ReportProgress(0, "Sorting listfile..");
@@ -268,7 +279,7 @@ namespace OBJExporterUI
                 }
 
                 if (showM2 && lines[i].EndsWith(".m2")) {
-                    if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera") && !lines[i].StartsWith("spells")) {
+                    if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera")) {
                         if (!files.Contains(lines[i])) { files.Add(lines[i]); }
                     }
                 }

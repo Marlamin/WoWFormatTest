@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using WoWFormatLib.FileReaders;
 using OpenTK;
 using System.IO;
+using Collada141;
+using System.Xml;
 
-namespace OBJExporterUI
+namespace OBJExporterUI.Exporters.DAE
 {
     public class WMOExporter
     {
@@ -127,7 +129,7 @@ namespace OBJExporterUI
             //No idea how MTL files really work yet. Needs more investigation.
             foreach (var material in materials)
             {
-                mtlsb.Append("newmtl " + material.filename + "\n");
+                /*mtlsb.Append("newmtl " + material.filename + "\n");
                 mtlsb.Append("Ns 96.078431\n");
                 mtlsb.Append("Ka 1.000000 1.000000 1.000000\n");
                 mtlsb.Append("Kd 0.640000 0.640000 0.640000\n");
@@ -140,10 +142,10 @@ namespace OBJExporterUI
                 if (material.transparent)
                 {
                     mtlsb.Append("map_d " + material.filename + ".png\n");
-                }
+                }*/
             }
 
-            File.WriteAllText(Path.Combine(outdir, file.Replace(".wmo", ".mtl")), mtlsb.ToString());
+            //File.WriteAllText(Path.Combine(outdir, file.Replace(".wmo", ".mtl")), mtlsb.ToString());
 
             exportworker.ReportProgress(75, "Exporting model..");
 
@@ -186,40 +188,133 @@ namespace OBJExporterUI
 
             exportworker.ReportProgress(95, "Writing files..");
 
-            var objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".wmo", ".obj")));
-            objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
-            objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file) + ".mtl");
+            COLLADA model = new COLLADA();
 
+            /* Set up asset information */
+            model.asset = new asset();
+            model.asset.contributor = new assetContributor[1];
+            model.asset.contributor[0] = new assetContributor();
+            model.asset.contributor[0].authoring_tool = "Marlamin's WoW Format Exporter";
+            model.asset.contributor[0].copyright = "Blizzard Entertainment";
+            model.asset.contributor[0].comments = "Exported from World of Warcraft";
+            model.asset.contributor[0].source_data = file;
+            model.asset.created = DateTime.Now;
+            model.asset.modified = DateTime.Now;
+            model.asset.up_axis = UpAxisType.Y_UP;
+            model.asset.unit = new assetUnit();
+            model.asset.unit.meter = 1;
+            model.asset.unit.name = "meter";
+
+            var geometries = new List<geometry>();
+
+            var groupc = 0;
             foreach (var group in groups)
             {
+                groupc++;
                 if (group.vertices == null) { continue; }
-                objsw.WriteLine("g " + group.name);
 
+                var geometree = new geometry();
+
+                geometree.id = "group_" + groupc.ToString();
+                geometree.name = group.name;
+
+                var mesh = new mesh();
+
+                mesh.vertices = new vertices();
+                mesh.vertices.id = geometree.id + "_vertices";
+                mesh.vertices.input = new InputLocal[1];
+                mesh.vertices.input[0] = new InputLocal() { semantic = "POSITION", source = "#" + mesh.vertices.id + "_positions_array" };
+
+                var positions = new source();
+                positions.id = mesh.vertices.id + "_positions";
+                positions.name = "position";
+
+                var floatArray = new float_array();
+                floatArray.id = positions.id + "_array";
+                floatArray.count = (ulong) group.vertices.Count() * 3;
+                floatArray.Values = new double[group.vertices.Count() * 3];
+
+                var i = 0;
                 foreach (var vertex in group.vertices)
                 {
-                    objsw.WriteLine("v " + vertex.Position.X + " " + vertex.Position.Y + " " + vertex.Position.Z);
-                    objsw.WriteLine("vt " + vertex.TexCoord.X + " " + -vertex.TexCoord.Y);
-                    objsw.WriteLine("vn " + vertex.Normal.X + " " + vertex.Normal.Y + " " + vertex.Normal.Z);
+                    floatArray.Values[i] = vertex.Position.X;
+                    floatArray.Values[i + 1] = vertex.Position.Y;
+                    floatArray.Values[i + 2] = vertex.Position.Z;
+                    i = i + 3;
                 }
 
-                var indices = group.indices;
+                positions.Item = floatArray;
+
+                positions.technique_common = new sourceTechnique_common();
+                positions.technique_common.accessor = new accessor();
+                positions.technique_common.accessor.source = "#" + positions.id + "_array";
+                positions.technique_common.accessor.offset = 0;
+                positions.technique_common.accessor.stride = 3;
+                positions.technique_common.accessor.count = (ulong) group.vertices.Count();
+                positions.technique_common.accessor.param = new param[3];
+                positions.technique_common.accessor.param[0] = new param();
+                positions.technique_common.accessor.param[0].name = "X";
+                positions.technique_common.accessor.param[0].type = "float";
+                positions.technique_common.accessor.param[1] = new param();
+                positions.technique_common.accessor.param[1].name = "Y";
+                positions.technique_common.accessor.param[1].type = "float";
+                positions.technique_common.accessor.param[2] = new param();
+                positions.technique_common.accessor.param[2].name = "Z";
+                positions.technique_common.accessor.param[2].type = "float";
+
+                mesh.source = new source[] {
+                    positions
+                };
+
+                var polylist = new polylist();
+                polylist.input = new InputLocalOffset[] {
+                    new InputLocalOffset() { semantic = "VERTEX", source = "#" + geometree.id + "_vertices_positions", offset=0 }
+                };
+
+                var totalCount = 0;
 
                 foreach (var renderbatch in group.renderBatches)
                 {
-                    var i = renderbatch.firstFace;
+                    polylist.vcount += string.Join("3 ", new string[renderbatch.numFaces + 1]).Trim();
+
+                    var j = renderbatch.firstFace;
+
                     if (renderbatch.numFaces > 0)
                     {
-                        objsw.WriteLine("usemtl " + materials[renderbatch.materialID].filename);
-                        objsw.WriteLine("s 1");
-                        while (i < (renderbatch.firstFace + renderbatch.numFaces))
+                        while (j < (renderbatch.firstFace + renderbatch.numFaces))
                         {
-                            objsw.WriteLine("f " + (indices[i] + group.verticeOffset + 1) + "/" + (indices[i] + group.verticeOffset + 1) + "/" + (indices[i] + group.verticeOffset + 1) + " " + (indices[i + 1] + group.verticeOffset + 1) + "/" + (indices[i + 1] + group.verticeOffset + 1) + "/" + (indices[i + 1] + group.verticeOffset + 1) + " " + (indices[i + 2] + group.verticeOffset + 1) + "/" + (indices[i + 2] + group.verticeOffset + 1) + "/" + (indices[i + 2] + group.verticeOffset + 1));
-                            i = i + 3;
+                            polylist.p += String.Format("{0} {1} {2} ", group.indices[j], group.indices[j + 1], group.indices[j + 2]);
+                            j = j + 3;
                         }
                     }
+
+                    totalCount = totalCount + (int) renderbatch.numFaces;
                 }
+
+                polylist.count = (ulong) totalCount;
+
+                mesh.Items = new object[]{
+                    polylist
+                };
+
+                geometree.Item = mesh;
+
+                geometries.Add(geometree);
             }
-            objsw.Close();
+
+            model.Items = new object[]
+            {
+                new library_geometries()
+                {
+                    geometry = geometries.ToArray()
+                }
+            };
+
+            model.Save(@"D:\MODELS\test.dae");
+
+           // var contents = File.ReadAllText(@"D:\MODELS\test.dae");
+           // contents = contents.Replace("<accessor", "<accessor offset=\"0\"");
+           // File.WriteAllText(@"D:\MODELS\test.dae", contents);
             Console.WriteLine("Done loading WMO file!");
         }
     }

@@ -104,23 +104,12 @@ namespace WoWOpenGL
         {
             listfileWorker.ReportProgress(0, "Loading listfile..");
             List<string> linelist = new List<string>();
-
-            if (CASC.FileExists("dbfilesclient/filedatacomplete.dbc"))
+            
+            (CASC.cascHandler.Root as WowRootHandler)?.LoadFileDataComplete(CASC.cascHandler);
+            
+            foreach(var filename in CASCFile.FileNames)
             {
-                var reader = new DBCReader<FileDataRecord>("dbfilesclient/filedatacomplete.dbc");
-
-                if (reader.recordCount > 0)
-                {
-                    listfileWorker.ReportProgress(50, "Loading complete listfile..");
-
-                    for (int i = 0; i < reader.recordCount; i++)
-                    {
-                        if (CASC.cascHandler.FileExists(reader[i].ID))
-                        {
-                            linelist.Add(reader[i].FileName + reader[i].FilePath);
-                        }
-                    }
-                }
+                linelist.Add(filename.Value);
             }
 
             if (linelist.Count() == 0)
@@ -184,7 +173,7 @@ namespace WoWOpenGL
 
                 if (lines[i].EndsWith(".m2"))
                 {
-                    if (!lines[i].StartsWith("character") && !lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera") && !lines[i].StartsWith("spells"))
+                    if (!lines[i].StartsWith("character") && !lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera"))
                     {
                        models.Add(lines[i]);
                     }

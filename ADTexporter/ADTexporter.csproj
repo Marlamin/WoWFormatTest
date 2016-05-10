@@ -1,19 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5DB0FB8F-0EAA-490A-AA7D-28AE010186A9}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{8EAB33C2-9560-449D-BD99-6DF49A03C464}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WoWFormatLib</RootNamespace>
-    <AssemblyName>WoWFormatLib</AssemblyName>
+    <RootNamespace>ADTexporter</RootNamespace>
+    <AssemblyName>ADTexporter</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,6 +26,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK">
+      <HintPath>..\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -39,46 +45,47 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DBC\DB2Reader.cs" />
-    <Compile Include="DBC\DBCHelper.cs" />
-    <Compile Include="DBC\DBCReader.cs" />
-    <Compile Include="DBC\Structs.cs" />
-    <Compile Include="FileReaders\ADTReader.cs" />
-    <Compile Include="FileReaders\BLPReader.cs" />
-    <Compile Include="FileReaders\M2Reader.cs" />
-    <Compile Include="FileReaders\SKINReader.cs" />
-    <Compile Include="FileReaders\TEXReader.cs" />
-    <Compile Include="FileReaders\WDLReader.cs" />
-    <Compile Include="FileReaders\WDTReader.cs" />
-    <Compile Include="FileReaders\WMOReader.cs" />
+    <Compile Include="CacheStorage.cs" />
+    <Compile Include="Loaders\BLPLoader.cs" />
+    <Compile Include="Loaders\M2Loader.cs" />
+    <Compile Include="Loaders\WMOLoader.cs" />
+    <Compile Include="OldCamera.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SereniaBLPLib\BlpFile.cs" />
-    <Compile Include="SereniaBLPLib\DXTDecompression.cs" />
-    <Compile Include="Structs\ADT.struct.cs" />
-    <Compile Include="Structs\ADTobj.struct.cs" />
-    <Compile Include="Structs\ADTtex.struct.cs" />
-    <Compile Include="Structs\M2.struct.cs" />
-    <Compile Include="Structs\SKIN.struct.cs" />
-    <Compile Include="Structs\WDL.struct.cs" />
-    <Compile Include="Structs\WDT.struct.cs" />
-    <Compile Include="Structs\WMO.struct.cs" />
-    <Compile Include="Utils\ABlock.cs" />
-    <Compile Include="Utils\BlizzHeader.cs" />
-    <Compile Include="Utils\CASC.cs" />
-    <Compile Include="Utils\RGBColor.cs" />
-    <Compile Include="Utils\MissingFile.cs" />
-    <Compile Include="Utils\Quaternion.cs" />
-    <Compile Include="Utils\Vector3.cs" />
+    <Compile Include="ShaderLoader.cs" />
+    <Compile Include="TerrainWindow.cs" />
+    <Compile Include="Structs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Shaders\model.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\model.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\terrain.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\terrain.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CASCExplorer\CascLib\CascLib.csproj">
       <Project>{e08e1e48-6585-4137-8405-661c62c10713}</Project>
       <Name>CascLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj">
+      <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>
+      <Name>WoWFormatLib</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
