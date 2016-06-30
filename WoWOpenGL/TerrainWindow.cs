@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using WoWFormatLib.FileReaders;
 using WoWOpenGL.Loaders;
+using System.ComponentModel;
 
 namespace WoWOpenGL
 {
@@ -18,6 +17,9 @@ namespace WoWOpenGL
         private static float dragY;
         private static float dragZ;
         private static float angle;
+        private static float MDDepth = 0;
+        private static float MDHorizontal = 0;
+        private static float MDVertical = 0;
         private static float lightHeight = 0.0f;
         private static float camSpeed = 0.25f;
         private List<Terrain> adts = new List<Terrain>();
@@ -33,11 +35,21 @@ namespace WoWOpenGL
 
         private CacheStorage cache = new CacheStorage();
 
+        private BackgroundWorker worker;
+
         OldCamera ActiveCamera;
 
-        public TerrainWindow(string modelPath)
+        public TerrainWindow(string modelPath, BackgroundWorker renderWorker)
             : base(1920, 1080, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Terrain test", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default)
         {
+            if(renderWorker == null)
+            {
+                renderWorker = new BackgroundWorker();
+                renderWorker.WorkerReportsProgress = true;
+            }
+
+            worker = renderWorker;
+
             dragX = 0;
             dragY = 0;
             dragZ = 0;
@@ -103,6 +115,7 @@ namespace WoWOpenGL
 
             GL.Enable(EnableCap.Texture2D);
 
+            worker.ReportProgress(0, "Loading ADT..");
             for (int x = centerx; x < centerx + distance; x++)
             {
                 for (int y = centery; y < centery + distance; y++)
@@ -175,12 +188,12 @@ namespace WoWOpenGL
                                     // Commented out for maptexture hack
                                     //v.TexCoord = new Vector2(((float)j + (((i % 2) != 0) ? 0.5f : 0f)) / 8f, ((float)i * 0.5f) / 8f);
 
-                                    v.Position = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
+                                    v.Position = new Vector3(chunk.header.position.X - (i * UnitSize * 0.5f), chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z);
 
-                                    if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
+                                    if ((i % 2) != 0) v.Position.Y -= 0.5f * UnitSize;
 
                                     //Maptexture hackfix
-                                    v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize);
+                                    v.TexCoord = new Vector2(-(v.Position.Y - initialChunkX) / TileSize, -(v.Position.X - initialChunkY) / TileSize);
 
                                     verticelist.Add(v);
                                 }
@@ -284,7 +297,7 @@ namespace WoWOpenGL
                             }
 
                             WorldModelBatch wmobatch = new WorldModelBatch();
-                            wmobatch.position = new Vector3(-(wmodelentry.position.X - 17066), wmodelentry.position.Y, -(wmodelentry.position.Z - 17066));
+                            wmobatch.position = new Vector3(-(wmodelentry.position.X - 17066.666f), wmodelentry.position.Y, -(wmodelentry.position.Z - 17066.666f));
                             wmobatch.rotation = new Vector3(wmodelentry.rotation.X, wmodelentry.rotation.Y, wmodelentry.rotation.Z);
                             wmobatch.worldModel = WMOLoader.LoadWMO(wmofilename, cache);
                             worldModelBatches.Add(wmobatch);
@@ -320,7 +333,7 @@ namespace WoWOpenGL
                         Console.WriteLine("Vertices in buffer: " + verticeBufferSize / 11 / sizeof(float));
                         Console.WriteLine("Indices in buffer: " + indiceBufferSize / sizeof(int));
 
-                        adts.Add(adt);
+                        adts.Add(adt);                       
                     }
                 }
             }
@@ -358,21 +371,45 @@ namespace WoWOpenGL
             MouseState mouseState = OpenTK.Input.Mouse.GetState();
             KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
 
+            MDVertical = 0;
+            MDDepth = 0;
+            MDHorizontal = 0;
+
             if (keyboardState.IsKeyDown(Key.I))
             {
                 Console.WriteLine("Camera position: " + ActiveCamera.Pos);
-                Console.WriteLine("Camera direction: " + ActiveCamera.Dir);
             }
 
             if (keyboardState.IsKeyDown(Key.Q))
             {
-                angle = angle + 0.5f;
+                MDVertical = 1;
             }
 
             if (keyboardState.IsKeyDown(Key.E))
             {
-                angle = angle - 0.5f;
+                MDVertical = -1;
             }
+
+            if (keyboardState.IsKeyDown(Key.W))
+            {
+                MDDepth = 1;
+            }
+
+            if (keyboardState.IsKeyDown(Key.S))
+            {
+                MDDepth = -1;
+            }
+
+            if (keyboardState.IsKeyDown(Key.A))
+            {
+                MDHorizontal = -1;
+            }
+
+            if (keyboardState.IsKeyDown(Key.D))
+            {
+                MDHorizontal =  1;
+            }
+
 
             if (keyboardState.IsKeyDown(Key.O))
             {
@@ -441,20 +478,13 @@ namespace WoWOpenGL
                 int mouseMovementY = (mouseNewCoords.Y - mouseOldCoords.Y);
                 int mouseMovementX = (mouseNewCoords.X - mouseOldCoords.X);
 
-                if (keyboardState.IsKeyDown(Key.ShiftLeft))
-                {
-                    dragY = dragY + mouseMovementY / 2;
-                    dragX = dragX + mouseMovementX / 2;
+                dragY = dragY + mouseMovementY / 20.0f;
+                dragX = dragX + mouseMovementX / 20.0f;
 
-                }
-                else
-                {
-                    //if(mouseMovementX < 0)
-                    //{
-                    //    dragX = dragX + mouseMovementX * angle;
-                    //}
-
-                    angle = angle + mouseMovementX / 10f;
+                if (dragY < -89) {
+                    dragY = -89;
+                } else if (dragY > 89) {
+                    dragY = 89;
                 }
 
                 mouseOldCoords = mouseNewCoords;
@@ -494,33 +524,28 @@ namespace WoWOpenGL
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-
+            
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             angle = angle % 360;
 
-            //int dragXa = angle % 90
+            //Position math
 
-            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
-
+            ActiveCamera.tick((float)e.Time, dragX, dragY, MDHorizontal, MDDepth, MDVertical);
             ActiveCamera.setupGLRenderMatrix();
 
-            GL.Translate(-(dragX - (adtSize / 2)), -(dragY - (adtSize / 2)), -(dragZ - (adtSize / 2))); //267 is from 533,33..(adtsize) / 2
+            //GL.Translate(-(dragX - (adtSize / 2)), -(dragY - (adtSize / 2)), -(dragZ - (adtSize / 2))); //267 is from 533,33..(adtsize) / 2
             //GL.Rotate(angle, 0.0, 1.0f, 0.0);
-            GL.Rotate(angle, 1.0f, 0.0f, 0.0);
-            GL.Translate(dragX - (adtSize / 2), dragY - (adtSize / 2), dragZ - (adtSize / 2));
-            DrawAxes();
+            //GL.Rotate(angle, 1.0f, 0.0f, 0.0);
+            //GL.Translate(dragX - (adtSize / 2), dragY - (adtSize / 2), dragZ - (adtSize / 2));
+            //DrawAxes();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.AlphaFunc(AlphaFunction.Greater, 0.5f);
-            GL.Enable(EnableCap.VertexArray);
             GL.EnableClientState(ArrayCap.VertexArray);
-            GL.Enable(EnableCap.NormalArray);
             GL.EnableClientState(ArrayCap.NormalArray);
-            GL.Enable(EnableCap.ColorArray);
             GL.EnableClientState(ArrayCap.ColorArray);
-            GL.Enable(EnableCap.Texture2D);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
             GL.Enable(EnableCap.AlphaTest);
 
@@ -574,8 +599,8 @@ namespace WoWOpenGL
 
                 GL.ActiveTexture(TextureUnit.Texture0);
 
-                GL.Disable(EnableCap.ColorArray);
                 GL.DisableClientState(ArrayCap.ColorArray);
+
                 GL.Enable(EnableCap.Texture2D);
                 for (int di = 0; di < adts[adti].doodads.Count(); di++)
                 {
@@ -583,14 +608,17 @@ namespace WoWOpenGL
 
                     var activeDoodadBatch = cache.doodadBatches[adts[adti].doodads[di].filename];
 
+                    GL.Rotate(90.0f, 1.0f, 0.0f, 0.0f);
+                    GL.Rotate(90.0f, 0.0f, 1.0f, 0.0f);
+
                     GL.Translate(adts[adti].doodads[di].position.X, adts[adti].doodads[di].position.Y, adts[adti].doodads[di].position.Z);
 
-                    GL.Rotate(adts[adti].doodads[di].rotation.Y - 90.0f, 0.0f, 1.0f, 0.0f);
+                    GL.Rotate(adts[adti].doodads[di].rotation.Y - 270.0f, 0.0f, 1.0f, 0.0f);
                     GL.Rotate(-adts[adti].doodads[di].rotation.X, 0.0f, 0.0f, 1.0f);
-                    GL.Rotate(adts[adti].doodads[di].rotation.Z, 1.0f, 0.0f, 0.0f);
+                    GL.Rotate(adts[adti].doodads[di].rotation.Z - 90.0f, 1.0f, 0.0f, 0.0f);
 
                     var scale = adts[adti].doodads[di].scale / 1024f;
-                    GL.Scale(-scale, scale, scale);
+                    GL.Scale(scale, scale, scale);
 
                     GL.BindBuffer(BufferTarget.ArrayBuffer, activeDoodadBatch.vertexBuffer);
                     GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
@@ -615,16 +643,19 @@ namespace WoWOpenGL
                     {
                         GL.PushMatrix();
 
-                        GL.Translate(adts[adti].worldModelBatches[wb].position.X, adts[adti].worldModelBatches[wb].position.Y, adts[adti].worldModelBatches[wb].position.Z);
-
                         // GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
                         //  GL.Rotate((adts[adti].worldModelBatches[wb].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
                         //  GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
-                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Y - 90.0f, 0.0f, 1.0f, 0.0f);
-                        GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X, 0.0f, 0.0f, 1.0f);
-                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Z, 1.0f, 0.0f, 0.0f);
 
-                        GL.Scale(-1.0f, 1.0f, 1.0f);
+
+                        GL.Rotate(90.0f, 1.0f, 0.0f, 0.0f);
+                        GL.Rotate(90.0f, 0.0f, 1.0f, 0.0f);
+
+                        GL.Translate(adts[adti].worldModelBatches[wb].position.X, adts[adti].worldModelBatches[wb].position.Y, adts[adti].worldModelBatches[wb].position.Z);
+                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Y - 270.0f, 0.0f, 1.0f, 0.0f);
+                        GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X, 0.0f, 0.0f, 1.0f);
+                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Z - 90.0f, 1.0f, 0.0f, 0.0f);
+
                         for (int si = 0; si < adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch.Count(); si++)
                         {
                             //Render opaque first
@@ -642,7 +673,6 @@ namespace WoWOpenGL
                     }
                 }
 
-                GL.Enable(EnableCap.ColorArray);
                 GL.EnableClientState(ArrayCap.ColorArray);
             }
 
@@ -654,14 +684,17 @@ namespace WoWOpenGL
 
                     var activeDoodadBatch = cache.doodadBatches[adts[adti].doodads[di].filename];
 
+                    GL.Rotate(90.0f, 1.0f, 0.0f, 0.0f);
+                    GL.Rotate(90.0f, 0.0f, 1.0f, 0.0f);
+
                     GL.Translate(adts[adti].doodads[di].position.X, adts[adti].doodads[di].position.Y, adts[adti].doodads[di].position.Z);
 
-                    GL.Rotate(adts[adti].doodads[di].rotation.Y - 90.0f, 0.0f, 1.0f, 0.0f);
+                    GL.Rotate(adts[adti].doodads[di].rotation.Y - 270.0f, 0.0f, 1.0f, 0.0f);
                     GL.Rotate(-adts[adti].doodads[di].rotation.X, 0.0f, 0.0f, 1.0f);
-                    GL.Rotate(adts[adti].doodads[di].rotation.Z, 1.0f, 0.0f, 0.0f);
+                    GL.Rotate(adts[adti].doodads[di].rotation.Z - 90.0f, 1.0f, 0.0f, 0.0f);
 
                     var scale = adts[adti].doodads[di].scale / 1024f;
-                    GL.Scale(-scale, scale, scale);
+                    GL.Scale(scale, scale, scale);
 
                     GL.BindBuffer(BufferTarget.ArrayBuffer, activeDoodadBatch.vertexBuffer);
                     GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
@@ -725,14 +758,18 @@ namespace WoWOpenGL
                     {
                         GL.PushMatrix();
 
-                        GL.Translate(adts[adti].worldModelBatches[wb].position.X, adts[adti].worldModelBatches[wb].position.Y, adts[adti].worldModelBatches[wb].position.Z);
+                        //GL.Translate(adts[adti].worldModelBatches[wb].position.X, adts[adti].worldModelBatches[wb].position.Y, adts[adti].worldModelBatches[wb].position.Z);
 
                         // GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X + (float)ControlsWindow.amb_1, 0, 0, 1);
                         //  GL.Rotate((adts[adti].worldModelBatches[wb].rotation.Y + 90) + (float)ControlsWindow.amb_2, 0, 1, 0);
                         //  GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.Z + (float)ControlsWindow.amb_3, 1, 0, 0);
-                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Y - 90.0f, 0.0f, 1.0f, 0.0f);
+                        GL.Rotate(90.0f, 1.0f, 0.0f, 0.0f);
+                        GL.Rotate(90.0f, 0.0f, 1.0f, 0.0f);
+
+                        GL.Translate(adts[adti].worldModelBatches[wb].position.X, adts[adti].worldModelBatches[wb].position.Y, adts[adti].worldModelBatches[wb].position.Z);
+                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Y - 270.0f, 0.0f, 1.0f, 0.0f);
                         GL.Rotate(-adts[adti].worldModelBatches[wb].rotation.X, 0.0f, 0.0f, 1.0f);
-                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Z, 1.0f, 0.0f, 0.0f);
+                        GL.Rotate(adts[adti].worldModelBatches[wb].rotation.Z - 90.0f, 1.0f, 0.0f, 0.0f);
 
                         GL.Scale(-1.0f, 1.0f, 1.0f);
                         for (int si = 0; si < adts[adti].worldModelBatches[wb].worldModel.wmoRenderBatch.Count(); si++)
@@ -763,7 +800,6 @@ namespace WoWOpenGL
                     }
                 }
 
-                GL.Enable(EnableCap.ColorArray);
                 GL.EnableClientState(ArrayCap.ColorArray);
             }
             if (GL.GetError().ToString() != "NoError")
@@ -862,12 +898,23 @@ namespace WoWOpenGL
             public WorldModel worldModel;
         }
 
+        public struct WMODoodad
+        {
+            public string filename;
+            public short flags;
+            public Vector3 position;
+            public Quaternion rotation;
+            public float scale;
+            public Vector4 color;
+        }
+
         public struct Submesh
         {
             public uint firstFace;
             public uint numFaces;
             public uint material;
             public uint blendType;
+            public uint groupID;
         }
 
         public struct WorldModel
@@ -875,6 +922,7 @@ namespace WoWOpenGL
             public WorldModelGroupBatches[] groupBatches;
             public Material[] mats;
             public RenderBatch[] wmoRenderBatch;
+            public WMODoodad[] doodads;
         }
 
         public struct WorldModelGroupBatches

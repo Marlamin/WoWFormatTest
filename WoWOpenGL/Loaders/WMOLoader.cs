@@ -13,6 +13,11 @@ namespace WoWOpenGL.Loaders
     {
         public static TerrainWindow.WorldModel LoadWMO(string filename, CacheStorage cache)
         {
+            if (cache.worldModelBatches.ContainsKey(filename))
+            {
+                return cache.worldModelBatches[filename];
+            }
+
             WoWFormatLib.Structs.WMO.WMO wmo = new WoWFormatLib.Structs.WMO.WMO();
 
             if (cache.worldModels.ContainsKey(filename))
@@ -25,7 +30,7 @@ namespace WoWOpenGL.Loaders
                 if (WoWFormatLib.Utils.CASC.FileExists(filename))
                 {
                     var wmoreader = new WMOReader();
-                    wmoreader.LoadWMO(filename);
+                    wmoreader.LoadWMO(filename, false);
                     cache.worldModels.Add(filename, wmoreader.wmofile);
                     wmo = wmoreader.wmofile;
                 }
@@ -39,20 +44,33 @@ namespace WoWOpenGL.Loaders
 
             wmobatch.groupBatches = new TerrainWindow.WorldModelGroupBatches[wmo.group.Count()];
 
+            string[] groupNames = new string[wmo.group.Count()];
+
             for (int g = 0; g < wmo.group.Count(); g++)
             {
                 if (wmo.group[g].mogp.vertices == null) { continue; }
 
                 wmobatch.groupBatches[g].vertexBuffer = GL.GenBuffer();
                 wmobatch.groupBatches[g].indiceBuffer = GL.GenBuffer();
+
                 GL.BindBuffer(BufferTarget.ArrayBuffer, wmobatch.groupBatches[g].vertexBuffer);
 
                 TerrainWindow.M2Vertex[] wmovertices = new TerrainWindow.M2Vertex[wmo.group[g].mogp.vertices.Count()];
 
+                for (int i = 0; i < wmo.groupNames.Count(); i++)
+                {
+                    if (wmo.group[g].mogp.nameOffset == wmo.groupNames[i].offset)
+                    {
+                        groupNames[g] = wmo.groupNames[i].name.Replace(" ", "_");
+                    }
+                }
+
+                if (groupNames[g] == "antiportal") { continue; }
+
                 for (int i = 0; i < wmo.group[g].mogp.vertices.Count(); i++)
                 {
-                    wmovertices[i].Position = new Vector3(wmo.group[g].mogp.vertices[i].vector.X, wmo.group[g].mogp.vertices[i].vector.Z, wmo.group[g].mogp.vertices[i].vector.Y);
-                    wmovertices[i].Normal = new Vector3(wmo.group[g].mogp.normals[i].normal.X, wmo.group[g].mogp.normals[i].normal.Z, wmo.group[g].mogp.normals[i].normal.Y);
+                    wmovertices[i].Position = new Vector3(wmo.group[g].mogp.vertices[i].vector.X, wmo.group[g].mogp.vertices[i].vector.Y, wmo.group[g].mogp.vertices[i].vector.Z);
+                    wmovertices[i].Normal = new Vector3(wmo.group[g].mogp.normals[i].normal.X, wmo.group[g].mogp.normals[i].normal.Y, wmo.group[g].mogp.normals[i].normal.Z);
                     if (wmo.group[g].mogp.textureCoords[0] == null)
                     {
                         wmovertices[i].TexCoord = new Vector2(0.0f, 0.0f);
@@ -97,7 +115,24 @@ namespace WoWOpenGL.Loaders
                 }
             }
 
-            
+            wmobatch.doodads = new TerrainWindow.WMODoodad[wmo.doodadDefinitions.Count()];
+
+            for(int i = 0; i < wmo.doodadDefinitions.Count(); i++)
+            {
+                for(int j = 0; j < wmo.doodadNames.Count(); j++)
+                {
+                    if (wmo.doodadDefinitions[i].offset == wmo.doodadNames[j].startOffset)
+                    {
+                        wmobatch.doodads[i].filename = wmo.doodadNames[j].filename;
+                        M2Loader.LoadM2(wmobatch.doodads[i].filename, cache);
+                    }
+                }
+                wmobatch.doodads[i].flags = wmo.doodadDefinitions[i].flags;
+                wmobatch.doodads[i].position = new Vector3(wmo.doodadDefinitions[i].position.X, wmo.doodadDefinitions[i].position.Y, wmo.doodadDefinitions[i].position.Z);
+                wmobatch.doodads[i].rotation = new Quaternion(wmo.doodadDefinitions[i].rotation.X, wmo.doodadDefinitions[i].rotation.Y, wmo.doodadDefinitions[i].rotation.Z, wmo.doodadDefinitions[i].rotation.W);
+                wmobatch.doodads[i].scale = wmo.doodadDefinitions[i].scale;
+                wmobatch.doodads[i].color = new Vector4(wmo.doodadDefinitions[i].color[0], wmo.doodadDefinitions[i].color[1], wmo.doodadDefinitions[i].color[2], wmo.doodadDefinitions[i].color[3]);
+            }
 
             int numRenderbatches = 0;
             //Get total amount of render batches
@@ -118,9 +153,20 @@ namespace WoWOpenGL.Loaders
                 {
                     wmobatch.wmoRenderBatch[rb].firstFace = group.mogp.renderBatches[i].firstFace;
                     wmobatch.wmoRenderBatch[rb].numFaces = group.mogp.renderBatches[i].numFaces;
+                    uint matID = 0;
+
+                    if (group.mogp.renderBatches[i].flags == 2)
+                    {
+                        matID = (uint) group.mogp.renderBatches[i].possibleBox2_3;
+                    }
+                    else
+                    {
+                        matID = group.mogp.renderBatches[i].materialID;
+                    }
+
                     for (int ti = 0; ti < wmobatch.mats.Count(); ti++)
                     {
-                        if (wmo.materials[group.mogp.renderBatches[i].materialID].texture1 == wmobatch.mats[ti].texture1)
+                        if (wmo.materials[matID].texture1 == wmobatch.mats[ti].texture1)
                         {
                             wmobatch.wmoRenderBatch[rb].materialID = new uint[] { (uint)wmobatch.mats[ti].textureID };
                         }
@@ -131,6 +177,8 @@ namespace WoWOpenGL.Loaders
                     rb++;
                 }
             }
+            cache.worldModelBatches.Add(filename, wmobatch);
+
             return wmobatch;
         }
     }

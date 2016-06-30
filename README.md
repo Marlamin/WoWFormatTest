@@ -50,6 +50,7 @@ Rendering test with WPF.
 - TOM_RUS
 - Schlumpf
 - Thoorium
+- Deamon87
 - Miceiken
 - Kirth
 - relaxok

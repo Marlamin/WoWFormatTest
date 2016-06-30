@@ -34,19 +34,174 @@ namespace WoWOpenGL
     {
         public static GLControl glc;
         public static System.Windows.Forms.Integration.WindowsFormsHost winFormControl;
+        public static TextBox filterBox;
+        public static ListBox modelListBox;
         public static ProgressBar cascProgressBar;
         public static Label cascProgressDesc;
+        public static TabItem mapsTab;
+
         private volatile bool fCancelMapLoading = false;
+
         public static int curlogentry = 0;
+
         public static bool useCASC = false;
         public static bool CASCinitialized = false;
         public static bool mapsTabLoaded = false;
-        public static bool mouseOverRenderArea = false;
+
         public static Window controls;
+
         private static List<string> models = new List<String>();
+
+        private BackgroundWorkerEx cascWorker = new BackgroundWorkerEx();
+        private BackgroundWorker listfileWorker = new BackgroundWorker();
+        private BackgroundWorker renderWorker = new BackgroundWorker();
+
         public MainWindow()
         {
             InitializeComponent();
+
+            cascWorker.DoWork += cascWorker_DoWork;
+            cascWorker.RunWorkerCompleted += cascWorker_RunWorkerCompleted;
+            cascWorker.ProgressChanged += worker_ProgressChanged;
+            cascWorker.WorkerReportsProgress = true;
+
+            listfileWorker.DoWork += ListfileWorker_DoWork;
+            listfileWorker.RunWorkerCompleted += ListfileWorker_RunWorkerCompleted;
+            listfileWorker.ProgressChanged += worker_ProgressChanged;
+            listfileWorker.WorkerReportsProgress = true;
+
+            renderWorker.RunWorkerCompleted += RenderWorker_RunWorkerCompleted;
+            renderWorker.ProgressChanged += worker_ProgressChanged;
+            renderWorker.WorkerReportsProgress = true;
+
+            filterBox = FilterBox;
+            modelListBox = ModelListBox;
+            mapsTab = MapsTab;
+        }
+
+        private void RenderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            progressBar.Value = 100;
+            progressLabel.Content = "Done.";
+        }
+
+        private void ListfileWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            FilterBox.Visibility = Visibility.Visible;
+            tabs.Visibility = Visibility.Visible;
+            ModelListBox.Visibility = Visibility.Visible;
+            MapsTab.Visibility = Visibility.Visible;
+
+            progressBar.Value = 100;
+            progressLabel.Content = "Done.";
+
+            ModelListBox.DataContext = models;
+
+            winFormControl = wfContainer;
+        }
+
+        private void ListfileWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            listfileWorker.ReportProgress(0, "Loading listfile..");
+            List<string> linelist = new List<string>();
+            
+            (CASC.cascHandler.Root as WowRootHandler)?.LoadFileDataComplete(CASC.cascHandler);
+            
+            foreach(var filename in CASCFile.FileNames)
+            {
+                linelist.Add(filename.Value);
+            }
+
+            if (linelist.Count() == 0)
+            {
+                // Fall back
+
+                if (!File.Exists("listfile.txt"))
+                {
+                    throw new Exception("Listfile not found. Unable to continue.");
+                }
+
+                listfileWorker.ReportProgress(50, "Loading listfile from disk..");
+
+                foreach(var line in File.ReadAllLines("listfile.txt"))
+                {
+                    if (CASC.FileExists(line)) {
+                        linelist.Add(line);
+                    }
+
+                }
+                linelist.AddRange(File.ReadAllLines("listfile.txt"));
+            }
+
+            listfileWorker.ReportProgress(0, "Sorting listfile..");
+
+            linelist.Sort();
+
+            string[] lines = linelist.ToArray();
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                lines[i] = lines[i].ToLower();
+            }
+
+            List<string> unwantedExtensions = new List<String>();
+            for (int u = 0; u < 512; u++)
+            {
+                unwantedExtensions.Add("_" + u.ToString().PadLeft(3, '0') + ".wmo");
+            }
+
+            string[] unwanted = unwantedExtensions.ToArray();
+
+            for (int i = 0; i < lines.Count(); i++)
+            {
+
+                //if (showADT && lines[i].EndsWith(".adt"))
+                //{
+                //    if (!lines[i].EndsWith("obj0.adt") && !lines[i].EndsWith("obj1.adt") && !lines[i].EndsWith("tex0.adt") && !lines[i].EndsWith("tex1.adt") && !lines[i].EndsWith("_lod.adt"))
+                //    {
+                //        if (!files.Contains(lines[i])) { files.Add(lines[i]); }
+                //    }
+                //}
+
+                if (lines[i].EndsWith(".wmo"))
+                {
+                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo"))
+                    {
+                        models.Add(lines[i]);
+                    }
+                }
+
+                if (lines[i].EndsWith(".m2"))
+                {
+                    if (!lines[i].StartsWith("character") && !lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera"))
+                    {
+                       models.Add(lines[i]);
+                    }
+                }
+
+                if (i % 100 == 0)
+                {
+                    var progress = (i * 100) / lines.Count();
+                    listfileWorker.ReportProgress(progress, "Filtering listfile..");
+                }
+            }
+        }
+
+        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            var state = (string)e.UserState;
+
+            if (!string.IsNullOrEmpty(state))
+            {
+                progressLabel.Content = state;
+            }
+
+            progressBar.Value = e.ProgressPercentage;
+        }
+
+        private void cascWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            listfileWorker.RunWorkerAsync();
         }
 
         /* MAP STUFF */
@@ -64,7 +219,12 @@ namespace WoWOpenGL
 
             string _SelectedMapName = ((KeyValuePair<int, string>)MapListBox.SelectedValue).Value;
             WDTGrid.Children.Clear();
-            pbLoadMap.Value = 0d;
+
+            progressBar.Visibility = Visibility.Visible;
+            progressLabel.Visibility = Visibility.Visible;
+
+            progressBar.Value = 0;
+            progressLabel.Content = "Loading minimap..";
 
             var wdt = new WDTReader();
             if (CASC.FileExists(System.IO.Path.Combine(@"world\maps\", _SelectedMapName, _SelectedMapName + ".wdt")))
@@ -88,16 +248,17 @@ namespace WoWOpenGL
 
                             Action _LoadTileAction = delegate() { LoadTile(tiles[i]); };
                             this.Dispatcher.Invoke(_LoadTileAction);
-                            _Worker.ReportProgress((i * 100) / tiles.Count);
+                            _Worker.ReportProgress((i * 100) / tiles.Count, "Loading minimap..");
                         }
 
-                        _Worker.ReportProgress(100);
+                        _Worker.ReportProgress(100, "Minimap loaded.");
                     });
 
                 _BackgroundWorker.ProgressChanged += new ProgressChangedEventHandler(
                     (object o, ProgressChangedEventArgs args) =>
                     {
-                        pbLoadMap.Value = args.ProgressPercentage;
+                        progressBar.Value = args.ProgressPercentage;
+                        progressLabel.Content = (string) args.UserState;
                     });
 
                 _BackgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(
@@ -105,7 +266,6 @@ namespace WoWOpenGL
                 {
                     fCancelMapLoading = false;
                     _SW.Stop();
-                    Console.WriteLine("Loading {0} took {1} seconds", _SelectedMapName, _SW.Elapsed.TotalSeconds, _SW.ElapsedMilliseconds);
                 });
 
                 _BackgroundWorker.RunWorkerAsync();
@@ -155,7 +315,6 @@ namespace WoWOpenGL
             WDTGrid.Children.Add(rect);
         }
 
-
         private void rbSortMapId_Checked(object sender, RoutedEventArgs e)
         {
             MapListBox.Items.SortDescriptions.Clear();
@@ -174,80 +333,13 @@ namespace WoWOpenGL
             string name = Convert.ToString(e.Source.GetType().GetProperty("Name").GetValue(e.Source, null));
             Console.WriteLine("Detected mouse event on " + name + "!");
 
-            using (TerrainWindow tw = new TerrainWindow(name))
+            using (TerrainWindow tw = new TerrainWindow(name, renderWorker))
             {
                 tw.Run(30.0, 60.0);
             }
         }
 
         /* MODEL STUFF */
-        private void ModelListBox_Loaded(object sender, RoutedEventArgs e)
-        {
-            models.Add(@"character\human\male\humanmale_hd.m2");
-            models.Add(@"character\troll\male\trollmale_hd.m2");
-            models.Add(@"creature\serpent\serpent.m2");
-            models.Add(@"creature\deathwing\deathwing.m2");
-            models.Add(@"creature\anduin\anduin.m2");
-            models.Add(@"creature\arthas\arthas.m2");
-            models.Add(@"creature\etherial\etherial.m2");
-            models.Add(@"creature\arakkoa2\arakkoa2.m2");
-            models.Add(@"creature\garrosh\garrosh.m2");
-            models.Add(@"item\objectcomponents\weapon\sword_1h_garrison_a_01.m2");
-            models.Add(@"world\expansion05\doodads\ironhorde\6ih_ironhorde_scaffolding13.m2");
-            models.Add(@"environments\stars\cavernsoftimesky.m2");
-            models.Add(@"world\wmo\kalimdor\ogrimmar\ogrimmar.wmo");
-            models.Add(@"world\wmo\azeroth\buildings\stormwind\stormwind2.wmo");
-            models.Add(@"world\wmo\draenor\ironhorde\6ih_ironhorde_tower01.wmo");
-            models.Add(@"world\wmo\transports\icebreaker\transport_icebreaker_ship_stationary.wmo");
-            models.Add(@"world\wmo\azeroth\buildings\townhall\townhall.wmo");
-            models.Add(@"world\wmo\transports\passengership\transportship_a.wmo");
-            models.Add(@"world\wmo\azeroth\buildings\altarofstorms\altarofstorms.wmo");
-            models.Add(@"world\wmo\northrend\dalaran\nd_dalaran.wmo");
-            models.Add(@"world\wmo\northrend\howlingfjord\radiotower\radiotower.wmo");
-            models.Add(@"world\wmo\outland\darkportal\darkportal.wmo");
-            models.Add(@"world\wmo\transports\alliance_battleship\transport_alliance_battleship.wmo");
-            models.Add(@"world\wmo\draenor\tanaanjungle\6tj_darkportal_broken.wmo");
-
-            if (File.Exists("listfile.txt"))
-            {
-                string[] lines = File.ReadAllLines("listfile.txt");
-
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    lines[i] = lines[i].ToLower();
-                }
-
-
-                List<string> unwantedExtensions = new List<String>();
-                for (int u = 0; u < 512; u++)
-                {
-                    unwantedExtensions.Add("_" + u.ToString().PadLeft(3, '0') + ".wmo");
-                }
-
-                string[] unwanted = unwantedExtensions.ToArray();
-
-                for (int i = 0; i < lines.Count(); i++)
-                {
-                    if (!CASC.FileExists(lines[i])) { continue; }
-                    if (lines[i].EndsWith(".m2"))
-                    {
-                        if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera") && !lines[i].StartsWith("spells"))
-                        {
-                            models.Add(lines[i]);
-                        }
-                    }
-                    else if (lines[i].EndsWith(".wmo"))
-                    {
-                        if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo"))
-                        {
-                            models.Add(lines[i]);
-                        }
-                    }
-                }
-            }
-
-            ModelListBox.DataContext = models;
-        }
 
         private void ModelListBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -258,16 +350,18 @@ namespace WoWOpenGL
         {
             ListBoxItem item = ModelListBox.SelectedValue as ListBoxItem;
 
+            Render rw;
+
             if (item == null)//Let's assume its a string
             {
                 if (ModelListBox.SelectedValue != null)
                 {
-                    new Render(ModelListBox.SelectedValue.ToString());
+                    rw = new Render(ModelListBox.SelectedValue.ToString(), renderWorker);
                 }
             }
             else
             {
-                new Render(item.Content.ToString());
+                rw = new Render(item.Content.ToString(), renderWorker);
             }
         }
 
@@ -281,56 +375,27 @@ namespace WoWOpenGL
             controls = new ControlsWindow();
             controls.Show();
 
-            winFormControl = wfContainer;
-            cascProgressBar = CASCprogress;
-            cascProgressDesc = CASCdesc;
-            useCASC = true;
-            if (!CASCinitialized)
-            {
-                SwitchToCASC();
-            }
+            cascProgressBar = progressBar;
+
+            ModelListBox.Visibility = Visibility.Hidden;
+            FilterBox.Visibility = Visibility.Hidden;
+            tabs.Visibility = Visibility.Hidden;
+
+            cascWorker.RunWorkerAsync();
         }
 
-        private void SwitchToCASC()
+        private void cascWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Console.WriteLine("Intializing CASC filesystem..");
-            ModelListBox.Visibility = Visibility.Hidden;
-            contentTypeLoading.Visibility = Visibility.Visible;
-            CASCdesc.Visibility = Visibility.Visible;
-            CASCprogress.Visibility = Visibility.Visible;
-            FilterBox.Visibility = Visibility.Hidden;
-            
-
             if (ConfigurationManager.AppSettings["basedir"] != "" && Directory.Exists(ConfigurationManager.AppSettings["basedir"]))
             {
-                Console.WriteLine("Using basedir " + ConfigurationManager.AppSettings["basedir"] + " to load..");
-                CASC.InitCasc(null, ConfigurationManager.AppSettings["basedir"], "wow_beta");
+                CASC.InitCasc(cascWorker, ConfigurationManager.AppSettings["basedir"], "wow_beta");
             }
             else
             {
-                CASC.InitCasc();
+                CASC.InitCasc(cascWorker, null, "wow_beta");
             }
 
-            Console.WriteLine("CASC filesystem initialized.");
-            Console.WriteLine("Generating listfile..");
-            List<string> files = new List<String>();
-            //models = CASC.GenerateListfile(); // Let's ship listfile instead now!
-            ModelListBox.DataContext = models;
-            ModelListBox.Items.SortDescriptions.Add(new SortDescription("", ListSortDirection.Ascending));
-            Console.WriteLine("Listfile generated!");
             CASCinitialized = true;
-            Console.WriteLine("BUILD: " + CASC.cascHandler.Config.BuildName);
-            FilterBox.Visibility = Visibility.Visible;
-            CASCdesc.Visibility = Visibility.Hidden;
-            CASCprogress.Visibility = Visibility.Hidden;
-            contentTypeLoading.Visibility = Visibility.Collapsed;
-            ModelListBox.Visibility = Visibility.Visible;
-            MapsTab.Visibility = Visibility.Visible;
-           // using (TerrainWindow tw = new TerrainWindow("draenor_30_31"))
-           // {
-           //     tw.Run(30.0, 60.0);
-           // }
-            // new Render(@"world\wmo\draenor\orc\6Oc_orcclans_housesmall.wmo");
         }
 
         private void MapsTab_Focused(object sender, RoutedEventArgs e)
@@ -345,20 +410,10 @@ namespace WoWOpenGL
             for(int i = 0; i < reader.recordCount; i++){
                 MapListBox.Items.Add(new KeyValuePair<int, string>(reader[i].ID, reader[i].Directory));
             }
+
             MapListBox.DisplayMemberPath = "Value";
+
             mapsTabLoaded = true;
-        }
-
-        private void glControl_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Console.WriteLine("Mouse entered!");
-            mouseOverRenderArea = true;
-        }
-
-        private void glControl_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Console.WriteLine("Mouse left!");
-            mouseOverRenderArea = false;
         }
 
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)

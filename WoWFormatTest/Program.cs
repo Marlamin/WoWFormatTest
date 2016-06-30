@@ -116,10 +116,10 @@ namespace WoWFormatLib
             //var wdtreader = new WDTReader(basedir);
             //wdtreader.LoadWDT(@"World\Maps\BlackrockFoundryTrainDepot\BlackrockFoundryTrainDepot.wdt");
 
-            CASC.InitCasc();
+            CASC.InitCasc(null, @"C:\World of Warcraft Beta", "wow_beta");
             Console.WriteLine("CASC loaded!");
             var wdtreader = new WDTReader();
-            wdtreader.LoadWDT("World\\Maps\\EdgeOfRealityMount\\EdgeOfRealityMount.wdt");
+            wdtreader.LoadWDT("World\\Maps\\BlackTemple\\BlackTemple.wdt");
             Console.WriteLine("DONE!");
             Console.ReadLine();
         }

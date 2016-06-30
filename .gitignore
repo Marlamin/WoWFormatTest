@@ -25,8 +25,8 @@ CascBot
 ListFileGenerator
 UltraDiffer3000/*
 ADTdiff/*
-BuildBackup/*
 AreaAssignments/*
 QuickFNChecker/*
 BLPBatchConverter/*
 OBJExporter/*
+MinimapUpdater/*

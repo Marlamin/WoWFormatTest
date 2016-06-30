@@ -410,6 +410,31 @@ namespace WoWFormatLib.DBC
         public int cosmeticParentMapID { get; private set; }
         public int timeOffset { get; private set; }
     }
-    
+
+    public class MapRecordLegion
+    {
+        public int ID { get; private set; }
+        public string Directory { get; private set; }
+        public int Flags { get; private set; }
+        public int Flags2 { get; private set; }
+        public float minimapIconScale { get; private set; }
+        public float corpse_x { get; private set; }
+        public float corpse_y { get; private set; }
+        public int raidOffset { get; private set; }
+        public string Mapname_lang { get; private set; }
+        public string MapDescription0_lang { get; private set; }
+        public string MapDescription1_lang { get; private set; }
+        public ushort areaTableID { get; private set; }
+        public short loadingScreenID { get; private set; }
+        public short corpseMapID { get; private set; }
+        public short timeOfDayoverride { get; private set; }
+        public short parentMapID { get; private set; }
+        public short cosmeticParentMapID { get; private set; }
+        public byte instanceType { get; private set; }
+        public byte MapType { get; private set; }
+        public byte expansionID { get; private set; }
+        public byte maxPlayers { get; private set; }
+        public byte timeOffset { get; private set; }
+    }
 }
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatTest", "WoWFormatTest\WoWFormatTest.csproj", "{3ED7F6F2-5A92-496A-9D87-60F56638C2A7}"
 EndProject
@@ -60,6 +60,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBJExporter", "OBJExporter\OBJExporter.csproj", "{F5DA3107-920F-4B67-95B9-F5CECEE4FDCB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OBJExporterUI", "OBJExporterUI\OBJExporterUI.csproj", "{436E7F98-9E8D-4F2F-9150-F48DBE14F2FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimapUpdater", "MinimapUpdater\MinimapUpdater.csproj", "{2B18B914-9146-4AC9-9D36-938D9E6A1147}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADTexporter", "ADTexporter\ADTexporter.csproj", "{8EAB33C2-9560-449D-BD99-6DF49A03C464}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -345,6 +349,30 @@ Global
 		{436E7F98-9E8D-4F2F-9150-F48DBE14F2FA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{436E7F98-9E8D-4F2F-9150-F48DBE14F2FA}.Release|x86.ActiveCfg = Release|Any CPU
 		{436E7F98-9E8D-4F2F-9150-F48DBE14F2FA}.Release|x86.Build.0 = Release|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Debug|x86.Build.0 = Debug|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Release|x86.ActiveCfg = Release|Any CPU
+		{2B18B914-9146-4AC9-9D36-938D9E6A1147}.Release|x86.Build.0 = Release|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Debug|x86.Build.0 = Debug|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Release|x86.ActiveCfg = Release|Any CPU
+		{8EAB33C2-9560-449D-BD99-6DF49A03C464}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

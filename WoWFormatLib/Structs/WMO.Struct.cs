@@ -1,4 +1,5 @@
-﻿using WoWFormatLib.Utils;
+﻿using System;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.Structs.WMO
 {
@@ -46,10 +47,11 @@ namespace WoWFormatLib.Structs.WMO
     public struct MODD
     {
         public uint offset;
+        public byte flags;
         public Vector3 position;
         public Quaternion rotation;
         public float scale;
-        public uint color;
+        public byte[] color;
     }
 
     //Texture filenames
@@ -93,6 +95,7 @@ namespace WoWFormatLib.Structs.WMO
         public int nameIndex; //something else
     }
 
+    [Flags]
     public enum MOGPFlags
     {
         Flag_0x1_HasMOBN_MOBR = 0x1, //Has MOBN and MOBR chunk.
@@ -120,6 +123,7 @@ namespace WoWFormatLib.Structs.WMO
         Flag_0x800000 = 0x800000,
         Flag_0x1000000 = 0x1000000, //SMOGroup::CVERTS2: Has two MOCV chunks: Just add two or don't set 0x4 to only use cverts2.
         Flag_0x2000000 = 0x2000000, //SMOGroup::TVERTS2: Has two MOTV chunks: Just add two.
+        Flag_0x40000000	= 0x40000000, // SMOGroup::TVERTS3: Has three MOTV chunks, eg. for MOMT with shader 18.
     }
 
     public struct WMOGroupFile
@@ -131,7 +135,7 @@ namespace WoWFormatLib.Structs.WMO
     {
         public uint nameOffset;
         public uint descriptiveNameOffset;
-        public uint flags;
+        public MOGPFlags flags;
         public Vector3 boundingBox1;
         public Vector3 boundingBox2;
         public ushort ofsPortals; //Index of portal in MOPR chunk

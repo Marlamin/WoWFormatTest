@@ -50,13 +50,10 @@ namespace WoWFormatLib.FileReaders
                 for (var y = 0; y < 64; y++)
                 {
                     var flags = bin.ReadUInt32();
-                    var unused = bin.ReadUInt32();
+                    var nobodycares = bin.ReadUInt32();
                     if (flags == 1)
                     {
-                        //ADT exists
-                        //var adtreader = new ADTReader();
-                        //var adtfilename = filename.Replace(".WDT", "_" + y + "_" + x + ".adt"); //blizz flips these
-                        //adtreader.LoadADT(adtfilename);
+                        var adtfilename = filename.Replace(".WDT", "_" + y + "_" + x + ".adt");
                         int[] xy = new int[] { y, x };
                         tiles.Add(xy);
                     }

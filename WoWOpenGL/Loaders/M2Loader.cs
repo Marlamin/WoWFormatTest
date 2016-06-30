@@ -14,9 +14,16 @@ namespace WoWOpenGL.Loaders
     {
         public static void LoadM2(string filename, CacheStorage cache)
         {
+            filename = filename.ToLower().Replace(".mdx", ".m2");
+            filename = filename.ToLower().Replace(".mdl", ".m2");
+
+            if (cache.doodadBatches.ContainsKey(filename))
+            {
+                return;
+            }
+
             WoWFormatLib.Structs.M2.M2Model model = new WoWFormatLib.Structs.M2.M2Model();
 
-            filename = filename.ToLower().Replace(".mdx", ".m2");
             if (cache.models.ContainsKey(filename))
             {
                 model = cache.models[filename];
@@ -50,7 +57,7 @@ namespace WoWOpenGL.Loaders
                 switch (model.textures[i].type)
                 {
                     case 0:
-                        Console.WriteLine("      Texture given in file!");
+                        // Console.WriteLine("      Texture given in file!");
                         texturefilename = model.textures[i].filename;
                         break;
                     case 1:
@@ -61,18 +68,18 @@ namespace WoWOpenGL.Loaders
                         }
                         else
                         {
-                            Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
+                            //Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
                         }
                         break;
                     case 2:
                         if (WoWFormatLib.Utils.CASC.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
                         {
-                            Console.WriteLine("      BLP exists!");
+                            // Console.WriteLine("      BLP exists!");
                             texturefilename = System.IO.Path.ChangeExtension(filename, ".blp");
                         }
                         else
                         {
-                            Console.WriteLine("      Type 2 does not exist!");
+                            //Console.WriteLine("      Type 2 does not exist!");
                             //needs lookup?
                         }
                         break;
@@ -87,7 +94,7 @@ namespace WoWOpenGL.Loaders
                         }
                         break;
                     default:
-                        Console.WriteLine("      Falling back to placeholder texture");
+                        //Console.WriteLine("      Falling back to placeholder texture");
                         texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
                         break;
                 }
@@ -99,7 +106,7 @@ namespace WoWOpenGL.Loaders
             ddBatch.submeshes = new TerrainWindow.Submesh[model.skins[0].submeshes.Count()];
             for (int i = 0; i < model.skins[0].submeshes.Count(); i++)
             {
-                if (filename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
+                if (filename.StartsWith("character"))
                 {
                     if (model.skins[0].submeshes[i].submeshID != 0)
                     {
@@ -154,8 +161,8 @@ namespace WoWOpenGL.Loaders
 
             for (int i = 0; i < model.vertices.Count(); i++)
             {
-                modelvertices[i].Position = new Vector3(model.vertices[i].position.X, model.vertices[i].position.Z, model.vertices[i].position.Y);
-                modelvertices[i].Normal = new Vector3(model.vertices[i].normal.X, model.vertices[i].normal.Z, model.vertices[i].normal.Y);
+                modelvertices[i].Position = new Vector3(model.vertices[i].position.X, model.vertices[i].position.Y, model.vertices[i].position.Z);
+                modelvertices[i].Normal = new Vector3(model.vertices[i].normal.X, model.vertices[i].normal.Y, model.vertices[i].normal.Z);
                 modelvertices[i].TexCoord = new Vector2(model.vertices[i].textureCoordX, model.vertices[i].textureCoordY);
             }
             GL.BindBuffer(BufferTarget.ArrayBuffer, ddBatch.vertexBuffer);

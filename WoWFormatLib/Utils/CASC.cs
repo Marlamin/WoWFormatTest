@@ -60,7 +60,7 @@ namespace WoWFormatLib.Utils
 
             if (File.Exists("wow-live-listfile-seed.txt"))
             {
-                var file = new System.IO.StreamReader("wow-live-listfile-seed.txt");
+                var file = new StreamReader("wow-live-listfile-seed.txt");
                 while ((line = file.ReadLine()) != null)
                 {
                     if (line.EndsWith(".wmo", StringComparison.OrdinalIgnoreCase) || line.EndsWith(".m2", StringComparison.OrdinalIgnoreCase))
@@ -102,6 +102,12 @@ namespace WoWFormatLib.Utils
             if (string.IsNullOrEmpty(filename)) { return false; }
 
             return cascHandler.FileExists(filename);
+        }
+
+        //Why do I even do this shit
+        public static bool FileExists(int fileDataID)
+        {
+            return cascHandler.FileExists(fileDataID);
         }
 
         public static Stream OpenFile(string filename)

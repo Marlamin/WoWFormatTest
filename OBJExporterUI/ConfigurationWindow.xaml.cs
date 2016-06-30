@@ -69,11 +69,11 @@ namespace OBJExporterUI
             programSelect.Items.Add(new KeyValuePair<string, string>("WoW Live", "wow"));
 
             programSelect.DisplayMemberPath = "Key";
+            programSelect.SelectedIndex = 0;
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             if ((bool)onlineMode.IsChecked)
@@ -97,9 +97,26 @@ namespace OBJExporterUI
                 config.AppSettings.Settings["firstrun"].Value = "false";
             }
 
+            if((string) outdirLabel.Content != "No export directory set")
+            {
+                if (Directory.Exists((string) outdirLabel.Content))
+                {
+                    config.AppSettings.Settings["outdir"].Value = (string) outdirLabel.Content;
+                }
+            }
+
             config.Save(ConfigurationSaveMode.Full);
-            Console.WriteLine(config.FilePath);
             Close();
+        }
+
+        private void outdirBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+            if (result.ToString() == "OK")
+            {
+                outdirLabel.Content = dialog.SelectedPath;
+            }
         }
     }
 }

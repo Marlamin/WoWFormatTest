@@ -29,7 +29,7 @@ namespace MinimapCompiler
             if(basedir != String.Empty){
                 CASC.InitCasc(null, basedir);
             }else{
-                CASC.InitCasc(null, @"D:\Games\World of Warcraft Public Test", "wow_beta"); // Use beta for now
+                CASC.InitCasc(null, @"D:\World of Warcraft Beta", "wow_beta"); // Use beta for now
             }
 
             Console.WriteLine("CASC initialized!");
@@ -37,13 +37,13 @@ namespace MinimapCompiler
 
             if (buildmaps == true)
             {
-                DBCReader<MapRecord> reader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");
+                DB2Reader<MapRecordLegion> reader = new DB2Reader<MapRecordLegion>("DBFilesClient\\Map.db2");
                 for (int i = 0; i < reader.recordCount; i++)
                 {
                     //I used to check if WDT existed, but sometimes minimaps for maps without WDTs slip through the cracks
                     mapname = reader[i].Directory;
 
-                    if (reader[i].expansionID < 6) { Console.WriteLine("Skipping map " + mapname + " WoD and below!"); continue; }
+                   // if (reader[i].expansionID < 6) { Console.WriteLine("Skipping map " + mapname + " WoD and below!"); continue; }
 
                     var min_x = 64;
                     var min_y = 64;
@@ -79,8 +79,10 @@ namespace MinimapCompiler
 
                     Console.WriteLine("[" + mapname + "] " + "Creating new image of " + res_x + "x" + res_y);
 
+
                     Bitmap bmp = new Bitmap(res_x, res_y);
                     Graphics g = Graphics.FromImage(bmp);
+
                     Font drawFont = new Font("Arial", 16);
 
                     for (int cur_x = 0; cur_x < 64; cur_x++)
@@ -98,8 +100,9 @@ namespace MinimapCompiler
                     g.Dispose();
                     if (!Directory.Exists("done")) { Directory.CreateDirectory("done"); }
                     bmp.Save("done/" + mapname + ".png");
-
+                    
                     // SUPER MINIMAP COMPILER TIME!!!!!!!!!!!!!!!
+                    /*
                     var super_res_x = (((max_x - min_x) * 512) + 512);
                     var super_res_y = (((max_y - min_y) * 512) + 512);
 
@@ -129,14 +132,34 @@ namespace MinimapCompiler
                     super_g.Dispose();
                     if (!Directory.Exists("done")) { Directory.CreateDirectory("done"); }
                     super_bmp.Save("done/SUPER_" + mapname + ".png");
+                    */
                 }
             }
                 
 
             if (buildWMOmaps == true)
             {
-                //List<string> listfile = CASC.GenerateListfile();
-                var listfile = File.ReadAllLines(@"listfile.txt");
+                List<string> linelist = new List<string>();
+
+                if (CASC.FileExists("dbfilesclient/filedatacomplete.dbc"))
+                {
+                    var dbcreader = new DBCReader<FileDataRecord>("dbfilesclient/filedatacomplete.dbc");
+
+                    if (dbcreader.recordCount > 0)
+                    {
+                        for (int i = 0; i < dbcreader.recordCount; i++)
+                        {
+                            if (CASC.cascHandler.FileExists(dbcreader[i].ID))
+                            {
+                                if(dbcreader[i].ID > 1023304)
+                                {
+                                    linelist.Add(dbcreader[i].FileName + dbcreader[i].FilePath);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 DBCReader<MapRecord> reader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");
 
                 string[] unwantedExtensions = new string[513];
@@ -145,9 +168,9 @@ namespace MinimapCompiler
                     unwantedExtensions[i] = "_" + i.ToString().PadLeft(3, '0') + ".wmo";
                 }
                 unwantedExtensions[512] = "LOD1.wmo";
-                foreach (string s in listfile)
+                foreach (string s in linelist)
                 {
-                    if (!unwantedExtensions.Contains(s.Substring(s.Length - 8, 8)))
+                    if (s.Length > 8 && !unwantedExtensions.Contains(s.Substring(s.Length - 8, 8)))
                     {
                         if (!s.Contains("LOD") && s.EndsWith(".wmo", StringComparison.CurrentCultureIgnoreCase))
                         {

@@ -33,7 +33,7 @@ namespace WoWFormatLib.FileReaders
                 if (!CASC.FileExists(filename.Replace(".adt", "_obj0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
                 if (!CASC.FileExists(filename.Replace(".adt", "_obj1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
                 if (!CASC.FileExists(filename.Replace(".adt", "_tex0.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
-                if (!CASC.FileExists(filename.Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; }
+               // if (!CASC.FileExists(filename.Replace(".adt", "_tex1.adt"))) { new WoWFormatLib.Utils.MissingFile(filename.Replace(".adt", "_tex1.adt")); return; }
             }
             else
             {

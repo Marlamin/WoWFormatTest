@@ -18,11 +18,11 @@ namespace WoWOpenGL.Loaders
             
             if (cache.materials.ContainsKey(filename))
             {
-                Console.WriteLine("[CACHE HIT] " + filename);
+               // Console.WriteLine("[CACHE HIT] " + filename);
                 return cache.materials[filename];
             }
 
-            Console.WriteLine("[CACHE MISS] " + filename);
+            //Console.WriteLine("[CACHE MISS] " + filename);
 
             int textureId = GL.GenTexture();
 
@@ -47,7 +47,7 @@ namespace WoWOpenGL.Loaders
                 blp.bmp.UnlockBits(bmp_data);
             }
 
-            Console.WriteLine("[CACHE ADD] " + filename);
+            // Console.WriteLine("[CACHE ADD] " + filename);
 
             return textureId;
         }

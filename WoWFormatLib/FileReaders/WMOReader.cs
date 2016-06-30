@@ -10,13 +10,16 @@ namespace WoWFormatLib.FileReaders
     public class WMOReader
     {
         public WMO wmofile;
+        private bool _lod;
 
         public WMOReader()
         {
         }
 
-        public void LoadWMO(string filename)
+        public void LoadWMO(string filename, bool lod = false)
         {
+            _lod = lod;
+
             if (!CASC.FileExists(filename))
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
@@ -120,7 +123,7 @@ namespace WoWFormatLib.FileReaders
             MOGP mogp = new MOGP();
             mogp.nameOffset = bin.ReadUInt32();
             mogp.descriptiveNameOffset = bin.ReadUInt32();
-            mogp.flags = bin.ReadUInt32();
+            mogp.flags = (MOGPFlags) bin.ReadUInt32();
             mogp.boundingBox1 = bin.Read<Vector3>();
             mogp.boundingBox2 = bin.Read<Vector3>();
             mogp.ofsPortals = bin.ReadUInt16();
@@ -139,7 +142,16 @@ namespace WoWFormatLib.FileReaders
             BlizzHeader subchunk;
             long position = 0;
             int MOTVi = 0;
-            mogp.textureCoords = new MOTV[2][];
+
+            if (mogp.flags.HasFlag(MOGPFlags.Flag_0x40000000))
+            {
+                mogp.textureCoords = new MOTV[3][];
+            }
+            else
+            {
+                mogp.textureCoords = new MOTV[2][];
+            }
+            
 
             while (position < stream.Length)
             {
@@ -331,6 +343,23 @@ namespace WoWFormatLib.FileReaders
             return indices;
         }
 
+        private MODD[] ReadMODDChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            var numDoodads = chunk.Size / 40;
+            var doodads = new MODD[numDoodads];
+            for (var i = 0; i < numDoodads; i++)
+            {
+                var raw_offset = bin.ReadBytes(3);
+                doodads[i].offset = (uint) (raw_offset[0] | raw_offset[1] << 8 | raw_offset[2] << 16);
+                doodads[i].flags = bin.ReadByte();
+                doodads[i].position = bin.Read<Vector3>();
+                doodads[i].rotation = bin.Read<Quaternion>();
+                doodads[i].scale = bin.ReadSingle();
+                doodads[i].color = bin.ReadBytes(4);
+            }
+            return doodads;
+        }
+
         private object ReadMOVVChunk(BlizzHeader chunk, BinaryReader bin)
         {
             throw new NotImplementedException();
@@ -377,7 +406,7 @@ namespace WoWFormatLib.FileReaders
                         wmofile.doodadNames = ReadMODNChunk(chunk, bin, wmofile.header.nModels);
                         continue;
                     case "MODD":
-                        //wmofile.doodadDefinitions = ReadMODDChunk(chunk, bin);
+                        wmofile.doodadDefinitions = ReadMODDChunk(chunk, bin);
                         continue;
                     case "MOGP":
                     //ReadMOGPChunk(chunk, bin);
@@ -403,8 +432,26 @@ namespace WoWFormatLib.FileReaders
             WMOGroupFile[] groupFiles = new WMOGroupFile[wmofile.header.nGroups];
             for (int i = 0; i < wmofile.header.nGroups; i++)
             {
-                var groupfilename = filename.Replace(".WMO", "_" + i.ToString().PadLeft(3, '0') + ".WMO");
-                groupfilename = groupfilename.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
+                string groupfilename = groupfilename = filename.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
+
+                if (_lod)
+                {
+                    if (CASC.FileExists(groupfilename.Replace(".wmo", "_lod2.wmo")))
+                    {
+                        groupfilename = groupfilename.Replace(".wmo", "_lod2.wmo");
+                        Console.WriteLine("[LOD] Loading LOD 2 for group " + i);
+                    }
+                    else if (CASC.FileExists(groupfilename.Replace(".wmo", "_lod1.wmo")))
+                    {
+                        groupfilename = groupfilename.Replace(".wmo", "_lod1.wmo");
+                        Console.WriteLine("[LOD] Loading LOD 1 for group " + i);
+                    }
+                    else
+                    {
+                        Console.WriteLine("[LOD] No LOD " + i);
+                    }
+                }
+                
                 if (!CASC.FileExists(groupfilename))
                 {
                     new WoWFormatLib.Utils.MissingFile(groupfilename);
@@ -420,11 +467,6 @@ namespace WoWFormatLib.FileReaders
             }
 
             wmofile.group = groupFiles;
-        }
-
-        private MODD[] ReadMODDChunk(BlizzHeader chunk, BinaryReader bin)
-        {
-            throw new NotImplementedException();
         }
 
         private WMOGroupFile ReadWMOGroupFile(string filename, Stream wmo)
