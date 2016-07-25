@@ -15,11 +15,11 @@
         <Button x:Name="exportButton" Visibility="Hidden" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Bottom" Click="button_Click"/>
         <ProgressBar x:Name="progressBar" Visibility="Visible" HorizontalAlignment="Stretch" Height="36" Margin="10" VerticalAlignment="Top" />
         <Label x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="0,7,0,0" VerticalAlignment="Top"/>
-        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="adtCheckBox" Content="ADTs" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top"/>
+        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="False" x:Name="adtCheckBox" Content="ADTs" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top"/>
         <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="61,46,0,0" VerticalAlignment="Top"/>
-        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="False" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="122,46,0,0" VerticalAlignment="Top"/>
-        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="objCheckBox" Content="OBJ" HorizontalAlignment="Left" Margin="542,51,0,0" VerticalAlignment="Top"/>
-        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="False" x:Name="daeCheckBox" Content="DAE" HorizontalAlignment="Left" Margin="495,51,0,0" VerticalAlignment="Top"/>
+        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="122,46,0,0" VerticalAlignment="Top"/>
+        <CheckBox Visibility="Hidden"  IsChecked="True" x:Name="objCheckBox" Content="OBJ" HorizontalAlignment="Left" Margin="542,51,0,0" VerticalAlignment="Top"/>
+        <CheckBox Visibility="Hidden" IsChecked="False" x:Name="daeCheckBox" Content="DAE" HorizontalAlignment="Left" Margin="495,51,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="buildsBox" Visibility="Hidden" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Width="185"/>
         <Label Visibility="Hidden" x:Name="label" Content="Export as.." HorizontalAlignment="Left" Margin="431,46,0,0" VerticalAlignment="Top" Height="30"/>
     </Grid>

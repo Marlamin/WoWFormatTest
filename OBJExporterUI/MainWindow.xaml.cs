@@ -29,8 +29,8 @@ namespace OBJExporterUI
         private bool showM2 = true;
         private bool showWMO = true;
 
-        private bool exportOBJ = false;
-        private bool exportDAE = true;
+        private bool exportOBJ = true;
+        private bool exportDAE = false;
 
         private List<String> files;
 
@@ -118,11 +118,6 @@ namespace OBJExporterUI
 
         private void cascworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
-//            Exporters.DAE.WMOExporter.exportWMO(@"world\wmo\azeroth\buildings\stormwind\sw_tradedistrict.wmo", exportworker);
-
-  //          return;
-
             worker.DoWork += worker_DoWork;
             worker.RunWorkerCompleted += worker_RunWorkerCompleted;
             worker.ProgressChanged += worker_ProgressChanged;
@@ -147,7 +142,7 @@ namespace OBJExporterUI
             m2CheckBox.Visibility = Visibility.Visible;
             adtCheckBox.Visibility = Visibility.Visible;
             objCheckBox.Visibility = Visibility.Visible;
-            daeCheckBox.Visibility = Visibility.Visible;
+            //daeCheckBox.Visibility = Visibility.Visible;
 
             modelListBox.DataContext = files;
         }
