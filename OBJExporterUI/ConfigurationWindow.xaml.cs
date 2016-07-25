@@ -33,6 +33,8 @@ namespace OBJExporterUI
             {
                 programSelect.Visibility = Visibility.Visible;
                 programLabel.Visibility = Visibility.Visible;
+                onlineLabel.Visibility = Visibility.Visible;
+                localLabel.Visibility = Visibility.Hidden;
                 basedirBrowse.Visibility = Visibility.Hidden;
                 basedirLabel.Visibility = Visibility.Hidden;
             }
@@ -40,6 +42,8 @@ namespace OBJExporterUI
             {
                 programSelect.Visibility = Visibility.Hidden;
                 programLabel.Visibility = Visibility.Hidden;
+                onlineLabel.Visibility = Visibility.Hidden;
+                localLabel.Visibility = Visibility.Visible;
                 basedirBrowse.Visibility = Visibility.Visible;
                 basedirLabel.Visibility = Visibility.Visible;
             }
