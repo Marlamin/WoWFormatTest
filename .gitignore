@@ -1,4 +1,13 @@
-[Oo]bj
+*TemporaryGenerated*
+*.exe
+*.pdb
+*FileListAbsolute*
+build.force
+*.g.cs
+*.g.i.cs
+*.lref
+*.baml
+*.dll
 [Bb]in
 *.user
 *.suo
