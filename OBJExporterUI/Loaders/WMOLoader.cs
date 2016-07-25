@@ -40,6 +40,11 @@ namespace OBJExporterUI.Loaders
                 }
             }
 
+            if(wmo.group.Count() == 0)
+            {
+                throw new Exception("Broken WMO! Report to developer (mail marlamin@marlamin.com) with this filename: " + filename);
+            }
+
             var wmobatch = new PreviewWindow.WorldModel();
 
             wmobatch.groupBatches = new PreviewWindow.WorldModelGroupBatches[wmo.group.Count()];

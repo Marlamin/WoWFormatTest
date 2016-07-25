@@ -41,6 +41,11 @@ namespace OBJExporterUI
                 ConfigurationManager.RefreshSection("appSettings");
             }
 
+            if (bool.Parse(ConfigurationManager.AppSettings["firstrun"]) == true)
+            {
+                Close();    
+            }
+
             InitializeComponent();
             
             exportworker.DoWork += exportworker_DoWork;
@@ -273,7 +278,7 @@ namespace OBJExporterUI
                 }
 
                 if (showWMO && lines[i].EndsWith(".wmo")) {
-                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2.wmo")) {
+                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2.wmo") && !lines[i].EndsWith("lod3.wmo")) {
                         if (!files.Contains(lines[i])) { files.Add(lines[i]); }
                     }
                 }

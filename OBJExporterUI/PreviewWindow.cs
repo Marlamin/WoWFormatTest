@@ -57,8 +57,6 @@ namespace OBJExporterUI
 
             filename = modelPath;
 
-            ActiveCamera.Pos = new Vector3(-15.0f, 0.0f, 4.0f);
-
             if (filename.EndsWith(".m2"))
             {
                 M2Loader.LoadM2(filename, cache);
@@ -281,7 +279,8 @@ namespace OBJExporterUI
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            
+            MakeCurrent();
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             angle = angle % 360;

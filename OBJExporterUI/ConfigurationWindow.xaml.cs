@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -21,9 +22,44 @@ namespace OBJExporterUI
     /// </summary>
     public partial class ConfigurationWindow : Window
     {
+        private bool wowFound = false;
+        private string wowLoc;
+
         public ConfigurationWindow()
         {
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Blizzard Entertainment\\World of Warcraft"))
+                {
+                    if (key != null)
+                    {
+                        var obj = key.GetValue("InstallPath");
+                        if (obj != null)
+                        {
+                            wowLoc = (string)obj;
+                            wowFound = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unable to get WoW install path from registry. Falling back to online mode! Error: " + ex.Message);
+            }
+
             InitializeComponent();
+
+            if (wowFound)
+            {
+                basedirLabel.Content = wowLoc;
+                localMode.IsChecked = true;
+                onlineMode.IsChecked = false;
+            }
+            else
+            {
+                onlineMode.IsChecked = true;
+                localMode.IsChecked = false;
+            }
         }
 
         private void mode_Checked(object sender, RoutedEventArgs e)
@@ -79,37 +115,55 @@ namespace OBJExporterUI
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
+            var error = false;
+
             if ((bool)onlineMode.IsChecked)
             {
-                if(programSelect.SelectedValue == null) { return; }
                 // Online mode
-                config.AppSettings.Settings["basedir"].Value = "";
-                config.AppSettings.Settings["program"].Value = ((KeyValuePair<string, string>)programSelect.SelectedValue).Value;
-                config.AppSettings.Settings["firstrun"].Value = "false";
+
+                if (programSelect.SelectedValue == null) {
+                    error = true;
+                }
+                else
+                {
+                    config.AppSettings.Settings["basedir"].Value = "";
+                    config.AppSettings.Settings["program"].Value = ((KeyValuePair<string, string>)programSelect.SelectedValue).Value;
+                    config.AppSettings.Settings["firstrun"].Value = "false";
+                }
             }
             else
             {
-                if((string) basedirLabel.Content == "No WoW directory set" || (string)basedirLabel.Content == "Could not find a WoW client there!")
-                {
-                    return;
-                }
-
                 // Local mode
-                config.AppSettings.Settings["basedir"].Value = (string) basedirLabel.Content;
-                config.AppSettings.Settings["program"].Value = "";
-                config.AppSettings.Settings["firstrun"].Value = "false";
+
+                if ((string)basedirLabel.Content == "No WoW directory set" || (string)basedirLabel.Content == "Could not find a WoW client there!")
+                {
+                    error = true;
+                }
+                else
+                {
+                    config.AppSettings.Settings["basedir"].Value = (string)basedirLabel.Content;
+                    config.AppSettings.Settings["program"].Value = "";
+                    config.AppSettings.Settings["firstrun"].Value = "false";
+                }
             }
 
-            if((string) outdirLabel.Content != "No export directory set")
+            if((string) outdirLabel.Content != "No export directory set, using application folder")
             {
                 if (Directory.Exists((string) outdirLabel.Content))
                 {
                     config.AppSettings.Settings["outdir"].Value = (string) outdirLabel.Content;
                 }
+                else
+                {
+                    error = true;
+                }
             }
 
-            config.Save(ConfigurationSaveMode.Full);
-            Close();
+            if (!error)
+            {
+                config.Save(ConfigurationSaveMode.Full);
+                Close();
+            }
         }
 
         private void outdirBrowse_Click(object sender, RoutedEventArgs e)
