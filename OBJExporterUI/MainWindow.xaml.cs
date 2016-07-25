@@ -26,7 +26,7 @@ namespace OBJExporterUI
         private readonly BackgroundWorkerEx cascworker = new BackgroundWorkerEx();
 
         private bool showADT = false;
-        private bool showM2 = true;
+        private bool showM2 = false;
         private bool showWMO = true;
 
         private bool exportOBJ = true;
@@ -268,7 +268,7 @@ namespace OBJExporterUI
                 }
 
                 if (showWMO && lines[i].EndsWith(".wmo")) {
-                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo")) {
+                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2   .wmo")) {
                         if (!files.Contains(lines[i])) { files.Add(lines[i]); }
                     }
                 }
