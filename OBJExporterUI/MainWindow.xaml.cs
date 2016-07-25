@@ -29,9 +29,6 @@ namespace OBJExporterUI
         private bool showM2 = false;
         private bool showWMO = true;
 
-        private bool exportOBJ = true;
-        private bool exportDAE = false;
-
         private List<String> files;
 
         public MainWindow()
@@ -79,7 +76,12 @@ namespace OBJExporterUI
             }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void previewButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Model preview! Yay!
+        }
+
+        private void exportButton_Click(object sender, RoutedEventArgs e)
         {
             progressBar.Value = 0;
             progressBar.Visibility = Visibility.Visible;
@@ -138,11 +140,11 @@ namespace OBJExporterUI
             modelListBox.Visibility = Visibility.Visible;
             filterTextBox.Visibility = Visibility.Visible;
             exportButton.Visibility = Visibility.Visible;
+            previewButton.Visibility = Visibility.Visible;
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
             adtCheckBox.Visibility = Visibility.Visible;
             objCheckBox.Visibility = Visibility.Visible;
-            //daeCheckBox.Visibility = Visibility.Visible;
 
             modelListBox.DataContext = files;
         }
@@ -268,7 +270,7 @@ namespace OBJExporterUI
                 }
 
                 if (showWMO && lines[i].EndsWith(".wmo")) {
-                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2   .wmo")) {
+                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2.wmo")) {
                         if (!files.Contains(lines[i])) { files.Add(lines[i]); }
                     }
                 }
@@ -306,6 +308,18 @@ namespace OBJExporterUI
             files = new List<String>();
 
             worker.RunWorkerAsync();
+        }
+
+        private void modelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(modelListBox.SelectedItems.Count == 1)
+            {
+                previewButton.IsEnabled = true;
+            }
+            else
+            {
+                previewButton.IsEnabled = false;
+            }
         }
     }
 }

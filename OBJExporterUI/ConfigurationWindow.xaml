@@ -12,7 +12,7 @@
         <Label x:Name="outdirLabel" Content="No export directory set, using application folder" Visibility="Visible" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top"/>
         <Button x:Name="outdirBrowse" Content="Browse.." Visibility="Visible" Click="outdirBrowse_Click" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Width="75"/>
         <Separator HorizontalAlignment="Stretch" Height="5" Margin="0,65,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="programLabel" Content="Select the branch of WoW to use:" HorizontalAlignment="Center" Margin="52,157,32,0" VerticalAlignment="Top" Width="210"/>
+        <Label x:Name="programLabel" Content="Select the version of WoW to use:" HorizontalAlignment="Center" Margin="52,157,32,0" VerticalAlignment="Top" Width="210"/>
         <ComboBox x:Name="programSelect" Loaded="programSelect_Loaded" HorizontalAlignment="Center" Margin="41,193,43,0" VerticalAlignment="Top" MinWidth="150" Width="Auto"/>
         <RadioButton Checked="mode_Checked" x:Name="onlineMode" GroupName="ContentSource" Content="Online mode" HorizontalAlignment="Left" Margin="41,75,0,0" IsChecked="True" VerticalAlignment="Top"/>
         <RadioButton Checked="mode_Checked" x:Name="localMode" GroupName="ContentSource" Content="Local mode" HorizontalAlignment="Left" Margin="171,75,0,0" VerticalAlignment="Top"/>

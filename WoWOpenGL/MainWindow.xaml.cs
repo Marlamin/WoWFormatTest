@@ -125,7 +125,8 @@ namespace WoWOpenGL
 
                 foreach(var line in File.ReadAllLines("listfile.txt"))
                 {
-                    if (CASC.FileExists(line)) {
+                    if (CASC.FileExists(line))
+                    {
                         linelist.Add(line);
                     }
 
@@ -154,28 +155,20 @@ namespace WoWOpenGL
 
             for (int i = 0; i < lines.Count(); i++)
             {
-
-                //if (showADT && lines[i].EndsWith(".adt"))
-                //{
-                //    if (!lines[i].EndsWith("obj0.adt") && !lines[i].EndsWith("obj1.adt") && !lines[i].EndsWith("tex0.adt") && !lines[i].EndsWith("tex1.adt") && !lines[i].EndsWith("_lod.adt"))
-                //    {
-                //        if (!files.Contains(lines[i])) { files.Add(lines[i]); }
-                //    }
-                //}
-
-                if (lines[i].EndsWith(".wmo"))
+                var line = lines[i];
+                if (line.EndsWith(".wmo"))
                 {
-                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo"))
+                    if (!unwanted.Contains(line.Substring(lines[i].Length - 8, 8)) && !line.EndsWith("lod.wmo") && !line.EndsWith("lod1.wmo") && !line.EndsWith("lod2.wmo"))
                     {
-                        models.Add(lines[i]);
+                        if (!models.Contains(line)) { models.Add(line); }
                     }
                 }
 
-                if (lines[i].EndsWith(".m2"))
+                if (line.EndsWith(".m2"))
                 {
-                    if (!lines[i].StartsWith("character") && !lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera"))
+                    if (!line.StartsWith("alternate") && !line.StartsWith("camera"))
                     {
-                       models.Add(lines[i]);
+                        if (!models.Contains(line)) { models.Add(line); }
                     }
                 }
 
