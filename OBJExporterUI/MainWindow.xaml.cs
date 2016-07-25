@@ -78,7 +78,10 @@ namespace OBJExporterUI
 
         private void previewButton_Click(object sender, RoutedEventArgs e)
         {
-            // Model preview! Yay!
+            using (PreviewWindow tw = new PreviewWindow((string)modelListBox.SelectedItem))
+            {
+                tw.Run(30.0, 60.0);
+            }
         }
 
         private void exportButton_Click(object sender, RoutedEventArgs e)

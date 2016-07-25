@@ -62,10 +62,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CacheStorage.cs" />
     <Compile Include="Exporters\OBJ\ADTExporter.cs" />
     <Compile Include="Exporters\OBJ\M2Exporter.cs" />
-	<Compile Include="Exporters\OBJ\WMOExporter.cs" />
+    <Compile Include="Exporters\OBJ\WMOExporter.cs" />
+    <Compile Include="Loaders\BLPLoader.cs" />
+    <Compile Include="Loaders\M2Loader.cs" />
+    <Compile Include="Loaders\WMOLoader.cs" />
+    <Compile Include="OldCamera.cs" />
     <Compile Include="Structs.cs" />
+    <Compile Include="PreviewWindow.cs" />
     <Page Include="ConfigurationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
