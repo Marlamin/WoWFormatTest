@@ -54,15 +54,15 @@ namespace WoWFormatLib.SereniaBLPLib
     public sealed class BlpFile : IDisposable
     {
         //uint type; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
-        byte encoding; // 1 = Uncompressed, 2 = DirectX Compressed
-        byte alphaDepth; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
-        byte alphaEncoding; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
-        byte hasMipmaps; // If true (1), then there are Mipmaps
-        int width; // X Resolution of the biggest Mipmap
-        int height; // Y Resolution of the biggest Mipmap
+        public byte encoding; // 1 = Uncompressed, 2 = DirectX Compressed
+        public byte alphaDepth; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
+        public byte alphaEncoding; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
+        public byte hasMipmaps; // If true (1), then there are Mipmaps
+        public int width; // X Resolution of the biggest Mipmap
+        public int height; // Y Resolution of the biggest Mipmap
 
-        uint[] mipmapOffsets = new uint[16]; // Offset for every Mipmap level. If 0 = no more mitmap level
-        uint[] mippmapSize = new uint[16]; // Size for every level
+        public uint[] mipmapOffsets = new uint[16]; // Offset for every Mipmap level. If 0 = no more mitmap level
+        public uint[] mippmapSize = new uint[16]; // Size for every level
         ARGBColor8[] paletteBGRA = new ARGBColor8[256]; // The color-palette for non-compressed pictures
 
         Stream str; // Reference of the stream
@@ -115,7 +115,7 @@ namespace WoWFormatLib.SereniaBLPLib
         /// </summary>
         /// <param name="mipmapLevel"></param>
         /// <returns></returns>
-        private byte[] GetPictureData(int mipmapLevel)
+        public byte[] GetPictureData(int mipmapLevel)
         {
             if (str != null)
             {
