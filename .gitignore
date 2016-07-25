@@ -5,6 +5,7 @@
 build.force
 *.g.cs
 *.g.i.cs
+*.resources
 *.lref
 *.baml
 *.dll
