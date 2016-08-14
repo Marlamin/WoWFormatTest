@@ -1,19 +1,57 @@
-﻿using System;
+﻿using DBFilesClient.NET;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.DBC
 {
     public class DBCHelper
     {
-        public static string[] getTexturesByModelFilename(string modelfilename, int flag, int texid = 0)
+        public static uint[] getTexturesByModelFilename(int modelID, int flag, int texid = 0)
         {
-            List<string> filenames = new List<string>();
-            if (flag == 1)
+            List<uint> results = new List<uint>();
+            
+            if(flag == 11)
             {
+                var creatureModelData = new Storage<CreatureModelDataEntry>(CASC.OpenFile(@"DBFilesClient/CreatureModelData.db2"));
+                foreach(var cmdEntry in creatureModelData)
+                {
+                    if(cmdEntry.Value.fileDataID == modelID)
+                    {
+                        var creatureDisplayInfo = new Storage<CreatureDisplayInfoEntry>(CASC.OpenFile(@"DBFilesClient/CreatureDisplayInfo.db2"));
+                        foreach(var cdiEntry in creatureDisplayInfo)
+                        {
+                            if(cdiEntry.Value.ModelID == cmdEntry.Key)
+                            {
+                                results.Add(cdiEntry.Value.TextureVariation[0]);
+                            }
+                        }
+                    }
+                }
+
+                //DBCReader<CreatureModelDataRecord> cmdreader = new DBCReader<CreatureModelDataRecord>("DBFilesClient\\CreatureModelData.dbc");
+                //for (int cmdi = 0; cmdi < cmdreader.recordCount; cmdi++)
+                //{
+                //    if (modelID == cmdreader[cmdi].fileDataID)
+                //    {
+                //        DBCReader<CreatureDisplayInfoRecord> cdireader = new DBCReader<CreatureDisplayInfoRecord>("DBFilesClient\\CreatureDisplayInfo.dbc");
+                //        for (int cdii = 0; cdii < cdireader.recordCount; cdii++)
+                //        {
+                //            if (cdireader[cdii].modelID == cmdreader[cmdi].ID && cdireader[cdii].textureVariation_0 != null)
+                //            {
+                //                filenames.Add(cdireader[cdii].textureVariation_0);
+                //            }
+                //        }
+                //    }
+                //}
+            }
+
+
+            /*if (flag == 1)
+            {
+                var instance = new Storage<CreatureDisplayInfoEntry>("CreatureDisplayInfoEntry.db2");
                 if (modelfilename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
                 {
                     DBCReader<ChrRaceRecord> reader = new DBCReader<ChrRaceRecord>("DBFilesClient\\ChrRaces.dbc");
@@ -143,8 +181,8 @@ namespace WoWFormatLib.DBC
                     }
                 }
             }
-           
-            string[] ret = filenames.Distinct().ToArray();
+           */
+            uint[] ret = results.Distinct().ToArray();
             return ret;
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WoWOpenGL.Loaders;
+using WoWFormatLib.Utils;
 using WoWFormatLib.FileReaders;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
@@ -21,6 +22,8 @@ namespace WoWOpenGL.Loaders
             {
                 return;
             }
+
+            var fileDataID = CASC.getFileDataIdByName(filename);
 
             WoWFormatLib.Structs.M2.M2Model model = new WoWFormatLib.Structs.M2.M2Model();
 
@@ -49,22 +52,24 @@ namespace WoWOpenGL.Loaders
             // Textures
             ddBatch.mats = new TerrainWindow.Material[model.textures.Count()];
 
+            // Always load error texture
+            BLPLoader.LoadTexture(CASC.getFileDataIdByName(@"test/qa_test_blp_1.blp"), cache);
             for (int i = 0; i < model.textures.Count(); i++)
             {
-                string texturefilename = model.textures[i].filename;
+                int textureFileDataID = 840426;
                 ddBatch.mats[i].flags = model.textures[i].flags;
 
                 switch (model.textures[i].type)
                 {
                     case 0:
                         // Console.WriteLine("      Texture given in file!");
-                        texturefilename = model.textures[i].filename;
+                        textureFileDataID = CASC.getFileDataIdByName(model.textures[i].filename);
                         break;
                     case 1:
-                        string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type, i);
+                        uint[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)model.textures[i].type, i);
                         if (csfilenames.Count() > 0)
                         {
-                            texturefilename = csfilenames[0];
+                            textureFileDataID = (int) csfilenames[0];
                         }
                         else
                         {
@@ -75,7 +80,7 @@ namespace WoWOpenGL.Loaders
                         if (WoWFormatLib.Utils.CASC.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
                         {
                             // Console.WriteLine("      BLP exists!");
-                            texturefilename = System.IO.Path.ChangeExtension(filename, ".blp");
+                            textureFileDataID = CASC.getFileDataIdByName(System.IO.Path.ChangeExtension(filename, ".blp"));
                         }
                         else
                         {
@@ -84,22 +89,18 @@ namespace WoWOpenGL.Loaders
                         }
                         break;
                     case 11:
-                        string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type);
+                        uint[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Count(); ti++)
                         {
-                            if (WoWFormatLib.Utils.CASC.FileExists(filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp")))
-                            {
-                                texturefilename = filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp");
-                            }
+                            textureFileDataID = (int)cdifilenames[ti];
                         }
                         break;
                     default:
-                        //Console.WriteLine("      Falling back to placeholder texture");
-                        texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
+                        textureFileDataID = 840426;
                         break;
                 }
-                ddBatch.mats[i].textureID = BLPLoader.LoadTexture(texturefilename, cache);
-                ddBatch.mats[i].filename = texturefilename;
+                ddBatch.mats[i].textureID = BLPLoader.LoadTexture(textureFileDataID, cache);
+                ddBatch.mats[i].filename = textureFileDataID.ToString();
             }
 
             // Submeshes
@@ -124,12 +125,12 @@ namespace WoWOpenGL.Loaders
                     if (model.skins[0].textureunit[tu].submeshIndex == i)
                     {
                         ddBatch.submeshes[i].blendType = model.renderflags[model.skins[0].textureunit[tu].renderFlags].blendingMode;
-                        if (!cache.materials.ContainsKey(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower()))
+                        if (!cache.materials.ContainsKey(CASC.getFileDataIdByName(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename).ToString()))
                         {
                             throw new Exception("MaterialCache does not have texture " + model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower());
                         }
 
-                        ddBatch.submeshes[i].material = (uint)cache.materials[model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower()];
+                        ddBatch.submeshes[i].material = (uint)cache.materials[CASC.getFileDataIdByName(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower()).ToString()];
                     }
                 }
             }
@@ -161,8 +162,8 @@ namespace WoWOpenGL.Loaders
 
             for (int i = 0; i < model.vertices.Count(); i++)
             {
-                modelvertices[i].Position = new Vector3(model.vertices[i].position.X, model.vertices[i].position.Y, model.vertices[i].position.Z);
-                modelvertices[i].Normal = new Vector3(model.vertices[i].normal.X, model.vertices[i].normal.Y, model.vertices[i].normal.Z);
+                modelvertices[i].Position = new OpenTK.Vector3(model.vertices[i].position.X, model.vertices[i].position.Y, model.vertices[i].position.Z);
+                modelvertices[i].Normal = new OpenTK.Vector3(model.vertices[i].normal.X, model.vertices[i].normal.Y, model.vertices[i].normal.Z);
                 modelvertices[i].TexCoord = new Vector2(model.vertices[i].textureCoordX, model.vertices[i].textureCoordY);
             }
             GL.BindBuffer(BufferTarget.ArrayBuffer, ddBatch.vertexBuffer);

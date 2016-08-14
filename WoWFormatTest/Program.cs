@@ -110,18 +110,29 @@ namespace WoWFormatLib
 
         private static void Main(string[] args)
         {
-            //string basedir = ConfigurationManager.AppSettings["basedir"];
-            //LoadAllMaps(basedir);
-            //LoadFromListfile("C:\\WoD\\18663listfile.txt", basedir);
-            //var wdtreader = new WDTReader(basedir);
-            //wdtreader.LoadWDT(@"World\Maps\BlackrockFoundryTrainDepot\BlackrockFoundryTrainDepot.wdt");
-
             CASC.InitCasc(null, @"C:\World of Warcraft", "wow");
             Console.WriteLine("CASC loaded!");
-            var m2reader = new M2Reader();
-            m2reader.LoadM2(@"Creature\DruidCat2\DruidCatTroll2.m2");
-            Console.WriteLine("DONE!");
-            Console.ReadLine();
+            var reader = new M2Reader();
+            reader.LoadM2(@"Creature\DruidCat2\DruidCatTroll2.m2");
+            var fileDataID = CASC.getFileDataIdByName(@"Creature\DruidCat2\DruidCatTroll2.m2");
+
+            for (int i = 0; i < reader.model.textures.Length; i++)
+            {
+                switch (reader.model.textures[i].type)
+                {
+                    case 11:
+                        uint[] cdifilenames = DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
+                        for (int ti = 0; ti < cdifilenames.Length; ti++)
+                        {
+                            Console.WriteLine("Found (texture #" + ti + ") " + cdifilenames[ti]);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                Console.WriteLine("DONE!");
+                Console.ReadLine();
+            }
         }
     }
 }

@@ -26,7 +26,7 @@ namespace OBJExporterUI
         private readonly BackgroundWorkerEx cascworker = new BackgroundWorkerEx();
 
         private bool showADT = false;
-        private bool showM2 = false;
+        private bool showM2 = true;
         private bool showWMO = true;
 
         private List<String> files;

@@ -166,13 +166,10 @@ namespace WoWOpenGL
 
                 if (line.EndsWith(".m2"))
                 {
-                    if (!line.StartsWith("alternate") && !line.StartsWith("camera"))
-                    {
-                        if (!models.Contains(line)) { models.Add(line); }
-                    }
+                    models.Add(line);
                 }
 
-                if (i % 100 == 0)
+                if (i % 1000 == 0)
                 {
                     var progress = (i * 100) / lines.Count();
                     listfileWorker.ReportProgress(progress, "Filtering listfile..");

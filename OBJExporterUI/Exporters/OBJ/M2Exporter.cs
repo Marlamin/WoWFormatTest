@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using DBFilesClient.NET;
+using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,14 +24,15 @@ namespace OBJExporterUI.Exporters.OBJ
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
+            var fileDataID = CASC.getFileDataIdByName(file);
             var outdir = ConfigurationManager.AppSettings["outdir"];
             var reader = new M2Reader();
 
             exportworker.ReportProgress(15, "Reading M2..");
 
-            if (!CASC.FileExists(file)) { throw new Exception("404 M2 not found!"); }
+            if (!CASC.FileExists(fileDataID)) { throw new Exception("404 M2 not found!"); }
 
-            reader.LoadM2(file);
+            reader.LoadM2(fileDataID);
 
             Structs.Vertex[] vertices = new Structs.Vertex[reader.model.vertices.Count()];
 
@@ -106,60 +108,34 @@ namespace OBJExporterUI.Exporters.OBJ
 
             for (int i = 0; i < reader.model.textures.Count(); i++)
             {
-                string texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
+                int textureFileDataID = 840426;
                 materials[i].flags = reader.model.textures[i].flags;
                 switch (reader.model.textures[i].type)
                 {
                     case 0:
                         //Console.WriteLine("      Texture given in file!");
-                        texturefilename = reader.model.textures[i].filename;
-                        break;
-                    case 1:
-                        string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(file, (int)reader.model.textures[i].type, i);
-                        if (csfilenames.Count() > 0)
-                        {
-                            texturefilename = csfilenames[0];
-                        }
-                        else
-                        {
-                            //Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
-                        }
-                        break;
-                    case 2:
-                        if (WoWFormatLib.Utils.CASC.FileExists(Path.ChangeExtension(file, ".blp")))
-                        {
-                            //Console.WriteLine("      BLP exists!");
-                            texturefilename = Path.ChangeExtension(file, ".blp");
-                        }
-                        else
-                        {
-                            //Console.WriteLine("      Type 2 does not exist!");
-                            //needs lookup?
-                        }
+                        textureFileDataID = CASC.getFileDataIdByName(reader.model.textures[i].filename);
                         break;
                     case 11:
-                        string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(file, (int)reader.model.textures[i].type);
+                        uint[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Count(); ti++)
                         {
-                            if (WoWFormatLib.Utils.CASC.FileExists(file.Replace(reader.model.name + ".M2", cdifilenames[ti] + ".blp")))
-                            {
-                                texturefilename = file.Replace(reader.model.name + ".M2", cdifilenames[ti] + ".blp");
-                            }
+                            textureFileDataID = (int)cdifilenames[0];
                         }
                         break;
                     default:
-                        // Console.WriteLine("      Falling back to placeholder texture");
+                        Console.WriteLine("      Falling back to placeholder texture");
                         break;
                 }
 
                 //Console.WriteLine("      Eventual filename is " + texturefilename);
 
                 materials[i].textureID = textureID + i;
-                materials[i].filename = Path.GetFileNameWithoutExtension(texturefilename);
+                materials[i].filename = textureFileDataID.ToString();
 
                 var blpreader = new BLPReader();
 
-                blpreader.LoadBLP(texturefilename);
+                blpreader.LoadBLP(textureFileDataID);
 
                 try
                 {

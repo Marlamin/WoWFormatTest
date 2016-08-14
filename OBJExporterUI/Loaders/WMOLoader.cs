@@ -129,7 +129,7 @@ namespace OBJExporterUI.Loaders
                     if (wmo.doodadDefinitions[i].offset == wmo.doodadNames[j].startOffset)
                     {
                         wmobatch.doodads[i].filename = wmo.doodadNames[j].filename;
-                        M2Loader.LoadM2(wmobatch.doodads[i].filename, cache);
+                        //M2Loader.LoadM2(wmobatch.doodads[i].filename, cache);
                     }
                 }
                 wmobatch.doodads[i].flags = wmo.doodadDefinitions[i].flags;

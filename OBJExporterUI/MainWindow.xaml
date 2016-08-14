@@ -18,7 +18,7 @@
         <Label x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="0,7,0,0" VerticalAlignment="Top"/>
         <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="False" x:Name="adtCheckBox" Content="ADTs" HorizontalAlignment="Left" Margin="10,46,0,0" VerticalAlignment="Top"/>
         <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="61,46,0,0" VerticalAlignment="Top"/>
-        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="False" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="122,46,0,0" VerticalAlignment="Top"/>
+        <CheckBox Visibility="Hidden" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="122,46,0,0" VerticalAlignment="Top"/>
         <CheckBox Visibility="Hidden"  IsChecked="True" x:Name="objCheckBox" Content="OBJ" HorizontalAlignment="Left" Margin="542,51,0,0" VerticalAlignment="Top"/>
         <CheckBox Visibility="Hidden" IsChecked="False" x:Name="daeCheckBox" Content="DAE" HorizontalAlignment="Left" Margin="495,51,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="buildsBox" Visibility="Hidden" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Width="185"/>

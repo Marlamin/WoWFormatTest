@@ -1,11 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DBFilesClient.NET;
 
 namespace WoWFormatLib.DBC
 {
+    [DBFileName("CreatureDisplayInfo")]
+    public sealed class CreatureDisplayInfoEntry
+    {
+        public uint ExtendedDisplayInfoID;
+        public float CreatureModelScale;
+        public float PlayerModelScale;
+        public uint[] TextureVariation;
+        public string PortraitTextureName;
+        public uint PortraitCreatureDisplayInfoID;
+        public uint CreatureGeosetData;
+        public uint StateSpellVisualKitID;
+        public float InstanceOtherPlayerPetScale;
+        public ushort ModelID;
+        public ushort SoundID;
+        public ushort NPCSoundID;
+        public ushort ParticleColorID;
+        public ushort ObjectEffectPackageID;
+        public ushort AnimReplacementSetID;
+        public byte CreatureModelAlpha;
+        public byte SizeClass;
+        public byte BloodID;
+        public byte Flags;
+        public sbyte Gender;
+        public sbyte Unk700;
+    }
+
+    [DBFileName("CreatureModelData")]
+    public sealed class CreatureModelDataEntry
+    {
+        public float scale;
+        public float footprintTextureLength;
+        public float footprintTextureWidth;
+        public float footprintParticleScale;
+        public float collisionWidth;
+        public float collisionHeight;
+        public float mountHeight;
+        public float[] geoBoxMin;
+        public float worldEffectScale;
+        public float attachedEffectScale;
+        public float missileCollisionRadius;
+        public float missileCollisionPush;
+        public float missileCollisionRaise;
+        public float overrideLootEffectScale;
+        public float overrideNameScale;
+        public float overrideSelectionRadius;
+        public float tamedPetBaseScale;
+        public float hoverHeight;
+        public uint flags;
+        public int fileDataID;
+        public int sizeClass;
+        public int bloodID;
+        public int footprintTextureID;
+        public int unk0;
+        public int unk1;
+        public int foleyMaterialID;
+        public int footstepShakeSize;
+        public int deathThudShakeSize;
+        public int soundID;
+        public int creatureGeosetDataID;
+    }
+
     public class AchievementRecord
     {
         public int ID { get; private set; }
@@ -330,45 +387,6 @@ namespace WoWFormatLib.DBC
         public int categoryEnumID { get; private set; }
         public string name_lang { get; private set; }
         public string iconFile { get; private set; }
-    }
-
-
-    public class CreatureModelDataRecord
-    {
-        public int ID { get; private set; }
-        public int flags { get; private set; }
-        public int fileDataID { get; private set; }
-        public int sizeClass { get; private set; }
-        public float modelScale { get; private set; }
-        public int bloodID { get; private set; }
-        public int footprintTextureID { get; private set; }
-        public float footprintTextureLength { get; private set; }
-        public float footprintTextureWidth { get; private set; }
-        public float footprintParticleScale { get; private set; }
-        public int foleyMaterialID { get; private set; }
-        public int footstepShakeSize { get; private set; }
-        public int deathThudShakeSize { get; private set; }
-        public int soundID { get; private set; }
-        public float collisionWidth { get; private set; }
-        public float collisionHeight { get; private set; }
-        public float mountHeight { get; private set; }
-        public float geoBoxMin_0 { get; private set; }
-        public float geoBoxMin_1 { get; private set; }
-        public float geoBoxMin_2 { get; private set; }
-        public float geoBoxMax_0 { get; private set; }
-        public float geoBoxMax_1 { get; private set; }
-        public float geoBoxMax_2 { get; private set; }
-        public float worldEffectScale { get; private set; }
-        public float attachedEffectScale { get; private set; }
-        public float missileCollisionRadius { get; private set; }
-        public float missileCollisionPush { get; private set; }
-        public float missileCollisionRaise { get; private set; }
-        public float overrideLootEffectScale { get; private set; }
-        public float overrideNameScale { get; private set; }
-        public float overrideSelectionRadius { get; private set; }
-        public float tamedPetBaseScale { get; private set; }
-        public int creatureGeosetDataID { get; private set; }
-        public float hoverHeight { get; private set; }
     }
 
     public class CreatureTypeRecord

@@ -61,15 +61,15 @@ namespace OBJExporterUI.Loaders
                         texturefilename = model.textures[i].filename;
                         break;
                     case 1:
-                        string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type, i);
-                        if (csfilenames.Count() > 0)
-                        {
-                            texturefilename = csfilenames[0];
-                        }
-                        else
-                        {
-                            //Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
-                        }
+                       // string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type, i);
+                       // if (csfilenames.Count() > 0)
+                       // {
+                       //     texturefilename = csfilenames[0];
+                      //  }
+                       // else
+                      //  {
+                      //      //Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
+                      //  }
                         break;
                     case 2:
                         if (WoWFormatLib.Utils.CASC.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
@@ -84,14 +84,14 @@ namespace OBJExporterUI.Loaders
                         }
                         break;
                     case 11:
-                        string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type);
-                        for (int ti = 0; ti < cdifilenames.Count(); ti++)
-                        {
-                            if (WoWFormatLib.Utils.CASC.FileExists(filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp")))
-                            {
-                                texturefilename = filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp");
-                            }
-                        }
+                      //  string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type);
+                      //  for (int ti = 0; ti < cdifilenames.Count(); ti++)
+                      //  {
+                      //      if (WoWFormatLib.Utils.CASC.FileExists(filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp")))
+                      //      {
+                     //           texturefilename = filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp");
+                      //      }
+                      //  }
                         break;
                     default:
                         //Console.WriteLine("      Falling back to placeholder texture");

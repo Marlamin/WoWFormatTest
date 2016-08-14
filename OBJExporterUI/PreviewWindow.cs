@@ -59,7 +59,8 @@ namespace OBJExporterUI
 
             if (filename.EndsWith(".m2"))
             {
-                M2Loader.LoadM2(filename, cache);
+                Exit();
+                //M2Loader.LoadM2(filename, cache);
                 isWMO = false;
             }
             else if (filename.EndsWith(".wmo"))
