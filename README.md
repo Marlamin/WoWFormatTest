@@ -49,6 +49,7 @@ Rendering test with WPF.
 ## Thanks (in no particular order)
 - TOM_RUS
 - Schlumpf
+- Warpten
 - Thoorium
 - Deamon87
 - Miceiken
