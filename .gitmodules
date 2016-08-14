@@ -2,3 +2,6 @@
 	path = CASCExplorer
 	url = https://github.com/WoW-Tools/CASCExplorer.git
 	branch = cli
+[submodule "DBFilesClient.NET"]
+	path = DBFilesClient.NET
+	url = https://github.com/Warpten/DBFilesClient.NET.git
