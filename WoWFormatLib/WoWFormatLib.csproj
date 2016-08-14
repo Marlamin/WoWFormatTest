@@ -78,6 +78,10 @@
       <Project>{e08e1e48-6585-4137-8405-661c62c10713}</Project>
       <Name>CascLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DBFilesClient.NET\DBFilesClient.NET\DBFilesClient.NET.csproj">
+      <Project>{9DD24326-77E6-47F5-BA54-345981C16289}</Project>
+      <Name>DBFilesClient.NET</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

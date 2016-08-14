@@ -13,16 +13,9 @@ namespace WoWFormatLib.FileReaders
         {
         }
 
-        public void LoadSKIN(string filename)
+        public void LoadSKIN(int fileDataID)
         {
-            filename = Path.ChangeExtension(filename, ".skin");
-            
-            if (!CASC.FileExists(filename))
-            {
-                new WoWFormatLib.Utils.MissingFile(filename);
-            }
-
-            BinaryReader bin = new BinaryReader(CASC.OpenFile(filename));
+            BinaryReader bin = new BinaryReader(CASC.OpenFile(fileDataID));
 
             var header = new string(bin.ReadChars(4));
             if (header != "SKIN")
@@ -30,7 +23,6 @@ namespace WoWFormatLib.FileReaders
                 Console.WriteLine("Invalid SKIN file!");
             }
 
-            skin.filename = filename;
             var nIndices = bin.ReadUInt32();
             var ofsIndices = bin.ReadUInt32();
             var nTriangles = bin.ReadUInt32();

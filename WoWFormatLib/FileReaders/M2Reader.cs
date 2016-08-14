@@ -31,31 +31,82 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadM2(string filename)
         {
-            filename = Path.ChangeExtension(filename, "M2");
-
             if (!CASC.FileExists(filename))
             {
                 new WoWFormatLib.Utils.MissingFile(filename);
                 return;
+            }else
+            {
+                LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
+            }
+        }
+
+        public void LoadM2(int fileDataID)
+        {
+            Stream m2 = CASC.OpenFile(fileDataID);
+
+            var bin = new BinaryReader(m2);
+
+            BlizzHeader chunk;
+
+            long position = 0;
+            while (position < m2.Length)
+            {
+                m2.Position = position;
+                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
+                position = m2.Position + chunk.Size;
+
+                switch (chunk.ToString())
+                {
+                    case "MD21":
+                        using (Stream m2stream = new MemoryStream(bin.ReadBytes((int)chunk.Size)))
+                        {
+                            ParseYeOldeM2Struct(m2stream);
+                        }
+                        break;
+                    case "AFID":
+                        var afids = new AFID[chunk.Size / 16];
+                        for(int a = 0; a < chunk.Size / 16; a++)
+                        {
+                            afids[a].animID = (short)bin.ReadUInt16();
+                            afids[a].subAnimID = (short)bin.ReadUInt16();
+                            afids[a].fileDataID = bin.ReadUInt32();
+                        }
+                        model.animFileData = afids;
+                        break;
+                    case "BFID":
+                        var bfids = new int[chunk.Size / 4];
+                        for (int b = 0; b < chunk.Size / 4; b++)
+                        {
+                            bfids[b] = (int)bin.ReadUInt32();
+                        }
+                        break;
+                    case "SFID":
+                        var sfids = new int[model.nViews];
+                        for(int s = 0; s < model.nViews; s++)
+                        {
+                            sfids[s] = (int)bin.ReadUInt32();
+                        }
+                        model.skinFileDataIDs = sfids;
+                        break;
+                    case "PFID":
+                        model.physFileID = (int)bin.ReadUInt32();
+                        break;
+                    default:
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunk.ToString(), position.ToString(), "id: " + fileDataID));
+                }
             }
 
-            Stream m2 = CASC.OpenFile(filename);
+            model.skins = readSkins(model.skinFileDataIDs);
 
-            BinaryReader bin = new BinaryReader(m2);
+            return;
+        }
 
+        public void ParseYeOldeM2Struct(Stream m2stream)
+        {
+            var bin = new BinaryReader(m2stream);
             var header = new string(bin.ReadChars(4));
-            if(header == "MD21")
-            {
-                bin.ReadBytes(4);
-                MemoryStream md21 = new MemoryStream(bin.ReadBytes((int) bin.BaseStream.Length - (int) bin.BaseStream.Position));
-                bin = new BinaryReader(md21);
-                bin.ReadBytes(4); //MD20
-            }
-            else if(header == "MD20")
-            {
-                // All is fine in the world! Except for this awful hackfix that needs a fix! TODO
-            }
-            else
+            if(header != "MD20")
             {
                 throw new Exception("Invalid M2 file!");
             }
@@ -137,17 +188,14 @@ namespace WoWFormatLib.FileReaders
             }
 
             bin.BaseStream.Position = ofsModelname;
-
             model.name = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
             model.name = model.name.Remove(model.name.Length - 1); //remove last char, empty
-            model.filename = filename;
             model.sequences = readSequences(nSequences, ofsSequences, bin);
             model.animations = readAnimations(nAnimations, ofsAnimations, bin);
             model.animationlookup = readAnimationLookup(nAnimationLookup, ofsAnimationLookup, bin);
             model.bones = readBones(nBones, ofsBones, bin);
             model.keybonelookup = readKeyboneLookup(nKeyboneLookup, ofsKeyboneLookup, bin);
             model.vertices = readVertices(nVertices, ofsVertices, bin);
-            model.skins = readSkins(model.nViews, filename);
             model.colors = readColors(nColors, ofsColors, bin);
             model.textures = readTextures(nTextures, ofsTextures, bin);
             model.transparency = readTransparency(nTransparency, ofsTransparency, bin);
@@ -169,8 +217,6 @@ namespace WoWFormatLib.FileReaders
             model.cameralookup = readCameraLookup(nCameraLookup, ofsCameraLookup, bin);
             model.ribbonemitters = readRibbonEmitters(nRibbonEmitters, ofsRibbonEmitters, bin);
             model.particleemitters = readParticleEmitters(nParticleEmitters, ofsParticleEmitters, bin);
-
-            m2.Close();
         }
 
         private AnimationLookup[] readAnimationLookup(uint nAnimationLookup, uint ofsAnimationLookup, BinaryReader bin)
@@ -194,11 +240,13 @@ namespace WoWFormatLib.FileReaders
                 if (animations[i].flags == 0)
                 {
                     //this check doesnt find all of them yet, needs actual flag parsing
+                    // needs filedata support
+                    /*
                     string animfilename = model.filename.Replace(".M2", animations[i].animationID.ToString().PadLeft(4, '0') + "-" + animations[i].subAnimationID.ToString().PadLeft(2, '0') + ".anim");
                     if (!CASC.FileExists(animfilename))
                     {
                         new WoWFormatLib.Utils.MissingFile(animfilename);
-                    }
+                    }*/
                 }
             }
             return animations;
@@ -380,22 +428,14 @@ namespace WoWFormatLib.FileReaders
             return sequences;
         }
 
-        private WoWFormatLib.Structs.SKIN.SKIN[] readSkins(UInt32 num, String filename)
+        private Structs.SKIN.SKIN[] readSkins(int[] skinFileDataIDs)
         {
-            var skins = new WoWFormatLib.Structs.SKIN.SKIN[num];
-            for (int i = 0; i < num; i++)
+            var skins = new Structs.SKIN.SKIN[skinFileDataIDs.Length];
+            for (int i = 0; i < skinFileDataIDs.Length; i++)
             {
-                var skinfilename = filename.Replace(".M2", i.ToString().PadLeft(2, '0') + ".skin");
-                if (!CASC.FileExists(skinfilename))
-                {
-                    new WoWFormatLib.Utils.MissingFile(skinfilename);
-                }
-                else
-                {
-                    SKINReader skinreader = new SKINReader();
-                    skinreader.LoadSKIN(skinfilename);
-                    skins[i] = skinreader.skin;
-                }
+                SKINReader skinreader = new SKINReader();
+                skinreader.LoadSKIN(skinFileDataIDs[i]);
+                skins[i] = skinreader.skin;
             }
             return skins;
         }

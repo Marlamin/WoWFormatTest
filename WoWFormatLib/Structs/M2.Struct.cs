@@ -22,6 +22,13 @@ namespace WoWFormatLib.Structs.M2
     public struct M2Model
     {
         public uint version;
+
+        public int physFileID;
+        public int[] boneFileDataIDs;
+        public int[] skinFileDataIDs;
+        public int[] lod_skinFileDataIDs;
+        public AFID[] animFileData;
+
         public string filename;
         public string name;
         public GlobalModelFlags flags;
@@ -86,6 +93,13 @@ namespace WoWFormatLib.Structs.M2
     public struct ParticleEmitter
     {
         //needs filling in
+    }
+
+    public struct AFID
+    {
+        public short animID;
+        public short subAnimID;
+        public uint fileDataID; 
     }
 
     public struct Animation
