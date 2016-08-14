@@ -38,6 +38,10 @@ namespace OBJExporterUI.Exporters.OBJ
             }
             */
 
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
             exportworker.ReportProgress(30, "Reading WMO..");
 
             uint totalVertices = 0;

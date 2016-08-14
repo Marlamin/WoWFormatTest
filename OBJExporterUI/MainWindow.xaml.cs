@@ -284,12 +284,12 @@ namespace OBJExporterUI
                 }
 
                 if (showM2 && lines[i].EndsWith(".m2")) {
-                    if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera")) {
-                        if (!files.Contains(lines[i])) { files.Add(lines[i]); }
-                    }
+                    //if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera")) {
+                       files.Add(lines[i]);
+                    //}
                 }
 
-                if (i % 100 == 0)
+                if (i % 1000 == 0)
                 {
                     var progress = (i * 100) / lines.Count();
                     worker.ReportProgress(progress, "Filtering listfile..");
