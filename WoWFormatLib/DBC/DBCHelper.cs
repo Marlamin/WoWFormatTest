@@ -12,42 +12,49 @@ namespace WoWFormatLib.DBC
         public static uint[] getTexturesByModelFilename(int modelID, int flag, int texid = 0)
         {
             List<uint> results = new List<uint>();
-            
-            if(flag == 11)
+            switch (flag)
             {
-                var creatureModelData = new Storage<CreatureModelDataEntry>(CASC.OpenFile(@"DBFilesClient/CreatureModelData.db2"));
-                foreach(var cmdEntry in creatureModelData)
-                {
-                    if(cmdEntry.Value.fileDataID == modelID)
+                case 1:
+                case 2:
+
+                    //ModelFileData.db2 (FileDataID) 1272528 => (ModelFileDataID) 37177
+                    var modelFileData = new Storage<ModelFileDataEntry>(CASC.OpenFile(@"DBFilesClient/ModelFileData.db2"));
+                    var modelFileDataID = modelFileData[modelID].modelFileDataID;
+
+                    //ItemDisplayInfoMaterialRes.db2 (ID) 37177 => (ItemDisplayInfoID) 53536, (TextureFileDataID) 59357
+                    var itemDisplayInfoMaterialRes = new Storage<ItemDisplayInfoMaterialResEntry>(CASC.OpenFile(@"DBFilesClient/ItemDisplayInfoMaterialRes.db2"));
+                    var textureFileDataID = itemDisplayInfoMaterialRes[modelFileDataID].textureFileDataID;
+
+                    // TextureFileData
+                    var textureFileData = new Storage<TextureFileDataEntry>(CASC.OpenFile(@"DBFilesClient/TextureFileData.db2"));
+                    foreach(var entry in textureFileData)
                     {
-                        var creatureDisplayInfo = new Storage<CreatureDisplayInfoEntry>(CASC.OpenFile(@"DBFilesClient/CreatureDisplayInfo.db2"));
-                        foreach(var cdiEntry in creatureDisplayInfo)
+                        if(entry.Value.textureFileDataID == textureFileDataID)
                         {
-                            if(cdiEntry.Value.ModelID == cmdEntry.Key)
+                            results.Add(entry.Value.fileDataID);
+                        }
+                    }
+
+                    break;
+
+                case 11:
+                    var creatureModelData = new Storage<CreatureModelDataEntry>(CASC.OpenFile(@"DBFilesClient/CreatureModelData.db2"));
+                    foreach (var cmdEntry in creatureModelData)
+                    {
+                        if (cmdEntry.Value.fileDataID == modelID)
+                        {
+                            var creatureDisplayInfo = new Storage<CreatureDisplayInfoEntry>(CASC.OpenFile(@"DBFilesClient/CreatureDisplayInfo.db2"));
+                            foreach (var cdiEntry in creatureDisplayInfo)
                             {
-                                results.Add(cdiEntry.Value.TextureVariation[0]);
+                                if (cdiEntry.Value.ModelID == cmdEntry.Key)
+                                {
+                                    results.Add(cdiEntry.Value.TextureVariation[0]);
+                                }
                             }
                         }
                     }
-                }
-
-                //DBCReader<CreatureModelDataRecord> cmdreader = new DBCReader<CreatureModelDataRecord>("DBFilesClient\\CreatureModelData.dbc");
-                //for (int cmdi = 0; cmdi < cmdreader.recordCount; cmdi++)
-                //{
-                //    if (modelID == cmdreader[cmdi].fileDataID)
-                //    {
-                //        DBCReader<CreatureDisplayInfoRecord> cdireader = new DBCReader<CreatureDisplayInfoRecord>("DBFilesClient\\CreatureDisplayInfo.dbc");
-                //        for (int cdii = 0; cdii < cdireader.recordCount; cdii++)
-                //        {
-                //            if (cdireader[cdii].modelID == cmdreader[cmdi].ID && cdireader[cdii].textureVariation_0 != null)
-                //            {
-                //                filenames.Add(cdireader[cdii].textureVariation_0);
-                //            }
-                //        }
-                //    }
-                //}
+                    break;
             }
-
 
             /*if (flag == 1)
             {

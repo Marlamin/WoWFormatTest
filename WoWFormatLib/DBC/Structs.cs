@@ -63,6 +63,30 @@ namespace WoWFormatLib.DBC
         public int creatureGeosetDataID;
     }
 
+    [DBFileName("ModelFileData")]
+    public sealed class ModelFileDataEntry
+    {
+        public byte whoCares;
+        public uint fileDataID;
+        public ushort modelFileDataID;
+    }
+
+    [DBFileName("ItemDisplayInfoMaterialRes")]
+    public sealed class ItemDisplayInfoMaterialResEntry
+    {
+        public uint itemDisplayInfoID;
+        public uint textureFileDataID;
+        public byte whocares;
+    }
+
+    [DBFileName("TextureFileData")]
+    public sealed class TextureFileDataEntry
+    {
+        public int textureFileDataID;
+        public byte whoCares;
+        public uint fileDataID;
+    }
+
     public class AchievementRecord
     {
         public int ID { get; private set; }

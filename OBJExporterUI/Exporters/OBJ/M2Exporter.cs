@@ -116,6 +116,8 @@ namespace OBJExporterUI.Exporters.OBJ
                         //Console.WriteLine("      Texture given in file!");
                         textureFileDataID = CASC.getFileDataIdByName(reader.model.textures[i].filename);
                         break;
+                    case 1:
+                    case 2:
                     case 11:
                         uint[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Count(); ti++)

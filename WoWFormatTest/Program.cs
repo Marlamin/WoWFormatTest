@@ -113,26 +113,33 @@ namespace WoWFormatLib
             CASC.InitCasc(null, @"C:\World of Warcraft", "wow");
             Console.WriteLine("CASC loaded!");
             var reader = new M2Reader();
-            reader.LoadM2(@"Creature\DruidCat2\DruidCatTroll2.m2");
-            var fileDataID = CASC.getFileDataIdByName(@"Creature\DruidCat2\DruidCatTroll2.m2");
+            var filename = @"item\objectcomponents\shield\shield_1h_artifactnorgannon_d_01.m2";
+            reader.LoadM2(filename);
+            var fileDataID = CASC.getFileDataIdByName(filename);
 
             for (int i = 0; i < reader.model.textures.Length; i++)
             {
+                Console.WriteLine("Doing type " + reader.model.textures[i].type + " lookup for texture #" + i);
                 switch (reader.model.textures[i].type)
                 {
+                    case 1:
+                    case 2:
                     case 11:
                         uint[] cdifilenames = DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Length; ti++)
                         {
                             Console.WriteLine("Found (texture #" + ti + ") " + cdifilenames[ti]);
+                            var blpreader = new BLPReader();
+                            blpreader.LoadBLP((int)cdifilenames[ti]);
                         }
                         break;
                     default:
+                        throw new Exception("Unhandled texture type");
                         break;
                 }
-                Console.WriteLine("DONE!");
-                Console.ReadLine();
             }
+            Console.WriteLine("Done.");
+            Console.ReadLine();
         }
     }
 }
