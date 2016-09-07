@@ -21,7 +21,7 @@ namespace OBJExporterUI.Exporters.OBJ
             //   exportworker = new BackgroundWorker();
             // }
 
-            CASC.InitCasc(null, @"C:\World of Warcraft Beta", "wow_beta");
+            //CASC.InitCasc(null, @"C:\World of Warcraft Beta", "wow_beta");
             var outdir = ConfigurationManager.AppSettings["outdir"];
 
             float TileSize = 1600.0f / 3.0f; //533.333
@@ -29,8 +29,8 @@ namespace OBJExporterUI.Exporters.OBJ
             float UnitSize = ChunkSize / 8.0f; //4.166666 // ~~fun fact time with marlamin~~ this /2 ends up being pixelspercoord on minimap
             float MapMidPoint = 32.0f / ChunkSize;
 
-            var mapname = file.Replace("world\\maps\\", "").Substring(0, file.Replace("world\\maps\\", "").IndexOf("\\"));
-            var coord = file.Replace("world\\maps\\" + mapname + "\\" + mapname, "").Replace(".adt", "").Split('_');
+            var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
+            var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
 
             var centerx = int.Parse(coord[1]);
             var centery = int.Parse(coord[2]);
