@@ -24,6 +24,7 @@ namespace OBJExporterUI
         private readonly BackgroundWorker worker = new BackgroundWorker();
         private readonly BackgroundWorker exportworker = new BackgroundWorker();
         private readonly BackgroundWorkerEx cascworker = new BackgroundWorkerEx();
+        private readonly BackgroundWorkerEx fileworker = new BackgroundWorkerEx();
 
         private bool showADT = false;
         private bool showM2 = true;
@@ -57,6 +58,11 @@ namespace OBJExporterUI
             cascworker.RunWorkerCompleted += cascworker_RunWorkerCompleted;
             cascworker.ProgressChanged += worker_ProgressChanged;
             cascworker.WorkerReportsProgress = true;
+
+            fileworker.DoWork += fileworker_DoWork;
+            fileworker.RunWorkerCompleted += fileworker_RunWorkerCompleted;
+            fileworker.ProgressChanged += fileworker_ProgressChanged;
+            fileworker.WorkerReportsProgress = true;
         }
 
         private void cascworker_DoWork(object sender, DoWorkEventArgs e)
@@ -104,9 +110,43 @@ namespace OBJExporterUI
             exportworker.RunWorkerAsync(modelListBox.SelectedItems);
         }
 
+        private void fileworker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void fileworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void fileworker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var results = new List<String>();
+            
+            throw new NotImplementedException();
+        }
+
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             List<String> filtered = new List<String>();
+
+            if (filterTextBox.Text.StartsWith("maptile:"))
+            {
+                filtered.Add("Maptile detected!");
+                var filterSplit = filterTextBox.Text.Remove(0, 8).Split('_');
+                if (filterSplit.Length == 3)
+                {
+                    filtered.Add("Length check is OK!");
+                    filtered.Add("Map: " + filterSplit[0] + ", X:" + filterSplit[1] + ", Y:" + filterSplit[2]);
+
+                    // set button to crawl for models 
+                    // do some more checks!
+                   // fileworker.RunWorkerAsync(filterSplit);
+                }
+            }else
+            {
+            }
 
             for (int i = 0; i < files.Count(); i++)
             {
