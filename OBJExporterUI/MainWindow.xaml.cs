@@ -97,34 +97,77 @@ namespace OBJExporterUI
 
         private void exportButton_Click(object sender, RoutedEventArgs e)
         {
-            progressBar.Value = 0;
-            progressBar.Visibility = Visibility.Visible;
-            loadingLabel.Content = "";
-            loadingLabel.Visibility = Visibility.Visible;
-            adtCheckBox.IsEnabled = false;
-            wmoCheckBox.IsEnabled = false;
-            m2CheckBox.IsEnabled = false;
-            exportButton.IsEnabled = false;
-            modelListBox.IsEnabled = false;
+            if ((string) exportButton.Content == "Crawl maptile for models")
+            {
+                var filterSplit = filterTextBox.Text.Remove(0, 8).Split('_');
+                var filename = "world\\maps\\" + filterSplit[0] + "\\" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt";
 
-            exportworker.RunWorkerAsync(modelListBox.SelectedItems);
+                fileworker.RunWorkerAsync(filename);
+            }else
+            {
+                progressBar.Value = 0;
+                progressBar.Visibility = Visibility.Visible;
+                loadingLabel.Content = "";
+                loadingLabel.Visibility = Visibility.Visible;
+                adtCheckBox.IsEnabled = false;
+                wmoCheckBox.IsEnabled = false;
+                m2CheckBox.IsEnabled = false;
+                exportButton.IsEnabled = false;
+                modelListBox.IsEnabled = false;
+
+                exportworker.RunWorkerAsync(modelListBox.SelectedItems);
+            }
         }
 
         private void fileworker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            modelListBox.DataContext = (List<string>) e.UserState;
         }
 
         private void fileworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            throw new NotImplementedException();
+            exportButton.Content = "Export model to OBJ!";
         }
 
         private void fileworker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var results = new List<String>();
-            
-            throw new NotImplementedException();
+            var results = new List<string>();
+            var remaining = new List<string>();
+            var progress = 0;
+
+            remaining.Add((string) e.Argument);
+
+            while(remaining.Count > 0)
+            {
+                var filename = remaining[0];
+                if (filename.EndsWith(".wmo"))
+                {
+                    var wmo = new WoWFormatLib.FileReaders.WMOReader();
+                    wmo.LoadWMO(filename);
+
+                    
+                    // Loop through filenames from WMO
+                }
+                else if (filename.EndsWith(".adt"))
+                {
+                    var adt = new WoWFormatLib.FileReaders.ADTReader();
+                    adt.LoadADT(filename);
+
+                    foreach (var entry in adt.adtfile.objects.wmoNames.filenames)
+                    {
+                        results.Add(entry.ToLower());
+                    }
+
+                    foreach (var entry in adt.adtfile.objects.m2Names.filenames)
+                    {
+                        results.Add(entry.ToLower());
+                    }
+                }
+
+                remaining.Remove(filename);
+            }
+
+            fileworker.ReportProgress(progress, results);
         }
 
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -140,12 +183,19 @@ namespace OBJExporterUI
                     filtered.Add("Length check is OK!");
                     filtered.Add("Map: " + filterSplit[0] + ", X:" + filterSplit[1] + ", Y:" + filterSplit[2]);
 
-                    // set button to crawl for models 
-                    // do some more checks!
-                   // fileworker.RunWorkerAsync(filterSplit);
+                    exportButton.Content = "Crawl maptile for models";
+
+                    if (CASC.FileExists("world/maps/" + filterSplit[0] + "/" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt"))
+                    {
+                        exportButton.IsEnabled = true;
+                    }else
+                    {
+                        exportButton.IsEnabled = false;
+                    }
                 }
             }else
             {
+                exportButton.Content = "Export model to OBJ!";
             }
 
             for (int i = 0; i < files.Count(); i++)
