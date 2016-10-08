@@ -176,13 +176,9 @@ namespace OBJExporterUI
 
             if (filterTextBox.Text.StartsWith("maptile:"))
             {
-                filtered.Add("Maptile detected!");
                 var filterSplit = filterTextBox.Text.Remove(0, 8).Split('_');
                 if (filterSplit.Length == 3)
                 {
-                    filtered.Add("Length check is OK!");
-                    filtered.Add("Map: " + filterSplit[0] + ", X:" + filterSplit[1] + ", Y:" + filterSplit[2]);
-
                     exportButton.Content = "Crawl maptile for models";
 
                     if (CASC.FileExists("world/maps/" + filterSplit[0] + "/" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt"))
