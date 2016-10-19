@@ -26,9 +26,10 @@ namespace OBJExporterUI
         private readonly BackgroundWorkerEx cascworker = new BackgroundWorkerEx();
         private readonly BackgroundWorkerEx fileworker = new BackgroundWorkerEx();
 
-        private bool showADT = false;
         private bool showM2 = true;
         private bool showWMO = true;
+
+        private bool mapsLoaded = false;
 
         private List<String> files;
 
@@ -109,7 +110,6 @@ namespace OBJExporterUI
                 progressBar.Visibility = Visibility.Visible;
                 loadingLabel.Content = "";
                 loadingLabel.Visibility = Visibility.Visible;
-                adtCheckBox.IsEnabled = false;
                 wmoCheckBox.IsEnabled = false;
                 m2CheckBox.IsEnabled = false;
                 exportButton.IsEnabled = false;
@@ -229,6 +229,7 @@ namespace OBJExporterUI
 
         private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            tabs.Visibility = Visibility.Visible;
             progressBar.Visibility = Visibility.Hidden;
             loadingLabel.Visibility = Visibility.Hidden;
             modelListBox.Visibility = Visibility.Visible;
@@ -237,8 +238,6 @@ namespace OBJExporterUI
             previewButton.Visibility = Visibility.Visible;
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
-            adtCheckBox.Visibility = Visibility.Visible;
-            objCheckBox.Visibility = Visibility.Visible;
 
             modelListBox.DataContext = files;
         }
@@ -248,7 +247,6 @@ namespace OBJExporterUI
             exportButton.IsEnabled = true;
             progressBar.Visibility = Visibility.Hidden;
             loadingLabel.Visibility = Visibility.Hidden;
-            adtCheckBox.IsEnabled = true;
             wmoCheckBox.IsEnabled = true;
             m2CheckBox.IsEnabled = true;
             modelListBox.IsEnabled = true;
@@ -356,13 +354,6 @@ namespace OBJExporterUI
 
             for (int i = 0; i < lines.Count(); i++)
             {
-                if (showADT && lines[i].EndsWith(".adt")) {
-                    if(!lines[i].EndsWith("obj0.adt") && !lines[i].EndsWith("obj1.adt") && !lines[i].EndsWith("tex0.adt") && !lines[i].EndsWith("tex1.adt") && !lines[i].EndsWith("_lod.adt"))
-                    {
-                        if (!files.Contains(lines[i])) { files.Add(lines[i]); }
-                    }
-                }
-
                 if (showWMO && lines[i].EndsWith(".wmo")) {
                     if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2.wmo") && !lines[i].EndsWith("lod3.wmo")) {
                         if (!files.Contains(lines[i])) { files.Add(lines[i]); }
@@ -385,19 +376,20 @@ namespace OBJExporterUI
 
         private void CheckBoxChanged(object sender, RoutedEventArgs e)
         {
+            if (exportButton == null) { return; }
             if(m2CheckBox == null) { return; }
-            if ((bool) adtCheckBox.IsChecked) { showADT = true; } else { showADT = false; }
+
             if ((bool) m2CheckBox.IsChecked) { showM2 = true; } else { showM2 = false; }
             if ((bool) wmoCheckBox.IsChecked) { showWMO = true; } else { showWMO = false; }
 
             progressBar.Visibility = Visibility.Visible;
             loadingLabel.Visibility = Visibility.Visible;
+            previewButton.Visibility = Visibility.Hidden;
             exportButton.Visibility = Visibility.Hidden;
             modelListBox.Visibility = Visibility.Hidden;
             filterTextBox.Visibility = Visibility.Hidden;
             wmoCheckBox.Visibility = Visibility.Hidden;
             m2CheckBox.Visibility = Visibility.Hidden;
-            adtCheckBox.Visibility = Visibility.Hidden;
 
             files = new List<String>();
 
@@ -413,6 +405,26 @@ namespace OBJExporterUI
             else
             {
                 previewButton.IsEnabled = false;
+            }
+        }
+
+        private void MapsTab_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (!mapsLoaded)
+            {
+                try
+                {
+                    mapListBox.DisplayMemberPath = "Value";
+                    var mapsData = new DBFilesClient.NET.Storage<MapEntry>(CASC.OpenFile(@"DBFilesClient/Map.db2"));
+                    foreach (var mapEntry in mapsData)
+                    {
+                        mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occured: " + ex.Message);
+                }
             }
         }
     }

@@ -63,6 +63,29 @@ namespace WoWFormatLib.DBC
         public int creatureGeosetDataID;
     }
 
+    [DBFileName("Map")]
+    public sealed class MapEntry
+    {
+        public string directory;
+        public int[] flags;
+        public float minimapIconScale;
+        public float[] corpseCoords;
+        public string mapname_lang;
+        public string mapDescription0_lang;
+        public string mapDescription1_lang;
+        public ushort areaTableID;
+        public short loadingScreenID;
+        public short corpseMapID;
+        public short timeOfDayoverride;
+        public short parentMapID;
+        public short cosmeticParentMapID;
+        public byte instanceType;
+        public byte mapType;
+        public byte expansionID;
+        public byte maxPlayers;
+        public byte timeOffset;
+    }
+
     [DBFileName("ModelFileData")]
     public sealed class ModelFileDataEntry
     {
