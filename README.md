@@ -58,7 +58,7 @@ Rendering test with WPF.
 - Blizzard Entertainment
 - Gredys
 - flippy84
-- JustMak
+- justMaku
 - Xalcon
 - BoogieMan 
 - Everyone in #modcraft on QuakeNet
