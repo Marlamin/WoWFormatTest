@@ -11,7 +11,8 @@ using WoWFormatLib.Utils;
 using CASCExplorer;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.Drawing.Imaging;
+using System.Windows.Media.Imaging;
 
 namespace OBJExporterUI
 {
@@ -30,8 +31,10 @@ namespace OBJExporterUI
         private bool showWMO = true;
 
         private bool mapsLoaded = false;
+        private bool texturesLoaded = false;
 
-        private List<String> files;
+        private List<string> models;
+        private List<string> textures;
 
         public MainWindow()
         {
@@ -172,37 +175,56 @@ namespace OBJExporterUI
 
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            List<String> filtered = new List<String>();
+            List<string> filtered = new List<string>();
 
-            if (filterTextBox.Text.StartsWith("maptile:"))
+            var selectedTab = (TabItem) tabs.SelectedItem;
+            if((string)selectedTab.Header == "Textures")
             {
-                var filterSplit = filterTextBox.Text.Remove(0, 8).Split('_');
-                if (filterSplit.Length == 3)
+                for (int i = 0; i < textures.Count(); i++)
                 {
-                    exportButton.Content = "Crawl maptile for models";
-
-                    if (CASC.FileExists("world/maps/" + filterSplit[0] + "/" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt"))
+                    if (textures[i].IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
                     {
-                        exportButton.IsEnabled = true;
-                    }else
-                    {
-                        exportButton.IsEnabled = false;
+                        filtered.Add(textures[i]);
                     }
                 }
-            }else
-            {
-                exportButton.Content = "Export model to OBJ!";
-            }
 
-            for (int i = 0; i < files.Count(); i++)
+                textureListBox.DataContext = filtered;
+            }
+            else
             {
-                if (files[i].IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
+                if (filterTextBox.Text.StartsWith("maptile:"))
                 {
-                    filtered.Add(files[i]);
+                    var filterSplit = filterTextBox.Text.Remove(0, 8).Split('_');
+                    if (filterSplit.Length == 3)
+                    {
+                        exportButton.Content = "Crawl maptile for models";
+
+                        if (CASC.FileExists("world/maps/" + filterSplit[0] + "/" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt"))
+                        {
+                            exportButton.IsEnabled = true;
+                        }
+                        else
+                        {
+                            exportButton.IsEnabled = false;
+                        }
+                    }
                 }
+                else
+                {
+                    exportButton.Content = "Export model to OBJ!";
+                }
+
+                for (int i = 0; i < models.Count(); i++)
+                {
+                    if (models[i].IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
+                    {
+                        filtered.Add(models[i]);
+                    }
+                }
+
+                modelListBox.DataContext = filtered;
             }
 
-            modelListBox.DataContext = filtered;
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -219,7 +241,8 @@ namespace OBJExporterUI
             worker.ProgressChanged += worker_ProgressChanged;
             worker.WorkerReportsProgress = true;
 
-            files = new List<String>();
+            models = new List<string>();
+            textures = new List<string>();
 
             loadingImage.Visibility = Visibility.Hidden;
             progressBar.Visibility = Visibility.Visible;
@@ -239,7 +262,8 @@ namespace OBJExporterUI
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
 
-            modelListBox.DataContext = files;
+            modelListBox.DataContext = models;
+            textureListBox.DataContext = textures;
         }
 
         private void exportworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -338,7 +362,6 @@ namespace OBJExporterUI
 
             string[] lines = linelist.ToArray();
 
-
             for (int i = 0; i < lines.Length; i++)
             {
                 lines[i] = lines[i].ToLower();
@@ -356,14 +379,19 @@ namespace OBJExporterUI
             {
                 if (showWMO && lines[i].EndsWith(".wmo")) {
                     if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2.wmo") && !lines[i].EndsWith("lod3.wmo")) {
-                        if (!files.Contains(lines[i])) { files.Add(lines[i]); }
+                        if (!models.Contains(lines[i])) { models.Add(lines[i]); }
                     }
                 }
 
                 if (showM2 && lines[i].EndsWith(".m2")) {
                     //if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera")) {
-                       files.Add(lines[i]);
+                       models.Add(lines[i]);
                     //}
+                }
+
+                if (lines[i].EndsWith(".blp"))
+                {
+                    textures.Add(lines[i]);
                 }
 
                 if (i % 1000 == 0)
@@ -391,8 +419,8 @@ namespace OBJExporterUI
             wmoCheckBox.Visibility = Visibility.Hidden;
             m2CheckBox.Visibility = Visibility.Hidden;
 
-            files = new List<String>();
-
+            models = new List<string>();
+            textures = new List<string>();
             worker.RunWorkerAsync();
         }
 
@@ -420,11 +448,68 @@ namespace OBJExporterUI
                     {
                         mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang));
                     }
+
+                    mapsLoaded = true;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("An error occured: " + ex.Message);
                 }
+            }
+        }
+
+        private void TexturesTab_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (!texturesLoaded)
+            {
+                modelListBox.DataContext = textures;
+                texturesLoaded = true;
+            }
+        }
+
+        private void exportTextureButton_Click(object sender, RoutedEventArgs e)
+        {
+            progressBar.Value = 0;
+            progressBar.Visibility = Visibility.Visible;
+            loadingLabel.Content = "";
+            loadingLabel.Visibility = Visibility.Visible;
+            wmoCheckBox.IsEnabled = false;
+            m2CheckBox.IsEnabled = false;
+            exportButton.IsEnabled = false;
+            modelListBox.IsEnabled = false;
+
+            exportworker.RunWorkerAsync(textureListBox.SelectedItems);
+        }
+
+        private void textureListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var file = (string)textureListBox.SelectedItem;
+            try
+            {
+                var blp = new WoWFormatLib.FileReaders.BLPReader();
+                blp.LoadBLP(file);
+
+                var bmp = blp.bmp;
+
+                using (var memory = new MemoryStream())
+                {
+                    bmp.Save(memory, ImageFormat.Png);
+
+                    memory.Position = 0;
+
+                    var bitmapImage = new BitmapImage();
+
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = memory;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+
+                    blpImage.Source = bitmapImage;
+                }
+            }
+            catch(Exception blpException)
+            {
+                Console.WriteLine(blpException.Message);
             }
         }
     }
