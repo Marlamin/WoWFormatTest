@@ -244,7 +244,6 @@ namespace OBJExporterUI
             models = new List<string>();
             textures = new List<string>();
 
-            loadingImage.Visibility = Visibility.Hidden;
             progressBar.Visibility = Visibility.Visible;
 
             worker.RunWorkerAsync();
@@ -252,6 +251,7 @@ namespace OBJExporterUI
 
         private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            loadingImage.Visibility = Visibility.Hidden;
             tabs.Visibility = Visibility.Visible;
             progressBar.Visibility = Visibility.Hidden;
             loadingLabel.Visibility = Visibility.Hidden;
