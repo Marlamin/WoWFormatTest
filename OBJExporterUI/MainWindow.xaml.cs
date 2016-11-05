@@ -306,6 +306,26 @@ namespace OBJExporterUI
                 else if (selectedFile.EndsWith(".adt"))
                 {
                     Exporters.OBJ.ADTExporter.exportADT(selectedFile);
+                }else if (selectedFile.EndsWith(".blp"))
+                {
+                    try
+                    {
+                        var blp = new WoWFormatLib.FileReaders.BLPReader();
+                        blp.LoadBLP(selectedFile);
+
+                        var bmp = blp.bmp;
+
+                        if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(selectedFile))))
+                        {
+                            Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(selectedFile)));
+                        }
+
+                        bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(selectedFile), Path.GetFileNameWithoutExtension(selectedFile)) + ".png");
+                    }
+                    catch (Exception blpException)
+                    {
+                        Console.WriteLine(blpException.Message);
+                    }
                 }
             }
         }
