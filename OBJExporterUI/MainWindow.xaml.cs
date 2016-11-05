@@ -462,7 +462,7 @@ namespace OBJExporterUI
         {
             if (!texturesLoaded)
             {
-                modelListBox.DataContext = textures;
+                textureListBox.DataContext = textures;
                 texturesLoaded = true;
             }
         }
