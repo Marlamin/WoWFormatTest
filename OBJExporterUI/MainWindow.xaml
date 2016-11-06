@@ -39,8 +39,16 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="2*" />
+                        <RowDefinition Height="0.5*" />
                     </Grid.RowDefinitions>
-                    <ListBox x:Name="mapListBox" Grid.Row="0" Height="Auto" VerticalAlignment="Top"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox Grid.Row="0" Grid.ColumnSpan="2" x:Name="mapListBox" SelectionMode="Extended" SelectionChanged="mapListBox_SelectionChanged" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
+                    <Image x:Name="tileImage" Grid.Column="1" Grid.Row="1" />
+                    <ListBox x:Name="tileListBox" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="0"  SelectionChanged="tileListBox_SelectionChanged"/>
+                    <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="exportTileButton" Height="25" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="exportTileButton_Click"/>
                 </Grid>
             </TabItem>
         </TabControl>

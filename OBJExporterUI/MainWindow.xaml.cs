@@ -36,6 +36,8 @@ namespace OBJExporterUI
         private List<string> models;
         private List<string> textures;
 
+        private DBFilesClient.NET.Storage<MapEntry> mapsData;
+
         public MainWindow()
         {
             if (bool.Parse(ConfigurationManager.AppSettings["firstrun"]) == true)
@@ -178,7 +180,7 @@ namespace OBJExporterUI
             List<string> filtered = new List<string>();
 
             var selectedTab = (TabItem) tabs.SelectedItem;
-            if((string)selectedTab.Header == "Textures")
+            if ((string)selectedTab.Header == "Textures")
             {
                 for (int i = 0; i < textures.Count(); i++)
                 {
@@ -189,6 +191,18 @@ namespace OBJExporterUI
                 }
 
                 textureListBox.DataContext = filtered;
+            }
+            else if ((string)selectedTab.Header == "Maps")
+            {
+                mapListBox.Items.Clear();
+
+                foreach (var mapEntry in mapsData)
+                {
+                    if(mapEntry.Value.directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.mapname_lang.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
+                    {
+                        mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang));
+                    }
+                }
             }
             else
             {
@@ -334,58 +348,27 @@ namespace OBJExporterUI
         {
             worker.ReportProgress(0, "Loading listfile..");
             List<string> linelist = new List<string>();
-
-            if (CASC.FileExists("dbfilesclient/filedatacomplete.dbc"))
-            {
-                var reader = new DBCReader<FileDataRecord>("dbfilesclient/filedatacomplete.dbc");
-
-                if (reader.recordCount > 0)
-                {
-                    worker.ReportProgress(50, "Loading complete listfile..");
-
-                    for (int i = 0; i < reader.recordCount; i++)
-                    {
-                        if (CASC.cascHandler.FileExists(reader[i].ID))
-                        {
-                            linelist.Add(reader[i].FileName + reader[i].FilePath);
-                        }
-                    }
-                }
-            }
             
-            if(linelist.Count() == 0)
+            if (!File.Exists("listfile.txt"))
             {
-                // Fall back
-
-                if (!File.Exists("listfile.txt"))
-                {
-                    throw new Exception("Listfile not found. Unable to continue.");
-                }
-
-                worker.ReportProgress(50, "Loading listfile from disk..");
-
-                foreach(var line in File.ReadAllLines("listfile.txt"))
-                {
-                    if (CASC.FileExists(line))
-                    {
-                        linelist.Add(line);
-                    }
-                }
-            }else
-            {
-                Console.WriteLine("Linelist count" + linelist.Count());
+                throw new Exception("Listfile not found. Unable to continue.");
             }
 
-            worker.ReportProgress(0, "Sorting listfile..");
+            worker.ReportProgress(50, "Loading listfile from disk..");
+
+            foreach(var line in File.ReadAllLines("listfile.txt"))
+            {
+                if (CASC.FileExists(line))
+                {
+                    linelist.Add(line.ToLower());
+                }
+            }
+
+            worker.ReportProgress(70, "Sorting listfile..");
 
             linelist.Sort();
 
             string[] lines = linelist.ToArray();
-
-            for (int i = 0; i < lines.Length; i++)
-            {
-                lines[i] = lines[i].ToLower();
-            }
 
             List<string> unwantedExtensions = new List<String>();
             for (int u = 0; u < 512; u++)
@@ -399,14 +382,12 @@ namespace OBJExporterUI
             {
                 if (showWMO && lines[i].EndsWith(".wmo")) {
                     if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2.wmo") && !lines[i].EndsWith("lod3.wmo")) {
-                        if (!models.Contains(lines[i])) { models.Add(lines[i]); }
+                        models.Add(lines[i]);
                     }
                 }
 
                 if (showM2 && lines[i].EndsWith(".m2")) {
-                    //if (!lines[i].StartsWith("alternate") && !lines[i].StartsWith("camera")) {
                        models.Add(lines[i]);
-                    //}
                 }
 
                 if (lines[i].EndsWith(".blp"))
@@ -463,7 +444,8 @@ namespace OBJExporterUI
                 try
                 {
                     mapListBox.DisplayMemberPath = "Value";
-                    var mapsData = new DBFilesClient.NET.Storage<MapEntry>(CASC.OpenFile(@"DBFilesClient/Map.db2"));
+                    mapsData = new DBFilesClient.NET.Storage<MapEntry>(CASC.OpenFile(@"DBFilesClient/Map.db2"));
+
                     foreach (var mapEntry in mapsData)
                     {
                         mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang));
@@ -528,6 +510,77 @@ namespace OBJExporterUI
                 }
             }
             catch(Exception blpException)
+            {
+                Console.WriteLine(blpException.Message);
+            }
+        }
+
+        private void exportTileButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void mapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            tileListBox.Items.Clear();
+
+            if (mapListBox.HasItems)
+            {
+                var selectedItem = (KeyValuePair<string, string>)mapListBox.SelectedItem;
+
+                var wdt = "world\\maps\\" + selectedItem.Key + "\\" + selectedItem.Key + ".wdt";
+
+                if (CASC.FileExists(wdt))
+                {
+                    var reader = new WoWFormatLib.FileReaders.WDTReader();
+                    reader.LoadWDT(wdt);
+                    for (var i = 0; i < reader.tiles.Count; i++)
+                    {
+                        tileListBox.Items.Add(reader.tiles[i][0].ToString().PadLeft(2, '0') + "_" + reader.tiles[i][1].ToString().PadLeft(2, '0'));
+                    }
+                }
+            }
+        }
+
+        private void tileListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            try
+            {
+                var file = (string)tileListBox.SelectedItem;
+
+                var selectedItem = (KeyValuePair<string, string>)mapListBox.SelectedItem;
+
+                var minimapFile = "world\\minimaps\\" + selectedItem.Key + "\\map" + file + ".blp";
+
+                if (!CASC.FileExists(minimapFile))
+                {
+                    minimapFile = @"interface\icons\inv_misc_questionmark.blp";
+                }
+
+                var blp = new WoWFormatLib.FileReaders.BLPReader();
+                blp.LoadBLP(minimapFile);
+
+                var bmp = blp.bmp;
+
+                using (var memory = new MemoryStream())
+                {
+                    bmp.Save(memory, ImageFormat.Png);
+
+                    memory.Position = 0;
+
+                    var bitmapImage = new BitmapImage();
+
+                    bitmapImage.BeginInit();
+                    bitmapImage.StreamSource = memory;
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.EndInit();
+
+                    tileImage.Source = bitmapImage;
+                }
+
+            }
+            catch (Exception blpException)
             {
                 Console.WriteLine(blpException.Message);
             }
