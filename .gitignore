@@ -35,8 +35,10 @@ CascBot
 ListFileGenerator
 UltraDiffer3000/*
 ADTdiff/*
+DBCtest/*
 AreaAssignments/*
 QuickFNChecker/*
 BLPBatchConverter/*
 OBJExporter/*
 MinimapUpdater/*
+OpenWoWEdit/*

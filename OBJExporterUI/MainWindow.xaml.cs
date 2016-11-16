@@ -517,6 +517,12 @@ namespace OBJExporterUI
 
         private void exportTileButton_Click(object sender, RoutedEventArgs e)
         {
+            var selectedMap = (KeyValuePair<string, string>)mapListBox.SelectedItem;
+            var selectedTile = (string)tileListBox.SelectedItem;
+
+            Console.WriteLine(selectedMap.Key + ", " + selectedMap.Value + ", " + selectedTile);
+
+            Exporters.OBJ.ADTExporter.exportADT("world/maps/" + selectedMap.Key.ToLower() + "/" + selectedMap.Key.ToLower() + "_" + selectedTile + ".adt");
 
         }
 

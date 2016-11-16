@@ -67,6 +67,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADTexporter", "ADTexporter\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBFilesClient.NET", "DBFilesClient.NET\DBFilesClient.NET\DBFilesClient.NET.csproj", "{9DD24326-77E6-47F5-BA54-345981C16289}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenWoWEdit", "OpenWoWEdit\OpenWoWEdit.csproj", "{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -387,6 +389,18 @@ Global
 		{9DD24326-77E6-47F5-BA54-345981C16289}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{9DD24326-77E6-47F5-BA54-345981C16289}.Release|x86.ActiveCfg = Release|Any CPU
 		{9DD24326-77E6-47F5-BA54-345981C16289}.Release|x86.Build.0 = Release|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Debug|x86.Build.0 = Debug|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Release|x86.ActiveCfg = Release|Any CPU
+		{7DE6D042-1580-4E0E-9A38-2BCB376C80EB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

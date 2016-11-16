@@ -13,11 +13,12 @@ namespace OBJExporterUI.Exporters.OBJ
 {
     class M2Exporter
     {
-        public static void exportM2(string file, BackgroundWorker exportworker = null)
+        public static void exportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
         {
             if (exportworker == null)
             {
                 exportworker = new BackgroundWorker();
+                exportworker.WorkerReportsProgress = true;
             }
 
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
@@ -43,13 +44,21 @@ namespace OBJExporterUI.Exporters.OBJ
                 vertices[i].TexCoord = new Vector2(reader.model.vertices[i].textureCoordX, reader.model.vertices[i].textureCoordY);
             }
 
-            // Create output directory
-            if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
-            {
-                Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
-            }
+            StreamWriter objsw;
 
-            var objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".obj")));
+            if(destinationOverride == null)
+            {
+                // Create output directory
+                if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
+                {
+                    Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
+                }
+
+                objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".obj")));
+            }
+            else {
+                objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".obj")));
+            }
 
             objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
             objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file) + ".mtl");
@@ -102,7 +111,17 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(65, "Exporting textures..");
 
-            var mtlsb = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".mtl")));
+            StreamWriter mtlsb;
+
+            if (destinationOverride == null)
+            {
+                mtlsb = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".mtl")));
+            }
+            else
+            {
+                mtlsb = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".mtl")));
+            }
+
             var textureID = 0;
             var materials = new Structs.Material[reader.model.textures.Count()];
 
@@ -141,7 +160,14 @@ namespace OBJExporterUI.Exporters.OBJ
 
                 try
                 {
-                    blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
+                    if (destinationOverride == null)
+                    {
+                        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
+                    }
+                    else
+                    {
+                        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
+                    }
                 }
                 catch (Exception e)
                 {

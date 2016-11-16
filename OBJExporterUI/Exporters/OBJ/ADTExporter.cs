@@ -24,6 +24,10 @@ namespace OBJExporterUI.Exporters.OBJ
             //CASC.InitCasc(null, @"C:\World of Warcraft Beta", "wow_beta");
             var outdir = ConfigurationManager.AppSettings["outdir"];
 
+            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
+
             float TileSize = 1600.0f / 3.0f; //533.333
             float ChunkSize = TileSize / 16.0f; //33.333
             float UnitSize = ChunkSize / 8.0f; //4.166666 // ~~fun fact time with marlamin~~ this /2 ends up being pixelspercoord on minimap
@@ -161,6 +165,23 @@ namespace OBJExporterUI.Exporters.OBJ
 
                         renderBatches.Add(batch);
                     }
+
+                    var doodadSW = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_ModelPlacementInformation.csv"));
+                    doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationX;RotationY;RotationZ;ScaleFactor;ModelId");
+                    for (int mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
+                    {
+                        var doodad = reader.adtfile.objects.models.entries[mi];
+
+                        var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
+
+                        if(!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")){
+                            M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        }
+
+                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId);
+                    }
+
+                    doodadSW.Close();
                 }
             }
 

@@ -2,6 +2,23 @@
 
 namespace WoWFormatLib.DBC
 {
+    [DBFileName("Creature")]
+    public sealed class CreatureEntry
+    {
+        public uint[] unk0;
+        public uint unk1;
+        public uint[] DisplayID;
+        public float[] unk2;
+        public string Name;
+        public string AlternateName;
+        public string Title;
+        public string unk3;
+        public ushort unk4;
+        public ushort unk5;
+        public ushort unk6;
+        public ushort unk7;
+    }
+
     [DBFileName("CreatureDisplayInfo")]
     public sealed class CreatureDisplayInfoEntry
     {
