@@ -3,6 +3,7 @@ using Hjg.Pngcs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using WoWFormatLib.SereniaBLPLib;
 using WoWFormatLib.Utils;
 
 namespace MinimapUpdater
@@ -40,6 +41,8 @@ namespace MinimapUpdater
 
                 Console.WriteLine("[" + mapname + "] Loading tiles..");
 
+                var bmpDict = new Dictionary<string, Bitmap>();
+
                 for (int cur_x = 0; cur_x < 64; cur_x++)
                 {
                     for (int cur_y = 0; cur_y < 64; cur_y++)
@@ -55,6 +58,11 @@ namespace MinimapUpdater
 
                             if (cur_x < min_x) { min_x = cur_x; }
                             if (cur_y < min_y) { min_y = cur_y; }
+
+                            using (var blp = new BlpFile(CASC.OpenFile(tilename)))
+                            {
+                                bmpDict.Add(cur_x + "_" + cur_y, blp.GetBitmap(0));
+                            }
                         }
                     }
                 }
@@ -77,11 +85,9 @@ namespace MinimapUpdater
 
                 Console.WriteLine("[" + mapname + "] " + "Image will be " + res_x + "x" + res_y);
 
-                var blp = new WoWFormatLib.FileReaders.BLPReader();
+
                 ImageInfo imi = new ImageInfo(res_x, res_y, 8, true);
                 PngWriter png = FileHelper.CreatePngWriter("maps/" + mapname + ".png", imi, true);
-
-                var prevtilename = "";
 
                 for (int row = 0; row < png.ImgInfo.Rows; row++)
                 {
@@ -94,33 +100,15 @@ namespace MinimapUpdater
                         var blp_x = min_x + (col / 256);
                         var blp_pixel_x = col - ((blp_x - min_x) * 256);
 
-                        var tilename = "World\\Minimaps\\" + mapname + "\\map" + blp_x + "_" + blp_y + ".blp";
-
-                        // if (blpDict.ContainsKey(blp_x + "_" + blp_y))
-                        //     {
-                        //         pixel = blpDict[blp_x + "_" + blp_y].GetPixel(blp_pixel_x, blp_pixel_y);
-                        ///     }
-                        //     else
-                        //     {
-                        // }
-
-                        if (tilename != prevtilename && CASC.FileExists(tilename))
+                        if(bmpDict.ContainsKey(blp_x + "_" + blp_y))
                         {
-                            blp.LoadBLP(tilename);
-                        }
-
-                        if (blp.bmp != null)
-                        {
-                            var pixel = blp.bmp.GetPixel(blp_pixel_x, blp_pixel_y);
+                            var pixel = bmpDict[blp_x + "_" + blp_y].GetPixel(blp_pixel_x, blp_pixel_y);
                             ImageLineHelper.SetPixel(iline, col, pixel.R, pixel.G, pixel.B, pixel.A);
                         }
                         else
                         {
-                            var pixel = Color.Transparent;
-                            ImageLineHelper.SetPixel(iline, col, pixel.R, pixel.G, pixel.B, pixel.A);
+                            ImageLineHelper.SetPixel(iline, col, 0x00, 0x00, 0x00, 0x00);
                         }
-
-                        prevtilename = tilename;
                     }
                     png.WriteRow(iline, row);
                     if(row % (png.ImgInfo.Rows / 100) == 0)
