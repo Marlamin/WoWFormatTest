@@ -448,7 +448,7 @@ namespace WoWFormatLib.FileReaders
             WMOGroupFile[] groupFiles = new WMOGroupFile[wmofile.header.nGroups];
             for (int i = 0; i < wmofile.header.nGroups; i++)
             {
-                string groupfilename = groupfilename = filename.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
+                string groupfilename = filename.ToLower().Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
 
                 if (_lod)
                 {
