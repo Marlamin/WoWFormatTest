@@ -315,42 +315,42 @@ namespace OBJExporterUI
 
                 for (int i = 0; i < cache.doodadBatches[filename].submeshes.Count(); i++)
                 {
+                    if (cache.doodadBatches[filename].submeshes[i].blendType == 0)
+                    {
+                        GL.Disable(EnableCap.Blend);
+                    }
+                    else
+                    {
+                        GL.Enable(EnableCap.Blend);
+                        GL.BlendEquation(BlendEquationMode.FuncAdd);
+                    }
+
                     switch (cache.doodadBatches[filename].submeshes[i].blendType)
                     {
                         case 0: //Combiners_Opaque (Blend disabled)
-                            GL.Disable(EnableCap.Blend);
                             break;
                         case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
                             GL.Enable(EnableCap.Blend);
-                            //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
                             //GL.BlendFuncSeparate(BlendingFactorSrc.One, BlendingFactorDest.Zero, BlendingFactorSrc.One, BlendingFactorDest.Zero);
-                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
                             break;
                         case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
-                            GL.Enable(EnableCap.Blend);
-                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                            //Tried:
-                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha
-                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha
-                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusDstAlpha
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                             break;
                         case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
-                            GL.Enable(EnableCap.Blend);
-                            GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha);
                             break;
                         case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
-                            GL.Enable(EnableCap.Blend);
-                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One, BlendingFactorSrc.Zero, BlendingFactorDest.One);
                             break;
                         case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
-                            GL.Enable(EnableCap.Blend);
                             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                             break;
                         case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
-                            GL.Enable(EnableCap.Blend);
-                            GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor, BlendingFactorSrc.DstAlpha, BlendingFactorDest.SrcAlpha);
                             break;
                         case 7: //World\Expansion05\Doodads\Shadowmoon\Doodads\6FX_Fire_Grassline_Doodad_blue_LARGE.m2
+                            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
                             break;
                         default:
                             throw new Exception("Unknown blend type " + cache.doodadBatches[filename].submeshes[i].blendType);
@@ -371,42 +371,42 @@ namespace OBJExporterUI
                     GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].indiceBuffer);
 
+                    if (cache.worldModelBatches[filename].wmoRenderBatch[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].blendType == 0)
+                    {
+                        GL.Disable(EnableCap.Blend);
+                    }
+                    else
+                    {
+                        GL.Enable(EnableCap.Blend);
+                        GL.BlendEquation(BlendEquationMode.FuncAdd);
+                    }
+
                     switch (cache.worldModelBatches[filename].wmoRenderBatch[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].blendType)
                     {
                         case 0: //Combiners_Opaque (Blend disabled)
-                            GL.Disable(EnableCap.Blend);
                             break;
                         case 1: //Combiners_Mod (Blend enabled, Src = ONE, Dest = ZERO, SrcAlpha = ONE, DestAlpha = ZERO)
                             GL.Enable(EnableCap.Blend);
-                            //Not BlendingFactorSrc.One and BlendingFactorDest.Zero!
                             //GL.BlendFuncSeparate(BlendingFactorSrc.One, BlendingFactorDest.Zero, BlendingFactorSrc.One, BlendingFactorDest.Zero);
-                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
                             break;
                         case 2: //Combiners_Decal (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
-                            GL.Enable(EnableCap.Blend);
-                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-                            //Tried:
-                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha
-                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha
-                            //BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusDstAlpha
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                             break;
                         case 3: //Combiners_Add (Blend enabled, Src = SRC_COLOR, Dest = DEST_COLOR, SrcAlpha = SRC_ALPHA, DestAlpha = DEST_ALPHA )
-                            GL.Enable(EnableCap.Blend);
-                            GL.BlendFunc(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcColor, BlendingFactorDest.DstColor, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.DstAlpha);
                             break;
                         case 4: //Combiners_Mod2x (Blend enabled, Src = SRC_ALPHA, Dest = ONE, SrcAlpha = SRC_ALPHA, DestAlpha = ONE )
-                            GL.Enable(EnableCap.Blend);
-                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One, BlendingFactorSrc.Zero, BlendingFactorDest.One);
                             break;
                         case 5: //Combiners_Fade (Blend enabled, Src = SRC_ALPHA, Dest = INV_SRC_ALPHA, SrcAlpha = SRC_ALPHA, DestAlpha = INV_SRC_ALPHA )
-                            GL.Enable(EnableCap.Blend);
                             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                             break;
                         case 6: //Used in the Deeprun Tram subway glass, supposedly (Blend enabled, Src = DEST_COLOR, Dest = SRC_COLOR, SrcAlpha = DEST_ALPHA, DestAlpha = SRC_ALPHA )
-                            GL.Enable(EnableCap.Blend);
-                            GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor);
+                            GL.BlendFuncSeparate(BlendingFactorSrc.DstColor, BlendingFactorDest.SrcColor, BlendingFactorSrc.DstAlpha, BlendingFactorDest.SrcAlpha);
                             break;
                         case 7: //World\Expansion05\Doodads\Shadowmoon\Doodads\6FX_Fire_Grassline_Doodad_blue_LARGE.m2
+                            GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
                             break;
                         default:
                             throw new Exception("Unknown blend type " + cache.worldModelBatches[filename].wmoRenderBatch[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].blendType);

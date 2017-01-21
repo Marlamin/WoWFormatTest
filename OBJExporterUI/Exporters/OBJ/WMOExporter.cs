@@ -13,11 +13,12 @@ namespace OBJExporterUI.Exporters.OBJ
 {
     public class WMOExporter
     {
-        public static void exportWMO(string file, BackgroundWorker exportworker = null)
+        public static void exportWMO(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
         {
             if(exportworker == null)
             {
                 exportworker = new BackgroundWorker();
+                exportworker.WorkerReportsProgress = true;
             }
 
             Console.WriteLine("Loading WMO file..");
@@ -85,10 +86,13 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(55, "Exporting textures..");
 
-            // Create output directory
-            if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
+            if (destinationOverride == null)
             {
-                Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
+                // Create output directory
+                if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
+                {
+                    Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
+                }
             }
 
             var mtlsb = new StringBuilder();
@@ -122,7 +126,14 @@ namespace OBJExporterUI.Exporters.OBJ
 
                             try
                             {
-                                blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
+                                if (destinationOverride == null)
+                                {
+                                    blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
+                                }
+                                else
+                                {
+                                    blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
+                                }
                             }
                             catch (Exception e)
                             {
@@ -154,7 +165,14 @@ namespace OBJExporterUI.Exporters.OBJ
                 }
             }
 
-            File.WriteAllText(Path.Combine(outdir, file.Replace(".wmo", ".mtl")), mtlsb.ToString());
+            if (destinationOverride == null)
+            {
+                File.WriteAllText(Path.Combine(outdir, file.Replace(".wmo", ".mtl")), mtlsb.ToString());
+            }
+            else
+            {
+                File.WriteAllText(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".wmo", ".mtl")), mtlsb.ToString());
+            }
 
             exportworker.ReportProgress(75, "Exporting model..");
 
@@ -197,7 +215,17 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(95, "Writing files..");
 
-            var objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".wmo", ".obj")));
+            StreamWriter objsw;
+
+            if (destinationOverride == null)
+            {
+                objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".wmo", ".obj")));
+            }
+            else
+            {
+                objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".wmo", ".obj")));
+            }
+
             objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
             objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file) + ".mtl");
 
