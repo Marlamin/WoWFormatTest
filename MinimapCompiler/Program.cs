@@ -18,7 +18,6 @@ namespace MinimapCompiler
     {
         private static void Main(string[] args)
         {
-            string mapname = "";
 
             string basedir = ConfigurationManager.AppSettings["basedir"];
             bool buildmaps = Boolean.Parse(ConfigurationManager.AppSettings["buildmaps"]);
@@ -29,12 +28,15 @@ namespace MinimapCompiler
             if(basedir != String.Empty){
                 CASC.InitCasc(null, basedir);
             }else{
-                CASC.InitCasc(null, @"D:\World of Warcraft Beta", "wow_beta"); // Use beta for now
+                CASC.InitCasc(null, null, "wowt");
             }
 
             Console.WriteLine("CASC initialized!");
             Console.WriteLine("Current patch: " + CASC.cascHandler.Config.BuildName);
 
+            /*
+            string mapname = "";
+             * 
             if (buildmaps == true)
             {
                 DB2Reader<MapRecordLegion> reader = new DB2Reader<MapRecordLegion>("DBFilesClient\\Map.db2");
@@ -133,46 +135,31 @@ namespace MinimapCompiler
                     if (!Directory.Exists("done")) { Directory.CreateDirectory("done"); }
                     super_bmp.Save("done/SUPER_" + mapname + ".png");
                     */
-                }
-            }
-                
+            // }
+            //}
+
 
             if (buildWMOmaps == true)
             {
                 List<string> linelist = new List<string>();
-
-                if (CASC.FileExists("dbfilesclient/filedatacomplete.dbc"))
+                
+                foreach(var line in File.ReadAllLines("listfile.txt"))
                 {
-                    var dbcreader = new DBCReader<FileDataRecord>("dbfilesclient/filedatacomplete.dbc");
-
-                    if (dbcreader.recordCount > 0)
-                    {
-                        for (int i = 0; i < dbcreader.recordCount; i++)
-                        {
-                            if (CASC.cascHandler.FileExists(dbcreader[i].ID))
-                            {
-                                if(dbcreader[i].ID > 1023304)
-                                {
-                                    linelist.Add(dbcreader[i].FileName + dbcreader[i].FilePath);
-                                }
-                            }
-                        }
-                    }
+                     linelist.Add(line);
                 }
-
-                DBCReader<MapRecord> reader = new DBCReader<MapRecord>("DBFilesClient\\Map.dbc");
 
                 string[] unwantedExtensions = new string[513];
                 for (int i = 0; i < 512; i++)
                 {
                     unwantedExtensions[i] = "_" + i.ToString().PadLeft(3, '0') + ".wmo";
                 }
-                unwantedExtensions[512] = "LOD1.wmo";
+
+                unwantedExtensions[512] = "lod1.wmo";
                 foreach (string s in linelist)
                 {
                     if (s.Length > 8 && !unwantedExtensions.Contains(s.Substring(s.Length - 8, 8)))
                     {
-                        if (!s.Contains("LOD") && s.EndsWith(".wmo", StringComparison.CurrentCultureIgnoreCase))
+                        if ((!s.Contains("lod1.wmo") && !s.Contains("lod2.wmo")) && s.EndsWith(".wmo", StringComparison.CurrentCultureIgnoreCase))
                         {
                             Console.WriteLine(s);
                             WMO wmocompiler = new WMO();

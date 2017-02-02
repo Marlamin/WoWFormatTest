@@ -25,7 +25,7 @@ namespace MinimapCompiler
 
             Console.WriteLine(wmoname);
 
-            if (wmo.group.Count() == 0)
+            if (wmo.group == null || wmo.group.Count() == 0)
             {
                 Console.WriteLine("WMO " + wmoname + " has no groups! Skipping..");
                 return;
@@ -167,7 +167,7 @@ namespace MinimapCompiler
             int y = 0;
 
             string wmoonlyname = Path.GetFileNameWithoutExtension(wmoname);
-            string wmodir = Path.GetDirectoryName(wmoname).Replace("World\\", "World\\Minimaps\\");
+            string wmodir = Path.GetDirectoryName(wmoname).Replace("world\\", "world\\minimaps\\");
             List<string> filePaths = new List<string>();
             string lastpath = "";
 
