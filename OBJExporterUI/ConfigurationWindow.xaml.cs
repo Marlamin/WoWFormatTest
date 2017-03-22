@@ -162,7 +162,8 @@ namespace OBJExporterUI
             if (!error)
             {
                 config.Save(ConfigurationSaveMode.Full);
-                Close();
+                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                Application.Current.Shutdown();
             }
         }
 

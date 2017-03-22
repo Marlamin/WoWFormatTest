@@ -10,9 +10,9 @@
         Title="OBJ Exporter" Height="600" Width="600">
     <Grid>
         <Image x:Name="loadingImage" Source="Resources/icon.png" Margin="234,235,234,187"/>
-        <TextBox x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="10" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged"/>
-        <ProgressBar x:Name="progressBar" Visibility="Visible" HorizontalAlignment="Stretch" Height="36" Margin="10" VerticalAlignment="Top" />
-        <Label x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="0,7,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="10,22,10,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged"/>
+        <ProgressBar x:Name="progressBar" Visibility="Visible" HorizontalAlignment="Stretch" Height="36" Margin="10,33,10,0" VerticalAlignment="Top" />
+        <Label x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="10,33,10,0" VerticalAlignment="Top" Width="572" HorizontalContentAlignment="Center" Height="36" VerticalContentAlignment="Center"/>
         <TabControl x:Name="tabs" Margin="0,50,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Hidden">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
@@ -52,5 +52,20 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <DockPanel>
+            <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False">
+                <MenuItem Header="_File">
+                    <MenuItem Name="MenuPreferences" Header="_Preferences" Click="MenuPreferences_Click"/>
+                    <MenuItem Name="MenuQuit" Header="_Quit" Click="MenuQuit_Click" />
+                </MenuItem>
+                <MenuItem Header="_Tools">
+                    <MenuItem Name="MenuListfile" Header="_Update Listfile" Click="MenuListfile_Click" IsEnabled="False"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="_About">
+                    <MenuItem Name="MenuVersion" Header="_Version" Click="MenuVersion_Click"></MenuItem>
+                </MenuItem>
+            </Menu>
+            <StackPanel></StackPanel>
+        </DockPanel>
     </Grid>
 </Window>

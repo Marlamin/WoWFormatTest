@@ -113,8 +113,10 @@ namespace OBJExporterUI
         protected override void OnResize(EventArgs e)
         {
             GL.Viewport(0, 0, Width, Height);
-            ActiveCamera = new OldCamera(Width, Height);
-            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
+            ActiveCamera = new OldCamera(Width, Height)
+            {
+                Pos = new Vector3(dragX, dragY, dragZ)
+            };
             ActiveCamera.setupGLRenderMatrix();
         }
         protected override void OnUpdateFrame(FrameEventArgs e)

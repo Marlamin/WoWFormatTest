@@ -8,7 +8,7 @@
         Icon="Resources/icon32.png"
         ResizeMode="NoResize"
         WindowStyle="ToolWindow"
-        Title="Initial Configuration" Height="300" Width="300">
+        Title="Configuration" Height="300" Width="300">
     <Grid>
         <Label x:Name="outdirLabel" Content="No export directory set, using application folder" Visibility="Visible" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top"/>
         <Button x:Name="outdirBrowse" Content="Browse.." Visibility="Visible" Click="outdirBrowse_Click" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Width="75"/>

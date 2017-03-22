@@ -13,6 +13,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Drawing.Imaging;
 using System.Windows.Media.Imaging;
+using System.Net;
+using System.IO.Compression;
 
 namespace OBJExporterUI
 {
@@ -261,6 +263,8 @@ namespace OBJExporterUI
             progressBar.Visibility = Visibility.Visible;
 
             worker.RunWorkerAsync();
+
+            MainMenu.IsEnabled = true;
         }
 
         private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -275,6 +279,8 @@ namespace OBJExporterUI
             previewButton.Visibility = Visibility.Visible;
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
+
+            MenuListfile.IsEnabled = true;
 
             modelListBox.DataContext = models;
             textureListBox.DataContext = textures;
@@ -347,11 +353,13 @@ namespace OBJExporterUI
         private void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             worker.ReportProgress(0, "Loading listfile..");
+
             List<string> linelist = new List<string>();
             
             if (!File.Exists("listfile.txt"))
             {
-                throw new Exception("Listfile not found. Unable to continue.");
+                worker.ReportProgress(20, "Downloading listfile..");
+                UpdateListfile();
             }
 
             worker.ReportProgress(50, "Loading listfile from disk..");
@@ -369,6 +377,8 @@ namespace OBJExporterUI
             linelist.Sort();
 
             string[] lines = linelist.ToArray();
+
+            linelist = null;
 
             List<string> unwantedExtensions = new List<String>();
             for (int u = 0; u < 512; u++)
@@ -401,6 +411,8 @@ namespace OBJExporterUI
                     worker.ReportProgress(progress, "Filtering listfile..");
                 }
             }
+
+            lines = null;
         }
 
         private void CheckBoxChanged(object sender, RoutedEventArgs e)
@@ -550,7 +562,6 @@ namespace OBJExporterUI
 
         private void tileListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
             try
             {
                 var file = (string)tileListBox.SelectedItem;
@@ -590,6 +601,61 @@ namespace OBJExporterUI
             {
                 Console.WriteLine(blpException.Message);
             }
+        }
+
+        private void UpdateListfile()
+        {
+            using (var client = new WebClient())
+            using (var stream = new MemoryStream())
+            {
+                client.Headers[HttpRequestHeader.AcceptEncoding] = "gzip";
+                var responseStream = new GZipStream(client.OpenRead(ConfigurationManager.AppSettings["listfileurl"]), CompressionMode.Decompress);
+                responseStream.CopyTo(stream);
+                File.WriteAllBytes("listfile.txt", stream.ToArray());
+                responseStream.Close();
+                responseStream.Dispose();
+            }
+        }
+
+        private void MenuPreferences_Click(object sender, RoutedEventArgs e)
+        {
+            var cfgWindow = new ConfigurationWindow();
+            cfgWindow.ShowDialog();
+
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void MenuQuit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        private void MenuListfile_Click(object sender, RoutedEventArgs e)
+        {
+            MenuListfile.IsEnabled = false;
+
+            progressBar.Visibility = Visibility.Visible;
+            loadingLabel.Visibility = Visibility.Visible;
+            previewButton.Visibility = Visibility.Hidden;
+            exportButton.Visibility = Visibility.Hidden;
+            modelListBox.Visibility = Visibility.Hidden;
+            filterTextBox.Visibility = Visibility.Hidden;
+            wmoCheckBox.Visibility = Visibility.Hidden;
+            m2CheckBox.Visibility = Visibility.Hidden;
+            tabs.Visibility = Visibility.Hidden;
+
+            UpdateListfile();
+
+            models.Clear();
+            textures.Clear();
+
+            worker.RunWorkerAsync();
+        }
+
+        private void MenuVersion_Click(object sender, RoutedEventArgs e)
+        {
+            var vwindow = new VersionWindow();
+            vwindow.Show();
         }
     }
 }
