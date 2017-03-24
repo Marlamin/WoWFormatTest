@@ -294,6 +294,11 @@ namespace OBJExporterUI
             wmoCheckBox.IsEnabled = true;
             m2CheckBox.IsEnabled = true;
             modelListBox.IsEnabled = true;
+
+            /* ADT specific UI */
+            exportTileButton.IsEnabled = true;
+            mapListBox.IsEnabled = true;
+            tileListBox.IsEnabled = true;
         }
 
         private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -325,7 +330,7 @@ namespace OBJExporterUI
                 }
                 else if (selectedFile.EndsWith(".adt"))
                 {
-                    Exporters.OBJ.ADTExporter.exportADT(selectedFile);
+                    Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
                 }else if (selectedFile.EndsWith(".blp"))
                 {
                     try
@@ -534,8 +539,24 @@ namespace OBJExporterUI
 
             Console.WriteLine(selectedMap.Key + ", " + selectedMap.Value + ", " + selectedTile);
 
-            Exporters.OBJ.ADTExporter.exportADT("world/maps/" + selectedMap.Key.ToLower() + "/" + selectedMap.Key.ToLower() + "_" + selectedTile + ".adt");
+            progressBar.Value = 0;
+            progressBar.Visibility = Visibility.Visible;
+            loadingLabel.Content = "";
+            loadingLabel.Visibility = Visibility.Visible;
+            wmoCheckBox.IsEnabled = false;
+            m2CheckBox.IsEnabled = false;
+            exportButton.IsEnabled = false;
+            modelListBox.IsEnabled = false;
 
+            /* ADT specific UI */
+            exportTileButton.IsEnabled = false;
+            mapListBox.IsEnabled = false;
+            tileListBox.IsEnabled = false;
+
+            var tempList = new List<string>();
+            tempList.Add("world/maps/" + selectedMap.Key.ToLower() + "/" + selectedMap.Key.ToLower() + "_" + selectedTile + ".adt");
+
+            exportworker.RunWorkerAsync(tempList);
         }
 
         private void mapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

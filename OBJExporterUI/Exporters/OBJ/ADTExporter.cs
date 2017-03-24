@@ -14,13 +14,13 @@ namespace OBJExporterUI.Exporters.OBJ
 {
     public class ADTExporter
     {
-
         public static void exportADT(string file, BackgroundWorker exportworker = null)
         {
-            //if (exportworker == null)
-            //{
-            //   exportworker = new BackgroundWorker();
-            // }
+            if (exportworker == null)
+            {
+                exportworker = new BackgroundWorker();
+                exportworker.WorkerReportsProgress = true;
+            }
 
             //CASC.InitCasc(null, @"C:\World of Warcraft Beta", "wow_beta");
             var outdir = ConfigurationManager.AppSettings["outdir"];
@@ -65,7 +65,7 @@ namespace OBJExporterUI.Exporters.OBJ
                         continue;
                     }
 
-                    //exportworker.ReportProgress(0, "Loading ADT " + curfile);
+                    exportworker.ReportProgress(0, "Loading ADT " + curfile);
 
                     ADTReader reader = new ADTReader();
                     reader.LoadADT(curfile);
@@ -191,6 +191,8 @@ namespace OBJExporterUI.Exporters.OBJ
                     var doodadSW = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_ModelPlacementInformation.csv"));
                     doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationX;RotationY;RotationZ;ScaleFactor;ModelId");
 
+                    exportworker.ReportProgress(25, "Exporting WMOs");
+
                     for (int mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
                     {
                         var wmo = reader.adtfile.objects.worldModels.entries[mi];
@@ -204,6 +206,8 @@ namespace OBJExporterUI.Exporters.OBJ
 
                         doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";;" + wmo.uniqueId);
                     }
+
+                    exportworker.ReportProgress(50, "Exporting M2s");
 
                     for (int mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
                     {
@@ -222,6 +226,8 @@ namespace OBJExporterUI.Exporters.OBJ
                 }
             }
 
+            exportworker.ReportProgress(75, "Exporting terrain textures..");
+
             var mtlsw = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".mtl"));
 
             //No idea how MTL files really work yet. Needs more investigation.
@@ -235,6 +241,8 @@ namespace OBJExporterUI.Exporters.OBJ
             }
 
             mtlsw.Close();
+
+            exportworker.ReportProgress(85, "Exporting terrain geometry..");
 
             var indices = indicelist.ToArray();
 
