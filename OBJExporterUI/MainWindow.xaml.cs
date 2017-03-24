@@ -177,6 +177,28 @@ namespace OBJExporterUI
             fileworker.ReportProgress(progress, results);
         }
 
+        private string FriendlyExpansionName(int expansionID)
+        {
+            switch (expansionID)
+            {
+                case 0:
+                    return "Vanilla 0-1.x";
+                case 1:
+                    return "TBC 2.x";
+                case 2:
+                    return "WotLK 3.x";
+                case 3:
+                    return "Cataclysm 4.x";
+                case 4:
+                    return "MoP 5.x";
+                case 5:
+                    return "Warlords of Draenor 6.x";
+                case 6:
+                    return "Legion 7.x";
+                default:
+                    return "Unknown";
+            }
+        }
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             List<string> filtered = new List<string>();
@@ -202,7 +224,11 @@ namespace OBJExporterUI
                 {
                     if(mapEntry.Value.directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.mapname_lang.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
                     {
-                        mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang));
+                        if (CASC.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
+                        {
+                            var expansion = FriendlyExpansionName(mapEntry.Value.expansionID);
+                            mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang + "   (" + expansion + ", internal: " + mapEntry.Value.directory + ")"));
+                        }
                     }
                 }
             }
@@ -465,7 +491,11 @@ namespace OBJExporterUI
 
                     foreach (var mapEntry in mapsData)
                     {
-                        mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang));
+                        if(CASC.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
+                        {
+                            var expansion = FriendlyExpansionName(mapEntry.Value.expansionID);
+                            mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang + "   (" + expansion + ", internal: " + mapEntry.Value.directory + ")"));
+                        }
                     }
 
                     mapsLoaded = true;
