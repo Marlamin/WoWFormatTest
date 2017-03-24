@@ -52,7 +52,4 @@ WoWOpenGL_SH
 # Don't include cached data files
 WoWOpenGL/Data/*
 
-# This stuff isn't ready for public consumption
-OBJExporterUI/Utils*
-
 
