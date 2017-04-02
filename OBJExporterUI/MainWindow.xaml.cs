@@ -15,6 +15,7 @@ using System.Drawing.Imaging;
 using System.Windows.Media.Imaging;
 using System.Net;
 using System.IO.Compression;
+using Microsoft.VisualBasic.FileIO;
 
 namespace OBJExporterUI
 {
@@ -38,7 +39,8 @@ namespace OBJExporterUI
         private List<string> models;
         private List<string> textures;
 
-        private DBFilesClient.NET.Storage<MapEntry> mapsData;
+        private Dictionary<int, NiceMapEntry> mapNames = new Dictionary<int, NiceMapEntry>();
+        private List<string> mapFilters = new List<string>();
 
         public MainWindow()
         {
@@ -52,11 +54,11 @@ namespace OBJExporterUI
 
             if (bool.Parse(ConfigurationManager.AppSettings["firstrun"]) == true)
             {
-                Close();    
+                Close();
             }
 
             InitializeComponent();
-            
+
             exportworker.DoWork += exportworker_DoWork;
             exportworker.RunWorkerCompleted += exportworker_RunWorkerCompleted;
             exportworker.ProgressChanged += worker_ProgressChanged;
@@ -105,13 +107,14 @@ namespace OBJExporterUI
 
         private void exportButton_Click(object sender, RoutedEventArgs e)
         {
-            if ((string) exportButton.Content == "Crawl maptile for models")
+            if ((string)exportButton.Content == "Crawl maptile for models")
             {
                 var filterSplit = filterTextBox.Text.Remove(0, 8).Split('_');
                 var filename = "world\\maps\\" + filterSplit[0] + "\\" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt";
 
                 fileworker.RunWorkerAsync(filename);
-            }else
+            }
+            else
             {
                 progressBar.Value = 0;
                 progressBar.Visibility = Visibility.Visible;
@@ -128,7 +131,7 @@ namespace OBJExporterUI
 
         private void fileworker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            modelListBox.DataContext = (List<string>) e.UserState;
+            modelListBox.DataContext = (List<string>)e.UserState;
         }
 
         private void fileworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -142,9 +145,9 @@ namespace OBJExporterUI
             var remaining = new List<string>();
             var progress = 0;
 
-            remaining.Add((string) e.Argument);
+            remaining.Add((string)e.Argument);
 
-            while(remaining.Count > 0)
+            while (remaining.Count > 0)
             {
                 var filename = remaining[0];
                 if (filename.EndsWith(".wmo"))
@@ -152,7 +155,7 @@ namespace OBJExporterUI
                     var wmo = new WoWFormatLib.FileReaders.WMOReader();
                     wmo.LoadWMO(filename);
 
-                    
+
                     // Loop through filenames from WMO
                 }
                 else if (filename.EndsWith(".adt"))
@@ -177,33 +180,11 @@ namespace OBJExporterUI
             fileworker.ReportProgress(progress, results);
         }
 
-        private string FriendlyExpansionName(int expansionID)
-        {
-            switch (expansionID)
-            {
-                case 0:
-                    return "Vanilla 0-1.x";
-                case 1:
-                    return "TBC 2.x";
-                case 2:
-                    return "WotLK 3.x";
-                case 3:
-                    return "Cataclysm 4.x";
-                case 4:
-                    return "MoP 5.x";
-                case 5:
-                    return "Warlords of Draenor 6.x";
-                case 6:
-                    return "Legion 7.x";
-                default:
-                    return "Unknown";
-            }
-        }
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             List<string> filtered = new List<string>();
 
-            var selectedTab = (TabItem) tabs.SelectedItem;
+            var selectedTab = (TabItem)tabs.SelectedItem;
             if ((string)selectedTab.Header == "Textures")
             {
                 for (int i = 0; i < textures.Count(); i++)
@@ -218,19 +199,7 @@ namespace OBJExporterUI
             }
             else if ((string)selectedTab.Header == "Maps")
             {
-                mapListBox.Items.Clear();
-
-                foreach (var mapEntry in mapsData)
-                {
-                    if(mapEntry.Value.directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.mapname_lang.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
-                    {
-                        if (CASC.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
-                        {
-                            var expansion = FriendlyExpansionName(mapEntry.Value.expansionID);
-                            mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang + "   (" + expansion + ", internal: " + mapEntry.Value.directory + ")"));
-                        }
-                    }
-                }
+                UpdateMapListView();
             }
             else
             {
@@ -290,6 +259,8 @@ namespace OBJExporterUI
 
             worker.RunWorkerAsync();
 
+            UpdateMapListView();
+
             MainMenu.IsEnabled = true;
         }
 
@@ -297,14 +268,16 @@ namespace OBJExporterUI
         {
             loadingImage.Visibility = Visibility.Hidden;
             tabs.Visibility = Visibility.Visible;
-            progressBar.Visibility = Visibility.Hidden;
-            loadingLabel.Visibility = Visibility.Hidden;
             modelListBox.Visibility = Visibility.Visible;
             filterTextBox.Visibility = Visibility.Visible;
+            filterTextLabel.Visibility = Visibility.Visible;
             exportButton.Visibility = Visibility.Visible;
             previewButton.Visibility = Visibility.Visible;
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
+
+            progressBar.Value = 100;
+            loadingLabel.Content = "Done";
 
             MenuListfile.IsEnabled = true;
 
@@ -315,8 +288,8 @@ namespace OBJExporterUI
         private void exportworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             exportButton.IsEnabled = true;
-            progressBar.Visibility = Visibility.Hidden;
-            loadingLabel.Visibility = Visibility.Hidden;
+            progressBar.Value = 100;
+            loadingLabel.Content = "Done";
             wmoCheckBox.IsEnabled = true;
             m2CheckBox.IsEnabled = true;
             modelListBox.IsEnabled = true;
@@ -335,13 +308,13 @@ namespace OBJExporterUI
             {
                 loadingLabel.Content = state;
             }
-            
+
             progressBar.Value = e.ProgressPercentage;
         }
 
         private void exportworker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var selectedFiles = (System.Collections.IList) e.Argument;
+            var selectedFiles = (System.Collections.IList)e.Argument;
 
             foreach (string selectedFile in selectedFiles)
             {
@@ -357,7 +330,8 @@ namespace OBJExporterUI
                 else if (selectedFile.EndsWith(".adt"))
                 {
                     Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
-                }else if (selectedFile.EndsWith(".blp"))
+                }
+                else if (selectedFile.EndsWith(".blp"))
                 {
                     try
                     {
@@ -386,7 +360,7 @@ namespace OBJExporterUI
             worker.ReportProgress(0, "Loading listfile..");
 
             List<string> linelist = new List<string>();
-            
+
             if (!File.Exists("listfile.txt"))
             {
                 worker.ReportProgress(20, "Downloading listfile..");
@@ -395,7 +369,7 @@ namespace OBJExporterUI
 
             worker.ReportProgress(50, "Loading listfile from disk..");
 
-            foreach(var line in File.ReadAllLines("listfile.txt"))
+            foreach (var line in File.ReadAllLines("listfile.txt"))
             {
                 if (CASC.FileExists(line))
                 {
@@ -421,14 +395,17 @@ namespace OBJExporterUI
 
             for (int i = 0; i < lines.Count(); i++)
             {
-                if (showWMO && lines[i].EndsWith(".wmo")) {
-                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2.wmo") && !lines[i].EndsWith("lod3.wmo")) {
+                if (showWMO && lines[i].EndsWith(".wmo"))
+                {
+                    if (!unwanted.Contains(lines[i].Substring(lines[i].Length - 8, 8)) && !lines[i].EndsWith("lod.wmo") && !lines[i].EndsWith("lod1.wmo") && !lines[i].EndsWith("lod2.wmo") && !lines[i].EndsWith("lod3.wmo"))
+                    {
                         models.Add(lines[i]);
                     }
                 }
 
-                if (showM2 && lines[i].EndsWith(".m2")) {
-                       models.Add(lines[i]);
+                if (showM2 && lines[i].EndsWith(".m2"))
+                {
+                    models.Add(lines[i]);
                 }
 
                 if (lines[i].EndsWith(".blp"))
@@ -449,10 +426,10 @@ namespace OBJExporterUI
         private void CheckBoxChanged(object sender, RoutedEventArgs e)
         {
             if (exportButton == null) { return; }
-            if(m2CheckBox == null) { return; }
+            if (m2CheckBox == null) { return; }
 
-            if ((bool) m2CheckBox.IsChecked) { showM2 = true; } else { showM2 = false; }
-            if ((bool) wmoCheckBox.IsChecked) { showWMO = true; } else { showWMO = false; }
+            if ((bool)m2CheckBox.IsChecked) { showM2 = true; } else { showM2 = false; }
+            if ((bool)wmoCheckBox.IsChecked) { showWMO = true; } else { showWMO = false; }
 
             progressBar.Visibility = Visibility.Visible;
             loadingLabel.Visibility = Visibility.Visible;
@@ -460,6 +437,7 @@ namespace OBJExporterUI
             exportButton.Visibility = Visibility.Hidden;
             modelListBox.Visibility = Visibility.Hidden;
             filterTextBox.Visibility = Visibility.Hidden;
+            filterTextLabel.Visibility = Visibility.Hidden;
             wmoCheckBox.Visibility = Visibility.Hidden;
             m2CheckBox.Visibility = Visibility.Hidden;
 
@@ -470,40 +448,13 @@ namespace OBJExporterUI
 
         private void modelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(modelListBox.SelectedItems.Count == 1)
+            if (modelListBox.SelectedItems.Count == 1)
             {
                 previewButton.IsEnabled = true;
             }
             else
             {
                 previewButton.IsEnabled = false;
-            }
-        }
-
-        private void MapsTab_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!mapsLoaded)
-            {
-                try
-                {
-                    mapListBox.DisplayMemberPath = "Value";
-                    mapsData = new DBFilesClient.NET.Storage<MapEntry>(CASC.OpenFile(@"DBFilesClient/Map.db2"));
-
-                    foreach (var mapEntry in mapsData)
-                    {
-                        if(CASC.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
-                        {
-                            var expansion = FriendlyExpansionName(mapEntry.Value.expansionID);
-                            mapListBox.Items.Add(new KeyValuePair<string, string>(mapEntry.Value.directory, mapEntry.Value.mapname_lang + "   (" + expansion + ", internal: " + mapEntry.Value.directory + ")"));
-                        }
-                    }
-
-                    mapsLoaded = true;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("An error occured: " + ex.Message);
-                }
             }
         }
 
@@ -556,7 +507,7 @@ namespace OBJExporterUI
                     blpImage.Source = bitmapImage;
                 }
             }
-            catch(Exception blpException)
+            catch (Exception blpException)
             {
                 Console.WriteLine(blpException.Message);
             }
@@ -564,10 +515,10 @@ namespace OBJExporterUI
 
         private void exportTileButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedMap = (KeyValuePair<string, string>)mapListBox.SelectedItem;
+            var selectedMap = (MapListItem)mapListBox.SelectedItem;
             var selectedTile = (string)tileListBox.SelectedItem;
 
-            Console.WriteLine(selectedMap.Key + ", " + selectedMap.Value + ", " + selectedTile);
+            Console.WriteLine(selectedMap.Name + ", " + selectedMap.Internal + ", " + selectedTile);
 
             progressBar.Value = 0;
             progressBar.Visibility = Visibility.Visible;
@@ -584,7 +535,7 @@ namespace OBJExporterUI
             tileListBox.IsEnabled = false;
 
             var tempList = new List<string>();
-            tempList.Add("world/maps/" + selectedMap.Key.ToLower() + "/" + selectedMap.Key.ToLower() + "_" + selectedTile + ".adt");
+            tempList.Add("world/maps/" + selectedMap.Internal.ToLower() + "/" + selectedMap.Internal.ToLower() + "_" + selectedTile + ".adt");
 
             exportworker.RunWorkerAsync(tempList);
         }
@@ -595,9 +546,9 @@ namespace OBJExporterUI
 
             if (mapListBox.HasItems)
             {
-                var selectedItem = (KeyValuePair<string, string>)mapListBox.SelectedItem;
+                var selectedItem = (MapListItem)mapListBox.SelectedItem;
 
-                var wdt = "world\\maps\\" + selectedItem.Key + "\\" + selectedItem.Key + ".wdt";
+                var wdt = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + ".wdt";
 
                 if (CASC.FileExists(wdt))
                 {
@@ -617,9 +568,9 @@ namespace OBJExporterUI
             {
                 var file = (string)tileListBox.SelectedItem;
 
-                var selectedItem = (KeyValuePair<string, string>)mapListBox.SelectedItem;
+                var selectedItem = (MapListItem)mapListBox.SelectedItem;
 
-                var minimapFile = "world\\minimaps\\" + selectedItem.Key + "\\map" + file + ".blp";
+                var minimapFile = "world\\minimaps\\" + selectedItem.Internal + "\\map" + file + ".blp";
 
                 if (!CASC.FileExists(minimapFile))
                 {
@@ -668,6 +619,19 @@ namespace OBJExporterUI
             }
         }
 
+        private void UpdateMapList()
+        {
+            using (var client = new WebClient())
+            using (var stream = new MemoryStream())
+            {
+                var responseStream = client.OpenRead("https://docs.google.com/spreadsheets/d/1yYSHjWTX0l751QscolQpFNWjwdKLbD_rzviZ_XqTPfk/export?exportFormat=csv&gid=0");
+                responseStream.CopyTo(stream);
+                File.WriteAllBytes("mapnames.csv", stream.ToArray());
+                responseStream.Close();
+                responseStream.Dispose();
+            }
+        }
+
         private void MenuPreferences_Click(object sender, RoutedEventArgs e)
         {
             var cfgWindow = new ConfigurationWindow();
@@ -691,6 +655,7 @@ namespace OBJExporterUI
             exportButton.Visibility = Visibility.Hidden;
             modelListBox.Visibility = Visibility.Hidden;
             filterTextBox.Visibility = Visibility.Hidden;
+            filterTextLabel.Visibility = Visibility.Hidden;
             wmoCheckBox.Visibility = Visibility.Hidden;
             m2CheckBox.Visibility = Visibility.Hidden;
             tabs.Visibility = Visibility.Hidden;
@@ -707,6 +672,172 @@ namespace OBJExporterUI
         {
             var vwindow = new VersionWindow();
             vwindow.Show();
+        }
+
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            var source = (CheckBox)sender;
+            if (string.IsNullOrEmpty((string)source.Content))
+            {
+                // Expansion filter
+                //Console.WriteLine("Checkbox event on " + source.Name);
+
+                if ((bool)source.IsChecked)
+                {
+                    if (!mapFilters.Contains(source.Name))
+                    {
+                        mapFilters.Add(source.Name);
+                    }
+                }
+                else
+                {
+                    mapFilters.Remove(source.Name);
+                }
+            }
+            else
+            {
+                // Category filter
+                //Console.WriteLine("Checkbox event on " + source.Content);
+
+                if ((bool)source.IsChecked)
+                {
+                    if (!mapFilters.Contains((string)source.Content))
+                    {
+                        mapFilters.Add((string)source.Content);
+                    }
+                }
+                else
+                {
+                    mapFilters.Remove((string)source.Content);
+                }
+            }
+
+            if (mapsLoaded)
+            {
+                UpdateMapListView();
+            }
+        }
+
+        private int ExpansionNameToID(string name)
+        {
+            switch (name)
+            {
+                case "Vanilla":
+                    return 1;
+                case "Burning Crusade":
+                    return 2;
+                case "Wrath of the Lich King":
+                    return 3;
+                case "Cataclysm":
+                    return 4;
+                case "Mists of Pandaria":
+                    return 5;
+                case "Warlords of Draenor":
+                    return 6;
+                case "Legion":
+                    return 7;
+                default:
+                    return 1;
+            }
+        }
+        private void UpdateMapListView()
+        {
+            if (!File.Exists("mapnames.csv"))
+            {
+                UpdateMapList();
+            }
+
+            if (File.Exists("mapnames.csv") && mapNames.Count == 0)
+            {
+                using (TextFieldParser parser = new TextFieldParser("mapnames.csv"))
+                {
+                    parser.TextFieldType = FieldType.Delimited;
+                    parser.SetDelimiters(",");
+                    while (!parser.EndOfData)
+                    {
+                        string[] fields = parser.ReadFields();
+                        if (fields[0] != "ID")
+                        {
+                            mapNames.Add(int.Parse(fields[0]), new NiceMapEntry { ID = fields[0], Name = fields[4], Internal = fields[2], Type = fields[3], Expansion = fields[5] });
+                        }
+                    }
+                }
+            }
+
+            mapListBox.DisplayMemberPath = "Value";
+            mapListBox.Items.Clear();
+
+            // try
+            //{
+            var mapsData = new DBFilesClient.NET.Storage<MapEntry72>(CASC.OpenFile(@"DBFilesClient/Map.db2"));
+
+            foreach (var mapEntry in mapsData)
+            {
+                if (CASC.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
+                {
+                    var mapItem = new MapListItem { Internal = mapEntry.Value.directory };
+
+                    if (mapNames.ContainsKey(mapEntry.Key))
+                    {
+                        mapItem.Name = mapNames[mapEntry.Key].Name;
+                        mapItem.Type = mapNames[mapEntry.Key].Type;
+                        var expansionID = ExpansionNameToID(mapNames[mapEntry.Key].Expansion);
+                        mapItem.Image = "Resources/wow" + expansionID + ".png";
+
+                        if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        mapItem.Name = mapEntry.Value.mapname_lang;
+                        mapItem.Type = "UNKNOWN";
+                        mapItem.Image = "Resources/wow7.png";
+                    }
+
+                    if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.mapname_lang.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                    {
+                        mapListBox.Items.Add(mapItem);
+                    }
+                }
+            }
+            /*}
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured during DBC reading.. falling back to CSV!" + ex.Message);
+                foreach (var map in mapNames)
+                {
+                    if (CASC.FileExists("World/Maps/" + map.Value.Internal + "/" + map.Value.Internal + ".wdt"))
+                    {
+                        mapListBox.Items.Add(new MapListItem { Name = map.Value.Name, Internal = map.Value.Internal, Type = map.Value.Type });
+                    }
+                }
+            }*/
+
+            mapsLoaded = true;
+        }
+
+        private void MenuMapNames_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateMapList();
+        }
+
+        public class MapListItem
+        {
+            public string Type { get; set; }
+            public string Name { get; set; }
+            public string Internal { get; set; }
+            public string Image { get; set; }
+        }
+
+        public class NiceMapEntry
+        {
+            public string ID { get; set; }
+            public string Name { get; set; }
+            public string Internal { get; set; }
+            public string Type { get; set; }
+            public string Expansion { get; set; }
         }
     }
 }

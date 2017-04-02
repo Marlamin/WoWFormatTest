@@ -5,22 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OBJExporterUI"
         mc:Ignorable="d"
+        ResizeMode="NoResize"
         Icon="Resources/icon32.png"
         ContentRendered="Window_ContentRendered"
-        Title="OBJ Exporter" Height="600" Width="600">
+        Title="OBJ Exporter" Height="616.333" Width="600">
     <Grid>
         <Image x:Name="loadingImage" Source="Resources/icon.png" Margin="234,235,234,187"/>
-        <TextBox x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="10,22,10,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged"/>
-        <ProgressBar x:Name="progressBar" Visibility="Visible" HorizontalAlignment="Stretch" Height="36" Margin="10,33,10,0" VerticalAlignment="Top" />
-        <Label x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="10,33,10,0" VerticalAlignment="Top" Width="572" HorizontalContentAlignment="Center" Height="36" VerticalContentAlignment="Center"/>
-        <TabControl x:Name="tabs" Margin="0,50,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Hidden">
+        <TextBox x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="234,22,0,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged" Panel.ZIndex="2"/>
+        <Label Content="Filter" Name="filterTextLabel" Visibility="Hidden" HorizontalAlignment="Left" Margin="191,22,0,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+        <TabControl x:Name="tabs" Margin="0,22,0,28" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Hidden">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
                     <CheckBox Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CheckBox Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="71,10,0,0" VerticalAlignment="Top"/>
-                    <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="modelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,53" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
-                    <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="297,0,10,10" VerticalAlignment="Bottom" Click="exportButton_Click"/>
-                    <Button x:Name="previewButton"  Height="25" Content="Preview model" HorizontalAlignment="Stretch" Margin="10,0,300,10" VerticalAlignment="Bottom" Click="previewButton_Click"/>
+                    <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="modelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,63" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
+                    <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="297,0,10,33" VerticalAlignment="Bottom" Click="exportButton_Click"/>
+                    <Button x:Name="previewButton"  Height="25" Content="Preview model" HorizontalAlignment="Stretch" Margin="10,0,300,33" VerticalAlignment="Bottom" Click="previewButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TexturesTab" Header="Textures" GotFocus="TexturesTab_GotFocus">
@@ -34,7 +34,7 @@
                     <Button Grid.Row="1" x:Name="exportTextureButton" Height="25" Content="Export texture to PNG!" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="exportTextureButton_Click"/>
                 </Grid>
             </TabItem>
-            <TabItem x:Name="MapsTab" Header="Maps" GotFocus="MapsTab_GotFocus">
+            <TabItem x:Name="MapsTab" Header="Maps">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*"/>
@@ -45,13 +45,60 @@
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
-                    <ListBox Grid.Row="0" Grid.ColumnSpan="2" x:Name="mapListBox" SelectionMode="Extended" SelectionChanged="mapListBox_SelectionChanged" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
-                    <Image x:Name="tileImage" Grid.Column="1" Grid.Row="1" />
-                    <ListBox x:Name="tileListBox" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="0"  SelectionChanged="tileListBox_SelectionChanged"/>
+                    <ListView Grid.Row="0" x:Name="mapListBox" SelectionMode="Single" SelectionChanged="mapListBox_SelectionChanged" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding}" Margin="-1,109,0,214" Grid.ColumnSpan="2" Grid.RowSpan="2">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Expansion" Width="60">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="32" Height="16" Source="{Binding Image}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
+                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="300"/>
+                                <GridViewColumn Header="Internal" DisplayMemberBinding="{Binding Internal}" Width="130"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <Image x:Name="tileImage" Grid.Column="1" Grid.Row="1" Margin="93,19,0,0" />
+                    <ListBox x:Name="tileListBox" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="0"  SelectionChanged="tileListBox_SelectionChanged" Height="199" Width="63" Margin="10,17,0,0"/>
                     <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="exportTileButton" Height="25" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="exportTileButton_Click"/>
+                    <Label Content="World" HorizontalAlignment="Left" Margin="-1,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Continent" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Click="CheckBox_Click" IsChecked="True" Width="82"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="PvP" HorizontalAlignment="Left" Margin="10,48,0,0" VerticalAlignment="Top" Click="CheckBox_Click" IsChecked="True"/>
+                    <Label Content="Instances" HorizontalAlignment="Left" Margin="90,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Instance" HorizontalAlignment="Left" Margin="100,28,0,0" VerticalAlignment="Top" Click="CheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Raid" HorizontalAlignment="Left" Margin="100,48,0,0" VerticalAlignment="Top" Click="CheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Scenario" HorizontalAlignment="Left" Margin="100,68,0,0" VerticalAlignment="Top" Click="CheckBox_Click" IsChecked="True"/>
+                    <Label Content="Other" HorizontalAlignment="Left" Margin="178,2,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Garrison" HorizontalAlignment="Left" Margin="188,51,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Dev" HorizontalAlignment="Left" Margin="188,71,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Artifact" HorizontalAlignment="Left" Margin="188,31,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="World" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top" Click="CheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Starter" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" Click="CheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="CheckBox_Click" Content="Unknown" HorizontalAlignment="Left" Margin="188,91,0,0" VerticalAlignment="Top" Click="CheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="CheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow1" Margin="10,31,0,0" VerticalAlignment="Top" Click="CheckBox_Click" Grid.Column="1"/>
+                    <CheckBox Loaded="CheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow2" Margin="40,31,0,0" VerticalAlignment="Top" Click="CheckBox_Click" Grid.Column="1"/>
+                    <CheckBox Loaded="CheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow3" Margin="72,31,0,0" VerticalAlignment="Top" Click="CheckBox_Click" Grid.Column="1"/>
+                    <CheckBox Loaded="CheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow4" Margin="107,31,0,0" VerticalAlignment="Top" Click="CheckBox_Click" Grid.Column="1"/>
+                    <CheckBox Loaded="CheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow5" Margin="142,31,0,0" VerticalAlignment="Top" Click="CheckBox_Click" Grid.Column="1"/>
+                    <CheckBox Loaded="CheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow6" Margin="180,31,0,0" VerticalAlignment="Top" Click="CheckBox_Click" Grid.Column="1"/>
+                    <CheckBox Loaded="CheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow7" Margin="212,31,0,0" VerticalAlignment="Top" Click="CheckBox_Click" Grid.Column="1"/>
+                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="16" Height="16" Margin="10,10,0,0" VerticalAlignment="Top" Source="Resources/wow1.png"/>
+                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="31,11,0,0" VerticalAlignment="Top" Source="Resources/wow2.png"/>
+                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="66,10,0,0" VerticalAlignment="Top" Source="Resources/wow3.png"/>
+                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="101,11,0,0" VerticalAlignment="Top" Source="Resources/wow4.png"/>
+                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="136,13,0,0" VerticalAlignment="Top" Source="Resources/wow5.png"/>
+                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="171,13,0,0" VerticalAlignment="Top" Source="Resources/wow6.png"/>
+                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="206,11,0,0" VerticalAlignment="Top" Source="Resources/wow7.png"/>
                 </Grid>
             </TabItem>
         </TabControl>
+        <ProgressBar x:Name="progressBar" Visibility="Visible" HorizontalAlignment="Stretch" Height="17" Margin="10,558,10,0" VerticalAlignment="Top" />
+        <Label x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="0,558,20,0" VerticalAlignment="Top" Width="572" HorizontalContentAlignment="Center" Height="17" VerticalContentAlignment="Center" Padding="5,0,5,1"/>
         <DockPanel>
             <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False">
                 <MenuItem Header="_File">
@@ -60,6 +107,7 @@
                 </MenuItem>
                 <MenuItem Header="_Tools">
                     <MenuItem Name="MenuListfile" Header="_Update Listfile" Click="MenuListfile_Click" IsEnabled="False"></MenuItem>
+                    <MenuItem Name="MenuMapNames" Header="_Update Map list" Click="MenuMapNames_Click" IsEnabled="True"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="_About">
                     <MenuItem Name="MenuVersion" Header="_Version" Click="MenuVersion_Click"></MenuItem>
@@ -67,5 +115,5 @@
             </Menu>
             <StackPanel></StackPanel>
         </DockPanel>
-    </Grid>
+   </Grid>
 </Window>
