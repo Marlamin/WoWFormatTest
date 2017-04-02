@@ -18,9 +18,9 @@
                 <Grid>
                     <CheckBox Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CheckBox Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="71,10,0,0" VerticalAlignment="Top"/>
-                    <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="modelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,63" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
-                    <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="297,0,10,33" VerticalAlignment="Bottom" Click="exportButton_Click"/>
-                    <Button x:Name="previewButton"  Height="25" Content="Preview model" HorizontalAlignment="Stretch" Margin="10,0,300,33" VerticalAlignment="Bottom" Click="previewButton_Click"/>
+                    <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="modelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
+                    <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="297,0,10,10" VerticalAlignment="Bottom" Click="exportButton_Click"/>
+                    <Button x:Name="previewButton"  Height="25" Content="Preview model" HorizontalAlignment="Stretch" Margin="10,0,300,10" VerticalAlignment="Bottom" Click="previewButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TexturesTab" Header="Textures" GotFocus="TexturesTab_GotFocus">
@@ -58,7 +58,7 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
-                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="300"/>
+                                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="260"/>
                                 <GridViewColumn Header="Internal" DisplayMemberBinding="{Binding Internal}" Width="130"/>
                             </GridView>
                         </ListView.View>
