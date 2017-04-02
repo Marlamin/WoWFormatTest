@@ -149,30 +149,30 @@
     <Resource Include="Resources\icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\wow0.png">
+    <Resource Include="Resources\wow0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\wow1.png">
+    </Resource>
+    <Resource Include="Resources\wow1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\wow2.png">
+    </Resource>
+    <Resource Include="Resources\wow2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\wow3.png">
+    </Resource>
+    <Resource Include="Resources\wow3.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\wow4.png">
+    </Resource>
+    <Resource Include="Resources\wow4.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\wow5.png">
+    </Resource>
+    <Resource Include="Resources\wow5.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\wow6.png">
+    </Resource>
+    <Resource Include="Resources\wow6.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\wow7.png">
+    </Resource>
+    <Resource Include="Resources\wow7.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

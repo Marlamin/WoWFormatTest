@@ -782,7 +782,7 @@ namespace OBJExporterUI
                         mapItem.Name = mapNames[mapEntry.Key].Name;
                         mapItem.Type = mapNames[mapEntry.Key].Type;
                         var expansionID = ExpansionNameToID(mapNames[mapEntry.Key].Expansion);
-                        mapItem.Image = "Resources/wow" + expansionID + ".png";
+                        mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
 
                         if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
                         {
@@ -793,7 +793,7 @@ namespace OBJExporterUI
                     {
                         mapItem.Name = mapEntry.Value.mapname_lang;
                         mapItem.Type = "UNKNOWN";
-                        mapItem.Image = "Resources/wow7.png";
+                        mapItem.Image = "pack://application:,,,/Resources/wow7.png";
                     }
 
                     if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.mapname_lang.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
