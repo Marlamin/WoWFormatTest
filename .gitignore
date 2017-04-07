@@ -9,7 +9,6 @@
 *.g.i.cs
 *.log
 *.lref
-*.ncb
 *.pdb
 *.resharper
 *.resources
@@ -17,11 +16,16 @@
 *.user
 *FileListAbsolute*
 *TemporaryGenerated*
-[Bb]in
+[Bb]in/
+[Dd]ebug/
+[Oo]bj/
+[Rr]elease/
 [Tt]humbs.db
 _ReSharper.*
 Ankh.NoLoad
 build.force
+build/
+x64/
 
 # Libraries
 CSDBCReader.dll
@@ -51,5 +55,3 @@ WoWOpenGL_SH
 
 # Don't include cached data files
 WoWOpenGL/Data/*
-
-
