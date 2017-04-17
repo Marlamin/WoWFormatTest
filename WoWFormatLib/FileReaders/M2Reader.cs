@@ -31,9 +31,9 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadM2(string filename)
         {
-            if (!CASC.FileExists(filename))
+            if (!CASC.cascHandler.FileExists(filename))
             {
-                new WoWFormatLib.Utils.MissingFile(filename);
+                new MissingFile(filename);
                 return;
             }else
             {
@@ -43,7 +43,7 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadM2(int fileDataID)
         {
-            Stream m2 = CASC.OpenFile(fileDataID);
+            Stream m2 = CASC.cascHandler.OpenFile(fileDataID);
 
             var bin = new BinaryReader(m2);
 
@@ -482,7 +482,7 @@ namespace WoWFormatLib.FileReaders
                     if (!filename.Equals(""))
                     {
                         textures[i].filename = filename;
-                        if (!CASC.FileExists(filename))
+                        if (!CASC.cascHandler.FileExists(filename))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", filename);
                             new WoWFormatLib.Utils.MissingFile(filename);

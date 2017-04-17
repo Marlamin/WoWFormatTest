@@ -28,8 +28,8 @@ namespace DBCtest
         {
             CASC.InitCasc(null, "C:\\World of Warcraft", "wow");
 
-            var creatureData = new DBFilesClient.NET.Storage<CreatureEntry>(CASC.OpenFile(@"DBFilesClient/Creature.db2"));
-            var cdiData = new DBFilesClient.NET.Storage<CreatureDisplayInfoEntry>(CASC.OpenFile(@"DBFilesClient/CreatureDisplayInfo.db2"));
+            var creatureData = new DBFilesClient.NET.Storage<CreatureEntry>(CASC.cascHandler.OpenFile(@"DBFilesClient/Creature.db2"));
+            var cdiData = new DBFilesClient.NET.Storage<CreatureDisplayInfoEntry>(CASC.cascHandler.OpenFile(@"DBFilesClient/CreatureDisplayInfo.db2"));
 
             using (DatWebClient client = new DatWebClient())
             {

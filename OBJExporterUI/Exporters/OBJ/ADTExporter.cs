@@ -59,7 +59,7 @@ namespace OBJExporterUI.Exporters.OBJ
                 {
                     var curfile = "world\\maps\\" + mapname + "\\" + mapname + "_" + x + "_" + y + ".adt";
 
-                    if (!CASC.FileExists(file))
+                    if (!CASC.cascHandler.FileExists(file))
                     {
                         Console.WriteLine("File " + file + " does not exist");
                         continue;
@@ -76,7 +76,7 @@ namespace OBJExporterUI.Exporters.OBJ
                         continue;
                     }
 
-                    if (CASC.FileExists("world\\maptextures\\" + mapname + "\\" + mapname + "_" + x + "_" + y + ".blp"))
+                    if (CASC.cascHandler.FileExists("world\\maptextures\\" + mapname + "\\" + mapname + "_" + x + "_" + y + ".blp"))
                     {
                         materials.Add(materials.Count() + 1, "mat" + y.ToString() + x.ToString());
 

@@ -28,7 +28,7 @@ namespace ADTexporter.Loaders
             else
             {
                 //Load model from file
-                if (WoWFormatLib.Utils.CASC.FileExists(filename))
+                if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(filename))
                 {
                     var modelreader = new M2Reader();
                     modelreader.LoadM2(filename);
@@ -69,7 +69,7 @@ namespace ADTexporter.Loaders
                         }
                         break;
                     case 2:
-                        if (WoWFormatLib.Utils.CASC.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
+                        if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
                         {
                             // Console.WriteLine("      BLP exists!");
                             texturefilename = System.IO.Path.ChangeExtension(filename, ".blp");
@@ -84,7 +84,7 @@ namespace ADTexporter.Loaders
                         string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Count(); ti++)
                         {
-                            if (WoWFormatLib.Utils.CASC.FileExists(filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp")))
+                            if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp")))
                             {
                                 texturefilename = filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp");
                             }

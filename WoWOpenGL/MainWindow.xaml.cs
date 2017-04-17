@@ -125,7 +125,7 @@ namespace WoWOpenGL
 
                 foreach(var line in File.ReadAllLines("listfile.txt"))
                 {
-                    if (CASC.FileExists(line))
+                    if (CASC.cascHandler.FileExists(line))
                     {
                         linelist.Add(line);
                     }
@@ -217,7 +217,7 @@ namespace WoWOpenGL
             progressLabel.Content = "Loading minimap..";
 
             var wdt = new WDTReader();
-            if (CASC.FileExists(System.IO.Path.Combine(@"world\maps\", _SelectedMapName, _SelectedMapName + ".wdt")))
+            if (CASC.cascHandler.FileExists(System.IO.Path.Combine(@"world\maps\", _SelectedMapName, _SelectedMapName + ".wdt")))
             {
                 Stopwatch _SW = new Stopwatch();
                 BackgroundWorker _BackgroundWorker = new BackgroundWorker();
@@ -274,7 +274,7 @@ namespace WoWOpenGL
             rect.VerticalAlignment = VerticalAlignment.Top;
             rect.HorizontalAlignment = HorizontalAlignment.Left;
 
-            if (CASC.FileExists(System.IO.Path.Combine(@"world\minimaps\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp")))
+            if (CASC.cascHandler.FileExists(System.IO.Path.Combine(@"world\minimaps\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp")))
             {
                 rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
                 var xmargin = x * rect.Width;

@@ -25,7 +25,7 @@ namespace OBJExporterUI.Loaders
 
             int textureId = GL.GenTexture();
 
-            using (var blp = new BlpFile(CASC.OpenFile(filename)))
+            using (var blp = new BlpFile(CASC.cascHandler.OpenFile(filename)))
             {
                 switch (blp.encoding)
                 {

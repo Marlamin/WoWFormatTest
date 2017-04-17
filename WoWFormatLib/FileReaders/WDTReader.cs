@@ -24,9 +24,9 @@ namespace WoWFormatLib.FileReaders
         public void LoadWDT(string filename)
         {
             tiles = new List<int[]>();
-            if (CASC.FileExists(filename))
+            if (CASC.cascHandler.FileExists(filename))
             {
-                using (Stream tex = CASC.OpenFile(filename))
+                using (Stream tex = CASC.cascHandler.OpenFile(filename))
                 {
                     ReadWDT(filename, tex);
                 }

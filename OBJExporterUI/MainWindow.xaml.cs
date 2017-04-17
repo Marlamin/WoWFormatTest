@@ -210,7 +210,7 @@ namespace OBJExporterUI
                     {
                         exportButton.Content = "Crawl maptile for models";
 
-                        if (CASC.FileExists("world/maps/" + filterSplit[0] + "/" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt"))
+                        if (CASC.cascHandler.FileExists("world/maps/" + filterSplit[0] + "/" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt"))
                         {
                             exportButton.IsEnabled = true;
                         }
@@ -318,7 +318,7 @@ namespace OBJExporterUI
 
             foreach (string selectedFile in selectedFiles)
             {
-                if (!CASC.FileExists(selectedFile)) { continue; }
+                if (!CASC.cascHandler.FileExists(selectedFile)) { continue; }
                 if (selectedFile.EndsWith(".wmo"))
                 {
                     Exporters.OBJ.WMOExporter.exportWMO(selectedFile, exportworker);
@@ -371,7 +371,7 @@ namespace OBJExporterUI
 
             foreach (var line in File.ReadAllLines("listfile.txt"))
             {
-                if (CASC.FileExists(line))
+                if (CASC.cascHandler.FileExists(line))
                 {
                     linelist.Add(line.ToLower());
                 }
@@ -550,7 +550,7 @@ namespace OBJExporterUI
 
                 var wdt = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + ".wdt";
 
-                if (CASC.FileExists(wdt))
+                if (CASC.cascHandler.FileExists(wdt))
                 {
                     var reader = new WoWFormatLib.FileReaders.WDTReader();
                     reader.LoadWDT(wdt);
@@ -572,7 +572,7 @@ namespace OBJExporterUI
 
                 var minimapFile = "world\\minimaps\\" + selectedItem.Internal + "\\map" + file + ".blp";
 
-                if (!CASC.FileExists(minimapFile))
+                if (!CASC.cascHandler.FileExists(minimapFile))
                 {
                     minimapFile = @"interface\icons\inv_misc_questionmark.blp";
                 }
@@ -769,11 +769,11 @@ namespace OBJExporterUI
 
             // try
             //{
-            var mapsData = new DBFilesClient.NET.Storage<MapEntry72>(CASC.OpenFile(@"DBFilesClient/Map.db2"));
+            var mapsData = new DBFilesClient.NET.Storage<MapEntry72>(CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2"));
 
             foreach (var mapEntry in mapsData)
             {
-                if (CASC.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
+                if (CASC.cascHandler.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
                 {
                     var mapItem = new MapListItem { Internal = mapEntry.Value.directory };
 

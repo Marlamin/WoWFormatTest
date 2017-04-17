@@ -35,14 +35,14 @@ namespace WoWFormatLib.FileReaders
         {
             _lod = lod;
 
-            if (!CASC.FileExists(filename))
+            if (!CASC.cascHandler.FileExists(filename))
             {
-                new WoWFormatLib.Utils.MissingFile(filename);
+                new MissingFile(filename);
                 return;
             }
             else
             {
-                using (Stream wmoStream = CASC.OpenFile(filename))
+                using (Stream wmoStream = CASC.cascHandler.OpenFile(filename))
                 {
                     ReadWMO(filename, wmoStream);
                 }
@@ -266,7 +266,7 @@ namespace WoWFormatLib.FileReaders
                     str.Replace("..", ".");
                     blpFiles.Add(str.ToString());
                     blpOffset.Add(i - str.ToString().Length);
-                    if (!CASC.FileExists(str.ToString()))
+                    if (!CASC.cascHandler.FileExists(str.ToString()))
                     {
                         new WoWFormatLib.Utils.MissingFile(str.ToString());
                     }
@@ -453,12 +453,12 @@ namespace WoWFormatLib.FileReaders
 
                 if (_lod)
                 {
-                    if (CASC.FileExists(groupfilename.Replace(".wmo", "_lod2.wmo")))
+                    if (CASC.cascHandler.FileExists(groupfilename.Replace(".wmo", "_lod2.wmo")))
                     {
                         groupfilename = groupfilename.Replace(".wmo", "_lod2.wmo");
                         Console.WriteLine("[LOD] Loading LOD 2 for group " + i);
                     }
-                    else if (CASC.FileExists(groupfilename.Replace(".wmo", "_lod1.wmo")))
+                    else if (CASC.cascHandler.FileExists(groupfilename.Replace(".wmo", "_lod1.wmo")))
                     {
                         groupfilename = groupfilename.Replace(".wmo", "_lod1.wmo");
                         Console.WriteLine("[LOD] Loading LOD 1 for group " + i);
@@ -469,14 +469,14 @@ namespace WoWFormatLib.FileReaders
                     }
                 }
                 
-                if (!CASC.FileExists(groupfilename))
+                if (!CASC.cascHandler.FileExists(groupfilename))
                 {
-                    new WoWFormatLib.Utils.MissingFile(groupfilename);
+                    new MissingFile(groupfilename);
                     return;
                 }
                 else
                 {
-                    using (Stream wmoStream = CASC.OpenFile(groupfilename))
+                    using (Stream wmoStream = CASC.cascHandler.OpenFile(groupfilename))
                     {
                         groupFiles[i] = ReadWMOGroupFile(groupfilename, wmoStream);
                     }

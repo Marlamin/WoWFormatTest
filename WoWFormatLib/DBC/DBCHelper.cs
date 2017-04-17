@@ -18,15 +18,15 @@ namespace WoWFormatLib.DBC
                 case 2:
 
                     //ModelFileData.db2 (FileDataID) 1272528 => (ModelFileDataID) 37177
-                    var modelFileData = new Storage<ModelFileDataEntry>(CASC.OpenFile(@"DBFilesClient/ModelFileData.db2"));
+                    var modelFileData = new Storage<ModelFileDataEntry>(CASC.cascHandler.OpenFile(@"DBFilesClient/ModelFileData.db2"));
                     var modelFileDataID = modelFileData[modelID].modelFileDataID;
 
                     //ItemDisplayInfoMaterialRes.db2 (ID) 37177 => (ItemDisplayInfoID) 53536, (TextureFileDataID) 59357
-                    var itemDisplayInfoMaterialRes = new Storage<ItemDisplayInfoMaterialResEntry>(CASC.OpenFile(@"DBFilesClient/ItemDisplayInfoMaterialRes.db2"));
+                    var itemDisplayInfoMaterialRes = new Storage<ItemDisplayInfoMaterialResEntry>(CASC.cascHandler.OpenFile(@"DBFilesClient/ItemDisplayInfoMaterialRes.db2"));
                     var textureFileDataID = itemDisplayInfoMaterialRes[modelFileDataID].textureFileDataID;
 
                     // TextureFileData
-                    var textureFileData = new Storage<TextureFileDataEntry>(CASC.OpenFile(@"DBFilesClient/TextureFileData.db2"));
+                    var textureFileData = new Storage<TextureFileDataEntry>(CASC.cascHandler.OpenFile(@"DBFilesClient/TextureFileData.db2"));
                     foreach(var entry in textureFileData)
                     {
                         if(entry.Value.textureFileDataID == textureFileDataID)
@@ -38,12 +38,12 @@ namespace WoWFormatLib.DBC
                     break;
 
                 case 11:
-                    var creatureModelData = new Storage<CreatureModelDataEntry>(CASC.OpenFile(@"DBFilesClient/CreatureModelData.db2"));
+                    var creatureModelData = new Storage<CreatureModelDataEntry>(CASC.cascHandler.OpenFile(@"DBFilesClient/CreatureModelData.db2"));
                     foreach (var cmdEntry in creatureModelData)
                     {
                         if (cmdEntry.Value.fileDataID == modelID)
                         {
-                            var creatureDisplayInfo = new Storage<CreatureDisplayInfoEntry>(CASC.OpenFile(@"DBFilesClient/CreatureDisplayInfo.db2"));
+                            var creatureDisplayInfo = new Storage<CreatureDisplayInfoEntry>(CASC.cascHandler.OpenFile(@"DBFilesClient/CreatureDisplayInfo.db2"));
                             foreach (var cdiEntry in creatureDisplayInfo)
                             {
                                 if (cdiEntry.Value.ModelID == cmdEntry.Key)

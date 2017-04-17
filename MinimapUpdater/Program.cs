@@ -49,7 +49,7 @@ namespace MinimapUpdater
                     {
                         var tilename = "World\\Minimaps\\" + mapname + "\\map" + cur_x + "_" + cur_y + ".blp";
 
-                        if (CASC.FileExists(tilename))
+                        if (CASC.cascHandler.FileExists(tilename))
                         {
                             hasMinimaps = true;
 
@@ -59,7 +59,7 @@ namespace MinimapUpdater
                             if (cur_x < min_x) { min_x = cur_x; }
                             if (cur_y < min_y) { min_y = cur_y; }
 
-                            using (var blp = new BlpFile(CASC.OpenFile(tilename)))
+                            using (var blp = new BlpFile(CASC.cascHandler.OpenFile(tilename)))
                             {
                                 bmpDict.Add(cur_x + "_" + cur_y, blp.GetBitmap(0));
                             }

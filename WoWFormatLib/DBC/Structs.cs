@@ -2,7 +2,6 @@
 
 namespace WoWFormatLib.DBC
 {
-    [DBFileName("Creature")]
     public sealed class CreatureEntry
     {
         public uint[] unk0;
@@ -19,7 +18,6 @@ namespace WoWFormatLib.DBC
         public ushort unk7;
     }
 
-    [DBFileName("CreatureDisplayInfo")]
     public sealed class CreatureDisplayInfoEntry
     {
         public uint ExtendedDisplayInfoID;
@@ -45,7 +43,6 @@ namespace WoWFormatLib.DBC
         public sbyte Unk700;
     }
 
-    [DBFileName("CreatureModelData")]
     public sealed class CreatureModelDataEntry
     {
         public float scale;
@@ -80,7 +77,6 @@ namespace WoWFormatLib.DBC
         public int creatureGeosetDataID;
     }
 
-    [DBFileName("Map")]
     public sealed class MapEntry
     {
         public string directory;
@@ -104,7 +100,6 @@ namespace WoWFormatLib.DBC
         public byte TimeOffset;
     }
 
-    [DBFileName("Map")]
     public sealed class MapEntry72
     {
         public string directory;
@@ -130,7 +125,6 @@ namespace WoWFormatLib.DBC
         public byte timeOffset;
     }
 
-    [DBFileName("ModelFileData")]
     public sealed class ModelFileDataEntry
     {
         public byte whoCares;
@@ -138,7 +132,6 @@ namespace WoWFormatLib.DBC
         public ushort modelFileDataID;
     }
 
-    [DBFileName("ItemDisplayInfoMaterialRes")]
     public sealed class ItemDisplayInfoMaterialResEntry
     {
         public uint itemDisplayInfoID;
@@ -146,7 +139,6 @@ namespace WoWFormatLib.DBC
         public byte whocares;
     }
 
-    [DBFileName("TextureFileData")]
     public sealed class TextureFileDataEntry
     {
         public int textureFileDataID;

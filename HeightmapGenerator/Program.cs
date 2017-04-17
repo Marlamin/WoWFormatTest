@@ -58,7 +58,7 @@ namespace HeightmapGenerator
                     {
                         string filename = "World/Maps/" + mapname + "/" + mapname + "_" + y + "_" + x + ".adt";
 
-                        if (CASC.FileExists(filename))
+                        if (CASC.cascHandler.FileExists(filename))
                         {
                             if (x > max_x) { max_x = x; }
                             if (y > max_y) { max_y = y; }
@@ -114,7 +114,7 @@ namespace HeightmapGenerator
                     for (int y = 0; y < 63; y++)
                     {
                         string filename = "World/Maps/" + mapname + "/" + mapname + "_" + y + "_" + x + ".adt";
-                        if (CASC.FileExists(filename))
+                        if (CASC.cascHandler.FileExists(filename))
                         {
                             ADTReader reader = new ADTReader();
                             reader.LoadADT(filename);

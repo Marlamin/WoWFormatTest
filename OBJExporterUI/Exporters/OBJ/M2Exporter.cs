@@ -31,7 +31,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(15, "Reading M2..");
 
-            if (!CASC.FileExists(fileDataID)) { throw new Exception("404 M2 not found!"); }
+            if (!CASC.cascHandler.FileExists(fileDataID)) { throw new Exception("404 M2 not found!"); }
 
             reader.LoadM2(fileDataID);
 

@@ -13,9 +13,9 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadTEX(string filename)
         {
-            if (CASC.FileExists(filename))
+            if (CASC.cascHandler.FileExists(filename))
             {
-                using (Stream tex = CASC.OpenFile(filename))
+                using (Stream tex = CASC.cascHandler.OpenFile(filename))
                 {
                     ReadTEX(filename, tex);
                 }
@@ -70,7 +70,7 @@ namespace WoWFormatLib.FileReaders
                     {
                         str.Replace("..", ".");
                         str.Append(".blp"); //Filenames in TEX dont have have BLP extensions
-                        if (!CASC.FileExists(str.ToString()))
+                        if (!CASC.cascHandler.FileExists(str.ToString()))
                         {
                             new WoWFormatLib.Utils.MissingFile(str.ToString());
                         }

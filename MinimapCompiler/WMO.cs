@@ -12,8 +12,6 @@ namespace MinimapCompiler
 {
     internal class WMO
     {
-        private string basedir;
-
         public WMO(){}
 
         public void Compile(string wmoname)
@@ -181,7 +179,7 @@ namespace MinimapCompiler
                     {
                         Console.WriteLine("CHECKING " + wmogroupfilename);
                     }
-                    if (CASC.FileExists(wmogroupfilename))
+                    if (CASC.cascHandler.FileExists(wmogroupfilename))
                     {
                         Console.WriteLine(wmogroupfilename + " exists!");
                         filePaths.Add(wmogroupfilename);

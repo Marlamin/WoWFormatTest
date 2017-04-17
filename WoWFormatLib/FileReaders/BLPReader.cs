@@ -25,7 +25,7 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadBLP(int fileDataID)
         {
-            using (var blp = new BlpFile(CASC.OpenFile(fileDataID)))
+            using (var blp = new BlpFile(CASC.cascHandler.OpenFile(fileDataID)))
             {
                 bmp = blp.GetBitmap(0);
             }
@@ -45,7 +45,7 @@ namespace WoWFormatLib.FileReaders
             //}
             //else
             //{
-                using (var blp = new BlpFile(CASC.OpenFile(filename)))
+                using (var blp = new BlpFile(CASC.cascHandler.OpenFile(filename)))
                 {
                     bmp = blp.GetBitmap(0);
                 }

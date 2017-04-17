@@ -34,7 +34,7 @@ namespace WoWOpenGL.Loaders
             else
             {
                 //Load model from file
-                if (WoWFormatLib.Utils.CASC.FileExists(filename))
+                if (CASC.cascHandler.FileExists(filename))
                 {
                     var modelreader = new M2Reader();
                     modelreader.LoadM2(filename);
@@ -77,7 +77,7 @@ namespace WoWOpenGL.Loaders
                         }
                         break;
                     case 2:
-                        if (WoWFormatLib.Utils.CASC.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
+                        if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
                         {
                             // Console.WriteLine("      BLP exists!");
                             textureFileDataID = CASC.getFileDataIdByName(System.IO.Path.ChangeExtension(filename, ".blp"));

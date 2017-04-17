@@ -122,7 +122,7 @@ namespace WoWOpenGL
                 {
                     string filename = "world\\maps\\" + map + "\\" + map + "_" + y + "_" + x + ".adt";
 
-                    if (WoWFormatLib.Utils.CASC.FileExists(filename))
+                    if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(filename))
                     {
                         ADTReader reader = new ADTReader();
                         reader.LoadADT(filename);
