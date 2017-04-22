@@ -81,6 +81,9 @@ namespace BLTEVerifier
                                 Console.WriteLine(" File is a patch archive!");
                             }else if(header == 268583248){
                                 Console.WriteLine(" File is a patch index!");
+                            }else if(header == 893668643 || header == 1279870499)
+                            {
+                                Console.WriteLine(" File is Overwatch root file!");
                             }else{
                                 Console.WriteLine("Unknown file encountered!");
                                 Console.ReadLine();
@@ -94,6 +97,7 @@ namespace BLTEVerifier
 
                             if (blteSize == 0)
                             {
+                                Console.WriteLine(file + " is a single chunk file!");
                                 chunkInfos = new BLTEChunkInfo[1];
                                 chunkInfos[0].isFullChunk = false;
                                 chunkInfos[0].inFileSize = Convert.ToInt32(bin.BaseStream.Length - bin.BaseStream.Position);

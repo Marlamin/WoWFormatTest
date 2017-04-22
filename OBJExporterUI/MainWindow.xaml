@@ -13,7 +13,7 @@
         <Image x:Name="loadingImage" Source="Resources/icon.png" Margin="234,235,234,187"/>
         <TextBox x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="234,22,0,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged" Panel.ZIndex="2"/>
         <Label Content="Filter" Name="filterTextLabel" Visibility="Hidden" HorizontalAlignment="Left" Margin="191,22,0,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-        <TabControl x:Name="tabs" Margin="0,22,0,28" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Hidden">
+        <TabControl x:Name="tabs" Margin="0,22,0,28" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Visible">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
                     <CheckBox Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -24,7 +24,7 @@
                 </Grid>
             </TabItem>
             <TabItem x:Name="TexturesTab" Header="Textures" GotFocus="TexturesTab_GotFocus">
-                <Grid>
+                <Grid Background="Black">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="2*" />

@@ -59,6 +59,8 @@ namespace OBJExporterUI
 
             InitializeComponent();
 
+            Title = "OBJ Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             exportworker.DoWork += exportworker_DoWork;
             exportworker.RunWorkerCompleted += exportworker_RunWorkerCompleted;
             exportworker.ProgressChanged += worker_ProgressChanged;
