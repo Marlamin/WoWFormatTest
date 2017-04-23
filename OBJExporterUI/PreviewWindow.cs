@@ -46,9 +46,9 @@ namespace OBJExporterUI
             : base(1920, 1080, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Model preview", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default)
         {
 
-            dragX = 0;
+            dragX = 7;
             dragY = 0;
-            dragZ = 0;
+            dragZ = 4;
             angle = 0.0f;
 
             Keyboard.KeyDown += Keyboard_KeyDown;
@@ -59,8 +59,7 @@ namespace OBJExporterUI
 
             if (filename.EndsWith(".m2"))
             {
-                Exit();
-                //M2Loader.LoadM2(filename, cache);
+                M2Loader.LoadM2(filename, cache);
                 isWMO = false;
             }
             else if (filename.EndsWith(".wmo"))

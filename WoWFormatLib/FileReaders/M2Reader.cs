@@ -44,7 +44,6 @@ namespace WoWFormatLib.FileReaders
         public void LoadM2(int fileDataID)
         {
             Stream m2 = CASC.cascHandler.OpenFile(fileDataID);
-
             var bin = new BinaryReader(m2);
 
             BlizzHeader chunk;
@@ -64,7 +63,7 @@ namespace WoWFormatLib.FileReaders
                             ParseYeOldeM2Struct(m2stream);
                         }
                         break;
-                    case "AFID":
+                    case "AFID": // Animation file IDs
                         var afids = new AFID[chunk.Size / 16];
                         for(int a = 0; a < chunk.Size / 16; a++)
                         {
@@ -74,14 +73,14 @@ namespace WoWFormatLib.FileReaders
                         }
                         model.animFileData = afids;
                         break;
-                    case "BFID":
+                    case "BFID": // Bone file IDs
                         var bfids = new int[chunk.Size / 4];
                         for (int b = 0; b < chunk.Size / 4; b++)
                         {
                             bfids[b] = (int)bin.ReadUInt32();
                         }
                         break;
-                    case "SFID":
+                    case "SFID": // Skin file IDs
                         var sfids = new int[model.nViews];
                         for(int s = 0; s < model.nViews; s++)
                         {
@@ -89,8 +88,10 @@ namespace WoWFormatLib.FileReaders
                         }
                         model.skinFileDataIDs = sfids;
                         break;
-                    case "PFID":
+                    case "PFID": // Phys file IDs
                         model.physFileID = (int)bin.ReadUInt32();
+                        break;
+                    case "TXAC":
                         break;
                     default:
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunk.ToString(), position.ToString(), "id: " + fileDataID));
@@ -237,16 +238,20 @@ namespace WoWFormatLib.FileReaders
             for (int i = 0; i < nAnimations; i++)
             {
                 animations[i] = bin.Read<Animation>();
-                if (animations[i].flags == 0)
+                if ((animations[i].flags & 0x130) == 0)
                 {
-                    //this check doesnt find all of them yet, needs actual flag parsing
-                    // needs filedata support
-                    /*
-                    string animfilename = model.filename.Replace(".M2", animations[i].animationID.ToString().PadLeft(4, '0') + "-" + animations[i].subAnimationID.ToString().PadLeft(2, '0') + ".anim");
-                    if (!CASC.FileExists(animfilename))
-                    {
-                        new WoWFormatLib.Utils.MissingFile(animfilename);
-                    }*/
+                    Console.WriteLine("Animation is in .anim file!");
+                    //foreach(var afid in model.animFileData)
+                    //{
+                    //    if(animations[i].animationID == afid.animID && animations[i].subAnimationID == animations[i].subAnimationID)
+                    //    {
+                    //        Console.WriteLine(".anim filedata id " + afid.fileDataID);
+                    //    }
+                    //}
+                }
+                else
+                {
+                    Console.WriteLine("Animation in file.");
                 }
             }
             return animations;
