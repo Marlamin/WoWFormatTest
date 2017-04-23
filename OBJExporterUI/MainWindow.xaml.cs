@@ -771,7 +771,8 @@ namespace OBJExporterUI
 
             // try
             //{
-            var mapsData = new DBFilesClient.NET.Storage<MapEntry72>(CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2"));
+            CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2").ExtractToFile(".", "Map.db2");
+            var mapsData = new DBFilesClient.NET.Storage<MapEntry72>("Map.db2");
 
             foreach (var mapEntry in mapsData)
             {
@@ -804,6 +805,7 @@ namespace OBJExporterUI
                     }
                 }
             }
+
             /*}
             catch (Exception ex)
             {
