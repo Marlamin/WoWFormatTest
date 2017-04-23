@@ -30,7 +30,9 @@
                         <RowDefinition Height="2*" />
                     </Grid.RowDefinitions>
                     <ListBox Grid.Row="0" x:Name="textureListBox" SelectionMode="Extended" SelectionChanged="textureListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
-                    <Image Grid.Row="1" x:Name="blpImage" Margin="10,0,10,40"/>
+                    <Border Grid.Row="1" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,10,40">
+                        <Image x:Name="blpImage"/>
+                    </Border>
                     <Button Grid.Row="1" x:Name="exportTextureButton" Height="25" Content="Export texture to PNG!" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="exportTextureButton_Click"/>
                 </Grid>
             </TabItem>

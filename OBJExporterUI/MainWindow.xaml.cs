@@ -636,7 +636,7 @@ namespace OBJExporterUI
 
         private void MenuPreferences_Click(object sender, RoutedEventArgs e)
         {
-            var cfgWindow = new ConfigurationWindow();
+            var cfgWindow = new ConfigurationWindow(true);
             cfgWindow.ShowDialog();
 
             ConfigurationManager.RefreshSection("appSettings");
@@ -771,8 +771,8 @@ namespace OBJExporterUI
 
             // try
             //{
-            CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2").ExtractToFile(".", "Map.db2");
-            var mapsData = new DBFilesClient.NET.Storage<MapEntry72>("Map.db2");
+            CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2").ExtractToFile("DBFilesClient", "Map.db2");
+            var mapsData = new DBFilesClient.NET.Storage<MapEntry72>(@"DBFilesClient/Map.db2");
 
             foreach (var mapEntry in mapsData)
             {

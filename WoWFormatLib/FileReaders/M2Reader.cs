@@ -240,7 +240,7 @@ namespace WoWFormatLib.FileReaders
                 animations[i] = bin.Read<Animation>();
                 if ((animations[i].flags & 0x130) == 0)
                 {
-                    Console.WriteLine("Animation is in .anim file!");
+                    // Animation in other file
                     //foreach(var afid in model.animFileData)
                     //{
                     //    if(animations[i].animationID == afid.animID && animations[i].subAnimationID == animations[i].subAnimationID)
@@ -251,7 +251,7 @@ namespace WoWFormatLib.FileReaders
                 }
                 else
                 {
-                    Console.WriteLine("Animation in file.");
+                    // Animation included in this file
                 }
             }
             return animations;

@@ -24,41 +24,67 @@ namespace OBJExporterUI
     {
         private bool wowFound = false;
         private string wowLoc;
+        private bool _editMode;
 
-        public ConfigurationWindow()
+        public ConfigurationWindow(bool editMode = false)
         {
-            try
-            {
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Blizzard Entertainment\\World of Warcraft"))
-                {
-                    if (key != null)
-                    {
-                        var obj = key.GetValue("InstallPath");
-                        if (obj != null)
-                        {
-                            wowLoc = (string)obj;
-                            wowFound = true;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Unable to get WoW install path from registry. Falling back to online mode! Error: " + ex.Message);
-            }
+            _editMode = editMode;
 
             InitializeComponent();
 
-            if (wowFound)
+            if (editMode)
             {
-                basedirLabel.Content = wowLoc;
-                localMode.IsChecked = true;
-                onlineMode.IsChecked = false;
+                // Load existing configuration values
+                var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                basedirLabel.Content = config.AppSettings.Settings["basedir"].Value;
+                outdirLabel.Content = config.AppSettings.Settings["outdir"].Value;
+
+                if (string.IsNullOrWhiteSpace(config.AppSettings.Settings["basedir"].Value))
+                {
+                    onlineMode.IsChecked = true;
+                    localMode.IsChecked = false;
+                }
+                else
+                {
+                    onlineMode.IsChecked = false;
+                    localMode.IsChecked = true;
+                }
             }
             else
             {
-                onlineMode.IsChecked = true;
-                localMode.IsChecked = false;
+                // Initial config
+                try
+                {
+                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Blizzard Entertainment\\World of Warcraft"))
+                    {
+                        if (key != null)
+                        {
+                            var obj = key.GetValue("InstallPath");
+                            if (obj != null)
+                            {
+                                wowLoc = (string)obj;
+                                wowFound = true;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Unable to get WoW install path from registry. Falling back to online mode! Error: " + ex.Message);
+                }
+
+
+                if (wowFound)
+                {
+                    basedirLabel.Content = wowLoc;
+                    localMode.IsChecked = true;
+                    onlineMode.IsChecked = false;
+                }
+                else
+                {
+                    onlineMode.IsChecked = true;
+                    localMode.IsChecked = false;
+                }
             }
         }
 
@@ -108,7 +134,21 @@ namespace OBJExporterUI
             programSelect.Items.Add(new KeyValuePair<string, string>("Public Test Realm (PTR)", "wowt"));
             programSelect.Items.Add(new KeyValuePair<string, string>("Beta", "wow_beta"));
             programSelect.DisplayMemberPath = "Key";
-            programSelect.SelectedIndex = 0;
+            if (_editMode)
+            {
+                var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                foreach (KeyValuePair<string, string> item in programSelect.Items)
+                {
+                    if (item.Value == config.AppSettings.Settings["program"].Value)
+                    {
+                        programSelect.SelectedItem = item;
+                    }
+                }
+            }
+            else
+            {
+                programSelect.SelectedIndex = 0;
+            }
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
