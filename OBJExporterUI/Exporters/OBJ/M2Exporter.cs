@@ -162,11 +162,11 @@ namespace OBJExporterUI.Exporters.OBJ
                 {
                     if (destinationOverride == null)
                     {
-                        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
+                        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), "tex_" + materials[i].filename + ".png"));
                     }
                     else
                     {
-                        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
+                        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, "tex_" + materials[i].filename.ToLower() + ".png"));
                     }
                 }
                 catch (Exception e)
@@ -179,10 +179,10 @@ namespace OBJExporterUI.Exporters.OBJ
 
             foreach (var material in materials)
             {
-                mtlsb.WriteLine("newmtl " + material.filename);
+                mtlsb.WriteLine("newmtl " + "tex_" + material.filename);
                 mtlsb.WriteLine("illum 2");
-                mtlsb.WriteLine("map_Ka " + material.filename + ".png");
-                mtlsb.WriteLine("map_Kd " + material.filename + ".png");
+                mtlsb.WriteLine("map_Ka " + "tex_" + material.filename + ".png");
+                mtlsb.WriteLine("map_Kd " + "tex_" + material.filename + ".png");
             }
 
             mtlsb.Close();
