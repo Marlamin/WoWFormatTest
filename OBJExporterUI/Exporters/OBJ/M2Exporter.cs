@@ -193,7 +193,7 @@ namespace OBJExporterUI.Exporters.OBJ
             {
                 var i = renderbatch.firstFace;
                 objsw.WriteLine("o " + Path.GetFileNameWithoutExtension(file) + renderbatch.groupID);
-                objsw.WriteLine("usemtl " + materials[renderbatch.materialID].filename);
+                objsw.WriteLine("usemtl tex_" + materials[renderbatch.materialID].filename);
                 objsw.WriteLine("s 1");
                 while (i < (renderbatch.firstFace + renderbatch.numFaces))
                 {
