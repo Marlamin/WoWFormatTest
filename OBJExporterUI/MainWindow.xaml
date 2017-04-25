@@ -65,6 +65,7 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
+                    <Button x:Name="tileViewerButton" Click="tileViewerButton_Click" Content="Tile viewer" Margin="109,19,57,181" Grid.Row="1"/>
                     <Image x:Name="tileImage" Grid.Column="1" Grid.Row="1" Margin="93,19,0,0" />
                     <ListBox x:Name="tileListBox" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="0"  SelectionChanged="tileListBox_SelectionChanged" Height="199" Width="63" Margin="10,17,0,0"/>
                     <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="exportTileButton" Height="25" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="exportTileButton_Click"/>
@@ -117,5 +118,5 @@
             </Menu>
             <StackPanel></StackPanel>
         </DockPanel>
-   </Grid>
+    </Grid>
 </Window>

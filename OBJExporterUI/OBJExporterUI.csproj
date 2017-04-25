@@ -71,6 +71,9 @@
     <Compile Include="Loaders\BLPLoader.cs" />
     <Compile Include="Loaders\M2Loader.cs" />
     <Compile Include="Loaders\WMOLoader.cs" />
+    <Compile Include="MapWindow.xaml.cs">
+      <DependentUpon>MapWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OldCamera.cs" />
     <Compile Include="Structs.cs" />
     <Compile Include="PreviewWindow.cs" />
@@ -96,6 +99,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MapWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="VersionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -42,6 +42,8 @@ namespace OBJExporterUI
         private Dictionary<int, NiceMapEntry> mapNames = new Dictionary<int, NiceMapEntry>();
         private List<string> mapFilters = new List<string>();
 
+        private static ListBox tileBox;
+
         public MainWindow()
         {
             if (bool.Parse(ConfigurationManager.AppSettings["firstrun"]) == true)
@@ -59,6 +61,8 @@ namespace OBJExporterUI
 
             InitializeComponent();
 
+            tileBox = tileListBox;
+
             Title = "OBJ Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             exportworker.DoWork += exportworker_DoWork;
@@ -75,6 +79,12 @@ namespace OBJExporterUI
             fileworker.RunWorkerCompleted += fileworker_RunWorkerCompleted;
             fileworker.ProgressChanged += fileworker_ProgressChanged;
             fileworker.WorkerReportsProgress = true;
+        }
+
+        public static void SelectTile(string tile)
+        {
+            Console.WriteLine("Got selected tile" + tile);
+            tileBox.SelectedValue = tile;
         }
 
         private void cascworker_DoWork(object sender, DoWorkEventArgs e)
@@ -285,6 +295,7 @@ namespace OBJExporterUI
 
             modelListBox.DataContext = models;
             textureListBox.DataContext = textures;
+
         }
 
         private void exportworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -742,6 +753,14 @@ namespace OBJExporterUI
                     return 1;
             }
         }
+
+        private void tileViewerButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (MapListItem)mapListBox.SelectedItem;
+            var mw = new MapWindow(selectedItem.Internal);
+            mw.Show();
+
+        }
         private void UpdateMapListView()
         {
             if (!File.Exists("mapnames.csv"))
@@ -843,5 +862,6 @@ namespace OBJExporterUI
             public string Type { get; set; }
             public string Expansion { get; set; }
         }
+
     }
 }
