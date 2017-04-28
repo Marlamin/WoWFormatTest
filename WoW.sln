@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatTest", "WoWFormatTest\WoWFormatTest.csproj", "{3ED7F6F2-5A92-496A-9D87-60F56638C2A7}"
 EndProject
@@ -46,8 +46,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWShaderTest", "WoWShaderTest\WoWShaderTest.csproj", "{9EB777C1-830D-4B06-9C73-53BD42552E18}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltraDiffer3000", "UltraDiffer3000\UltraDiffer3000.csproj", "{40F099C9-BA29-4747-B6A8-F7DEE72A6DC0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildBackup", "BuildBackup\BuildBackup.csproj", "{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADTdiff", "ADTdiff\ADTdiff.csproj", "{5DE0E162-A91D-457A-9852-EF99D490FF3B}"
 EndProject
@@ -279,18 +277,6 @@ Global
 		{40F099C9-BA29-4747-B6A8-F7DEE72A6DC0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{40F099C9-BA29-4747-B6A8-F7DEE72A6DC0}.Release|x86.ActiveCfg = Release|Any CPU
 		{40F099C9-BA29-4747-B6A8-F7DEE72A6DC0}.Release|x86.Build.0 = Release|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Debug|x86.Build.0 = Debug|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Release|x86.ActiveCfg = Release|Any CPU
-		{C2B7FF1C-0A90-4A0C-A7C0-B35B41953528}.Release|x86.Build.0 = Release|Any CPU
 		{5DE0E162-A91D-457A-9852-EF99D490FF3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5DE0E162-A91D-457A-9852-EF99D490FF3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DE0E162-A91D-457A-9852-EF99D490FF3B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
