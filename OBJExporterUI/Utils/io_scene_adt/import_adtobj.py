@@ -24,6 +24,8 @@ import os
 import time
 import bpy
 import mathutils
+from math import radians
+from mathutils import Quaternion
 import string
 from bpy_extras.io_utils import unpack_list
 from bpy_extras.image_utils import load_image
@@ -72,9 +74,6 @@ def load(context,
         # Import ADT
         bpy.ops.import_scene.obj(filepath=filepath)
 
-        # Select the imported doodad
-        obj = bpy.context.object
-
         # Make object active
         # bpy.context.scene.objects.active = obj
 
@@ -85,53 +84,65 @@ def load(context,
                 doodad_path, doodad_filename = os.path.split(filepath)
                 newpath = os.path.join(doodad_path, row['ModelFile'])
 
-                # Import the doodad
-                bpy.ops.import_scene.obj(filepath=newpath)
+                if row['Type'] == 'wmo':
+                    bpy.ops.object.add(type='EMPTY')
+                    parent = bpy.context.active_object
+                    parent.name = row['ModelFile']
+                    parent.location = (17066 - float(row['PositionX']), (17066 - float(row['PositionZ'])) * -1, float(row['PositionY']))
+                    parent.rotation_euler = [0, 0, 0]
+                    #obj.rotation_euler.x += (radians(90 + float(row['RotationX']))) # TODO
+                    #obj.rotation_euler.y -= radians(float(row['RotationY']))        # TODO
+                    parent.rotation_euler.z = radians((-90 + float(row['RotationY'])))
 
-                # Select the imported doodad
-                obj = bpy.context.object
+                    bpy.ops.import_scene.obj(filepath=newpath)
+                    obj_objects = bpy.context.selected_objects[:]
 
-                # Make object active
-                # bpy.context.scene.objects.active = obj
+                    # Put ADT rotations in here
+                    for obj in obj_objects:
+                        obj.parent = bpy.data.objects[mapname + '_' + str(map_x) + '_' + str(map_y)]
 
-                # Set position
-                # WARNING: WoW world coordinates, are Y and Z swapped?
-                if obj:
-                    obj.location = (float(row['PositionX']) - offset_x, float(row['PositionY']), float(row['PositionZ']) - offset_y)
-
-                    print(float(row['PositionX']) - offset_x)
-                    print(obj.location[0])
-
-                    # Set scale
-                    if row['ScaleFactor']:
-                        obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
-
-                    print(obj.scale[0])
-
-                #break
-                #print(newpath)
-                #print(row['ModelFile'], row['PositionX'])
-        #file = open(newpath, "r")
-#
-        #for line in file:
-        #    print(line)
-        #    splitted_line = line.split(";")
-#
-        #    modelname = splitted_line[0]
-        #    type(modelname)
-        #    position_x = float(splitted_line[1])
-        #    type(position_x)
-        #    position_y = float(splitted_line[2])
-        #    position_z = float(splitted_line[3])
-        #    rotation_x = float(splitted_line[4])
-        #    rotation_y = float(splitted_line[5])
-        #    rotation_z = float(splitted_line[6])
-        #    scale = float(splitted_line[7])
-        #    modelid = int(splitted_line[8])
-        #    type(modelid)
-#
-        #    print ("Model name: %r, POS: %f %f %f, ROT: %f %f %f, Scale: %f, ModelID: %d" % (modelname, position_x, position_y, position_z, rotation_x, rotation_y, rotation_z, scale, modelid))
-        #file.close()
+                    wmocsvpath = newpath.replace('.obj', '_ModelPlacementInformation.csv')
+                    # Read WMO doodads definitions file
+                    with open(wmocsvpath) as wmocsvfile:
+                        wmoreader = csv.DictReader(wmocsvfile, delimiter=';')
+                        for wmorow in wmoreader:
+                            wmodoodad_path, wmodoodad_filename = os.path.split(filepath)
+                            wmonewpath = os.path.join(wmodoodad_path, wmorow['ModelFile'])
+                            # Import the doodad
+                            bpy.ops.import_scene.obj(filepath=wmonewpath)
+                            # Select the imported doodad
+                            wmoobj_objects = bpy.context.selected_objects[:]
+                            for wmoobj in wmoobj_objects:
+                                # Print object name
+                                # Set position
+                                wmoobj.parent = parent
+                                #wmoobj.location.x = (float(wmorow['PositionY']) * -1)
+                                #wmoobj.location.y = float(wmorow['PositionX'])
+                                #wmoobj.location.z = float(wmorow['PositionZ']) # okay
+                                wmoobj.location = (float(wmorow['PositionX']) * -1, float(wmorow['PositionY']) * -1, float(wmorow['PositionZ']))
+                                # Set rotation
+                                rotQuat = Quaternion((float(wmorow['RotationW']), float(wmorow['RotationX']), float(wmorow['RotationY']), float(wmorow['RotationZ'])))
+                                rotEul = rotQuat.to_euler()
+                                rotEul.x += radians(90);
+                                #rotEul.z += radians(90);
+                                wmoobj.rotation_euler = rotEul
+                                # Set scale
+                                if wmorow['ScaleFactor']:
+                                    wmoobj.scale = (float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']))
+                else:
+                    print("m2")
+                    bpy.ops.import_scene.obj(filepath=newpath)
+                    obj_objects = bpy.context.selected_objects[:]
+                    for obj in obj_objects:
+                        obj.location.x = offset_x - float(row['PositionX'])
+                        obj.location.y = (offset_y - float(row['PositionZ'])) * -1
+                        obj.location.z = float(row['PositionY'])
+                        obj.rotation_euler.z = radians(90 + float(row['RotationY']))
+                        #obj.parent = bpy.data.objects[mapname + '_' + str(map_x) + '_' + str(map_y)]
+                        #obj.rotation_euler.x = -90
+                        # Set scale
+                        if row['ScaleFactor']:
+                            obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
 
         progress.leave_substeps("Finished importing: %r" % filepath)
 
