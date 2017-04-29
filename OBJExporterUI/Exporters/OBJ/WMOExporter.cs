@@ -29,16 +29,6 @@ namespace OBJExporterUI.Exporters.OBJ
             WMOReader reader = new WMOReader();
             reader.LoadWMO(file);
 
-            // TODO: Support doodads!
-            /*
-            for (int i = 0; i < reader.wmofile.doodadNames.Count(); i++)
-            {
-                //Console.WriteLine(reader.wmofile.doodadNames[i].filename);
-                //reader.wmofile.doodadDefinitions[i].
-                //reader.wmofile.doodadDefinitions[i].
-            }
-            */
-
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
@@ -94,6 +84,26 @@ namespace OBJExporterUI.Exporters.OBJ
                     Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
                 }
             }
+
+            exportworker.ReportProgress(65, "Exporting doodads..");
+
+            var doodadSW = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_ModelPlacementInformation.csv"));
+            doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationW;RotationX;RotationY;RotationZ;ScaleFactor");
+            foreach(var doodadDefinition in reader.wmofile.doodadDefinitions)
+            {
+                foreach(var doodadNameEntry in reader.wmofile.doodadNames)
+                {
+                    if(doodadNameEntry.startOffset == doodadDefinition.offset)
+                    {
+                        if (!File.Exists(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj"))
+                        {
+                            M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2"), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        }
+                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj;" + doodadDefinition.position.X.ToString("F09") + ";" + doodadDefinition.position.Y.ToString("F09") + ";" + doodadDefinition.position.Z.ToString("F09") + ";" + doodadDefinition.rotation.W.ToString("F15") + ";" + doodadDefinition.rotation.X.ToString("F15") + ";" + doodadDefinition.rotation.Y.ToString("F15") + ";" + doodadDefinition.rotation.Z.ToString("F15") + ";" + doodadDefinition.scale);
+                    }
+                }
+            }
+            doodadSW.Close();
 
             var mtlsb = new StringBuilder();
             var textureID = 0;

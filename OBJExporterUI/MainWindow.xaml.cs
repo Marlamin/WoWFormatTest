@@ -757,6 +757,8 @@ namespace OBJExporterUI
         private void tileViewerButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = (MapListItem)mapListBox.SelectedItem;
+            if (selectedItem == null) return;
+
             var mw = new MapWindow(selectedItem.Internal);
             mw.Show();
 

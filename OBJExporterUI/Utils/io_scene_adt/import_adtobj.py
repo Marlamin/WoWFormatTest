@@ -96,16 +96,17 @@ def load(context,
 
                 # Set position
                 # WARNING: WoW world coordinates, are Y and Z swapped?
-                obj.location = (float(row['PositionX']) - offset_x, float(row['PositionY']), float(row['PositionZ']) - offset_y)
+                if obj:
+                    obj.location = (float(row['PositionX']) - offset_x, float(row['PositionY']), float(row['PositionZ']) - offset_y)
 
-                print(float(row['PositionX']) - offset_x)
-                print(obj.location[0])
+                    print(float(row['PositionX']) - offset_x)
+                    print(obj.location[0])
 
-                # Set scale
-                if row['ScaleFactor']:
-                    obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
+                    # Set scale
+                    if row['ScaleFactor']:
+                        obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
 
-                print(obj.scale[0])
+                    print(obj.scale[0])
 
                 #break
                 #print(newpath)
