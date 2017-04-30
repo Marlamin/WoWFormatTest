@@ -74,6 +74,19 @@ def load(context,
         # Import ADT
         bpy.ops.import_scene.obj(filepath=filepath)
 
+        bpy.ops.object.add(type='EMPTY')
+        doodadparent = bpy.context.active_object
+        doodadparent.parent = bpy.data.objects[mapname + '_' + str(map_x) + '_' + str(map_y)]
+        doodadparent.name = "Doodads"
+        doodadparent.rotation_euler = [0, 0, 0]
+        doodadparent.rotation_euler.x = radians(-90)
+
+        bpy.ops.object.add(type='EMPTY')
+        wmoparent = bpy.context.active_object
+        wmoparent.parent = bpy.data.objects[mapname + '_' + str(map_x) + '_' + str(map_y)]
+        wmoparent.name = "WMOs"
+        wmoparent.rotation_euler = [0, 0, 0]
+        wmoparent.rotation_euler.x = radians(-90)
         # Make object active
         # bpy.context.scene.objects.active = obj
 
@@ -88,6 +101,7 @@ def load(context,
                     bpy.ops.object.add(type='EMPTY')
                     parent = bpy.context.active_object
                     parent.name = row['ModelFile']
+                    parent.parent = wmoparent
                     parent.location = (17066 - float(row['PositionX']), (17066 - float(row['PositionZ'])) * -1, float(row['PositionY']))
                     parent.rotation_euler = [0, 0, 0]
                     #obj.rotation_euler.x += (radians(90 + float(row['RotationX']))) # TODO
@@ -99,7 +113,7 @@ def load(context,
 
                     # Put ADT rotations in here
                     for obj in obj_objects:
-                        obj.parent = bpy.data.objects[mapname + '_' + str(map_x) + '_' + str(map_y)]
+                        obj.parent = parent
 
                     wmocsvpath = newpath.replace('.obj', '_ModelPlacementInformation.csv')
                     # Read WMO doodads definitions file
@@ -113,12 +127,9 @@ def load(context,
                             # Select the imported doodad
                             wmoobj_objects = bpy.context.selected_objects[:]
                             for wmoobj in wmoobj_objects:
-                                # Print object name
-                                # Set position
+                                # Set parent
                                 wmoobj.parent = parent
-                                #wmoobj.location.x = (float(wmorow['PositionY']) * -1)
-                                #wmoobj.location.y = float(wmorow['PositionX'])
-                                #wmoobj.location.z = float(wmorow['PositionZ']) # okay
+                                # Set position
                                 wmoobj.location = (float(wmorow['PositionX']) * -1, float(wmorow['PositionY']) * -1, float(wmorow['PositionZ']))
                                 # Set rotation
                                 rotQuat = Quaternion((float(wmorow['RotationW']), float(wmorow['RotationX']), float(wmorow['RotationY']), float(wmorow['RotationZ'])))
@@ -134,12 +145,17 @@ def load(context,
                     bpy.ops.import_scene.obj(filepath=newpath)
                     obj_objects = bpy.context.selected_objects[:]
                     for obj in obj_objects:
-                        obj.location.x = offset_x - float(row['PositionX'])
-                        obj.location.y = (offset_y - float(row['PositionZ'])) * -1
+                        # Set parent
+                        obj.parent = doodadparent
+
+                        # Set location
+                        obj.location.x = (17066 - float(row['PositionX']))
+                        obj.location.y = (17066 - float(row['PositionZ'])) * -1
                         obj.location.z = float(row['PositionY'])
-                        obj.rotation_euler.z = radians(90 + float(row['RotationY']))
-                        #obj.parent = bpy.data.objects[mapname + '_' + str(map_x) + '_' + str(map_y)]
-                        #obj.rotation_euler.x = -90
+                        obj.rotation_euler.x += radians(float(row['RotationZ']))
+                        obj.rotation_euler.y += radians(float(row['RotationX']))
+                        obj.rotation_euler.z = radians(90 + float(row['RotationY'])) # okay
+
                         # Set scale
                         if row['ScaleFactor']:
                             obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
