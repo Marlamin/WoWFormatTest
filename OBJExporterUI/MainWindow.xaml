@@ -5,15 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OBJExporterUI"
         mc:Ignorable="d"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         Icon="Resources/icon32.png"
         ContentRendered="Window_ContentRendered"
-        Title="OBJ Exporter" Height="616.333" Width="600">
+        Title="OBJ Exporter" MinHeight="650" Height="650" MinWidth="615" Width="615">
     <Grid>
-        <Image x:Name="loadingImage" Source="Resources/icon.png" Margin="234,235,234,187"/>
-        <TextBox x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="234,22,0,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged" Panel.ZIndex="2"/>
-        <Label Content="Filter" Name="filterTextLabel" Visibility="Hidden" HorizontalAlignment="Left" Margin="191,22,0,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-        <TabControl x:Name="tabs" Margin="0,22,0,28" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Visible">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="600" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Column="0">
+            <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False">
+                <MenuItem Header="_File">
+                    <MenuItem Name="MenuPreferences" Header="_Preferences" Click="MenuPreferences_Click"/>
+                    <MenuItem Name="MenuQuit" Header="_Quit" Click="MenuQuit_Click" />
+                </MenuItem>
+                <MenuItem Header="_Tools">
+                    <MenuItem Name="MenuListfile" Header="_Update Listfile" Click="MenuListfile_Click" IsEnabled="False"></MenuItem>
+                    <MenuItem Name="MenuMapNames" Header="_Update Map list" Click="MenuMapNames_Click" IsEnabled="True"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="_About">
+                    <MenuItem Name="MenuVersion" Header="_Version" Click="MenuVersion_Click"></MenuItem>
+                </MenuItem>
+            </Menu>
+            <StackPanel></StackPanel>
+        </DockPanel>
+        <ProgressBar x:Name="progressBar" Grid.Column="0" Margin="5,5,5,5" Height="25" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+        <Label Grid.Column="0" x:Name="progressLabel" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+        <Label Grid.Column="0" x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="5,10,0,0" VerticalAlignment="Top" Width="572" HorizontalContentAlignment="Center" Height="17" VerticalContentAlignment="Center" Padding="5,0,5,1"/>
+        <Image Grid.Column="0" x:Name="loadingImage" Source="Resources/icon.png" Margin="0,0,0,0" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBox Grid.Column="0" x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="234,35,0,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged" Panel.ZIndex="2"/>
+        <Label Grid.Column="0" Content="Filter" Name="filterTextLabel" Visibility="Hidden" HorizontalAlignment="Stretch" Margin="198,35,366,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center"/>
+        <TabControl Grid.Column="0" x:Name="tabs" Margin="0,40,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto" Visibility="Hidden">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
                     <CheckBox Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -100,23 +126,5 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <ProgressBar x:Name="progressBar" Visibility="Visible" HorizontalAlignment="Stretch" Height="17" Margin="10,558,10,0" VerticalAlignment="Top" />
-        <Label x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="0,558,20,0" VerticalAlignment="Top" Width="572" HorizontalContentAlignment="Center" Height="17" VerticalContentAlignment="Center" Padding="5,0,5,1"/>
-        <DockPanel>
-            <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False">
-                <MenuItem Header="_File">
-                    <MenuItem Name="MenuPreferences" Header="_Preferences" Click="MenuPreferences_Click"/>
-                    <MenuItem Name="MenuQuit" Header="_Quit" Click="MenuQuit_Click" />
-                </MenuItem>
-                <MenuItem Header="_Tools">
-                    <MenuItem Name="MenuListfile" Header="_Update Listfile" Click="MenuListfile_Click" IsEnabled="False"></MenuItem>
-                    <MenuItem Name="MenuMapNames" Header="_Update Map list" Click="MenuMapNames_Click" IsEnabled="True"></MenuItem>
-                </MenuItem>
-                <MenuItem Header="_About">
-                    <MenuItem Name="MenuVersion" Header="_Version" Click="MenuVersion_Click"></MenuItem>
-                </MenuItem>
-            </Menu>
-            <StackPanel></StackPanel>
-        </DockPanel>
     </Grid>
 </Window>
