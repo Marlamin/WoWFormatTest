@@ -1,18 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
-using OpenTK.Input;
 using OpenTK.Graphics.OpenGL;
-using System.Drawing;
-using WoWFormatLib.FileReaders;
 using OBJExporterUI.Loaders;
-using System.ComponentModel;
+using System.Drawing;
+using OpenTK.Input;
 
 namespace OBJExporterUI
 {
-    public class PreviewWindow : GameWindow
+    public class PreviewControl
     {
+        private GLControl renderCanvas;
+
+        private bool ready = false;
+        private bool isWMO;
+
+        // Cache storage for models... bad idea?
+        private CacheStorage cache = new CacheStorage();
+
+        // Camera stuff
+        private bool mouseDragging = true;
         private static float dragX;
         private static float dragY;
         private static float dragZ;
@@ -20,43 +26,34 @@ namespace OBJExporterUI
         private static float MDDepth = 0;
         private static float MDHorizontal = 0;
         private static float MDVertical = 0;
-        private static float lightHeight = 0.0f;
         private static float camSpeed = 0.25f;
-        private List<Terrain> adts = new List<Terrain>();
-
-        private string filename; 
-
-        private static float maxSize = 51200 / 3; //17066,66666666667
-	    private static float mapSize = maxSize * 2; //34133,33333333333
-	    private static float adtSize = mapSize / 64; //533,3333333333333
-
-        private Dictionary<Key, int> CoolOffKeys = new Dictionary<Key, int>();
-
-        private bool mouseDragging = true;
-
-        private bool isWMO;
-
+        private OldCamera ActiveCamera;
         private Point mouseOldCoords;
 
-        private CacheStorage cache = new CacheStorage();
+        private string filename;
 
-        OldCamera ActiveCamera;
-
-        public PreviewWindow(string modelPath)
-            : base(1920, 1080, new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8), "Model preview", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, OpenTK.Graphics.GraphicsContextFlags.Default)
+        public PreviewControl(GLControl renderCanvas)
         {
+            this.renderCanvas = renderCanvas;
+            this.renderCanvas.Paint += RenderCanvas_Paint;
+            this.renderCanvas.Load += RenderCanvas_Load;
+            this.renderCanvas.KeyDown += RenderCanvas_KeyDown;
 
-            dragX = 7;
+            dragX = 0;
             dragY = 0;
-            dragZ = 4;
+            dragZ = 0;
             angle = 0.0f;
 
-            Keyboard.KeyDown += Keyboard_KeyDown;
+            ActiveCamera = new OldCamera(renderCanvas.Width, renderCanvas.Height);
+        }
 
-            ActiveCamera = new OldCamera(Width, Height);
+        private void RenderCanvas_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            // Console.WriteLine(e.KeyCode);
+        }
 
-            filename = modelPath;
-
+        public void LoadModel(string filename)
+        {
             if (filename.EndsWith(".m2"))
             {
                 M2Loader.LoadM2(filename, cache);
@@ -67,66 +64,23 @@ namespace OBJExporterUI
                 WMOLoader.LoadWMO(filename, cache);
                 isWMO = true;
             }
+
+            this.filename = filename;
+
+            ready = true;
         }
 
-        void Keyboard_KeyDown(object sender, KeyboardKeyEventArgs e)
+        public void WindowsFormsHost_Initialized(object sender, EventArgs e)
         {
-            if (e.Key == Key.Escape)
-            {
-                Exit();
-            }
+            renderCanvas.MakeCurrent();
         }
 
-        private void DrawAxes()
+        private void Update()
         {
-            GL.Begin(PrimitiveType.Lines);
+            if (!renderCanvas.Focused) return;
 
-            GL.Color3(Color.DarkRed);  // x axis
-            GL.Vertex3(-10, 0, 0);
-            GL.Vertex3(10, 0, 0);
-
-            GL.Color3(Color.ForestGreen);  // y axis
-            GL.Vertex3(0, -10, 0);
-            GL.Vertex3(0, 10, 0);
-
-            GL.Color3(Color.LightBlue);  // z axis
-            GL.Vertex3(0, 0, -10);
-            GL.Vertex3(0, 0, 10);
-
-            GL.End();
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-
-            GL.Enable(EnableCap.Texture2D);
-            GL.Enable(EnableCap.DepthTest);
-            GL.ShadeModel(ShadingModel.Smooth);
-            GL.ClearColor(Color.White);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
-            ActiveCamera.setupGLRenderMatrix();
-        }
-
-        protected override void OnResize(EventArgs e)
-        {
-            GL.Viewport(0, 0, Width, Height);
-            ActiveCamera = new OldCamera(Width, Height)
-            {
-                Pos = new Vector3(dragX, dragY, dragZ)
-            };
-            ActiveCamera.setupGLRenderMatrix();
-        }
-        protected override void OnUpdateFrame(FrameEventArgs e)
-        {
-            if (!this.Focused)
-            {
-                return;
-            }
-
-            MouseState mouseState = OpenTK.Input.Mouse.GetState();
-            KeyboardState keyboardState = OpenTK.Input.Keyboard.GetState();
+            MouseState mouseState = Mouse.GetState();
+            KeyboardState keyboardState = Keyboard.GetState();
 
             MDVertical = 0;
             MDDepth = 0;
@@ -164,7 +118,7 @@ namespace OBJExporterUI
 
             if (keyboardState.IsKeyDown(Key.D))
             {
-                MDHorizontal =  1;
+                MDHorizontal = 1;
             }
 
             if (keyboardState.IsKeyDown(Key.O))
@@ -200,27 +154,6 @@ namespace OBJExporterUI
                 }
             }
 
-            if (keyboardState.IsKeyDown(Key.L))
-            {
-                lightHeight = lightHeight + 50f;
-            }
-            if (keyboardState.IsKeyDown(Key.K))
-            {
-                lightHeight = lightHeight - 50f;
-            }
-
-            /*
-            if (keyboardState.IsKeyDown(Key.X))
-            {
-                dragZ = (dragZ + 10f) - 1068;
-            }
-
-            if (keyboardState.IsKeyDown(Key.Z))
-            {
-                dragZ = (dragZ - 10f) - 1068;
-            }
-            */
-
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
                 if (!mouseDragging)
@@ -237,9 +170,12 @@ namespace OBJExporterUI
                 dragY = dragY + mouseMovementY / 20.0f;
                 dragX = dragX + mouseMovementX / 20.0f;
 
-                if (dragY < -89) {
+                if (dragY < -89)
+                {
                     dragY = -89;
-                } else if (dragY > 89) {
+                }
+                else if (dragY > 89)
+                {
                     dragY = 89;
                 }
 
@@ -256,53 +192,54 @@ namespace OBJExporterUI
                 dragX = dragY = dragZ = angle = 0;
             }
 
-            if (!CoolOffKeys.ContainsKey(Key.Right) && keyboardState.IsKeyDown(Key.Right) && keyboardState.IsKeyUp(Key.ShiftLeft))
-            {
-                angle += 90;
-                CoolOffKey(Key.Right);
-            }
-
-            if (!CoolOffKeys.ContainsKey(Key.Left) && keyboardState.IsKeyDown(Key.Left) && keyboardState.IsKeyUp(Key.ShiftLeft))
-            {
-                angle -= 90;
-                CoolOffKey(Key.Left);
-            }
-
             dragZ = (mouseState.WheelPrecise / 2) - 500; //Startzoom is at -7.5f 
         }
 
-        private void CoolOffKey(Key kKey)
+        private void RenderCanvas_Load(object sender, EventArgs e)
         {
-            if (CoolOffKeys.ContainsKey(kKey))
-                CoolOffKeys[kKey] = 1000;
-            else CoolOffKeys.Add(kKey, 1000);
+            GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.DepthTest);
+            GL.ShadeModel(ShadingModel.Smooth);
+            GL.ClearColor(Color.Black);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            ActiveCamera.Pos = new Vector3(dragX, dragY, dragZ);
+            ActiveCamera.setupGLRenderMatrix();
         }
 
-        protected override void OnRenderFrame(FrameEventArgs e)
+        private void DrawAxes()
         {
-            MakeCurrent();
+            GL.Begin(PrimitiveType.Lines);
 
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Color3(Color.DarkRed);  // x axis
+            GL.Vertex3(-10, 0, 0);
+            GL.Vertex3(10, 0, 0);
 
-            angle = angle % 360;
+            GL.Color3(Color.ForestGreen);  // y axis
+            GL.Vertex3(0, -10, 0);
+            GL.Vertex3(0, 10, 0);
 
-            //Position math
+            GL.Color3(Color.LightBlue);  // z axis
+            GL.Vertex3(0, 0, -10);
+            GL.Vertex3(0, 0, 10);
 
-            ActiveCamera.tick((float)e.Time, dragX, dragY, MDHorizontal, MDDepth, MDVertical);
-            ActiveCamera.setupGLRenderMatrix();
+            GL.End();
+        }
+
+        private void RenderCanvas_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
+        {
+            if (!ready) return;
 
             ActiveCamera.tick(0.02f, dragX, dragY, MDHorizontal, MDDepth, MDVertical);
-
             ActiveCamera.setupGLRenderMatrix();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            GL.Viewport(0, 0, renderCanvas.Width, renderCanvas.Height);
             GL.Enable(EnableCap.Texture2D);
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.NormalArray);
             GL.EnableClientState(ArrayCap.TextureCoordArray);
-
-            GL.Rotate(180f, 0.0, 0.0, 1.0);
 
             if (!isWMO)
             {
@@ -313,7 +250,7 @@ namespace OBJExporterUI
                 GL.VertexPointer(3, VertexPointerType.Float, 8 * sizeof(float), (IntPtr)(5 * sizeof(float)));
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.doodadBatches[filename].indiceBuffer);
 
-                for (int i = 0; i < cache.doodadBatches[filename].submeshes.Count(); i++)
+                for (int i = 0; i < cache.doodadBatches[filename].submeshes.Length; i++)
                 {
                     if (cache.doodadBatches[filename].submeshes[i].blendType == 0)
                     {
@@ -363,7 +300,7 @@ namespace OBJExporterUI
             {
                 // WMO 
 
-                for (int j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Count(); j++)
+                for (int j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Length; j++)
                 {
                     GL.BindBuffer(BufferTarget.ArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vertexBuffer);
                     GL.NormalPointer(NormalPointerType.Float, 8 * sizeof(float), (IntPtr)0);
@@ -423,129 +360,14 @@ namespace OBJExporterUI
             {
                 Console.WriteLine(error);
             }
-
-            this.SwapBuffers();
-
-            Key[] keys = CoolOffKeys.Keys.ToArray();
-            int decreasevalue = (int)(base.RenderTime * 3000d);//TERRIBLE
-            for (int i = 0; i < keys.Length; i++)
-            {
-                Key k = keys[i];
-
-                CoolOffKeys[k] -= decreasevalue;
-
-                if (CoolOffKeys[k] <= 0)
-                    CoolOffKeys.Remove(k);
-            }
-            
+            GL.Flush();
+            renderCanvas.SwapBuffers();
         }
 
-        protected override void OnUnload(EventArgs e)
+        public void CompositionTarget_Rendering(object sender, EventArgs e)
         {
-            Dispose();
-            base.OnUnload(e);
-        }
-
-        public struct Terrain
-        {
-            public int vertexBuffer;
-            public int indiceBuffer;
-            public RenderBatch[] renderBatches;
-            public Doodad[] doodads;
-            public WorldModelBatch[] worldModelBatches;
-        }
-
-        public struct Vertex
-        {
-            public Vector3 Normal;
-            public Vector3 Color;
-            public Vector2 TexCoord;
-            public Vector3 Position;
-        }
-
-        public struct M2Vertex
-        {
-            public Vector3 Normal;
-            public Vector2 TexCoord;
-            public Vector3 Position;
-
-        }
-        public struct Material
-        {
-            public string filename;
-            public int textureID;
-            internal WoWFormatLib.Structs.M2.TextureFlags flags;
-            internal uint texture1;
-        }
-
-        public struct RenderBatch
-        {
-            public uint firstFace;
-            public uint numFaces;
-            public uint[] materialID;
-            /* WMO ONLY */
-            public uint groupID;
-            public uint blendType;
-            /* ADT ONLY */
-            public int[] alphaMaterialID;
-        }
-
-        public struct Doodad
-        {
-            public string filename;
-            public Vector3 position;
-            public Vector3 rotation;
-            public float scale;
-        }
-
-        public struct DoodadBatch
-        {
-            public int vertexBuffer;
-            public int indiceBuffer;
-            public uint[] indices;
-            public Submesh[] submeshes;
-            public Material[] mats;
-        }
-
-        public struct WorldModelBatch
-        {
-            public Vector3 position;
-            public Vector3 rotation;
-            public WorldModel worldModel;
-        }
-
-        public struct WMODoodad
-        {
-            public string filename;
-            public short flags;
-            public Vector3 position;
-            public Quaternion rotation;
-            public float scale;
-            public Vector4 color;
-        }
-
-        public struct Submesh
-        {
-            public uint firstFace;
-            public uint numFaces;
-            public uint material;
-            public uint blendType;
-            public uint groupID;
-        }
-
-        public struct WorldModel
-        {
-            public WorldModelGroupBatches[] groupBatches;
-            public Material[] mats;
-            public RenderBatch[] wmoRenderBatch;
-            public WMODoodad[] doodads;
-        }
-
-        public struct WorldModelGroupBatches
-        {
-            public int vertexBuffer;
-            public int indiceBuffer;
-            public uint[] indices;
+            Update();
+            renderCanvas.Invalidate();
         }
     }
 }

@@ -47,15 +47,15 @@ namespace OBJExporterUI
 
             /* Calc look at position */
             
-            Matrix4 rotationY = Matrix4.CreateRotationY(DegreeToRadian(dragY));
+            Matrix3 rotationY = Matrix3.CreateRotationY(DegreeToRadian(dragY));
             Vector3.Transform(ref dir, ref rotationY, out dir);
-            Matrix4 rotationZ = Matrix4.CreateRotationZ(DegreeToRadian(-dragX));
+            Matrix3 rotationZ = Matrix3.CreateRotationZ(DegreeToRadian(-dragX));
             Vector3.Transform(ref dir, ref rotationZ, out dir);
 
             /* Calc camera position */
             if (MDHorizontal != 0.0f) {
                 Vector3 right;
-                rotationZ = Matrix4.CreateRotationZ(DegreeToRadian(-90));
+                rotationZ = Matrix3.CreateRotationZ(DegreeToRadian(-90));
                 Vector3.Transform(ref dir, ref rotationZ, out right);
                 right.Z = 0.0f;
                 right.Normalize();
@@ -92,7 +92,7 @@ namespace OBJExporterUI
             // start by creating our camera matrix from our camera vectors
             Matrix4 cameraMatrix = Matrix4.LookAt(Pos, Pos + Dir, Up);
             // then extract only the camera ROTATION, and turn that into a rotation matrix..
-            Matrix4 cameraRotationMatrix = Matrix4.CreateFromQuaternion(cameraMatrix.ExtractRotation());
+            Matrix3 cameraRotationMatrix = Matrix3.CreateFromQuaternion(cameraMatrix.ExtractRotation());
 
             // now transform our pan-vector into camera space by using the inverse rotation matrix
             Pos += Vector3.Transform(mousePanVector, cameraRotationMatrix.Inverted());
@@ -110,7 +110,7 @@ namespace OBJExporterUI
 
             Quaternion qResult = yaw_Rotation * pitch_Rotation;
 
-            Matrix4 newOrientation = Matrix4.CreateFromQuaternion(qResult);
+            Matrix3 newOrientation = Matrix3.CreateFromQuaternion(qResult);
 
             // recalculate our new orientation
             Dir = Vector3.Transform(Dir, newOrientation);

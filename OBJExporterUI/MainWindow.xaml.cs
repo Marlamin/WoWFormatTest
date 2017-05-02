@@ -16,6 +16,10 @@ using System.Windows.Media.Imaging;
 using System.Net;
 using System.IO.Compression;
 using Microsoft.VisualBasic.FileIO;
+using OpenTK.Graphics.OpenGL;
+using System.Drawing;
+using System.Windows.Media;
+using System.Windows.Input;
 
 namespace OBJExporterUI
 {
@@ -44,6 +48,8 @@ namespace OBJExporterUI
 
         private static ListBox tileBox;
 
+        private PreviewControl previewControl;
+
         public MainWindow()
         {
             if (bool.Parse(ConfigurationManager.AppSettings["firstrun"]) == true)
@@ -65,6 +71,10 @@ namespace OBJExporterUI
 
             Title = "OBJ Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
+            previewControl = new PreviewControl(renderCanvas);
+            CompositionTarget.Rendering += previewControl.CompositionTarget_Rendering;
+            wfHost.Initialized += previewControl.WindowsFormsHost_Initialized;
+
             exportworker.DoWork += exportworker_DoWork;
             exportworker.RunWorkerCompleted += exportworker_RunWorkerCompleted;
             exportworker.ProgressChanged += worker_ProgressChanged;
@@ -81,6 +91,7 @@ namespace OBJExporterUI
             fileworker.WorkerReportsProgress = true;
         }
 
+       
         public static void SelectTile(string tile)
         {
             Console.WriteLine("Got selected tile" + tile);
@@ -111,10 +122,11 @@ namespace OBJExporterUI
 
         private void previewButton_Click(object sender, RoutedEventArgs e)
         {
-            using (PreviewWindow tw = new PreviewWindow((string)modelListBox.SelectedItem))
-            {
-                tw.Run(30.0, 60.0);
-            }
+            previewControl.LoadModel((string)modelListBox.SelectedItem);
+            //using (PreviewWindow tw = new PreviewWindow((string)modelListBox.SelectedItem))
+            //{
+            //    tw.Run(30.0, 60.0);
+            //}
         }
 
         private void exportButton_Click(object sender, RoutedEventArgs e)
@@ -864,6 +876,5 @@ namespace OBJExporterUI
             public string Type { get; set; }
             public string Expansion { get; set; }
         }
-
     }
 }

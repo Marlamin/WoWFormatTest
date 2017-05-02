@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:opentk="clr-namespace:OpenTK;assembly=OpenTK.GLControl"
         xmlns:local="clr-namespace:OBJExporterUI"
         mc:Ignorable="d"
         ResizeMode="CanResize"
@@ -33,13 +34,13 @@
             </Menu>
             <StackPanel></StackPanel>
         </DockPanel>
-        <ProgressBar x:Name="progressBar" Grid.Column="0" Margin="5,5,5,5" Height="25" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
-        <Label Grid.Column="0" x:Name="progressLabel" Margin="0,5,0,0" HorizontalAlignment="Center"/>
-        <Label Grid.Column="0" x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="5,10,0,0" VerticalAlignment="Top" Width="572" HorizontalContentAlignment="Center" Height="17" VerticalContentAlignment="Center" Padding="5,0,5,1"/>
+        <ProgressBar x:Name="progressBar" Grid.Column="0" Margin="5,25,5,5" Height="25" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+        <Label Grid.Column="0" x:Name="progressLabel" Margin="0,25,0,0" HorizontalAlignment="Center"/>
+        <Label Grid.Column="0" x:Name="loadingLabel" Content="Loading WoW client..." HorizontalAlignment="Center" Margin="5,30,0,0" VerticalAlignment="Top" Width="572" HorizontalContentAlignment="Center" Height="17" VerticalContentAlignment="Center" Padding="5,0,5,1"/>
         <Image Grid.Column="0" x:Name="loadingImage" Source="Resources/icon.png" Margin="0,0,0,0" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <TextBox Grid.Column="0" x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="234,35,0,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged" Panel.ZIndex="2"/>
-        <Label Grid.Column="0" Content="Filter" Name="filterTextLabel" Visibility="Hidden" HorizontalAlignment="Stretch" Margin="198,35,366,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center"/>
-        <TabControl Grid.Column="0" x:Name="tabs" Margin="0,40,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto" Visibility="Hidden">
+        <TextBox Grid.Column="0" x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="234,55,0,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged" Panel.ZIndex="2"/>
+        <Label Grid.Column="0" Content="Filter" Name="filterTextLabel" Visibility="Hidden" HorizontalAlignment="Stretch" Margin="198,55,366,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center"/>
+        <TabControl Grid.Column="0" x:Name="tabs" Margin="0,60,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto" Visibility="Hidden">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
                     <CheckBox Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -126,5 +127,10 @@
                 </Grid>
             </TabItem>
         </TabControl>
+        <Grid Grid.Column="1" Background="Black">
+            <WindowsFormsHost x:Name="wfHost" Width="Auto" Height="Auto" Margin="0">
+                <opentk:GLControl x:Name="renderCanvas" />
+            </WindowsFormsHost>
+        </Grid>
     </Grid>
 </Window>
