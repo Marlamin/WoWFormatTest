@@ -44,10 +44,14 @@ namespace OBJExporterUI.Loaders
                 }
             }
 
-            var ddBatch = new PreviewWindow.DoodadBatch();
+            var ddBatch = new Renderer.Structs.DoodadBatch();
+
+            ddBatch.boundingBox = new Renderer.Structs.BoundingBox();
+            ddBatch.boundingBox.min = new Vector3(model.boundingbox[0].X, model.boundingbox[0].Y, model.boundingbox[0].Z);
+            ddBatch.boundingBox.max = new Vector3(model.boundingbox[1].X, model.boundingbox[1].Y, model.boundingbox[1].Z);
 
             // Textures
-            ddBatch.mats = new PreviewWindow.Material[model.textures.Count()];
+            ddBatch.mats = new Renderer.Structs.Material[model.textures.Count()];
 
             for (int i = 0; i < model.textures.Count(); i++)
             {
@@ -103,7 +107,7 @@ namespace OBJExporterUI.Loaders
             }
 
             // Submeshes
-            ddBatch.submeshes = new PreviewWindow.Submesh[model.skins[0].submeshes.Count()];
+            ddBatch.submeshes = new Renderer.Structs.Submesh[model.skins[0].submeshes.Count()];
             for (int i = 0; i < model.skins[0].submeshes.Count(); i++)
             {
                 if (filename.StartsWith("character"))
@@ -157,7 +161,7 @@ namespace OBJExporterUI.Loaders
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ddBatch.indiceBuffer);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ddBatch.indices.Length * sizeof(uint)), ddBatch.indices, BufferUsageHint.StaticDraw);
 
-            PreviewWindow.M2Vertex[] modelvertices = new PreviewWindow.M2Vertex[model.vertices.Count()];
+            Renderer.Structs.M2Vertex[] modelvertices = new Renderer.Structs.M2Vertex[model.vertices.Count()];
 
             for (int i = 0; i < model.vertices.Count(); i++)
             {

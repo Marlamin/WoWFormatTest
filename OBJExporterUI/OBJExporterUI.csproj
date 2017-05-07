@@ -83,7 +83,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CacheStorage.cs" />
+    <Compile Include="Renderer\CacheStorage.cs" />
     <Compile Include="Exporters\glTF\WMOExporter.cs" />
     <Compile Include="Exporters\OBJ\ADTExporter.cs" />
     <Compile Include="Exporters\OBJ\M2Exporter.cs" />
@@ -94,8 +94,10 @@
     <Compile Include="MapWindow.xaml.cs">
       <DependentUpon>MapWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="OldCamera.cs" />
+    <Compile Include="Renderer\NewCamera.cs" />
     <Compile Include="PreviewControl.cs" />
+    <Compile Include="Renderer\Shader.cs" />
+    <Compile Include="Renderer\Structs.cs" />
     <Compile Include="Structs.cs" />
     <Compile Include="PreviewWindow.cs" />
     <Compile Include="VersionWindow.xaml.cs">
@@ -154,6 +156,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Content Include="Shaders\fragment.shader">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shaders\vertex.shader">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

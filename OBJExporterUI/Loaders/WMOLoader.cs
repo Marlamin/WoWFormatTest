@@ -11,7 +11,7 @@ namespace OBJExporterUI.Loaders
 {
     class WMOLoader
     {
-        public static PreviewWindow.WorldModel LoadWMO(string filename, CacheStorage cache)
+        public static Renderer.Structs.WorldModel LoadWMO(string filename, CacheStorage cache)
         {
             if (cache.worldModelBatches.ContainsKey(filename))
             {
@@ -45,9 +45,9 @@ namespace OBJExporterUI.Loaders
                 throw new Exception("Broken WMO! Report to developer (mail marlamin@marlamin.com) with this filename: " + filename);
             }
 
-            var wmobatch = new PreviewWindow.WorldModel();
+            var wmobatch = new Renderer.Structs.WorldModel();
 
-            wmobatch.groupBatches = new PreviewWindow.WorldModelGroupBatches[wmo.group.Count()];
+            wmobatch.groupBatches = new Renderer.Structs.WorldModelGroupBatches[wmo.group.Count()];
 
             string[] groupNames = new string[wmo.group.Count()];
 
@@ -60,7 +60,7 @@ namespace OBJExporterUI.Loaders
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, wmobatch.groupBatches[g].vertexBuffer);
 
-                PreviewWindow.M2Vertex[] wmovertices = new PreviewWindow.M2Vertex[wmo.group[g].mogp.vertices.Count()];
+                Renderer.Structs.M2Vertex[] wmovertices = new Renderer.Structs.M2Vertex[wmo.group[g].mogp.vertices.Count()];
 
                 for (int i = 0; i < wmo.groupNames.Count(); i++)
                 {
@@ -105,7 +105,7 @@ namespace OBJExporterUI.Loaders
 
             GL.Enable(EnableCap.Texture2D);
 
-            wmobatch.mats = new PreviewWindow.Material[wmo.materials.Count()];
+            wmobatch.mats = new Renderer.Structs.Material[wmo.materials.Count()];
             for (int i = 0; i < wmo.materials.Count(); i++)
             {
                 for (int ti = 0; ti < wmo.textures.Count(); ti++)
@@ -120,7 +120,7 @@ namespace OBJExporterUI.Loaders
                 }
             }
 
-            wmobatch.doodads = new PreviewWindow.WMODoodad[wmo.doodadDefinitions.Count()];
+            wmobatch.doodads = new Renderer.Structs.WMODoodad[wmo.doodadDefinitions.Count()];
 
             for(int i = 0; i < wmo.doodadDefinitions.Count(); i++)
             {
@@ -147,7 +147,7 @@ namespace OBJExporterUI.Loaders
                 numRenderbatches = numRenderbatches + wmo.group[i].mogp.renderBatches.Count();
             }
 
-            wmobatch.wmoRenderBatch = new PreviewWindow.RenderBatch[numRenderbatches];
+            wmobatch.wmoRenderBatch = new Renderer.Structs.RenderBatch[numRenderbatches];
 
             int rb = 0;
             for (int g = 0; g < wmo.group.Count(); g++)

@@ -20,16 +20,16 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Column="0">
             <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False">
-                <MenuItem Header="_File">
-                    <MenuItem Name="MenuPreferences" Header="_Preferences" Click="MenuPreferences_Click"/>
-                    <MenuItem Name="MenuQuit" Header="_Quit" Click="MenuQuit_Click" />
+                <MenuItem Header="File">
+                    <MenuItem Name="MenuPreferences" Header="Preferences" Click="MenuPreferences_Click"/>
+                    <MenuItem Name="MenuQuit" Header="Quit" Click="MenuQuit_Click" />
                 </MenuItem>
-                <MenuItem Header="_Tools">
-                    <MenuItem Name="MenuListfile" Header="_Update Listfile" Click="MenuListfile_Click" IsEnabled="False"></MenuItem>
-                    <MenuItem Name="MenuMapNames" Header="_Update Map list" Click="MenuMapNames_Click" IsEnabled="True"></MenuItem>
+                <MenuItem Header="Tools">
+                    <MenuItem Name="MenuListfile" Header="Update Listfile" Click="MenuListfile_Click" IsEnabled="False"></MenuItem>
+                    <MenuItem Name="MenuMapNames" Header="Update Map list" Click="MenuMapNames_Click" IsEnabled="True"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="_About">
-                    <MenuItem Name="MenuVersion" Header="_Version" Click="MenuVersion_Click"></MenuItem>
+                <MenuItem Header="About">
+                    <MenuItem Name="MenuVersion" Header="Version" Click="MenuVersion_Click"></MenuItem>
                 </MenuItem>
             </Menu>
             <StackPanel></StackPanel>
