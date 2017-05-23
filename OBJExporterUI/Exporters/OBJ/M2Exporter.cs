@@ -203,6 +203,34 @@ namespace OBJExporterUI.Exporters.OBJ
             }
 
             objsw.Close();
+
+            exportworker.ReportProgress(90, "Exporting collision..");
+
+            if(destinationOverride == null)
+            {
+                objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".phys.obj")));
+            }
+            else {
+                objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".phys.obj")));
+            }
+
+            objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
+
+            for (int i = 0; i < reader.model.boundingvertices.Count(); i++)
+            {
+                objsw.WriteLine("v " +
+                     reader.model.boundingvertices[i].vertex.X + " " +
+                     reader.model.boundingvertices[i].vertex.Z + " " +
+                    -reader.model.boundingvertices[i].vertex.Y);
+            }
+
+            for (int i = 0; i < reader.model.boundingtriangles.Count(); i++)
+            {
+                var t = reader.model.boundingtriangles[i];
+                objsw.WriteLine("f " + (t.index_0 + 1) + " " + (t.index_1 + 1) + " " + (t.index_2 + 1));
+            }
+
+            objsw.Close();
             // https://en.wikipedia.org/wiki/Wavefront_.obj_file#Basic_materials
             // http://wiki.unity3d.com/index.php?title=ExportOBJ
             // http://web.cse.ohio-state.edu/~hwshen/581/Site/Lab3_files/Labhelp_Obj_parser.htm

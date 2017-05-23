@@ -1,15 +1,15 @@
 ﻿/*
-        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
-                    Version 2, December 2004 
+        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
 
- Copyright (C) 2004 Sam Hocevar <sam@hocevar.net> 
+ Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
 
- Everyone is permitted to copy and distribute verbatim or modified 
- copies of this license document, and changing it is allowed as long 
- as the name is changed. 
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
 
-            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
-   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
   0. You just DO WHAT THE FUCK YOU WANT TO.
 */
@@ -209,6 +209,7 @@ namespace WoWFormatLib.FileReaders
             model.translookup = readTransLookup(nTransLookup, ofsTranslookup, bin);
             model.uvanimlookup = readUVAnimLookup(nUVAnimLookup, ofsUVAnimLookup, bin);
             model.boundingtriangles = readBoundingTriangles(nBoundingTriangles, ofsBoundingTriangles, bin);
+            model.boundingvertices = readBoundingVertices(nBoundingVertices, ofsBoundingVertices, bin);
             model.boundingnormals = readBoundingNormals(nBoundingNormals, ofsBoundingNormals, bin);
             model.attachments = readAttachments(nAttachments, ofsAttachments, bin);
             model.attachlookup = readAttachLookup(nAttachLookup, ofsAttachLookup, bin);
@@ -310,6 +311,17 @@ namespace WoWFormatLib.FileReaders
                 boundingNormals[i] = bin.Read<BoundingNormal>();
             }
             return boundingNormals;
+        }
+
+        private BoundingVertex[] readBoundingVertices(uint nBoundingVertices, uint ofsBoundingVertices, BinaryReader bin)
+        {
+            bin.BaseStream.Position = ofsBoundingVertices;
+            var boundingVertices = new BoundingVertex[nBoundingVertices];
+            for (int i = 0; i < nBoundingVertices; i++)
+            {
+                boundingVertices[i] = bin.Read<BoundingVertex>();
+            }
+            return boundingVertices;
         }
 
         private BoundingTriangle[] readBoundingTriangles(uint nBoundingTriangles, uint ofsBoundingTriangles, BinaryReader bin)
