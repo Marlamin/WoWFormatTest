@@ -141,12 +141,60 @@ namespace OBJExporterUI.Exporters.OBJ
 
                         batch.firstFace = (uint)indicelist.Count();
 
-                        for (int j = 9; j < 145; j++)
+                        // Stupid C# and its structs
+                        var holesHighRes = new byte[8];
+                        holesHighRes[0] = chunk.header.holesHighRes_0;
+                        holesHighRes[1] = chunk.header.holesHighRes_1;
+                        holesHighRes[2] = chunk.header.holesHighRes_2;
+                        holesHighRes[3] = chunk.header.holesHighRes_3;
+                        holesHighRes[4] = chunk.header.holesHighRes_4;
+                        holesHighRes[5] = chunk.header.holesHighRes_5;
+                        holesHighRes[6] = chunk.header.holesHighRes_6;
+                        holesHighRes[7] = chunk.header.holesHighRes_7;
+
+                        for (int j = 9, xx = 0, yy = 0; j < 145; j++, xx++)
                         {
-                            indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
-                            indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
-                            indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j });
-                            indicelist.AddRange(new Int32[] { off + j + 9, off + j + 8, off + j });
+                            if (xx >= 8) { xx = 0; ++yy; }
+                            bool isHole = true;
+
+                            // Check if chunk is using low-res holes
+                            if ((chunk.header.flags & 0x10000) == 0)
+                            {
+                                // Calculate current hole number
+                                var currentHole = (int) Math.Pow (2,
+                                        Math.Floor (xx / 2f) * 1f +
+                                        Math.Floor (yy / 2f) * 4f);
+
+                                // Check if current hole number should be a hole
+                                if ((chunk.header.holesLowRes & currentHole) == 0)
+                                {
+                                    isHole = false;
+                                }
+                            }
+
+                            else
+                            {
+                                // Check if current section is a hole
+                                if (((holesHighRes[yy] >> xx) & 1) == 0)
+                                {
+                                    isHole = false;
+                                }
+                            }
+
+                            if (!isHole)
+                            {
+                                indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
+                                indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
+                                indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j });
+                                indicelist.AddRange(new Int32[] { off + j + 9, off + j + 8, off + j });
+
+                                // Generates quads instead of 4x triangles
+                                /*
+                                indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j - 8 });
+                                indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j + 8 });
+                                */
+                            }
+
                             if ((j + 1) % (9 + 8) == 0) j += 9;
                         }
 

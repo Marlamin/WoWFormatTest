@@ -45,8 +45,16 @@ namespace WoWFormatLib.Structs.ADT
         public uint indexY;
         public uint nLayers;
         public uint nDoodadRefs;
-        public uint ofsMCVT;
-        public uint ofsMCNR;
+        public byte holesHighRes_0;
+        public byte holesHighRes_1;
+        public byte holesHighRes_2;
+        public byte holesHighRes_3;
+        public byte holesHighRes_4;
+        public byte holesHighRes_5;
+        public byte holesHighRes_6;
+        public byte holesHighRes_7;
+        // public uint ofsMCVT;
+        // public uint ofsMCNR;
         public uint ofsMCLY;
         public uint ofsMCRF;
         public uint ofsMCAL;
@@ -55,7 +63,8 @@ namespace WoWFormatLib.Structs.ADT
         public uint sizeShadows;
         public uint areaID;
         public uint nMapObjRefs;
-        public uint holes;
+        public ushort holesLowRes;
+        public ushort unknownPad;
         public short lowQualityTexturingMap_0;
         public short lowQualityTexturingMap_1;
         public short lowQualityTexturingMap_2;
