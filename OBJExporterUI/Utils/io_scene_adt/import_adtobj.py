@@ -127,6 +127,8 @@ def load(context,
                             # Select the imported doodad
                             wmoobj_objects = bpy.context.selected_objects[:]
                             for wmoobj in wmoobj_objects:
+                                # Prepend name
+                                wmoobj.name = "(" + wmorow['DoodadSet'] + ") " + wmoobj.name
                                 # Set parent
                                 wmoobj.parent = parent
                                 # Set position

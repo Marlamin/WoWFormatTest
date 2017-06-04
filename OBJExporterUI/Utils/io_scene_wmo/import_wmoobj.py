@@ -67,6 +67,9 @@ def load(context,
                     # Print object name
                     # print (obj.name)
 
+                    # Prepend name
+                    obj.name = "(" + row['DoodadSet'] + ") " + obj.name
+
                     # Set position
                     obj.location = (float(row['PositionY']) * -1, float(row['PositionX']), float(row['PositionZ']))
 

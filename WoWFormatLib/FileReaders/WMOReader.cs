@@ -377,6 +377,20 @@ namespace WoWFormatLib.FileReaders
             return doodads;
         }
 
+        private MODS[] ReadMODSChunk(BlizzHeader chunk, BinaryReader bin)
+        {
+            var numDoodadSets = chunk.Size / 32;
+            var doodadSets = new MODS[numDoodadSets];
+            for (var i = 0; i < numDoodadSets; i++)
+            {
+                doodadSets[i].setName = new string(bin.ReadChars(20)).Replace("\0", string.Empty);
+                doodadSets[i].firstInstanceIndex = bin.ReadUInt32();
+                doodadSets[i].numDoodads = bin.ReadUInt32();
+                doodadSets[i].unused = bin.ReadUInt32();
+            }
+            return doodadSets;
+        }
+
         private object ReadMOVVChunk(BlizzHeader chunk, BinaryReader bin)
         {
             throw new NotImplementedException();
@@ -425,6 +439,9 @@ namespace WoWFormatLib.FileReaders
                     case "MODD":
                         wmofile.doodadDefinitions = ReadMODDChunk(chunk, bin);
                         continue;
+                    case "MODS":
+                        wmofile.doodadSets = ReadMODSChunk(chunk, bin);
+                        continue;
                     case "MOGP":
                     //ReadMOGPChunk(chunk, bin);
                     //continue;
@@ -435,8 +452,6 @@ namespace WoWFormatLib.FileReaders
                     case "MOVV": //Visible block vertices
                     case "MOVB": //Visible block list
                     case "MOLT":
-                    case "MODS":
-                    
                     case "MFOG":
                     case "MCVP":
                     case "GFID": // Legion

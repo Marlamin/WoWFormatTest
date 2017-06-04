@@ -98,10 +98,23 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(65, "Exporting doodads..");
 
-            doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationW;RotationX;RotationY;RotationZ;ScaleFactor");
-            foreach(var doodadDefinition in reader.wmofile.doodadDefinitions)
+            doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationW;RotationX;RotationY;RotationZ;ScaleFactor;DoodadSet");
+
+            string currentDoodadSetName = "";
+            for (int i = 0; i < reader.wmofile.doodadDefinitions.Count(); i++)
             {
-                foreach(var doodadNameEntry in reader.wmofile.doodadNames)
+                var doodadDefinition = reader.wmofile.doodadDefinitions[i];
+
+                foreach (var doodadSet in reader.wmofile.doodadSets)
+                {
+                    if (doodadSet.firstInstanceIndex == i)
+                    {
+                        Console.WriteLine("At set: " + doodadSet.setName);
+                        currentDoodadSetName = doodadSet.setName.Replace("Set_", "").Replace("SET_", "").Replace("$DefaultGlobal", "Default");
+                    }
+                }
+
+                foreach (var doodadNameEntry in reader.wmofile.doodadNames)
                 {
                     if(doodadNameEntry.startOffset == doodadDefinition.offset)
                     {
@@ -117,10 +130,11 @@ namespace OBJExporterUI.Exporters.OBJ
                             }
                                
                         }
-                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj;" + doodadDefinition.position.X.ToString("F09") + ";" + doodadDefinition.position.Y.ToString("F09") + ";" + doodadDefinition.position.Z.ToString("F09") + ";" + doodadDefinition.rotation.W.ToString("F15") + ";" + doodadDefinition.rotation.X.ToString("F15") + ";" + doodadDefinition.rotation.Y.ToString("F15") + ";" + doodadDefinition.rotation.Z.ToString("F15") + ";" + doodadDefinition.scale);
+                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj;" + doodadDefinition.position.X.ToString("F09") + ";" + doodadDefinition.position.Y.ToString("F09") + ";" + doodadDefinition.position.Z.ToString("F09") + ";" + doodadDefinition.rotation.W.ToString("F15") + ";" + doodadDefinition.rotation.X.ToString("F15") + ";" + doodadDefinition.rotation.Y.ToString("F15") + ";" + doodadDefinition.rotation.Z.ToString("F15") + ";" + doodadDefinition.scale + ";" + currentDoodadSetName);
                     }
                 }
             }
+
             doodadSW.Close();
 
             var mtlsb = new StringBuilder();

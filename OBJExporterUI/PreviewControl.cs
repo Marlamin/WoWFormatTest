@@ -50,7 +50,11 @@ namespace OBJExporterUI
             vertexAttribObject = GL.GenVertexArray();
             GL.BindVertexArray(vertexAttribObject);
 
+            Console.WriteLine("Generated and binded to vertex array: " + vertexAttribObject);
+
             GL.ActiveTexture(TextureUnit.Texture0);
+
+            this.filename = filename;
 
             if (filename.EndsWith(".m2"))
             {
@@ -62,8 +66,6 @@ namespace OBJExporterUI
                 WMOLoader.LoadWMO(filename, cache);
                 isWMO = true;
             }
-
-            this.filename = filename;
 
             //var normalAttrib = GL.GetAttribLocation(shaderProgram, "normal");
             //GL.EnableVertexAttribArray(normalAttrib);

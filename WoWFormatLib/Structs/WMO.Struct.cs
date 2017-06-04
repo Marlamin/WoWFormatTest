@@ -27,6 +27,7 @@ namespace WoWFormatLib.Structs.WMO
         public MOMT[] materials;
         public MODN[] doodadNames;
         public MODD[] doodadDefinitions;
+        public MODS[] doodadSets;
         public MOGN[] groupNames;
         public MOGI[] groupInfo;
         public WMOGroupFile[] group;
@@ -67,6 +68,14 @@ namespace WoWFormatLib.Structs.WMO
         public Quaternion rotation;
         public float scale;
         public byte[] color;
+    }
+
+    public struct MODS
+    {
+        public string setName;
+        public uint firstInstanceIndex;
+        public uint numDoodads;
+        public uint unused;
     }
 
     //Texture filenames
