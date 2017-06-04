@@ -18,7 +18,6 @@ namespace OBJExporterUI
         // Cache storage for models... bad idea?
         private CacheStorage cache = new CacheStorage();
 
-        // Camera stuff
         private NewCamera ActiveCamera;
 
         private string filename;
@@ -32,7 +31,6 @@ namespace OBJExporterUI
             this.renderCanvas = renderCanvas;
             this.renderCanvas.Paint += RenderCanvas_Paint;
             this.renderCanvas.Load += RenderCanvas_Load;
-            this.renderCanvas.KeyDown += RenderCanvas_KeyDown;
             this.renderCanvas.Resize += RenderCanvas_Resize;
 
             ActiveCamera = new NewCamera(renderCanvas.Width, renderCanvas.Height, new Vector3(0, 0, -1), new Vector3(-11, 0, 0), Vector3.UnitZ);
@@ -47,14 +45,8 @@ namespace OBJExporterUI
             }
         }
 
-        private void RenderCanvas_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-        {
-            // Console.WriteLine(e.KeyCode);
-        }
-
         public void LoadModel(string filename)
         {
-
             vertexAttribObject = GL.GenVertexArray();
             GL.BindVertexArray(vertexAttribObject);
 
@@ -88,16 +80,18 @@ namespace OBJExporterUI
             if (!isWMO)
             {
                 ActiveCamera.Pos = new Vector3((cache.doodadBatches[filename].boundingBox.max.Z) + 11.0f, 0.0f, 4.0f);
-
-                // M2
-                GL.BindBuffer(BufferTarget.ArrayBuffer, cache.doodadBatches[filename].vertexBuffer);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.doodadBatches[filename].indiceBuffer);
             }
             else
             {
                 // WMO
-
+                for (int j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Length; j++)
+                {
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vertexBuffer);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].indiceBuffer);
+                }
             }
+
+            GL.BindVertexArray(0);
 
             ready = true;
         }
@@ -142,11 +136,14 @@ namespace OBJExporterUI
 
             ActiveCamera.setupGLRenderMatrix(shaderProgram);
 
-            //ActiveCamera.onRender();
+            GL.BindVertexArray(vertexAttribObject);
 
             if (!isWMO)
             {
                 // M2
+                GL.BindBuffer(BufferTarget.ArrayBuffer, cache.doodadBatches[filename].vertexBuffer);
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.doodadBatches[filename].indiceBuffer);
+
                 for (int i = 0; i < cache.doodadBatches[filename].submeshes.Length; i++)
                 {
                     GL.BindTexture(TextureTarget.Texture2D, cache.doodadBatches[filename].submeshes[i].material);
