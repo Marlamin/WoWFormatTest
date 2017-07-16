@@ -47,6 +47,8 @@ namespace OBJExporterUI
 
         public void LoadModel(string filename)
         {
+            ready = false;
+
             vertexAttribObject = GL.GenVertexArray();
             GL.BindVertexArray(vertexAttribObject);
 
@@ -63,7 +65,10 @@ namespace OBJExporterUI
             }
             else if (filename.EndsWith(".wmo"))
             {
-                WMOLoader.LoadWMO(filename, cache);
+                if (!cache.worldModels.ContainsKey(filename))
+                {
+                    WMOLoader.LoadWMO(filename, cache);
+                }
                 isWMO = true;
             }
 
@@ -88,7 +93,9 @@ namespace OBJExporterUI
                 // WMO
                 for (int j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Length; j++)
                 {
+                    Console.WriteLine("Binding Vertex Buffer " + cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vertexBuffer);
                     GL.BindBuffer(BufferTarget.ArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vertexBuffer);
+                    Console.WriteLine("Binding Index Buffer " + cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].indiceBuffer);
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].indiceBuffer);
                 }
             }
@@ -172,6 +179,7 @@ namespace OBJExporterUI
                 throw new Exception(error);
             }
 
+            GL.BindVertexArray(0);
             renderCanvas.SwapBuffers();
         }
 
