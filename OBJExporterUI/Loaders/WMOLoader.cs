@@ -11,7 +11,7 @@ namespace OBJExporterUI.Loaders
 {
     class WMOLoader
     {
-        public static Renderer.Structs.WorldModel LoadWMO(string filename, CacheStorage cache)
+        public static Renderer.Structs.WorldModel LoadWMO(string filename, CacheStorage cache, int shaderProgram)
         {
             if (cache.worldModelBatches.ContainsKey(filename))
             {
@@ -46,7 +46,6 @@ namespace OBJExporterUI.Loaders
             }
 
             var wmobatch = new Renderer.Structs.WorldModel();
-
             wmobatch.groupBatches = new Renderer.Structs.WorldModelGroupBatches[wmo.group.Count()];
 
             string[] groupNames = new string[wmo.group.Count()];
@@ -55,8 +54,11 @@ namespace OBJExporterUI.Loaders
             {
                 if (wmo.group[g].mogp.vertices == null) { continue; }
 
+                wmobatch.groupBatches[g].vao = GL.GenVertexArray();
                 wmobatch.groupBatches[g].vertexBuffer = GL.GenBuffer();
                 wmobatch.groupBatches[g].indiceBuffer = GL.GenBuffer();
+
+                GL.BindVertexArray(wmobatch.groupBatches[g].vao);
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, wmobatch.groupBatches[g].vertexBuffer);
 
@@ -88,6 +90,19 @@ namespace OBJExporterUI.Loaders
 
                 //Push to buffer
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(wmovertices.Length * 8 * sizeof(float)), wmovertices, BufferUsageHint.StaticDraw);
+
+                //Set pointers in buffer
+                //var normalAttrib = GL.GetAttribLocation(shaderProgram, "normal");
+                //GL.EnableVertexAttribArray(normalAttrib);
+                //GL.VertexAttribPointer(normalAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 0);
+
+                var texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
+                GL.EnableVertexAttribArray(texCoordAttrib);
+                GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 3);
+
+                var posAttrib = GL.GetAttribLocation(shaderProgram, "position");
+                GL.EnableVertexAttribArray(posAttrib);
+                GL.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 5);
 
                 //Switch to Index buffer
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, wmobatch.groupBatches[g].indiceBuffer);

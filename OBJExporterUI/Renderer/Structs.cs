@@ -58,6 +58,7 @@ namespace OBJExporterUI.Renderer
 
         public struct DoodadBatch
         {
+            public int vao;
             public int vertexBuffer;
             public int indiceBuffer;
             public uint[] indices;
@@ -108,6 +109,7 @@ namespace OBJExporterUI.Renderer
 
         public struct WorldModelGroupBatches
         {
+            public int vao;
             public int vertexBuffer;
             public int indiceBuffer;
             public uint[] indices;

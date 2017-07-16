@@ -12,7 +12,7 @@ namespace OBJExporterUI.Loaders
 {
     class M2Loader
     {
-        public static void LoadM2(string filename, CacheStorage cache)
+        public static void LoadM2(string filename, CacheStorage cache, int shaderProgram)
         {
             filename = filename.ToLower().Replace(".mdx", ".m2");
             filename = filename.ToLower().Replace(".mdl", ".m2");
@@ -138,6 +138,9 @@ namespace OBJExporterUI.Loaders
                 }
             }
 
+            ddBatch.vao = GL.GenVertexArray();
+            GL.BindVertexArray(ddBatch.vao);
+
             // Vertices & indices
             ddBatch.vertexBuffer = GL.GenBuffer();
             ddBatch.indiceBuffer = GL.GenBuffer();
@@ -172,6 +175,18 @@ namespace OBJExporterUI.Loaders
             GL.BindBuffer(BufferTarget.ArrayBuffer, ddBatch.vertexBuffer);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(modelvertices.Length * 8 * sizeof(float)), modelvertices, BufferUsageHint.StaticDraw);
 
+            //Set pointers in buffer
+            //var normalAttrib = GL.GetAttribLocation(shaderProgram, "normal");
+            //GL.EnableVertexAttribArray(normalAttrib);
+            //GL.VertexAttribPointer(normalAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 0);
+
+            var texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
+            GL.EnableVertexAttribArray(texCoordAttrib);
+            GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 3);
+
+            var posAttrib = GL.GetAttribLocation(shaderProgram, "position");
+            GL.EnableVertexAttribArray(posAttrib);
+            GL.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 5);
             cache.doodadBatches.Add(filename, ddBatch);
         }
     }
