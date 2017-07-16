@@ -72,21 +72,23 @@ namespace OBJExporterUI
                 isWMO = true;
             }
 
-            //var normalAttrib = GL.GetAttribLocation(shaderProgram, "normal");
-            //GL.EnableVertexAttribArray(normalAttrib);
-            //GL.VertexAttribPointer(normalAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 0);
 
-            var texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
-            GL.EnableVertexAttribArray(texCoordAttrib);
-            GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 3);
-
-            var posAttrib = GL.GetAttribLocation(shaderProgram, "position");
-            GL.EnableVertexAttribArray(posAttrib);
-            GL.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 5);
 
             if (!isWMO)
             {
                 ActiveCamera.Pos = new Vector3((cache.doodadBatches[filename].boundingBox.max.Z) + 11.0f, 0.0f, 4.0f);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, cache.doodadBatches[filename].vertexBuffer);
+
+                var texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
+                GL.EnableVertexAttribArray(texCoordAttrib);
+                GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 3);
+
+                var posAttrib = GL.GetAttribLocation(shaderProgram, "position");
+                GL.EnableVertexAttribArray(posAttrib);
+                GL.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 5);
+
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.doodadBatches[filename].indiceBuffer);
             }
             else
             {
@@ -95,6 +97,19 @@ namespace OBJExporterUI
                 {
                     Console.WriteLine("Binding Vertex Buffer " + cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vertexBuffer);
                     GL.BindBuffer(BufferTarget.ArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vertexBuffer);
+
+                    //var normalAttrib = GL.GetAttribLocation(shaderProgram, "normal");
+                    //GL.EnableVertexAttribArray(normalAttrib);
+                    //GL.VertexAttribPointer(normalAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 0);
+
+                    var texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
+                    GL.EnableVertexAttribArray(texCoordAttrib);
+                    GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 3);
+
+                    var posAttrib = GL.GetAttribLocation(shaderProgram, "position");
+                    GL.EnableVertexAttribArray(posAttrib);
+                    GL.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 8, sizeof(float) * 5);
+
                     Console.WriteLine("Binding Index Buffer " + cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].indiceBuffer);
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].indiceBuffer);
                 }
@@ -168,7 +183,7 @@ namespace OBJExporterUI
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].indiceBuffer);
 
                     GL.BindTexture(TextureTarget.Texture2D, cache.worldModelBatches[filename].wmoRenderBatch[j].materialID[0]);
-                    GL.DrawRangeElements(PrimitiveType.Triangles, cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace, (cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace + cache.worldModelBatches[filename].wmoRenderBatch[j].numFaces), (int)cache.worldModelBatches[filename].wmoRenderBatch[j].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace * 4));
+                    GL.DrawElements(PrimitiveType.Triangles, (int)cache.worldModelBatches[filename].wmoRenderBatch[j].numFaces, DrawElementsType.UnsignedInt, (int)cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace * 4);
                 }
             }
 
