@@ -13,7 +13,7 @@ namespace OBJExporterUI
         private GLControl renderCanvas;
 
         private bool ready = false;
-        private bool isWMO;
+        private string modelType;
 
         // Cache storage for models... bad idea?
         private CacheStorage cache = new CacheStorage();
@@ -24,7 +24,9 @@ namespace OBJExporterUI
 
         private int vertexAttribObject;
 
-        private int shaderProgram;
+        private int adtShaderProgram;
+        private int wmoShaderProgram;
+        private int m2ShaderProgram;
 
         public PreviewControl(GLControl renderCanvas)
         {
@@ -59,22 +61,21 @@ namespace OBJExporterUI
             {
                 if (!cache.doodadBatches.ContainsKey(filename))
                 {
-                    M2Loader.LoadM2(filename, cache, shaderProgram);
+                    M2Loader.LoadM2(filename, cache, m2ShaderProgram);
                 }
-                isWMO = false;
+                modelType = "m2";
+                ActiveCamera.Pos = new Vector3((cache.doodadBatches[filename].boundingBox.max.Z) + 11.0f, 0.0f, 4.0f);
             }
             else if (filename.EndsWith(".wmo"))
             {
                 if (!cache.worldModels.ContainsKey(filename))
                 {
-                    WMOLoader.LoadWMO(filename, cache, shaderProgram);
+                    WMOLoader.LoadWMO(filename, cache, wmoShaderProgram);
                 }
-                isWMO = true;
-            }
-
-            if (!isWMO)
+                modelType = "wmo";
+            }else if (filename.EndsWith(".adt"))
             {
-                ActiveCamera.Pos = new Vector3((cache.doodadBatches[filename].boundingBox.max.Z) + 11.0f, 0.0f, 4.0f);
+                modelType = "adt";
             }
 
             ready = true;
@@ -101,9 +102,9 @@ namespace OBJExporterUI
         {
             GL.Enable(EnableCap.DepthTest);
 
-            shaderProgram = Shader.CompileShader();
-
-            ActiveCamera.setupGLRenderMatrix(shaderProgram);
+            adtShaderProgram = Shader.CompileShader("adt");
+            wmoShaderProgram = Shader.CompileShader("wmo");
+            m2ShaderProgram = Shader.CompileShader("m2");
 
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -118,12 +119,10 @@ namespace OBJExporterUI
             GL.Viewport(0, 0, renderCanvas.Width, renderCanvas.Height);
             GL.Enable(EnableCap.Texture2D);
 
-            ActiveCamera.setupGLRenderMatrix(shaderProgram);
-
-
-            if (!isWMO)
+            if (modelType == "m2")
             {
-                // M2
+                ActiveCamera.setupGLRenderMatrix(m2ShaderProgram);
+
                 GL.BindVertexArray(cache.doodadBatches[filename].vao);
 
                 for (int i = 0; i < cache.doodadBatches[filename].submeshes.Length; i++)
@@ -132,9 +131,10 @@ namespace OBJExporterUI
                     GL.DrawRangeElements(PrimitiveType.Triangles, cache.doodadBatches[filename].submeshes[i].firstFace, (cache.doodadBatches[filename].submeshes[i].firstFace + cache.doodadBatches[filename].submeshes[i].numFaces), (int)cache.doodadBatches[filename].submeshes[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.doodadBatches[filename].submeshes[i].firstFace * 4));
                 }
             }
-            else
+            else if (modelType == "wmo")
             {
-                // WMO 
+                ActiveCamera.setupGLRenderMatrix(adtShaderProgram);
+
                 for (int j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Length; j++)
                 {
                     GL.BindVertexArray(cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vao);
@@ -142,6 +142,9 @@ namespace OBJExporterUI
                     GL.BindTexture(TextureTarget.Texture2D, cache.worldModelBatches[filename].wmoRenderBatch[j].materialID[0]);
                     GL.DrawElements(PrimitiveType.Triangles, (int)cache.worldModelBatches[filename].wmoRenderBatch[j].numFaces, DrawElementsType.UnsignedInt, (int)cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace * 4);
                 }
+            }else if(modelType == "adt")
+            {
+
             }
 
             var error = GL.GetError().ToString();

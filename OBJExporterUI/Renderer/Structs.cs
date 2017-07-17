@@ -31,9 +31,20 @@ namespace OBJExporterUI.Renderer
         public struct Material
         {
             public string filename;
+
+            // M2
             public int textureID;
-            internal WoWFormatLib.Structs.M2.TextureFlags flags;
+
+            // WMO
+            public int textureID1;
+            public int textureID2;
+            public int textureID3;
             internal uint texture1;
+            internal uint texture2;
+            internal uint texture3;
+
+            public uint blendMode;
+            internal WoWFormatLib.Structs.M2.TextureFlags flags;
         }
 
         public struct RenderBatch

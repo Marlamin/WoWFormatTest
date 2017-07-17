@@ -10,7 +10,7 @@ namespace OBJExporterUI
 {
     public static class Shader
     {
-        public static int CompileShader()
+        public static int CompileShader(string type)
         {
             // Print OpenGL version/vendor
             Console.WriteLine("OpenGL version: " + GL.GetString(StringName.Version));
@@ -18,7 +18,7 @@ namespace OBJExporterUI
 
             var vertexShader = GL.CreateShader(ShaderType.VertexShader);
 
-            var vertexSource = File.ReadAllText("Shaders/vertex.shader");
+            var vertexSource = File.ReadAllText("Shaders/" + type + ".vertex.shader");
             GL.ShaderSource(vertexShader, vertexSource);
 
             GL.CompileShader(vertexShader);
@@ -32,7 +32,7 @@ namespace OBJExporterUI
             // Fragment shader
             var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
 
-            var fragmentSource = File.ReadAllText("Shaders/fragment.shader");
+            var fragmentSource = File.ReadAllText("Shaders/" + type + ".fragment.shader");
             GL.ShaderSource(fragmentShader, fragmentSource);
 
             GL.CompileShader(fragmentShader);
