@@ -258,7 +258,6 @@ namespace WoWFormatLib.FileReaders
             List<String> blpFiles = new List<string>();
             List<int> blpOffset = new List<int>();
             var str = new StringBuilder();
-            File.WriteAllBytes("blpchunk.out", blpFilesChunk);
 
             var buildingString = true;
             for (var i = 0; i < blpFilesChunk.Length; i++)
