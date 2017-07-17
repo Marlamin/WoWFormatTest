@@ -123,14 +123,25 @@ namespace OBJExporterUI.Loaders
             wmobatch.mats = new Renderer.Structs.Material[wmo.materials.Count()];
             for (int i = 0; i < wmo.materials.Count(); i++)
             {
+                wmobatch.mats[i].texture1 = wmo.materials[i].texture1;
+                wmobatch.mats[i].texture2 = wmo.materials[i].texture2;
+                wmobatch.mats[i].texture3 = wmo.materials[i].texture3;
+
                 for (int ti = 0; ti < wmo.textures.Count(); ti++)
                 {
-
                     if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
                     {
-                        wmobatch.mats[i].texture1 = wmo.materials[i].texture1;
-                        wmobatch.mats[i].textureID = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
-                        wmobatch.mats[i].filename = wmo.textures[ti].filename;
+                        wmobatch.mats[i].textureID1 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
+                    }
+
+                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture2)
+                    {
+                        wmobatch.mats[i].textureID2 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
+                    }
+
+                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture3)
+                    {
+                        wmobatch.mats[i].textureID3 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
                     }
                 }
             }
@@ -184,11 +195,22 @@ namespace OBJExporterUI.Loaders
                         matID = group.mogp.renderBatches[i].materialID;
                     }
 
+                    wmobatch.wmoRenderBatch[rb].materialID = new uint[3];
                     for (int ti = 0; ti < wmobatch.mats.Count(); ti++)
                     {
                         if (wmo.materials[matID].texture1 == wmobatch.mats[ti].texture1)
                         {
-                            wmobatch.wmoRenderBatch[rb].materialID = new uint[] { (uint)wmobatch.mats[ti].textureID };
+                            wmobatch.wmoRenderBatch[rb].materialID[0] = (uint)wmobatch.mats[ti].textureID1;
+                        }
+
+                        if (wmo.materials[matID].texture2 == wmobatch.mats[ti].texture2)
+                        {
+                            wmobatch.wmoRenderBatch[rb].materialID[1] = (uint)wmobatch.mats[ti].textureID2;
+                        }
+
+                        if (wmo.materials[matID].texture3 == wmobatch.mats[ti].texture3)
+                        {
+                            wmobatch.wmoRenderBatch[rb].materialID[2] = (uint)wmobatch.mats[ti].textureID3;
                         }
                     }
 
