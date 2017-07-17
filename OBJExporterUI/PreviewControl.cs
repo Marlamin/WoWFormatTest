@@ -71,6 +71,12 @@ namespace OBJExporterUI
                 modelType = "wmo";
             }else if (filename.EndsWith(".adt"))
             {
+                if (!cache.terrain.ContainsKey(filename))
+                {
+                    ADTLoader.LoadADT(filename, cache, adtShaderProgram);
+                }
+
+                ActiveCamera.Pos = new Vector3(cache.terrain[filename].startPos.Position.X, cache.terrain[filename].startPos.Position.Y, cache.terrain[filename].startPos.Position.Z);
                 modelType = "adt";
             }
 
@@ -120,6 +126,7 @@ namespace OBJExporterUI
                 GL.UseProgram(m2ShaderProgram);
 
                 ActiveCamera.setupGLRenderMatrix(m2ShaderProgram);
+                ActiveCamera.flyMode = false;
 
                 GL.BindVertexArray(cache.doodadBatches[filename].vao);
 
@@ -134,6 +141,7 @@ namespace OBJExporterUI
                 GL.UseProgram(wmoShaderProgram);
 
                 ActiveCamera.setupGLRenderMatrix(wmoShaderProgram);
+                ActiveCamera.flyMode = false;
 
                 var alphaRefLoc = GL.GetUniformLocation(wmoShaderProgram, "alphaRef");
 
@@ -167,7 +175,35 @@ namespace OBJExporterUI
                 }
             }else if(modelType == "adt")
             {
+                GL.UseProgram(adtShaderProgram);
 
+                ActiveCamera.setupGLRenderMatrix(adtShaderProgram);
+                ActiveCamera.flyMode = true;
+
+                GL.BindVertexArray(cache.terrain[filename].vao);
+
+                for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
+                {
+                    for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
+                    {
+                        var textureLoc = GL.GetAttribLocation(adtShaderProgram, "layer" + j);
+                        GL.Uniform1(textureLoc, j);
+
+                        GL.ActiveTexture(TextureUnit.Texture0 + j);
+                        GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
+                    }
+
+                    for (int j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
+                    {
+                        var textureLoc = GL.GetAttribLocation(adtShaderProgram, "alphaLayer" + j);
+                        GL.Uniform1(textureLoc, 3 + j);
+
+                        GL.ActiveTexture(TextureUnit.Texture3 + j);
+                        GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
+                    }
+
+                    GL.DrawRangeElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].firstFace, (int)cache.terrain[filename].renderBatches[i].firstFace + (int)cache.terrain[filename].renderBatches[i].numFaces, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.terrain[filename].renderBatches[i].firstFace * 4));
+                }
             }
 
             var error = GL.GetError().ToString();

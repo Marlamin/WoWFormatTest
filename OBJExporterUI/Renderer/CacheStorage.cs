@@ -15,6 +15,8 @@ namespace OBJExporterUI
         public Dictionary<string, Renderer.Structs.DoodadBatch> doodadBatches = new Dictionary<string, Renderer.Structs.DoodadBatch>();
         public Dictionary<string, Renderer.Structs.WorldModel> worldModelBatches = new Dictionary<string, Renderer.Structs.WorldModel>();
 
+        public Dictionary<string, Renderer.Structs.Terrain> terrain = new Dictionary<string, Renderer.Structs.Terrain>();
+
         public CacheStorage()
         {
             

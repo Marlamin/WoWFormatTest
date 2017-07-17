@@ -14,6 +14,8 @@ namespace OBJExporterUI
         int Width, Height;
         Matrix4 projectionMatrix;
 
+        public bool flyMode = false;
+
         public Vector3 Pos;
         private Vector3 Target;
         private Vector3 Up;
@@ -47,24 +49,40 @@ namespace OBJExporterUI
                 Pos -= (Target * stepSize);
             }
 
-            if (state.IsKeyDown(Key.A))
+            if (flyMode)
             {
-                rotationAngle = rotationAngle + 0.1f;
+                if (state.IsKeyDown(Key.A))
+                {
+                    Pos.Y -= 0.1f;
+                }
+
+                if (state.IsKeyDown(Key.D))
+                {
+                    Pos.Y += 0.1f;
+                }
+            }
+            else
+            {
+                if (state.IsKeyDown(Key.A))
+                {
+                    rotationAngle += 0.1f;
+                }
+
+                if (state.IsKeyDown(Key.D))
+                {
+                    rotationAngle -= - 0.1f;
+                }
             }
 
-            if (state.IsKeyDown(Key.D))
-            {
-                rotationAngle = rotationAngle - 0.1f;
-            }
           
             if (state.IsKeyDown(Key.Up))
             {
-                Pos.Z = Pos.Z + 0.1f;
+                Pos.Z += 0.1f;
             }
 
             if (state.IsKeyDown(Key.Down))
             {
-                Pos.Z = Pos.Z - 0.1f;
+                Pos.Z -= 0.1f;
             }
 
             if (state.IsKeyDown(Key.I))

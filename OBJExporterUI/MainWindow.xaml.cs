@@ -876,5 +876,19 @@ namespace OBJExporterUI
             public string Type { get; set; }
             public string Expansion { get; set; }
         }
+
+        private void mapViewerButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (MapListItem)mapListBox.SelectedItem;
+            if (selectedItem == null) return;
+
+            var tiles = tileListBox.SelectedItem.ToString().Split('_');
+            var x = int.Parse(tiles[0]);
+            var y = int.Parse(tiles[1]);
+
+            var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
+
+            previewControl.LoadModel(adtFile);
+        }
     }
 }

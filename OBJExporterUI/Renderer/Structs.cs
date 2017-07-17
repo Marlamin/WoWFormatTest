@@ -6,8 +6,10 @@ namespace OBJExporterUI.Renderer
     {
         public struct Terrain
         {
+            public int vao;
             public int vertexBuffer;
             public int indiceBuffer;
+            public Vertex startPos;
             public RenderBatch[] renderBatches;
             public Doodad[] doodads;
             public WorldModelBatch[] worldModelBatches;

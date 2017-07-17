@@ -93,6 +93,7 @@
                         </ListView.View>
                     </ListView>
                     <Button x:Name="tileViewerButton" Click="tileViewerButton_Click" Content="Tile viewer" Margin="83,0,94.6,188.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Width="120" Height="20" VerticalAlignment="Bottom"/>
+                    <Button x:Name="mapViewerButton" Click="mapViewerButton_Click" Content="Map viewer (crashy)" Margin="83,0,94.6,163.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Width="120" Height="20" VerticalAlignment="Bottom"/>
                     <Image x:Name="tileImage" Grid.Column="1" Grid.Row="1" Margin="93,19,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
                     <ListBox x:Name="tileListBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0"  SelectionChanged="tileListBox_SelectionChanged" Height="209" Width="75" Margin="3,0,0,59" VerticalContentAlignment="Bottom" Grid.RowSpan="2"/>
                     <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="exportTileButton" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="exportTileButton_Click"/>
