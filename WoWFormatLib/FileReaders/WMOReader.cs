@@ -258,23 +258,29 @@ namespace WoWFormatLib.FileReaders
             List<String> blpFiles = new List<string>();
             List<int> blpOffset = new List<int>();
             var str = new StringBuilder();
+            File.WriteAllBytes("blpchunk.out", blpFilesChunk);
 
+            var buildingString = true;
             for (var i = 0; i < blpFilesChunk.Length; i++)
             {
                 if (blpFilesChunk[i] == '\0')
                 {
-                    str.Replace("..", ".");
-                    blpFiles.Add(str.ToString());
-                    blpOffset.Add(i - str.ToString().Length);
-                    if (!CASC.cascHandler.FileExists(str.ToString()))
+                    if (buildingString)
                     {
-                        new WoWFormatLib.Utils.MissingFile(str.ToString());
+                        str.Replace("..", ".");
+                        blpFiles.Add(str.ToString());
+                        blpOffset.Add(i - str.ToString().Length);
+                        if (!CASC.cascHandler.FileExists(str.ToString()))
+                        {
+                            new WoWFormatLib.Utils.MissingFile(str.ToString());
+                        }
                     }
-                   
+                    buildingString = false;
                     str = new StringBuilder();
                 }
                 else
                 {
+                    buildingString = true;
                     str.Append((char)blpFilesChunk[i]);
                 }
             }
