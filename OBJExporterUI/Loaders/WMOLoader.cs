@@ -214,7 +214,7 @@ namespace OBJExporterUI.Loaders
                         }
                     }
 
-                    wmobatch.wmoRenderBatch[rb].blendType = wmo.materials[group.mogp.renderBatches[i].materialID].blendMode;
+                    wmobatch.wmoRenderBatch[rb].blendType = wmo.materials[matID].blendMode;
                     wmobatch.wmoRenderBatch[rb].groupID = (uint)g;
                     rb++;
                 }

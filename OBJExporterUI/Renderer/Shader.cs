@@ -55,7 +55,7 @@ namespace OBJExporterUI
             Console.Write(programInfoLog);
 
             GL.GetProgram(shaderProgram, GetProgramParameterName.LinkStatus, out int programStatus);
-            Console.WriteLine("[" + type + "][PROGRAM] Program link status: " + programStatus);
+            Console.WriteLine("[" + type + "] [PROGRAM] Program link status: " + programStatus);
             GL.UseProgram(shaderProgram);
 
             GL.ValidateProgram(shaderProgram);
