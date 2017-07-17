@@ -24,7 +24,7 @@ namespace OBJExporterUI
             GL.CompileShader(vertexShader);
 
             GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out int vertexShaderStatus);
-            Console.WriteLine("[VERTEX] Shader compile status: " + vertexShaderStatus);
+            Console.WriteLine("[" + type + "] [VERTEX] Shader compile status: " + vertexShaderStatus);
 
             GL.GetShaderInfoLog(vertexShader, out string vertexShaderLog);
             Console.Write(vertexShaderLog);
@@ -38,7 +38,7 @@ namespace OBJExporterUI
             GL.CompileShader(fragmentShader);
 
             GL.GetShader(fragmentShader, ShaderParameter.CompileStatus, out int fragmentShaderStatus);
-            Console.WriteLine("[FRAGMENT] Shader compile status: " + fragmentShaderStatus);
+            Console.WriteLine("[" + type + "] [FRAGMENT] Shader compile status: " + fragmentShaderStatus);
 
             GL.GetShaderInfoLog(fragmentShader, out string fragmentShaderLog);
             Console.Write(fragmentShaderLog);
@@ -55,7 +55,7 @@ namespace OBJExporterUI
             Console.Write(programInfoLog);
 
             GL.GetProgram(shaderProgram, GetProgramParameterName.LinkStatus, out int programStatus);
-            Console.WriteLine("[FRAGMENT] Program link status: " + programStatus);
+            Console.WriteLine("[" + type + "][PROGRAM] Program link status: " + programStatus);
             GL.UseProgram(shaderProgram);
 
             GL.ValidateProgram(shaderProgram);

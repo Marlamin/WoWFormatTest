@@ -22,8 +22,6 @@ namespace OBJExporterUI
 
         private string filename;
 
-        private int vertexAttribObject;
-
         private int adtShaderProgram;
         private int wmoShaderProgram;
         private int m2ShaderProgram;
@@ -50,8 +48,6 @@ namespace OBJExporterUI
         public void LoadModel(string filename)
         {
             ready = false;
-
-            Console.WriteLine("Generated and binded to vertex array: " + vertexAttribObject);
 
             GL.ActiveTexture(TextureUnit.Texture0);
 
@@ -121,6 +117,8 @@ namespace OBJExporterUI
 
             if (modelType == "m2")
             {
+                GL.UseProgram(m2ShaderProgram);
+
                 ActiveCamera.setupGLRenderMatrix(m2ShaderProgram);
 
                 GL.BindVertexArray(cache.doodadBatches[filename].vao);
@@ -133,11 +131,31 @@ namespace OBJExporterUI
             }
             else if (modelType == "wmo")
             {
-                ActiveCamera.setupGLRenderMatrix(adtShaderProgram);
+                GL.UseProgram(wmoShaderProgram);
+
+                ActiveCamera.setupGLRenderMatrix(wmoShaderProgram);
+
+                var alphaRefLoc = GL.GetUniformLocation(wmoShaderProgram, "alphaRef");
 
                 for (int j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Length; j++)
                 {
                     GL.BindVertexArray(cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vao);
+
+                    switch(cache.worldModelBatches[filename].wmoRenderBatch[j].blendType)
+                    {
+                        case 0:
+                            GL.Disable(EnableCap.Blend);
+                            GL.Uniform1(alphaRefLoc, -1.0f);
+                            break;
+                        case 1:
+                            GL.Disable(EnableCap.Blend);
+                            GL.Uniform1(alphaRefLoc, 0.90393700787f);
+                            break;
+                        default:
+                            GL.Disable(EnableCap.Blend);
+                            GL.Uniform1(alphaRefLoc, -1.0f);
+                            break;
+                    }
 
                     GL.BindTexture(TextureTarget.Texture2D, cache.worldModelBatches[filename].wmoRenderBatch[j].materialID[0]);
                     GL.DrawElements(PrimitiveType.Triangles, (int)cache.worldModelBatches[filename].wmoRenderBatch[j].numFaces, DrawElementsType.UnsignedInt, (int)cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace * 4);
