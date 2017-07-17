@@ -259,7 +259,7 @@ namespace WoWFormatLib.FileReaders
             List<int> blpOffset = new List<int>();
             var str = new StringBuilder();
 
-            var buildingString = true;
+            var buildingString = false;
             for (var i = 0; i < blpFilesChunk.Length; i++)
             {
                 if (blpFilesChunk[i] == '\0')
