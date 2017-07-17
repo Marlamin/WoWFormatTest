@@ -151,6 +151,11 @@ namespace OBJExporterUI
                             GL.Disable(EnableCap.Blend);
                             GL.Uniform1(alphaRefLoc, 0.90393700787f);
                             break;
+                        case 2:
+                            GL.Enable(EnableCap.Blend);
+                            GL.Uniform1(alphaRefLoc, -1.0f);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            break;
                         default:
                             GL.Disable(EnableCap.Blend);
                             GL.Uniform1(alphaRefLoc, -1.0f);
