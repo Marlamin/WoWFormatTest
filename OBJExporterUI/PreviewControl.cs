@@ -33,7 +33,7 @@ namespace OBJExporterUI
             this.renderCanvas.Load += RenderCanvas_Load;
             this.renderCanvas.Resize += RenderCanvas_Resize;
 
-            ActiveCamera = new NewCamera(renderCanvas.Width, renderCanvas.Height, new Vector3(0, 0, -1), new Vector3(-11, 0, 0), Vector3.UnitZ);
+            ActiveCamera = new NewCamera(renderCanvas.Width, renderCanvas.Height, new Vector3(0, 0, -1), new Vector3(-11, 0, 0));
         }
 
         private void RenderCanvas_Resize(object sender, EventArgs e)
@@ -60,6 +60,7 @@ namespace OBJExporterUI
                     M2Loader.LoadM2(filename, cache, m2ShaderProgram);
                 }
                 modelType = "m2";
+                ActiveCamera.switchMode("perspective");
                 ActiveCamera.Pos = new Vector3((cache.doodadBatches[filename].boundingBox.max.Z) + 11.0f, 0.0f, 4.0f);
             }
             else if (filename.EndsWith(".wmo"))
@@ -68,6 +69,7 @@ namespace OBJExporterUI
                 {
                     WMOLoader.LoadWMO(filename, cache, wmoShaderProgram);
                 }
+                ActiveCamera.switchMode("perspective");
                 modelType = "wmo";
             }else if (filename.EndsWith(".adt"))
             {
@@ -75,7 +77,7 @@ namespace OBJExporterUI
                 {
                     ADTLoader.LoadADT(filename, cache, adtShaderProgram);
                 }
-
+                //ActiveCamera.switchMode("ortho");
                 ActiveCamera.Pos = new Vector3(cache.terrain[filename].startPos.Position.X, cache.terrain[filename].startPos.Position.Y, cache.terrain[filename].startPos.Position.Z);
                 modelType = "adt";
             }
