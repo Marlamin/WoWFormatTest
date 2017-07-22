@@ -94,7 +94,7 @@ namespace OBJExporterUI
 
                 if (state.IsKeyDown(Key.D))
                 {
-                    rotationAngle -= - 0.1f;
+                    rotationAngle -= 0.1f;
                 }
             }
 
