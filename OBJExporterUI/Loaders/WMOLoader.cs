@@ -45,8 +45,10 @@ namespace OBJExporterUI.Loaders
                 throw new Exception("Broken WMO! Report to developer (mail marlamin@marlamin.com) with this filename: " + filename);
             }
 
-            var wmobatch = new Renderer.Structs.WorldModel();
-            wmobatch.groupBatches = new Renderer.Structs.WorldModelGroupBatches[wmo.group.Count()];
+            var wmobatch = new Renderer.Structs.WorldModel()
+            {
+                groupBatches = new Renderer.Structs.WorldModelGroupBatches[wmo.group.Count()]
+            };
 
             string[] groupNames = new string[wmo.group.Count()];
 

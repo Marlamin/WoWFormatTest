@@ -229,7 +229,7 @@ namespace WoWOpenGL
                         _SW.Start();
                         BackgroundWorker _Worker = o as BackgroundWorker;
                         wdt.LoadWDT(System.IO.Path.Combine(@"world\maps\", _SelectedMapName, _SelectedMapName + ".wdt"));
-                        List<int[]> tiles = wdt.getTiles();
+                        List<int[]> tiles = wdt.GetTiles();
 
                         for (int i = 0; i < tiles.Count; i++)
                         {

@@ -57,7 +57,7 @@ namespace OBJExporterUI
                         _SW.Start();
                         BackgroundWorker _Worker = o as BackgroundWorker;
                         wdt.LoadWDT(System.IO.Path.Combine(@"world\maps\", map, map + ".wdt"));
-                        List<int[]> tiles = wdt.getTiles();
+                        List<int[]> tiles = wdt.GetTiles();
 
                         if(tiles.Count == 0)
                         {

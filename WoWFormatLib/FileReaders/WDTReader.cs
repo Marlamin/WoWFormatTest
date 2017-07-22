@@ -13,7 +13,7 @@ namespace WoWFormatLib.FileReaders
         public List<int[]> tiles;
         public WDT wdtfile;
 
-        public List<int[]> getTiles()
+        public List<int[]> GetTiles()
         {
             return tiles;
         }
@@ -30,7 +30,7 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                new WoWFormatLib.Utils.MissingFile(filename);
+                new MissingFile(filename);
                 return;
             }
         }
@@ -86,10 +86,12 @@ namespace WoWFormatLib.FileReaders
 
         private MPHD ReadMPHDChunk(BinaryReader bin)
         {
-            var mphd = new MPHD();
-            mphd.flags = (mphdFlags) bin.ReadUInt32();
-            mphd.something = bin.ReadUInt32();
-            mphd.unused = new uint[] { bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32() };
+            var mphd = new MPHD()
+            {
+                flags = (mphdFlags)bin.ReadUInt32(),
+                something = bin.ReadUInt32(),
+                unused = new uint[] { bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32() }
+            };
             return mphd;
         }
 
