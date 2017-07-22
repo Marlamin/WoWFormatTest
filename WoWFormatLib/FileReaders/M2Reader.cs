@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using WoWFormatLib.Structs.M2;
 using WoWFormatLib.Utils;
 
@@ -24,10 +25,6 @@ namespace WoWFormatLib.FileReaders
     public class M2Reader
     {
         public M2Model model;
-
-        public M2Reader()
-        {
-        }
 
         public void LoadM2(string filename)
         {
@@ -45,27 +42,27 @@ namespace WoWFormatLib.FileReaders
         {
             Stream m2 = CASC.cascHandler.OpenFile(fileDataID);
             var bin = new BinaryReader(m2);
-
-            BlizzHeader chunk;
-
             long position = 0;
             while (position < m2.Length)
             {
                 m2.Position = position;
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                position = m2.Position + chunk.Size;
 
-                switch (chunk.ToString())
+                var chunkName = new string(bin.ReadChars(4));
+                var chunkSize = bin.ReadUInt32();
+
+                position = m2.Position + chunkSize;
+
+                switch (chunkName)
                 {
                     case "MD21":
-                        using (Stream m2stream = new MemoryStream(bin.ReadBytes((int)chunk.Size)))
+                        using (Stream m2stream = new MemoryStream(bin.ReadBytes((int)chunkSize)))
                         {
                             ParseYeOldeM2Struct(m2stream);
                         }
                         break;
                     case "AFID": // Animation file IDs
-                        var afids = new AFID[chunk.Size / 16];
-                        for(int a = 0; a < chunk.Size / 16; a++)
+                        var afids = new AFID[chunkSize / 16];
+                        for(int a = 0; a < chunkSize / 16; a++)
                         {
                             afids[a].animID = (short)bin.ReadUInt16();
                             afids[a].subAnimID = (short)bin.ReadUInt16();
@@ -74,8 +71,8 @@ namespace WoWFormatLib.FileReaders
                         model.animFileData = afids;
                         break;
                     case "BFID": // Bone file IDs
-                        var bfids = new int[chunk.Size / 4];
-                        for (int b = 0; b < chunk.Size / 4; b++)
+                        var bfids = new int[chunkSize / 4];
+                        for (int b = 0; b < chunkSize / 4; b++)
                         {
                             bfids[b] = (int)bin.ReadUInt32();
                         }
@@ -94,7 +91,7 @@ namespace WoWFormatLib.FileReaders
                     case "TXAC":
                         break;
                     default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunk.ToString(), position.ToString(), "id: " + fileDataID));
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
                 }
             }
 

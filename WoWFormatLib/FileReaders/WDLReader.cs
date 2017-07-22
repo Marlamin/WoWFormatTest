@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using WoWFormatLib.Utils;
 
@@ -7,10 +8,6 @@ namespace WoWFormatLib.FileReaders
 {
     public class WDLReader
     {
-        public WDLReader()
-        {
-        }
-
         public void LoadWDL(string filename)
         {
             if (CASC.cascHandler.FileExists(filename))
@@ -22,7 +19,7 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                new WoWFormatLib.Utils.MissingFile(filename);
+                new MissingFile(filename);
                 return;
             }
         }
@@ -35,9 +32,9 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadMWMOChunk(BinaryReader bin, BlizzHeader chunk)
+        private void ReadMWMOChunk(BinaryReader bin, uint size)
         {
-            var wmoFilesChunk = bin.ReadBytes((int)chunk.Size);
+            var wmoFilesChunk = bin.ReadBytes((int)size);
 
             var str = new StringBuilder();
 
@@ -65,22 +62,21 @@ namespace WoWFormatLib.FileReaders
         private void ReadWDL(string filename, Stream wdl)
         {
             var bin = new BinaryReader(wdl);
-            BlizzHeader chunk;
             long position = 0;
             while (position < wdl.Length)
             {
                 wdl.Position = position;
 
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
+                var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                var chunkSize = bin.ReadUInt32();
 
-                position = wdl.Position + chunk.Size;
+                position = wdl.Position + chunkSize;
 
-                switch (chunk.ToString())
+                switch (chunkName)
                 {
                     case "MVER": ReadMVERChunk(bin);
                         continue;
-                    case "MWMO": ReadMWMOChunk(bin, chunk);
+                    case "MWMO": ReadMWMOChunk(bin, chunkSize);
                         continue;
                     case "MWID":
                     case "MODF":
@@ -89,7 +85,7 @@ namespace WoWFormatLib.FileReaders
                     case "MAOC": //New in WoD
                     case "MAHO": continue;
                     default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                 }
             }
         }

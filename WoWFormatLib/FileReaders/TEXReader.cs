@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using WoWFormatLib.Utils;
 
@@ -7,10 +8,6 @@ namespace WoWFormatLib.FileReaders
 {
     public class TEXReader
     {
-        public TEXReader()
-        {
-        }
-
         public void LoadTEX(string filename)
         {
             if (CASC.cascHandler.FileExists(filename))
@@ -22,7 +19,7 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                new WoWFormatLib.Utils.MissingFile(filename);
+                new MissingFile(filename);
                 return;
             }
         }
@@ -30,35 +27,33 @@ namespace WoWFormatLib.FileReaders
         private void ReadTEX(string filename, Stream tex)
         {
             var bin = new BinaryReader(tex);
-            BlizzHeader chunk;
             long position = 0;
             while (position < tex.Length)
             {
                 tex.Position = position;
 
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
+                var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                var chunkSize = bin.ReadUInt32();
 
-                position = tex.Position + chunk.Size;
+                position = tex.Position + chunkSize;
 
-                switch (chunk.ToString())
+                switch (chunkName)
                 {
                     case "TXVR": ReadTXVRChunk(bin);
                         continue;
-                    case "TXFN": ReadTXFNChunk(bin, chunk);
+                    case "TXFN": ReadTXFNChunk(bin, chunkSize);
                         continue;
                     case "TXBT":
                     case "TXMD": continue;
                     default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                 }
             }
         }
-
-        private void ReadTXFNChunk(BinaryReader bin, BlizzHeader chunk)
+        private void ReadTXFNChunk(BinaryReader bin, uint size)
         {
             //List of BLP filenames
-            var blpFilesChunk = bin.ReadBytes((int)chunk.Size);
+            var blpFilesChunk = bin.ReadBytes((int)size);
 
             var str = new StringBuilder();
 
@@ -83,7 +78,6 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
-
         private void ReadTXVRChunk(BinaryReader bin)
         {
             if (bin.ReadUInt32() != 0)

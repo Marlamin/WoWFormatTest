@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using WoWFormatLib.Utils;
 using WoWFormatLib.Structs.WDT;
+using System.Linq;
 
 namespace WoWFormatLib.FileReaders
 {
@@ -11,10 +12,6 @@ namespace WoWFormatLib.FileReaders
     {
         public List<int[]> tiles;
         public WDT wdtfile;
-
-        public WDTReader()
-        {
-        }
 
         public List<int[]> getTiles()
         {
@@ -38,11 +35,11 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        private void ReadMAINChunk(BinaryReader bin, BlizzHeader chunk, String filename)
+        private void ReadMAINChunk(BinaryReader bin, uint size, String filename)
         {
-            if (chunk.Size != 4096 * 8)
+            if (size != 4096 * 8)
             {
-                throw new Exception("MAIN size is wrong! (" + chunk.Size.ToString() + ")");
+                throw new Exception("MAIN size is wrong! (" + size.ToString() + ")");
             }
 
             for (var x = 0; x < 64; x++)
@@ -100,31 +97,35 @@ namespace WoWFormatLib.FileReaders
         {
             filename = Path.ChangeExtension(filename, "WDT");
             var bin = new BinaryReader(wdt);
-            BlizzHeader chunk;
             long position = 0;
             while (position < wdt.Length)
             {
                 wdt.Position = position;
 
-                chunk = new BlizzHeader(bin.ReadChars(4), bin.ReadUInt32());
-                chunk.Flip();
+                var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                var chunkSize = bin.ReadUInt32();
 
-                position = wdt.Position + chunk.Size;
+                position = wdt.Position + chunkSize;
 
-                switch (chunk.ToString())
+                switch (chunkName)
                 {
-                    case "MVER": ReadMVERChunk(bin);
-                        continue;
-                    case "MAIN": ReadMAINChunk(bin, chunk, filename);
-                        continue;
-                    case "MWMO": ReadMWMOChunk(bin);
-                        continue;
-                    case "MPHD": wdtfile.mphd = ReadMPHDChunk(bin);
-                        continue;
+                    case "MVER":
+                        ReadMVERChunk(bin);
+                        break;
+                    case "MAIN":
+                        ReadMAINChunk(bin, chunkSize, filename);
+                        break;
+                    case "MWMO":
+                        ReadMWMOChunk(bin);
+                        break;
+                    case "MPHD":
+                        wdtfile.mphd = ReadMPHDChunk(bin);
+                        break;
                     case "MPLT":
-                    case "MODF": continue;
+                    case "MODF":
+                        continue;
                     default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunk.ToString(), position.ToString(), filename));
+                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                 }
             }
         }
