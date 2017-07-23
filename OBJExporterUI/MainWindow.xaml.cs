@@ -308,8 +308,9 @@ namespace OBJExporterUI
             modelListBox.DataContext = models;
             textureListBox.DataContext = textures;
 
+            previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
-            Renderer.RenderMinimap.Generate("world\\maps\\Azeroth\\Azeroth_39_24.adt");
+            //Renderer.RenderMinimap.Generate("world\\maps\\Azeroth\\Azeroth_39_24.adt", "azeroth_39_42.bmp");
 #endif
         }
 
@@ -892,6 +893,20 @@ namespace OBJExporterUI
             var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
 
             previewControl.LoadModel(adtFile);
+        }
+
+        private void bakeTextureButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (MapListItem)mapListBox.SelectedItem;
+            if (selectedItem == null) return;
+
+            var tiles = tileListBox.SelectedItem.ToString().Split('_');
+            var x = int.Parse(tiles[0]);
+            var y = int.Parse(tiles[1]);
+
+            var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
+
+            Renderer.RenderMinimap.Generate(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".bmp");
         }
     }
 }

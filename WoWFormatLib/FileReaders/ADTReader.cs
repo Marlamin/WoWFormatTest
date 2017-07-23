@@ -512,6 +512,7 @@ namespace WoWFormatLib.FileReaders
                 }
                 if (mapchunk.layers[layer].flags.HasFlag(mclyFlags.Flag_0x200)) // Compressed
                 {
+                    //Console.WriteLine("Compressed");
                     // first layer is always fully opaque -> you can let that out
                     // array of 3 x array of 64*64 chars: unpacked alpha values
                     mcal[layer].layer = new byte[64 * 64];
@@ -551,11 +552,13 @@ namespace WoWFormatLib.FileReaders
                 }
                 else if (wdt.mphd.flags.HasFlag(Structs.WDT.mphdFlags.Flag_0x4) || wdt.mphd.flags.HasFlag(Structs.WDT.mphdFlags.Flag_0x80)) // Uncompressed (4096)
                 {
+                    //Console.WriteLine("Uncompressed (4096)");
                     mcal[layer].layer = bin.ReadBytes(4096);
                     read_offset += 4096;
                 }
                 else // Uncompressed (2048)
                 {
+                    //Console.WriteLine("Uncompressed (2048)");
                     mcal[layer].layer = new byte[64 * 64];
                     var mcal_data = bin.ReadBytes(2048);
                     read_offset += 2048;

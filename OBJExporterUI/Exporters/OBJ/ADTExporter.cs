@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
 using WoWFormatLib.Utils;
+using static OBJExporterUI.Renderer.Structs;
 
 namespace OBJExporterUI.Exporters.OBJ
 {
@@ -76,27 +77,30 @@ namespace OBJExporterUI.Exporters.OBJ
                         continue;
                     }
 
-                    if (CASC.cascHandler.FileExists("world\\maptextures\\" + mapname + "\\" + mapname + "_" + x + "_" + y + ".blp"))
-                    {
-                        materials.Add(materials.Count() + 1, "mat" + y.ToString() + x.ToString());
+                    //if (CASC.cascHandler.FileExists("world\\maptextures\\" + mapname + "\\" + mapname + "_" + x + "_" + y + ".blp"))
+                    //{
+                    //    materials.Add(materials.Count() + 1, "mat" + y.ToString() + x.ToString());
 
-                        var blpreader = new BLPReader();
+                    //    var blpreader = new BLPReader();
 
-                        blpreader.LoadBLP(curfile.Replace("maps", "maptextures").Replace(".adt", ".blp"));
+                    //    blpreader.LoadBLP(curfile.Replace("maps", "maptextures").Replace(".adt", ".blp"));
 
-                        try
-                        {
-                            blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + y.ToString() + x.ToString() + ".png"));
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
-                        }
-                    }else
-                    {
-                        Console.WriteLine("No maptextures, this map will have missing textures.");
-                    }
+                    //    try
+                    //    {
+                    //        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + y.ToString() + x.ToString() + ".png"));
+                    //    }
+                    //    catch (Exception e)
+                    //    {
+                    //        Console.WriteLine(e.Message);
+                    //    }
+                    //}else
+                    //{
+                    //    Console.WriteLine("No maptextures, this map will have missing textures.");
+                    //}
 
+                    Renderer.RenderMinimap.Generate(curfile, Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + y.ToString() + x.ToString() + ".png"));
+
+                    materials.Add(1, "mat" + y.ToString() + x.ToString());
                     //List<Material> materials = new List<Material>();
 
                     //for (int ti = 0; ti < reader.adtfile.textures.filenames.Count(); ti++)
