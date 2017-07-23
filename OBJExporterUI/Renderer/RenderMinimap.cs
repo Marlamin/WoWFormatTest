@@ -39,7 +39,7 @@ namespace OBJExporterUI.Renderer
             var bakedTexture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, bakedTexture);
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, 2048, 2048, 0, PixelFormat.Rgb, PixelType.UnsignedByte, new IntPtr(0));
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, 4096, 4096, 0, PixelFormat.Rgb, PixelType.UnsignedByte, new IntPtr(0));
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
@@ -71,7 +71,7 @@ namespace OBJExporterUI.Renderer
 
             var firstPosLocation = GL.GetUniformLocation(bakeShaderProgram, "firstPos");
             GL.Uniform3(firstPosLocation, ref firstPos);
-            GL.Viewport(0, 0, 2048, 2048);
+            GL.Viewport(0, 0, 4096, 4096);
 
             GL.BindVertexArray(cache.terrain[filename].vao);
 
@@ -98,9 +98,9 @@ namespace OBJExporterUI.Renderer
                 GL.DrawRangeElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].firstFace, (int)cache.terrain[filename].renderBatches[i].firstFace + (int)cache.terrain[filename].renderBatches[i].numFaces, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.terrain[filename].renderBatches[i].firstFace * 4));
             }
 
-            Bitmap bmp = new Bitmap(2048, 2048);
+            Bitmap bmp = new Bitmap(4096, 4096);
             System.Drawing.Imaging.BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            GL.ReadPixels(0, 0, 2048, 2048, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
+            GL.ReadPixels(0, 0, 4096, 4096, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
             bmp.UnlockBits(data);
 
             bmp.RotateFlip(RotateFlipType.Rotate270FlipX);
