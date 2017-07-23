@@ -9,6 +9,7 @@
         ResizeMode="CanResize"
         Icon="Resources/icon32.png"
         ContentRendered="Window_ContentRendered"
+        KeyboardNavigation.DirectionalNavigation="None"
         Title="OBJ Exporter" MinHeight="650" Height="650" MinWidth="615" Width="615">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -19,7 +20,7 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
         <DockPanel Grid.Column="0">
-            <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False">
+            <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False" PreviewKeyDown="tabs_PreviewKeyDown">
                 <MenuItem Header="File">
                     <MenuItem Name="MenuPreferences" Header="Preferences" Click="MenuPreferences_Click"/>
                     <MenuItem Name="MenuQuit" Header="Quit" Click="MenuQuit_Click" />
