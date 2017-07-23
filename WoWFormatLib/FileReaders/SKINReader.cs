@@ -8,42 +8,34 @@ namespace WoWFormatLib.FileReaders
     public class SKINReader
     {
         public SKIN skin;
-
-        public SKINReader()
-        {
-        }
-
         public void LoadSKIN(int fileDataID)
         {
-            BinaryReader bin = new BinaryReader(CASC.cascHandler.OpenFile(fileDataID));
-
-            var header = new string(bin.ReadChars(4));
-            if (header != "SKIN")
+            using (var bin = new BinaryReader(CASC.cascHandler.OpenFile(fileDataID)))
             {
-                Console.WriteLine("Invalid SKIN file!");
+                var header = new string(bin.ReadChars(4));
+                if (header != "SKIN")
+                {
+                    Console.WriteLine("Invalid SKIN file!");
+                }
+
+                var nIndices = bin.ReadUInt32();
+                var ofsIndices = bin.ReadUInt32();
+                var nTriangles = bin.ReadUInt32();
+                var ofsTriangles = bin.ReadUInt32();
+                var nProperties = bin.ReadUInt32();
+                var ofsProperties = bin.ReadUInt32();
+                var nSubmeshes = bin.ReadUInt32();
+                var ofsSubmeshes = bin.ReadUInt32();
+                var nTextureUnits = bin.ReadUInt32();
+                var ofsTextureUnits = bin.ReadUInt32();
+                skin.bones = bin.ReadUInt32();
+                skin.indices = ReadIndices(nIndices, ofsIndices, bin);
+                skin.triangles = ReadTriangles(nTriangles, ofsTriangles, bin);
+                skin.properties = ReadProperties(nProperties, ofsProperties, bin);
+                skin.submeshes = ReadSubmeshes(nSubmeshes, ofsSubmeshes, bin);
+                skin.textureunit = ReadTextureUnits(nTextureUnits, ofsTextureUnits, bin);
             }
-
-            var nIndices = bin.ReadUInt32();
-            var ofsIndices = bin.ReadUInt32();
-            var nTriangles = bin.ReadUInt32();
-            var ofsTriangles = bin.ReadUInt32();
-            var nProperties = bin.ReadUInt32();
-            var ofsProperties = bin.ReadUInt32();
-            var nSubmeshes = bin.ReadUInt32();
-            var ofsSubmeshes = bin.ReadUInt32();
-            var nTextureUnits = bin.ReadUInt32();
-            var ofsTextureUnits = bin.ReadUInt32();
-            skin.bones = bin.ReadUInt32();
-
-            skin.indices = ReadIndices(nIndices, ofsIndices, bin);
-            skin.triangles = ReadTriangles(nTriangles, ofsTriangles, bin);
-            skin.properties = ReadProperties(nProperties, ofsProperties, bin);
-            skin.submeshes = ReadSubmeshes(nSubmeshes, ofsSubmeshes, bin);
-            skin.textureunit = ReadTextureUnits(nTextureUnits, ofsTextureUnits, bin);
-
-            bin.Close();
         }
-
         private Indice[] ReadIndices(uint nIndices, uint ofsIndices, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsIndices;
@@ -54,7 +46,6 @@ namespace WoWFormatLib.FileReaders
             }
             return indices;
         }
-
         private Property[] ReadProperties(uint nProperties, uint ofsProperties, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsProperties;
@@ -65,7 +56,6 @@ namespace WoWFormatLib.FileReaders
             }
             return properties;
         }
-
         private Submesh[] ReadSubmeshes(uint nSubmeshes, uint ofsSubmeshes, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsSubmeshes;
@@ -96,7 +86,6 @@ namespace WoWFormatLib.FileReaders
             }
             return submeshes;
         }
-
         private TextureUnit[] ReadTextureUnits(uint nTextureUnits, uint ofsTextureUnits, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTextureUnits;
@@ -107,7 +96,6 @@ namespace WoWFormatLib.FileReaders
             }
             return textureunits;
         }
-
         private Triangle[] ReadTriangles(uint nTriangles, uint ofsTriangles, BinaryReader bin)
         {
             bin.BaseStream.Position = ofsTriangles;

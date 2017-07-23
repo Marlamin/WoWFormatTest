@@ -1,7 +1,5 @@
 ﻿using DBFilesClient.NET;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using WoWFormatLib.Utils;
 using CASCExplorer;

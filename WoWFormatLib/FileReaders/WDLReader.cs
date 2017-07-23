@@ -22,7 +22,6 @@ namespace WoWFormatLib.FileReaders
                 throw new FileNotFoundException("WDL " + filename + " does not exist");
             }
         }
-
         private void ReadMVERChunk(BinaryReader bin)
         {
             if (bin.ReadUInt32() != 18)
@@ -30,7 +29,6 @@ namespace WoWFormatLib.FileReaders
                 throw new Exception("Unsupported WDL version!");
             }
         }
-
         private void ReadMWMOChunk(BinaryReader bin, uint size)
         {
             var wmoFilesChunk = bin.ReadBytes((int)size);
@@ -56,7 +54,6 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
-
         private void ReadWDL(string filename, Stream wdl)
         {
             var bin = new BinaryReader(wdl);

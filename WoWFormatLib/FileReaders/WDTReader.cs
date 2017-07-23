@@ -33,7 +33,6 @@ namespace WoWFormatLib.FileReaders
                 throw new FileNotFoundException("WDT " + filename + " does not exist");
             }
         }
-
         private void ReadMAINChunk(BinaryReader bin, uint size, String filename)
         {
             if (size != 4096 * 8)
@@ -56,7 +55,6 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
-
         private void ReadMVERChunk(BinaryReader bin)
         {
             if (bin.ReadUInt32() != 18)
@@ -64,7 +62,6 @@ namespace WoWFormatLib.FileReaders
                 throw new Exception("Unsupported WDT version!");
             }
         }
-
         private void ReadMWMOChunk(BinaryReader bin)
         {
             if (bin.ReadByte() != 0)
@@ -82,7 +79,6 @@ namespace WoWFormatLib.FileReaders
                 //wmoreader.LoadWMO(wmofilename);
             }
         }
-
         private MPHD ReadMPHDChunk(BinaryReader bin)
         {
             var mphd = new MPHD()
@@ -93,7 +89,6 @@ namespace WoWFormatLib.FileReaders
             };
             return mphd;
         }
-
         private void ReadWDT(string filename, Stream wdt)
         {
             filename = Path.ChangeExtension(filename, "WDT");
@@ -130,6 +125,5 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
-
     }
 }

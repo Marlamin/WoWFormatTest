@@ -18,7 +18,6 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
-
         private void ReadTEX(string filename, Stream tex)
         {
             var bin = new BinaryReader(tex);
