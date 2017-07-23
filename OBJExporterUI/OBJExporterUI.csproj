@@ -187,6 +187,12 @@
     <Content Include="Shaders\wmo.fragment.shader">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Shaders\baketexture.vertex.shader">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shaders\baketexture.fragment.shader">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Utils\io_scene_wmo\import_wmoobj.pyc" />
   </ItemGroup>
   <ItemGroup>

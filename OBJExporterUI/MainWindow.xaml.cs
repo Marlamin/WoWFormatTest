@@ -308,6 +308,9 @@ namespace OBJExporterUI
             modelListBox.DataContext = models;
             textureListBox.DataContext = textures;
 
+#if DEBUG
+            previewControl.LoadModel("world\\maps\\Azeroth\\Azeroth_39_24.adt");
+#endif
         }
 
         private void exportworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

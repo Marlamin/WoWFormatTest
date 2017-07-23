@@ -121,9 +121,6 @@ namespace OBJExporterUI.Loaders
                 int[] indices = indicelist.ToArray();
                 Vertex[] vertices = verticelist.ToArray();
 
-                Console.WriteLine("Vertices in array: " + vertices.Count());
-                Console.WriteLine("Indices in array: " + indices.Count());
-
                 GL.BindBuffer(BufferTarget.ArrayBuffer, result.vertexBuffer);
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Count() * 11 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
