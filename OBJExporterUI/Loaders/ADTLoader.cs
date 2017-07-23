@@ -82,8 +82,7 @@ namespace OBJExporterUI.Loaders
                             v.Color = new Vector3(1.0f, 1.0f, 1.0f);
                         }
 
-                        // Commented out for maptexture hack
-                        v.TexCoord = new Vector2(((float)j + (((i % 2) != 0) ? 0.5f : 0f)) / 8f, ((float)i * 0.5f) / 8f);
+                        v.TexCoord = new Vector2((j + (((i % 2) != 0) ? 0.5f : 0f)) / 8f, (i * 0.5f) / 8f);
 
                         v.Position = new Vector3(chunk.header.position.X - (i * UnitSize * 0.5f), chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z);
 

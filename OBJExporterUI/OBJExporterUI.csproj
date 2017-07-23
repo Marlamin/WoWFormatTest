@@ -97,6 +97,7 @@
     </Compile>
     <Compile Include="Renderer\NewCamera.cs" />
     <Compile Include="PreviewControl.cs" />
+    <Compile Include="Renderer\RenderMinimap.cs" />
     <Compile Include="Renderer\Shader.cs" />
     <Compile Include="Renderer\Structs.cs" />
     <Compile Include="Structs.cs" />

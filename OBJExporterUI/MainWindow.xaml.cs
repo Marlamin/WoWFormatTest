@@ -309,7 +309,7 @@ namespace OBJExporterUI
             textureListBox.DataContext = textures;
 
 #if DEBUG
-            previewControl.LoadModel("world\\maps\\Azeroth\\Azeroth_39_24.adt");
+            Renderer.RenderMinimap.Generate("world\\maps\\Azeroth\\Azeroth_39_24.adt");
 #endif
         }
 
