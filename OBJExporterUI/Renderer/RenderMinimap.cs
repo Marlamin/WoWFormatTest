@@ -18,6 +18,11 @@ namespace OBJExporterUI.Renderer
 
         public static void Generate(string filename)
         {
+            float TileSize = 1600.0f / 3.0f; //533.333
+            float ChunkSize = TileSize / 16.0f; //33.333
+            float UnitSize = ChunkSize / 8.0f; //4.166666
+            float MapMidPoint = 32.0f / ChunkSize;
+
             // Generate baked terrain texture
             bakeShaderProgram = Shader.CompileShader("baketexture");
 
@@ -49,19 +54,19 @@ namespace OBJExporterUI.Renderer
             }
 
             var firstPos = cache.terrain[filename].startPos.Position;
-            var projectionMatrix = Matrix4.CreateOrthographic(1024, 1024, -500f, 500f);
+            var projectionMatrix = Matrix4.CreateOrthographic(550, 550, -1500f, 1500f);
+            //var projectionMatrix = Matrix4.CreateOrthographicOffCenter(533, 533, 0, 0, -1500f, 1500f);
             var projectionMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "projection_matrix");
             GL.UniformMatrix4(projectionMatrixLocation, false, ref projectionMatrix);
 
             var modelviewMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "modelview_matrix");
-            var eye = new Vector3((float)533.3333 / 2, (float)533.3333 / 2, 300f);
-            var target = new Vector3((float)533.3333 / 2, (float)533.3333 / 2, 300f - 0.1f);
-            //Matrix4 modelViewMatrix = Matrix4.LookAt(eye, target, new Vector3(0f, 0f, 1f));
-            Matrix4 modelViewMatrix = Matrix4.LookAt(new Vector3(-1f, -1f, 0f), new Vector3(0f, 0f, 0f), new Vector3(0f, 0f, 1f));
+            var eye = new Vector3(-TileSize / 2 , -TileSize/2, 100f);
+            var target = new Vector3(-TileSize/2, -TileSize/2, 99.9f);
+            Matrix4 modelViewMatrix = Matrix4.LookAt(eye, target, new Vector3(0f, 1f, 1f));
             GL.UniformMatrix4(modelviewMatrixLocation, false, ref modelViewMatrix);
 
             var rotationMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "rotation_matrix");
-            Matrix4 rotationMatrix = Matrix4.CreateRotationX(90f);
+            Matrix4 rotationMatrix = Matrix4.CreateRotationX(-270f);
             GL.UniformMatrix4(rotationMatrixLocation, false, ref rotationMatrix);
 
             var firstPosLocation = GL.GetUniformLocation(bakeShaderProgram, "firstPos");
@@ -98,7 +103,7 @@ namespace OBJExporterUI.Renderer
             GL.ReadPixels(0, 0, 2048, 2048, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
             bmp.UnlockBits(data);
 
-            bmp.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            bmp.RotateFlip(RotateFlipType.Rotate270FlipX);
             bmp.Save(Path.GetFileNameWithoutExtension(filename) + ".bmp", System.Drawing.Imaging.ImageFormat.Bmp);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
