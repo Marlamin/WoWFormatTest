@@ -20,7 +20,7 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
         <DockPanel Grid.Column="0">
-            <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False" PreviewKeyDown="tabs_PreviewKeyDown">
+            <Menu Name="MainMenu" DockPanel.Dock="Top" Height="20" IsEnabled="False" KeyboardNavigation.DirectionalNavigation="None">
                 <MenuItem Header="File">
                     <MenuItem Name="MenuPreferences" Header="Preferences" Click="MenuPreferences_Click"/>
                     <MenuItem Name="MenuQuit" Header="Quit" Click="MenuQuit_Click" />
@@ -41,7 +41,7 @@
         <Image Grid.Column="0" x:Name="loadingImage" Source="Resources/icon.png" Margin="0,0,0,0" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <TextBox Grid.Column="0" x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="234,55,0,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged" Panel.ZIndex="2"/>
         <Label Grid.Column="0" Content="Filter" Name="filterTextLabel" Visibility="Hidden" HorizontalAlignment="Stretch" Margin="198,55,366,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center"/>
-        <TabControl Grid.Column="0" x:Name="tabs" Margin="0,60,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto" Visibility="Hidden">
+        <TabControl Grid.Column="0" x:Name="tabs" Margin="0,60,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto" Visibility="Hidden" KeyboardNavigation.DirectionalNavigation="None">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
                     <CheckBox Checked="CheckBoxChanged" Unchecked="CheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -134,8 +134,8 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Grid Grid.Column="1" Background="Black">
-            <WindowsFormsHost x:Name="wfHost" Width="Auto" Height="Auto" Margin="0">
+        <Grid Grid.Column="1" Background="Black" KeyboardNavigation.DirectionalNavigation="None">
+            <WindowsFormsHost x:Name="wfHost" Width="Auto" Height="Auto" Margin="0" KeyboardNavigation.DirectionalNavigation="None">
                 <opentk:GLControl x:Name="renderCanvas" />
             </WindowsFormsHost>
         </Grid>

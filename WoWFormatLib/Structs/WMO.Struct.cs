@@ -173,6 +173,7 @@ namespace WoWFormatLib.Structs.WMO
         public byte fogIndices_3;
         public uint liquidType;
         public uint groupID;
+        public uint unused;
         public uint unk0;
         public uint unk1;
         //public MOBR[] faceIndices;

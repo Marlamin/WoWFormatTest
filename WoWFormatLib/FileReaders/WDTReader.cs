@@ -30,8 +30,7 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                new MissingFile(filename);
-                return;
+                throw new FileNotFoundException("WDT " + filename + " does not exist");
             }
         }
 

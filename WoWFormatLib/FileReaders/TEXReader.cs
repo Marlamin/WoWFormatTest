@@ -17,11 +17,6 @@ namespace WoWFormatLib.FileReaders
                     ReadTEX(filename, tex);
                 }
             }
-            else
-            {
-                new MissingFile(filename);
-                return;
-            }
         }
 
         private void ReadTEX(string filename, Stream tex)
@@ -65,10 +60,6 @@ namespace WoWFormatLib.FileReaders
                     {
                         str.Replace("..", ".");
                         str.Append(".blp"); //Filenames in TEX dont have have BLP extensions
-                        if (!CASC.cascHandler.FileExists(str.ToString()))
-                        {
-                            new WoWFormatLib.Utils.MissingFile(str.ToString());
-                        }
                     }
                     str = new StringBuilder();
                 }

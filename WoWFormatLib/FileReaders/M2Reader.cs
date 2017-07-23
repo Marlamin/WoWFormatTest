@@ -28,13 +28,13 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadM2(string filename)
         {
-            if (!CASC.cascHandler.FileExists(filename))
-            {
-                new MissingFile(filename);
-                return;
-            }else
+            if (CASC.cascHandler.FileExists(filename))
             {
                 LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
+            }
+            else
+            {
+                throw new FileNotFoundException("M2 " + filename + " not found");
             }
         }
 
@@ -477,7 +477,6 @@ namespace WoWFormatLib.FileReaders
                         if (!CASC.cascHandler.FileExists(filename))
                         {
                             Console.WriteLine("BLP file does not exist!!! {0}", filename);
-                            new WoWFormatLib.Utils.MissingFile(filename);
                         }
                     }
                     else

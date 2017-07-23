@@ -15,7 +15,6 @@ namespace OBJExporterUI
         private bool ready = false;
         private string modelType;
 
-        // Cache storage for models... bad idea?
         private CacheStorage cache = new CacheStorage();
 
         private NewCamera ActiveCamera;
@@ -71,7 +70,8 @@ namespace OBJExporterUI
                 }
                 ActiveCamera.switchMode("perspective");
                 modelType = "wmo";
-            }else if (filename.EndsWith(".adt"))
+            }
+            else if (filename.EndsWith(".adt"))
             {
                 if (!cache.terrain.ContainsKey(filename))
                 {

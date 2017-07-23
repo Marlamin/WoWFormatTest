@@ -28,24 +28,20 @@ namespace WoWFormatLib.FileReaders
         public WMO wmofile;
         private bool _lod;
 
-        public WMOReader()
-        {
-        }
         public void LoadWMO(string filename, bool lod = false)
         {
             _lod = lod;
 
-            if (!CASC.cascHandler.FileExists(filename))
-            {
-                new MissingFile(filename);
-                return;
-            }
-            else
+            if (CASC.cascHandler.FileExists(filename))
             {
                 using (Stream wmoStream = CASC.cascHandler.OpenFile(filename))
                 {
                     ReadWMO(filename, wmoStream);
                 }
+            }
+            else
+            {
+                throw new FileNotFoundException("File " + filename + " was not found");
             }
         }
 
@@ -137,12 +133,7 @@ namespace WoWFormatLib.FileReaders
                     }
                 }
 
-                if (!CASC.cascHandler.FileExists(groupfilename))
-                {
-                    new MissingFile(groupfilename);
-                    return;
-                }
-                else
+                if (CASC.cascHandler.FileExists(groupfilename))
                 {
                     using (Stream wmoStream = CASC.cascHandler.OpenFile(groupfilename))
                     {
@@ -185,10 +176,6 @@ namespace WoWFormatLib.FileReaders
                         str.Replace("..", ".");
                         blpFiles.Add(str.ToString());
                         blpOffset.Add(i - str.ToString().Length);
-                        if (!CASC.cascHandler.FileExists(str.ToString()))
-                        {
-                            new WoWFormatLib.Utils.MissingFile(str.ToString());
-                        }
                     }
                     buildingString = false;
                     str = new StringBuilder();
@@ -335,53 +322,56 @@ namespace WoWFormatLib.FileReaders
         {
             WMOGroupFile groupFile = new WMOGroupFile();
 
-            var bin = new BinaryReader(wmo);
-
-            long position = 0;
-            while (position < wmo.Length)
+            using (var bin = new BinaryReader(wmo))
             {
-                wmo.Position = position;
-                var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
-                var chunkSize = bin.ReadUInt32();
-                position = wmo.Position + chunkSize;
-
-                switch (chunkName)
+                long position = 0;
+                while (position < wmo.Length)
                 {
-                    case "MVER":
-                        groupFile.version = bin.Read<MVER>();
-                        if (wmofile.version.version != 17)
-                        {
-                            throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
-                        }
-                        continue;
-                    case "MOGP":
-                        groupFile.mogp = ReadMOGPChunk(chunkSize, bin);
-                        continue;
-                    default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
+                    wmo.Position = position;
+                    var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                    var chunkSize = bin.ReadUInt32();
+                    position = wmo.Position + chunkSize;
+
+                    switch (chunkName)
+                    {
+                        case "MVER":
+                            groupFile.version = bin.Read<MVER>();
+                            if (wmofile.version.version != 17)
+                            {
+                                throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
+                            }
+                            continue;
+                        case "MOGP":
+                            groupFile.mogp = ReadMOGPChunk(chunkSize, bin);
+                            continue;
+                        default:
+                            throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
+                    }
                 }
             }
+            
             return groupFile;
         }
         private MOGP ReadMOGPChunk(uint size, BinaryReader bin)
         {
-            MOGP mogp = new MOGP();
-            mogp.nameOffset = bin.ReadUInt32();
-            mogp.descriptiveNameOffset = bin.ReadUInt32();
-            mogp.flags = (MOGPFlags) bin.ReadUInt32();
-            mogp.boundingBox1 = bin.Read<Vector3>();
-            mogp.boundingBox2 = bin.Read<Vector3>();
-            mogp.ofsPortals = bin.ReadUInt16();
-            mogp.numPortals = bin.ReadUInt16();
-            mogp.numBatchesA = bin.ReadUInt16();
-            mogp.numBatchesB = bin.ReadUInt16();
-            mogp.numBatchesC = bin.ReadUInt32();
-            //mogp.fogIndices = bin.ReadBytes(4);
-            bin.ReadBytes(4);
-            mogp.liquidType = bin.ReadUInt32();
-            mogp.groupID = bin.ReadUInt32();
-            mogp.unk0 = bin.ReadUInt32();
-            mogp.unk1 = bin.ReadUInt32();
+            MOGP mogp = new MOGP()
+            {
+                nameOffset = bin.ReadUInt32(),
+                descriptiveNameOffset = bin.ReadUInt32(),
+                flags = (MOGPFlags)bin.ReadUInt32(),
+                boundingBox1 = bin.Read<Vector3>(),
+                boundingBox2 = bin.Read<Vector3>(),
+                ofsPortals = bin.ReadUInt16(),
+                numPortals = bin.ReadUInt16(),
+                numBatchesA = bin.ReadUInt16(),
+                numBatchesB = bin.ReadUInt16(),
+                numBatchesC = bin.ReadUInt32(),
+                unused = bin.ReadUInt32(),
+                liquidType = bin.ReadUInt32(),
+                groupID = bin.ReadUInt32(),
+                unk0 = bin.ReadUInt32(),
+                unk1 = bin.ReadUInt32()
+            };
 
             using (var stream = new MemoryStream(bin.ReadBytes((int)size)))
             using (var subbin = new BinaryReader(stream))

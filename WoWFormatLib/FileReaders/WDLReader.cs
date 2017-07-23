@@ -19,8 +19,7 @@ namespace WoWFormatLib.FileReaders
             }
             else
             {
-                new MissingFile(filename);
-                return;
+                throw new FileNotFoundException("WDL " + filename + " does not exist");
             }
         }
 
@@ -47,7 +46,6 @@ namespace WoWFormatLib.FileReaders
                         if (!CASC.cascHandler.FileExists(str.ToString()))
                         {
                             Console.WriteLine("WMO file does not exist!!! {0}", str.ToString());
-                            new WoWFormatLib.Utils.MissingFile(str.ToString());
                         }
                     }
                     str = new StringBuilder();

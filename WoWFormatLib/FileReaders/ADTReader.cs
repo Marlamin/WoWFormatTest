@@ -17,7 +17,7 @@ namespace WoWFormatLib.FileReaders
         private Structs.WDT.WDT wdt;
 
         /* ROOT */
-        public void LoadADT(string filename, bool loadSecondaryADTs = true, bool filenamesOnly = false, bool localFile = false)
+        public void LoadADT(string filename, bool loadSecondaryADTs = true)
         {
             m2Files = new List<string>();
             wmoFiles = new List<string>();
@@ -25,46 +25,26 @@ namespace WoWFormatLib.FileReaders
 
             filename = Path.ChangeExtension(filename, ".adt");
 
-            if (!localFile)
+            if (!CASC.cascHandler.FileExists(filename) || !CASC.cascHandler.FileExists(filename.Replace(".adt", "_obj0.adt")) || !CASC.cascHandler.FileExists(filename.Replace(".adt", "_tex0.adt"))) {
+                throw new FileNotFoundException("One or more ADT files for ADT " + filename + " could not be found.");
+            }
+
+            var mapname = filename.Replace("world\\maps\\", "").Substring(0, filename.Replace("world\\maps\\", "").IndexOf("\\"));
+
+            if (CASC.cascHandler.FileExists("world\\maps\\" + mapname + "\\" + mapname + ".wdt"))
             {
-                if (!CASC.cascHandler.FileExists(filename)) { new MissingFile(filename); return; }
-                if (!CASC.cascHandler.FileExists(filename.Replace(".adt", "_obj0.adt"))) { new MissingFile(filename.Replace(".adt", "_obj0.adt")); return; }
-                if (!CASC.cascHandler.FileExists(filename.Replace(".adt", "_obj1.adt"))) { new MissingFile(filename.Replace(".adt", "_obj1.adt")); return; }
-                if (!CASC.cascHandler.FileExists(filename.Replace(".adt", "_tex0.adt"))) { new MissingFile(filename.Replace(".adt", "_tex0.adt")); return; }
+                var wdtr = new WDTReader();
+                wdtr.LoadWDT("world\\maps\\" + mapname + "\\" + mapname + ".wdt");
+                wdt = wdtr.wdtfile;
             }
             else
             {
-                if (!File.Exists(filename)) { throw new Exception("Missing file!"); }
+                throw new Exception("WDT does not exist, need this for MCAL flags!");
             }
 
-            Stream adt;
-
-            if (!localFile)
+            using (var adt = CASC.cascHandler.OpenFile(filename))
+            using (var bin = new BinaryReader(adt))
             {
-                var mapname = filename.Replace("world\\maps\\", "").Substring(0, filename.Replace("world\\maps\\", "").IndexOf("\\"));
-
-                if (CASC.cascHandler.FileExists("world\\maps\\" + mapname + "\\" + mapname + ".wdt"))
-                {
-                    var wdtr = new WDTReader();
-                    wdtr.LoadWDT("world\\maps\\" + mapname + "\\" + mapname + ".wdt");
-                    wdt = wdtr.wdtfile;
-                }
-                else
-                {
-                    throw new Exception("WDT does not exist, need this for MCAL flags!");
-                }
-
-
-                adt = CASC.cascHandler.OpenFile(filename);
-            }
-            else
-            {
-                adt = File.OpenRead(filename);
-            }
-
-            if (filenamesOnly == false)
-            {
-                var bin = new BinaryReader(adt);
                 long position = 0;
                 int MCNKi = 0;
                 adtfile.chunks = new MCNK[16 * 16];
@@ -110,10 +90,8 @@ namespace WoWFormatLib.FileReaders
                             throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position, filename));
                     }
                 }
-
-                adt.Close();
             }
-
+            
             if (loadSecondaryADTs)
             {
                 using (var adtobj0 = CASC.cascHandler.OpenFile(filename.Replace(".adt", "_obj0.adt")))
@@ -297,8 +275,8 @@ namespace WoWFormatLib.FileReaders
         }
         private MMDX ReadMMDXChunk(uint size, BinaryReader bin)
         {
-            //List of M2 filenames, but are still named after MDXs internally. Have to rename!
             var m2FilesChunk = bin.ReadBytes((int)size);
+
             MMDX mmdx = new MMDX();
             var str = new StringBuilder();
 
@@ -340,7 +318,6 @@ namespace WoWFormatLib.FileReaders
         }
         private MWMO ReadMWMOChunk(uint size, BinaryReader bin)
         {
-            //List of WMO filenames
             var wmoFilesChunk = bin.ReadBytes((int)size);
 
             MWMO mwmo = new MWMO();
@@ -362,8 +339,8 @@ namespace WoWFormatLib.FileReaders
                 }
             }
 
-            mwmo.offsets = offsets.ToArray();
             mwmo.filenames = wmoFiles.ToArray();
+            mwmo.offsets = offsets.ToArray();
             return mwmo;
         }
         private MWID ReadMWIDChunk(uint size, BinaryReader bin)
@@ -502,7 +479,6 @@ namespace WoWFormatLib.FileReaders
                     if (!CASC.cascHandler.FileExists(str.ToString()))
                     {
                         Console.WriteLine("BLP file does not exist!!! {0}", str.ToString());
-                        new MissingFile(str.ToString());
                     }
                     str = new StringBuilder();
                 }
