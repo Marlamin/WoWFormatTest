@@ -45,6 +45,9 @@ namespace OBJExporterUI.Renderer
             internal uint texture2;
             internal uint texture3;
 
+            // ADT
+            public float scale;
+
             public uint blendMode;
             internal WoWFormatLib.Structs.M2.TextureFlags flags;
         }
@@ -59,6 +62,7 @@ namespace OBJExporterUI.Renderer
             public uint blendType;
             /* ADT ONLY */
             public int[] alphaMaterialID;
+            public float[] scales;
         }
 
         public struct Doodad

@@ -34,6 +34,13 @@ namespace OBJExporterUI.Renderer
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            // Make sure no textures are bound by previewcontrol
+            for (int j = 0; j < 8; j++)
+            {
+                GL.ActiveTexture(TextureUnit.Texture0 + j);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+            }
+
             // Generate baked terrain texture
             bakeShaderProgram = Shader.CompileShader("baketexture");
 
@@ -89,6 +96,9 @@ namespace OBJExporterUI.Renderer
                     var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "layer" + j);
                     GL.Uniform1(textureLoc, j);
 
+                    var scaleLoc = GL.GetUniformLocation(bakeShaderProgram, "layer" + j + "scale");
+                    GL.Uniform1(scaleLoc, cache.terrain[filename].renderBatches[i].scales[j]);
+
                     GL.ActiveTexture(TextureUnit.Texture0 + j);
                     GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
                 }
@@ -102,9 +112,9 @@ namespace OBJExporterUI.Renderer
                     GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
                 }
 
-                GL.DrawRangeElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].firstFace, (int)cache.terrain[filename].renderBatches[i].firstFace + (int)cache.terrain[filename].renderBatches[i].numFaces, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.terrain[filename].renderBatches[i].firstFace * 4));
+                GL.DrawElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.terrain[filename].renderBatches[i].firstFace * 4);
 
-                for(int j = 0; j < 8; j++)
+                for (int j = 0; j < 8; j++)
                 {
                     GL.ActiveTexture(TextureUnit.Texture0 + j);
                     GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -121,6 +131,8 @@ namespace OBJExporterUI.Renderer
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             GL.BindTexture(TextureTarget.Texture2D, 0);
+
+            cache.terrain.Remove(filename);
         }
     }
 }

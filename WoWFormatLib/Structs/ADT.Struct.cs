@@ -8,6 +8,7 @@ namespace WoWFormatLib.Structs.ADT
         public uint version;
         public MHDR header;
         public MTEX textures;
+        public MTXP[] texParams;
         public MCNK[] chunks;
         public TexMCNK[] texChunks;
         public Obj objects;
@@ -264,4 +265,11 @@ namespace WoWFormatLib.Structs.ADT
         public string[] filenames;
     }
 
+    public struct MTXP
+    {
+        public uint flags;
+        public float height;
+        public float unk2;
+        public uint unk3;
+    }
 }

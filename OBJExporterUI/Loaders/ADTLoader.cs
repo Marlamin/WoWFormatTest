@@ -51,6 +51,7 @@ namespace OBJExporterUI.Loaders
                 Material material = new Material();
                 material.filename = adt.textures.filenames[ti];
                 material.textureID = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
+                material.scale = (float)Math.Pow(2, (adt.texParams[ti].flags & 0xF0) >> 4);
                 materials.Add(material);
             }
 
@@ -107,15 +108,19 @@ namespace OBJExporterUI.Loaders
 
                 var layermats = new List<uint>();
                 var alphalayermats = new List<int>();
+                var layerscales = new List<float>();
+
                 for (int li = 0; li < adt.texChunks[c].layers.Count(); li++)
                 {
                     if(adt.texChunks[c].alphaLayer != null){
                         alphalayermats.Add(BLPLoader.GenerateAlphaTexture(adt.texChunks[c].alphaLayer[li].layer));
                     }
+                    layerscales.Add(materials.Where(material => material.filename == adt.textures.filenames[adt.texChunks[c].layers[li].textureId]).Single().scale);
                     layermats.Add((uint)cache.materials[adt.textures.filenames[adt.texChunks[c].layers[li].textureId].ToLower()]);
                 }
                 batch.materialID = layermats.ToArray();
                 batch.alphaMaterialID = alphalayermats.ToArray();
+                batch.scales = layerscales.ToArray();
 
                 int[] indices = indicelist.ToArray();
                 Vertex[] vertices = verticelist.ToArray();
@@ -127,9 +132,9 @@ namespace OBJExporterUI.Loaders
                 //GL.EnableVertexAttribArray(normalAttrib);
                 //GL.VertexAttribPointer(normalAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 11, sizeof(float) * 0);
 
-                //var colorAttrib = GL.GetAttribLocation(shaderProgram, "color");
-                //GL.EnableVertexAttribArray(colorAttrib);
-                //GL.VertexAttribPointer(colorAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 11, sizeof(float) * 3);
+                var colorAttrib = GL.GetAttribLocation(shaderProgram, "color");
+                GL.EnableVertexAttribArray(colorAttrib);
+                GL.VertexAttribPointer(colorAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 11, sizeof(float) * 3);
 
                 var texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
                 GL.EnableVertexAttribArray(texCoordAttrib);

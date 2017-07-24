@@ -417,8 +417,10 @@ namespace WoWFormatLib.FileReaders
                             adtfile.texChunks[MCNKi] = ReadTexMCNKChunk(chunkSize, bin);
                             MCNKi++;
                             break;
-                        case "MAMP":
                         case "MTXP":
+                            adtfile.texParams = ReadMTXPChunk(adtfile.textures.filenames.Length, bin);
+                            break;
+                        case "MAMP":
                             break;
                         default:
                             throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position));
@@ -490,6 +492,17 @@ namespace WoWFormatLib.FileReaders
 
             txchunk.filenames = blpFiles.ToArray();
             return txchunk;
+        }
+        private MTXP[] ReadMTXPChunk(int count, BinaryReader bin)
+        {
+            MTXP[] txparams = new MTXP[count];
+
+            for(var i = 0; i < count; i++)
+            {
+                txparams[i] = bin.Read<MTXP>();
+            }
+
+            return txparams;
         }
         private MCAL[] ReadMCALSubChunk(uint size, BinaryReader bin, TexMCNK mapchunk)
         {
