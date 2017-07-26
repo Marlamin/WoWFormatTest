@@ -51,7 +51,14 @@ namespace OBJExporterUI.Loaders
                 Material material = new Material();
                 material.filename = adt.textures.filenames[ti];
                 material.textureID = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
-                material.scale = (float)Math.Pow(2, (adt.texParams[ti].flags & 0xF0) >> 4);
+                if(adt.texParams != null && adt.texParams.Count() >= ti)
+                {
+                    material.scale = (float)Math.Pow(2, (adt.texParams[ti].flags & 0xF0) >> 4);
+                }
+                else
+                {
+                    material.scale = 0.0f;
+                }
                 materials.Add(material);
             }
 
