@@ -46,6 +46,7 @@
     <Compile Include="DBC\Structs.cs" />
     <Compile Include="FileReaders\ADTReader.cs" />
     <Compile Include="FileReaders\BLPReader.cs" />
+    <Compile Include="FileReaders\BLSReader.cs" />
     <Compile Include="FileReaders\M2Reader.cs" />
     <Compile Include="FileReaders\SKINReader.cs" />
     <Compile Include="FileReaders\TEXReader.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Structs\ADT.struct.cs" />
     <Compile Include="Structs\ADTobj.struct.cs" />
     <Compile Include="Structs\ADTtex.struct.cs" />
+    <Compile Include="Structs\BLS.struct.cs" />
     <Compile Include="Structs\M2.struct.cs" />
     <Compile Include="Structs\SKIN.struct.cs" />
     <Compile Include="Structs\WDL.struct.cs" />
