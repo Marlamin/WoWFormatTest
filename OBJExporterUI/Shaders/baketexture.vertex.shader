@@ -7,9 +7,9 @@ uniform mat4 rotation_matrix;
 uniform vec3 firstPos;
 in vec3 position;
 in vec2 texCoord;
-in vec3 color;
+in vec4 color;
 
-out vec3 VColor;
+out vec4 VColor;
 out vec2 TexCoord;
 
 void main()

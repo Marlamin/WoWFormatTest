@@ -81,13 +81,13 @@ namespace OBJExporterUI.Loaders
                     {
                         Vertex v = new Vertex();
                         v.Normal = new Vector3(chunk.normals.normal_0[idx], chunk.normals.normal_1[idx], chunk.normals.normal_2[idx]);
-                        if (chunk.vertexShading.red != null && chunk.vertexShading.red[idx] != 127)
+                        if (chunk.vertexShading.red != null)
                         {
-                            v.Color = new Vector3(chunk.vertexShading.blue[idx] / 255.0f, chunk.vertexShading.green[idx] / 255.0f, chunk.vertexShading.red[idx] / 255.0f);
+                            v.Color = new Vector4(chunk.vertexShading.blue[idx] / 255.0f, chunk.vertexShading.green[idx] / 255.0f, chunk.vertexShading.red[idx] / 255.0f, chunk.vertexShading.alpha[idx] / 255.0f);
                         }
                         else
                         {
-                            v.Color = new Vector3(1.0f, 1.0f, 1.0f);
+                            v.Color = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
                         }
 
                         v.TexCoord = new Vector2((j + (((i % 2) != 0) ? 0.5f : 0f)) / 8f, (i * 0.5f) / 8f);
@@ -133,7 +133,7 @@ namespace OBJExporterUI.Loaders
                 Vertex[] vertices = verticelist.ToArray();
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, result.vertexBuffer);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Count() * 11 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Count() * 12 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
                 //var normalAttrib = GL.GetAttribLocation(shaderProgram, "normal");
                 //GL.EnableVertexAttribArray(normalAttrib);
@@ -141,15 +141,15 @@ namespace OBJExporterUI.Loaders
 
                 var colorAttrib = GL.GetAttribLocation(shaderProgram, "color");
                 GL.EnableVertexAttribArray(colorAttrib);
-                GL.VertexAttribPointer(colorAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 11, sizeof(float) * 3);
+                GL.VertexAttribPointer(colorAttrib, 4, VertexAttribPointerType.Float, false, sizeof(float) * 12, sizeof(float) * 3);
 
                 var texCoordAttrib = GL.GetAttribLocation(shaderProgram, "texCoord");
                 GL.EnableVertexAttribArray(texCoordAttrib);
-                GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 11, sizeof(float) * 6);
+                GL.VertexAttribPointer(texCoordAttrib, 2, VertexAttribPointerType.Float, false, sizeof(float) * 12, sizeof(float) * 7);
 
                 var posAttrib = GL.GetAttribLocation(shaderProgram, "position");
                 GL.EnableVertexAttribArray(posAttrib);
-                GL.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 11, sizeof(float) * 8);
+                GL.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, sizeof(float) * 12, sizeof(float) * 9);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, result.indiceBuffer);
                 GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(int)), indices, BufferUsageHint.StaticDraw);

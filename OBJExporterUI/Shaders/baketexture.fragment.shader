@@ -1,7 +1,7 @@
 ﻿#version 330
 
 in vec2 TexCoord;
-in vec3 VColor;
+in vec4 VColor;
 out vec4 outColor;
 
 uniform sampler2D layer0;
@@ -29,5 +29,5 @@ void main()
 	vec3 alphaTexture2 = texture(alphaLayer2, TexCoord).rgb;
 	vec3 alphaTexture3 = texture(alphaLayer3, TexCoord).rgb;
 
-	outColor = vec4(VColor, 1.0) * vec4(texture0 * (1.0 - (alphaTexture1 + alphaTexture2 + alphaTexture3)) + texture1 * alphaTexture1 + texture2 * alphaTexture2 + texture3 * alphaTexture3, 1.0);
+	outColor = VColor * vec4(texture0 * (1.0 - (alphaTexture1 + alphaTexture2 + alphaTexture3)) + texture1 * alphaTexture1 + texture2 * alphaTexture2 + texture3 * alphaTexture3, 1.0);
 }

@@ -308,7 +308,7 @@ namespace OBJExporterUI
             modelListBox.DataContext = models;
             textureListBox.DataContext = textures;
 
-            previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
+            //previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
             Renderer.RenderMinimap.Generate("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
 #endif
