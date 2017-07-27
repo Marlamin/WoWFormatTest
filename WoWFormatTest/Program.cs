@@ -16,11 +16,14 @@ namespace WoWFormatLib
             //Console.WriteLine("CASC loaded!");
 
             var reader = new BLSReader();
-            reader.LoadBLS("shaders/pixel/ps_5_0/terrain.bls");
+            reader.LoadBLS("shaders/pixel/glfs_420/terrain.bls");
 
             var shader = reader.shaderFile;
 
-            Console.WriteLine("Shader loaded!");
+            for(var i = 0; i < shader.nShaders; i++)
+            {
+                File.WriteAllText(i + ".txt", shader.shaderBlocks[i].shaderContent);
+            }
         }
     }
 }
