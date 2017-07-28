@@ -15,7 +15,6 @@ namespace OBJExporterUI.Renderer
     class RenderMinimap
     {
         private static CacheStorage cache = new CacheStorage();
-        private static int bakeShaderProgram;
 
         public static void Generate(string filename, string outName)
         {
@@ -42,7 +41,7 @@ namespace OBJExporterUI.Renderer
             }
 
             // Generate baked terrain texture
-            bakeShaderProgram = Shader.CompileShader("baketexture");
+            var bakeShaderProgram = Shader.CompileShader("baketexture");
 
             GL.UseProgram(bakeShaderProgram);
 
@@ -129,10 +128,32 @@ namespace OBJExporterUI.Renderer
             bmp.RotateFlip(RotateFlipType.Rotate270FlipX);
             bmp.Save(outName, System.Drawing.Imaging.ImageFormat.Png);
 
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            GL.BindTexture(TextureTarget.Texture2D, 0);
+            // Cleanup 
+
+            for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
+            {
+
+                for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
+                {
+                    GL.DeleteTexture(cache.terrain[filename].renderBatches[i].materialID[j]);
+                }
+
+                for (int j = 0; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
+                {
+                    GL.DeleteTexture(cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
+                }
+            }
+
+            GL.DeleteBuffer(cache.terrain[filename].vertexBuffer);
+            GL.DeleteBuffer(cache.terrain[filename].indiceBuffer);
+            GL.DeleteVertexArray(cache.terrain[filename].vao);
 
             cache.terrain.Remove(filename);
+
+            GL.DeleteFramebuffer(frameBuffer);
+            GL.DeleteShader(bakeShaderProgram);
+
+            win.Close();
         }
     }
 }

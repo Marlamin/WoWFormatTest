@@ -6,11 +6,13 @@ uniform mat4 rotation_matrix;
 
 in vec3 position;
 in vec2 texCoord;
+in vec4 color;
 
 out vec2 TexCoord;
-
+out vec4 VColor;
 void main()
 {
 	gl_Position = projection_matrix * modelview_matrix * rotation_matrix * vec4(position, 1);
 	TexCoord = texCoord;
+	VColor = color;
 }

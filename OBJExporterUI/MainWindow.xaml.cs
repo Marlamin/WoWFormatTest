@@ -308,9 +308,9 @@ namespace OBJExporterUI
             modelListBox.DataContext = models;
             textureListBox.DataContext = textures;
 
-            //previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
+            previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
-            Renderer.RenderMinimap.Generate("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
+            //Renderer.RenderMinimap.Generate("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
 #endif
         }
 
@@ -906,7 +906,9 @@ namespace OBJExporterUI
 
             var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
 
+            previewControl.renderCanvas.Context.MakeCurrent(null);
             Renderer.RenderMinimap.Generate(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".bmp");
+            previewControl.renderCanvas.MakeCurrent();
         }
     }
 }

@@ -10,7 +10,7 @@ namespace OBJExporterUI
 {
     public class PreviewControl
     {
-        private GLControl renderCanvas;
+        public GLControl renderCanvas;
 
         private bool ready = false;
         private string modelType;
@@ -118,6 +118,9 @@ namespace OBJExporterUI
         {
             if (!ready) return;
 
+            // This sucks, need to give context back nicely after baking minimaps
+            // renderCanvas.MakeCurrent();
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.Viewport(0, 0, renderCanvas.Width, renderCanvas.Height);
@@ -135,7 +138,7 @@ namespace OBJExporterUI
                 for (int i = 0; i < cache.doodadBatches[filename].submeshes.Length; i++)
                 {
                     GL.BindTexture(TextureTarget.Texture2D, cache.doodadBatches[filename].submeshes[i].material);
-                    GL.DrawRangeElements(PrimitiveType.Triangles, cache.doodadBatches[filename].submeshes[i].firstFace, (cache.doodadBatches[filename].submeshes[i].firstFace + cache.doodadBatches[filename].submeshes[i].numFaces), (int)cache.doodadBatches[filename].submeshes[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.doodadBatches[filename].submeshes[i].firstFace * 4));
+                    GL.DrawElements(PrimitiveType.Triangles, (int)cache.doodadBatches[filename].submeshes[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.doodadBatches[filename].submeshes[i].firstFace * 4);
                 }
             }
             else if (modelType == "wmo")
@@ -212,7 +215,7 @@ namespace OBJExporterUI
 
             if (error != "NoError")
             {
-                throw new Exception(error);
+                Console.WriteLine(error);
             }
 
             GL.BindVertexArray(0);
