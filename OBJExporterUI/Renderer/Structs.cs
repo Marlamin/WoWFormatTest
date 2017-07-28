@@ -13,6 +13,8 @@ namespace OBJExporterUI.Renderer
             public RenderBatch[] renderBatches;
             public Doodad[] doodads;
             public WorldModelBatch[] worldModelBatches;
+            public Vector4 heights;
+            public Vector4 weights;
         }
 
         public struct Vertex
@@ -47,6 +49,9 @@ namespace OBJExporterUI.Renderer
 
             // ADT
             public float scale;
+            public float heightScale;
+            public float heightOffset;
+            public int heightTexture;
 
             public uint blendMode;
             internal WoWFormatLib.Structs.M2.TextureFlags flags;
@@ -63,6 +68,10 @@ namespace OBJExporterUI.Renderer
             /* ADT ONLY */
             public int[] alphaMaterialID;
             public float[] scales;
+            public int[] heightMaterialIDs;
+
+            public Vector4 heightScales;
+            public Vector4 heightOffsets;
         }
 
         public struct Doodad

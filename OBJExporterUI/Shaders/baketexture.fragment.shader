@@ -4,6 +4,9 @@ in vec2 TexCoord;
 in vec4 VColor;
 out vec4 outColor;
 
+uniform vec4 heightScales;
+uniform vec4 heightOffsets;
+
 uniform sampler2D layer0;
 uniform sampler2D layer1;
 uniform sampler2D layer2;

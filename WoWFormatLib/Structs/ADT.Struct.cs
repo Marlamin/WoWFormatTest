@@ -269,7 +269,7 @@ namespace WoWFormatLib.Structs.ADT
     {
         public uint flags;
         public float height;
-        public float unk2;
+        public float offset;
         public uint unk3;
     }
 }

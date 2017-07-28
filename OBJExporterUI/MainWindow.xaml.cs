@@ -310,7 +310,9 @@ namespace OBJExporterUI
 
             previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
-            //Renderer.RenderMinimap.Generate("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
+            previewControl.renderCanvas.Context.MakeCurrent(null);
+            Renderer.RenderMinimap.Generate("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
+            previewControl.renderCanvas.MakeCurrent();
 #endif
         }
 
@@ -907,7 +909,10 @@ namespace OBJExporterUI
             var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
 
             previewControl.renderCanvas.Context.MakeCurrent(null);
-            Renderer.RenderMinimap.Generate(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".bmp");
+            if (CASC.cascHandler.FileExists(adtFile))
+            {
+                Renderer.RenderMinimap.Generate(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".bmp");
+            }
             previewControl.renderCanvas.MakeCurrent();
         }
     }

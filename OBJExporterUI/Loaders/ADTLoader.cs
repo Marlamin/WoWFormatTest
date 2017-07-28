@@ -51,9 +51,31 @@ namespace OBJExporterUI.Loaders
                 Material material = new Material();
                 material.filename = adt.textures.filenames[ti];
                 material.textureID = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
-                if(adt.texParams != null && adt.texParams.Count() >= ti)
+
+
+                if (adt.texParams != null && adt.texParams.Count() >= ti)
                 {
                     material.scale = (float)Math.Pow(2, (adt.texParams[ti].flags & 0xF0) >> 4);
+                    if(adt.texParams[ti].height != 0.0 || adt.texParams[ti].offset != 1.0)
+                    {
+                        material.heightScale = adt.texParams[ti].height;
+                        material.heightOffset = adt.texParams[ti].offset;
+
+                        var heightName = adt.textures.filenames[ti].Replace(".blp", "_h.blp");
+                        if (!WoWFormatLib.Utils.CASC.cascHandler.FileExists(heightName))
+                        {
+                            throw new Exception(heightName + " does not exist!");
+                        }
+                        else
+                        {
+                            material.heightTexture = BLPLoader.LoadTexture(heightName, cache);
+                        }
+                    }
+                    else
+                    {
+                        material.heightScale = 0.0f;
+                        material.heightOffset = 1.0f;
+                    }
                 }
                 else
                 {
@@ -116,18 +138,32 @@ namespace OBJExporterUI.Loaders
                 var layermats = new List<uint>();
                 var alphalayermats = new List<int>();
                 var layerscales = new List<float>();
+                var layerheights = new List<int>();
+
+                batch.heightScales = new Vector4();
+                batch.heightOffsets = new Vector4();
 
                 for (int li = 0; li < adt.texChunks[c].layers.Count(); li++)
                 {
                     if(adt.texChunks[c].alphaLayer != null){
                         alphalayermats.Add(BLPLoader.GenerateAlphaTexture(adt.texChunks[c].alphaLayer[li].layer));
                     }
-                    layerscales.Add(materials.Where(material => material.filename == adt.textures.filenames[adt.texChunks[c].layers[li].textureId]).Single().scale);
                     layermats.Add((uint)cache.materials[adt.textures.filenames[adt.texChunks[c].layers[li].textureId].ToLower()]);
+
+                    var curMat = materials.Where(material => material.filename == adt.textures.filenames[adt.texChunks[c].layers[li].textureId]).Single();
+
+                    layerscales.Add(curMat.scale);
+                    layerheights.Add(curMat.heightTexture);
+
+                    batch.heightScales[li] = curMat.heightScale;
+                    batch.heightOffsets[li] = curMat.heightOffset;
+
                 }
+
                 batch.materialID = layermats.ToArray();
                 batch.alphaMaterialID = alphalayermats.ToArray();
                 batch.scales = layerscales.ToArray();
+                batch.heightMaterialIDs = layerheights.ToArray();
 
                 int[] indices = indicelist.ToArray();
                 Vertex[] vertices = verticelist.ToArray();

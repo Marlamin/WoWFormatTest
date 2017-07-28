@@ -119,7 +119,7 @@ namespace OBJExporterUI
             if (!ready) return;
 
             // This sucks, need to give context back nicely after baking minimaps
-            // renderCanvas.MakeCurrent();
+            renderCanvas.MakeCurrent();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
