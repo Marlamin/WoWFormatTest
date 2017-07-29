@@ -195,23 +195,48 @@ namespace OBJExporterUI
 
                 for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                 {
+                    var heightScaleLoc = GL.GetUniformLocation(adtShaderProgram, "pc_heightScale");
+                    GL.Uniform4(heightScaleLoc, cache.terrain[filename].renderBatches[i].heightScales);
+
+                    var heightOffsetLoc = GL.GetUniformLocation(adtShaderProgram, "pc_heightOffset");
+                    GL.Uniform4(heightOffsetLoc, cache.terrain[filename].renderBatches[i].heightOffsets);
+
                     for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
                     {
-                        var textureLoc = GL.GetUniformLocation(adtShaderProgram, "layer" + j);
+                        var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_layer" + j);
                         GL.Uniform1(textureLoc, j);
+
+                        var scaleLoc = GL.GetUniformLocation(adtShaderProgram, "layer" + j + "scale");
+                        GL.Uniform1(scaleLoc, cache.terrain[filename].renderBatches[i].scales[j]);
 
                         GL.ActiveTexture(TextureUnit.Texture0 + j);
                         GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
                     }
 
-                    // TODO: Merge alpha layers into one rgb texture
                     for (int j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
                     {
-                        var textureLoc = GL.GetUniformLocation(adtShaderProgram, "alphaLayer" + j);
+                        var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_blend" + j);
                         GL.Uniform1(textureLoc, 3 + j);
 
                         GL.ActiveTexture(TextureUnit.Texture3 + j);
                         GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
+                    }
+
+                    for (int j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
+                    {
+                        var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_height" + j);
+                        GL.Uniform1(textureLoc, 7 + j);
+
+                        GL.ActiveTexture(TextureUnit.Texture7 + j);
+                        GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].heightMaterialIDs[j]);
+                    }
+
+                    GL.DrawElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.terrain[filename].renderBatches[i].firstFace * 4);
+
+                    for (int j = 0; j < 11; j++)
+                    {
+                        GL.ActiveTexture(TextureUnit.Texture0 + j);
+                        GL.BindTexture(TextureTarget.Texture2D, 0);
                     }
 
                     GL.DrawRangeElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].firstFace, (int)cache.terrain[filename].renderBatches[i].firstFace + (int)cache.terrain[filename].renderBatches[i].numFaces, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.terrain[filename].renderBatches[i].firstFace * 4));
