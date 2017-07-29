@@ -125,12 +125,9 @@ namespace OBJExporterUI
 
         private void RenderCanvas_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
         {
-            if (!ready) return;
-
-            // This sucks, need to give context back nicely after baking minimaps
-            renderCanvas.MakeCurrent();
-
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            if (!ready) return;
 
             GL.Viewport(0, 0, renderCanvas.Width, renderCanvas.Height);
             GL.Enable(EnableCap.Texture2D);

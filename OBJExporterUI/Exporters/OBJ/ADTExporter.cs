@@ -1,6 +1,4 @@
 ﻿using OpenTK;
-using OpenTK.Graphics.OpenGL;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +7,6 @@ using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
 using WoWFormatLib.Utils;
-using static OBJExporterUI.Renderer.Structs;
 
 namespace OBJExporterUI.Exporters.OBJ
 {
@@ -77,48 +74,7 @@ namespace OBJExporterUI.Exporters.OBJ
                         continue;
                     }
 
-                    //if (CASC.cascHandler.FileExists("world\\maptextures\\" + mapname + "\\" + mapname + "_" + x + "_" + y + ".blp"))
-                    //{
-                    //    materials.Add(materials.Count() + 1, "mat" + y.ToString() + x.ToString());
-
-                    //    var blpreader = new BLPReader();
-
-                    //    blpreader.LoadBLP(curfile.Replace("maps", "maptextures").Replace(".adt", ".blp"));
-
-                    //    try
-                    //    {
-                    //        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + y.ToString() + x.ToString() + ".png"));
-                    //    }
-                    //    catch (Exception e)
-                    //    {
-                    //        Console.WriteLine(e.Message);
-                    //    }
-                    //}else
-                    //{
-                    //    Console.WriteLine("No maptextures, this map will have missing textures.");
-                    //}
-
-                    // called after exporter is done because shit threading
-                    //Renderer.RenderMinimap.Generate(curfile, Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + y.ToString() + x.ToString() + ".png"));
-
                     materials.Add(1, "mat" + y.ToString() + x.ToString());
-                    //List<Material> materials = new List<Material>();
-
-                    //for (int ti = 0; ti < reader.adtfile.textures.filenames.Count(); ti++)
-
-                    //{
-
-                    //    Material material = new Material();
-
-                    //    material.filename = reader.adtfile.textures.filenames[ti];
-
-                    //    //if (!WoWFormatLib.Utils.CASC.FileExists(material.filename)) { continue; }
-
-                    //    material.textureID = BLPLoader.LoadTexture(reader.adtfile.textures.filenames[ti], cache);
-
-                    //    materials.Add(material);
-
-                    //}
 
                     var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
                     var initialChunkX = reader.adtfile.chunks[0].header.position.X;
@@ -208,74 +164,51 @@ namespace OBJExporterUI.Exporters.OBJ
                         batch.numFaces = (uint)(indicelist.Count()) - batch.firstFace;
 
                         var layermats = new List<uint>();
-                        var alphalayermats = new List<int>();
 
-                        for (int li = 0; li < reader.adtfile.texChunks[c].layers.Count(); li++)
-                        {
-                            //if (reader.adtfile.texChunks[c].alphaLayer != null)
-                            //{
-                            //    //alphalayermats.Add(BLPLoader.GenerateAlphaTexture(reader.adtfile.texChunks[c].alphaLayer[li].layer));
-                            //    var bmp = new System.Drawing.Bitmap(64, 64);
-                            //    var data = bmp.LockBits(new System.Drawing.Rectangle(0, 0, 64, 64), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                            //    int stride = data.Stride;
-                            //    var values = reader.adtfile.texChunks[c].alphaLayer[li].layer;
-                            //    unsafe
-                            //    {
-                            //        byte* ptr = (byte*)data.Scan0;
-                            //        for (int ax = 0; ax < 64; ax++)
-                            //        {
-                            //            for (int ay = 0; ay < 64; ay++)
-                            //            {
-                            //                var color = System.Drawing.Color.FromArgb(values[ax * 64 + ay], values[ax * 64 + ay], values[ax * 64 + ay], values[ax * 64 + ay]);
-                            //                ptr[(y * 4) + x * stride] = color.B;
-                            //                ptr[(y * 4) + x * stride + 1] = color.G;
-                            //                ptr[(y * 4) + x * stride + 2] = color.R;
-                            //                ptr[(y * 4) + x * stride + 3] = color.A;
-                            //            }
-                            //        }
-                            //    }
-                            //    bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_" + c + "_" + li + ".png"));
-                            //}
-                        }
 
                         renderBatches.Add(batch);
                     }
-
-                    var doodadSW = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_ModelPlacementInformation.csv"));
-                    doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationX;RotationY;RotationZ;ScaleFactor;ModelId;Type");
-
-                    exportworker.ReportProgress(25, "Exporting WMOs");
-
-                    for (int mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
+                    ConfigurationManager.RefreshSection("appSettings");
+                    Console.WriteLine(ConfigurationManager.AppSettings["exportEverything"]);
+                    if(ConfigurationManager.AppSettings["exportEverything"] == "True")
                     {
-                        var wmo = reader.adtfile.objects.worldModels.entries[mi];
+                        var doodadSW = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_ModelPlacementInformation.csv"));
+                        doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationX;RotationY;RotationZ;ScaleFactor;ModelId;Type");
 
-                        var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
+                        exportworker.ReportProgress(25, "Exporting WMOs");
 
-                        if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj"))
+                        for (int mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
                         {
-                            WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                            var wmo = reader.adtfile.objects.worldModels.entries[mi];
+
+                            var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
+
+                            if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj"))
+                            {
+                                WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                            }
+
+                            doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";;" + wmo.uniqueId + ";wmo");
                         }
 
-                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";;" + wmo.uniqueId + ";wmo");
-                    }
+                        exportworker.ReportProgress(50, "Exporting M2s");
 
-                    exportworker.ReportProgress(50, "Exporting M2s");
+                        for (int mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
+                        {
+                            var doodad = reader.adtfile.objects.models.entries[mi];
 
-                    for (int mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
-                    {
-                        var doodad = reader.adtfile.objects.models.entries[mi];
+                            var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
 
-                        var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
+                            if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj"))
+                            {
+                                M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                            }
 
-                        if(!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")){
-                            M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                            doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId + ";m2");
                         }
 
-                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId + ";m2");
+                        doodadSW.Close();
                     }
-
-                    doodadSW.Close();
                 }
             }
 

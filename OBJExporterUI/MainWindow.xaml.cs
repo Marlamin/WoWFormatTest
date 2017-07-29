@@ -309,7 +309,7 @@ namespace OBJExporterUI
             modelListBox.DataContext = models;
             textureListBox.DataContext = textures;
 
-            //previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
+            previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
             //previewControl.BakeTexture("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
 #endif
@@ -571,10 +571,7 @@ namespace OBJExporterUI
 
             exportworker.RunWorkerAsync(tempList);
 
-            // Hackfix because I can't seem to get GL and backgroundworkers due to work well together due to threading
-            progressBar.Value = 10;
-            loadingLabel.Content = "Rendering terrain texture..";
-
+            // Hackfix because I can't seem to get GL and backgroundworkers due to work well together due to threading, will freeze everything
             var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
 
@@ -934,6 +931,13 @@ namespace OBJExporterUI
 
                 bakeTextureButton.IsEnabled = true;
             }
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["exportEverything"].Value = exportEverything.IsChecked.ToString();
+            config.Save(ConfigurationSaveMode.Full);
         }
     }
 }

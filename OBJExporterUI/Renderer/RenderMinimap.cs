@@ -3,12 +3,6 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OBJExporterUI.Loaders;
 using System.Drawing;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using OpenTK.Graphics;
 
 namespace OBJExporterUI.Renderer
 {

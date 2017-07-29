@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using WoWFormatLib.FileReaders;
 using OpenTK;
 using System.IO;
