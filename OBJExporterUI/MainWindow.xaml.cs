@@ -311,7 +311,7 @@ namespace OBJExporterUI
 
             //previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
-            //previewControl.BakeTexture("world\\maps\\troll raid\\troll raid_23_22.adt", "troll raid_23_22.png");
+            previewControl.BakeTexture("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
 #endif
         }
 

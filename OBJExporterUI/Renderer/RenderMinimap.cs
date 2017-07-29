@@ -26,14 +26,6 @@ namespace OBJExporterUI.Renderer
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            // Make sure no textures are bound by previewcontrol
-            for (int j = 0; j < 8; j++)
-            {
-                GL.ActiveTexture(TextureUnit.Texture0 + j);
-                GL.BindTexture(TextureTarget.Texture2D, 0);
-            }
-
-            // Generate baked terrain texture
             var bakeShaderProgram = Shader.CompileShader("baketexture");
 
             GL.UseProgram(bakeShaderProgram);
@@ -69,8 +61,8 @@ namespace OBJExporterUI.Renderer
             GL.UniformMatrix4(projectionMatrixLocation, false, ref projectionMatrix);
 
             var modelviewMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "modelview_matrix");
-            var eye = new Vector3(-TileSize / 2 , -TileSize/2, 100f);
-            var target = new Vector3(-TileSize/2, -TileSize/2, 99.9999f);
+            var eye = new Vector3(-TileSize / 2 , -TileSize/2, 400f);
+            var target = new Vector3(-TileSize/2, -TileSize/2, 399.9999f);
             Matrix4 modelViewMatrix = Matrix4.LookAt(eye, target, new Vector3(0f, 1f, 0f));
             GL.UniformMatrix4(modelviewMatrixLocation, false, ref modelViewMatrix);
 
@@ -121,16 +113,16 @@ namespace OBJExporterUI.Renderer
 
                 GL.DrawElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.terrain[filename].renderBatches[i].firstFace * 4);
 
-                var error = GL.GetError().ToString();
-                if (error != "NoError")
-                {
-                    Console.WriteLine(error);
-                }
-
                 for (int j = 0; j < 11; j++)
                 {
                     GL.ActiveTexture(TextureUnit.Texture0 + j);
                     GL.BindTexture(TextureTarget.Texture2D, 0);
+                }
+
+                var error = GL.GetError().ToString();
+                if (error != "NoError")
+                {
+                    Console.WriteLine(error);
                 }
             }
 
