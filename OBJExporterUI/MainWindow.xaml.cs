@@ -28,7 +28,6 @@ namespace OBJExporterUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string outdir;
         private readonly BackgroundWorker worker = new BackgroundWorker();
         private readonly BackgroundWorker exportworker = new BackgroundWorker();
         private readonly BackgroundWorkerEx cascworker = new BackgroundWorkerEx();
@@ -46,6 +45,8 @@ namespace OBJExporterUI
 
         private Dictionary<int, NiceMapEntry> mapNames = new Dictionary<int, NiceMapEntry>();
         private List<string> mapFilters = new List<string>();
+
+        private string outdir;
 
         private static ListBox tileBox;
 
@@ -70,141 +71,38 @@ namespace OBJExporterUI
 
             tileBox = tileListBox;
 
-            Title = "OBJ Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Title = "Marlamin's OBJ Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             previewControl = new PreviewControl(renderCanvas);
             CompositionTarget.Rendering += previewControl.CompositionTarget_Rendering;
             wfHost.Initialized += previewControl.WindowsFormsHost_Initialized;
 
-            exportworker.DoWork += exportworker_DoWork;
-            exportworker.RunWorkerCompleted += exportworker_RunWorkerCompleted;
-            exportworker.ProgressChanged += worker_ProgressChanged;
+            exportworker.DoWork += Exportworker_DoWork;
+            exportworker.RunWorkerCompleted += Exportworker_RunWorkerCompleted;
+            exportworker.ProgressChanged += Worker_ProgressChanged;
             exportworker.WorkerReportsProgress = true;
 
-            cascworker.DoWork += cascworker_DoWork;
-            cascworker.RunWorkerCompleted += cascworker_RunWorkerCompleted;
-            cascworker.ProgressChanged += worker_ProgressChanged;
+            cascworker.DoWork += CASCworker_DoWork;
+            cascworker.RunWorkerCompleted += CASCworker_RunWorkerCompleted;
+            cascworker.ProgressChanged += Worker_ProgressChanged;
             cascworker.WorkerReportsProgress = true;
 
-            fileworker.DoWork += fileworker_DoWork;
-            fileworker.RunWorkerCompleted += fileworker_RunWorkerCompleted;
-            fileworker.ProgressChanged += fileworker_ProgressChanged;
+            fileworker.DoWork += Fileworker_DoWork;
+            fileworker.RunWorkerCompleted += Fileworker_RunWorkerCompleted;
+            fileworker.ProgressChanged += Fileworker_ProgressChanged;
             fileworker.WorkerReportsProgress = true;
         }
-
-       
-        public static void SelectTile(string tile)
+        private void Window_ContentRendered(object sender, EventArgs e)
         {
-            Console.WriteLine("Got selected tile" + tile);
-            tileBox.SelectedValue = tile;
+            outdir = ConfigurationManager.AppSettings["outdir"];
+            cascworker.RunWorkerAsync();
         }
 
-        private void cascworker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            var basedir = ConfigurationManager.AppSettings["basedir"];
-            if (Directory.Exists(basedir))
-            {
-                if (File.Exists(Path.Combine(basedir, ".build.info")))
-                {
-                    cascworker.ReportProgress(0, "Loading WoW from disk..");
-                    CASC.InitCasc(cascworker, basedir, ConfigurationManager.AppSettings["program"]);
-                }
-                else
-                {
-                    throw new Exception("Unable to find World of Warcraft client!");
-                }
-            }
-            else
-            {
-                cascworker.ReportProgress(0, "Loading WoW from web..");
-                CASC.InitCasc(cascworker, null, ConfigurationManager.AppSettings["program"]);
-            }
-        }
-
-        private void previewButton_Click(object sender, RoutedEventArgs e)
+        /* Generic UI */
+        private void PreviewButton_Click(object sender, RoutedEventArgs e)
         {
             previewControl.LoadModel((string)modelListBox.SelectedItem);
-            //using (PreviewWindow tw = new PreviewWindow((string)modelListBox.SelectedItem))
-            //{
-            //    tw.Run(30.0, 60.0);
-            //}
         }
-
-        private void exportButton_Click(object sender, RoutedEventArgs e)
-        {
-            if ((string)exportButton.Content == "Crawl maptile for models")
-            {
-                var filterSplit = filterTextBox.Text.Remove(0, 8).Split('_');
-                var filename = "world\\maps\\" + filterSplit[0] + "\\" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt";
-
-                fileworker.RunWorkerAsync(filename);
-            }
-            else
-            {
-                progressBar.Value = 0;
-                progressBar.Visibility = Visibility.Visible;
-                loadingLabel.Content = "";
-                loadingLabel.Visibility = Visibility.Visible;
-                wmoCheckBox.IsEnabled = false;
-                m2CheckBox.IsEnabled = false;
-                exportButton.IsEnabled = false;
-                modelListBox.IsEnabled = false;
-
-                exportworker.RunWorkerAsync(modelListBox.SelectedItems);
-            }
-        }
-
-        private void fileworker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            modelListBox.DataContext = (List<string>)e.UserState;
-        }
-
-        private void fileworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            exportButton.Content = "Export model to OBJ!";
-        }
-
-        private void fileworker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            var results = new List<string>();
-            var remaining = new List<string>();
-            var progress = 0;
-
-            remaining.Add((string)e.Argument);
-
-            while (remaining.Count > 0)
-            {
-                var filename = remaining[0];
-                if (filename.EndsWith(".wmo"))
-                {
-                    var wmo = new WoWFormatLib.FileReaders.WMOReader();
-                    wmo.LoadWMO(filename);
-
-
-                    // Loop through filenames from WMO
-                }
-                else if (filename.EndsWith(".adt"))
-                {
-                    var adt = new WoWFormatLib.FileReaders.ADTReader();
-                    adt.LoadADT(filename);
-
-                    foreach (var entry in adt.adtfile.objects.wmoNames.filenames)
-                    {
-                        results.Add(entry.ToLower());
-                    }
-
-                    foreach (var entry in adt.adtfile.objects.m2Names.filenames)
-                    {
-                        results.Add(entry.ToLower());
-                    }
-                }
-
-                remaining.Remove(filename);
-            }
-
-            fileworker.ReportProgress(progress, results);
-        }
-
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             List<string> filtered = new List<string>();
@@ -262,19 +160,36 @@ namespace OBJExporterUI
             }
 
         }
-
-        private void Window_ContentRendered(object sender, EventArgs e)
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            outdir = ConfigurationManager.AppSettings["outdir"];
+            if ((string)exportButton.Content == "Crawl maptile for models")
+            {
+                var filterSplit = filterTextBox.Text.Remove(0, 8).Split('_');
+                var filename = "world\\maps\\" + filterSplit[0] + "\\" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt";
 
-            cascworker.RunWorkerAsync();
+                fileworker.RunWorkerAsync(filename);
+            }
+            else
+            {
+                progressBar.Value = 0;
+                progressBar.Visibility = Visibility.Visible;
+                loadingLabel.Content = "";
+                loadingLabel.Visibility = Visibility.Visible;
+                wmoCheckBox.IsEnabled = false;
+                m2CheckBox.IsEnabled = false;
+                exportButton.IsEnabled = false;
+                modelListBox.IsEnabled = false;
+
+                exportworker.RunWorkerAsync(modelListBox.SelectedItems);
+            }
         }
 
-        private void cascworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        /* Workers */
+        private void CASCworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            worker.DoWork += worker_DoWork;
-            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            worker.ProgressChanged += worker_ProgressChanged;
+            worker.DoWork += Worker_DoWork;
+            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+            worker.ProgressChanged += Worker_ProgressChanged;
             worker.WorkerReportsProgress = true;
 
             models = new List<string>();
@@ -288,8 +203,78 @@ namespace OBJExporterUI
 
             MainMenu.IsEnabled = true;
         }
+        private void CASCworker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var basedir = ConfigurationManager.AppSettings["basedir"];
+            if (Directory.Exists(basedir))
+            {
+                if (File.Exists(Path.Combine(basedir, ".build.info")))
+                {
+                    cascworker.ReportProgress(0, "Loading WoW from disk..");
+                    CASC.InitCasc(cascworker, basedir, ConfigurationManager.AppSettings["program"]);
+                }
+                else
+                {
+                    throw new Exception("Unable to find World of Warcraft client!");
+                }
+            }
+            else
+            {
+                cascworker.ReportProgress(0, "Loading WoW from web..");
+                CASC.InitCasc(cascworker, null, ConfigurationManager.AppSettings["program"]);
+            }
+        }
 
-        private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void Fileworker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            modelListBox.DataContext = (List<string>)e.UserState;
+        }
+        private void Fileworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            exportButton.Content = "Export model to OBJ!";
+        }
+        private void Fileworker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var results = new List<string>();
+            var remaining = new List<string>();
+            var progress = 0;
+
+            remaining.Add((string)e.Argument);
+
+            while (remaining.Count > 0)
+            {
+                var filename = remaining[0];
+                if (filename.EndsWith(".wmo"))
+                {
+                    var wmo = new WoWFormatLib.FileReaders.WMOReader();
+                    wmo.LoadWMO(filename);
+
+
+                    // Loop through filenames from WMO
+                }
+                else if (filename.EndsWith(".adt"))
+                {
+                    var adt = new WoWFormatLib.FileReaders.ADTReader();
+                    adt.LoadADT(filename);
+
+                    foreach (var entry in adt.adtfile.objects.wmoNames.filenames)
+                    {
+                        results.Add(entry.ToLower());
+                    }
+
+                    foreach (var entry in adt.adtfile.objects.m2Names.filenames)
+                    {
+                        results.Add(entry.ToLower());
+                    }
+                }
+
+                remaining.Remove(filename);
+            }
+
+            fileworker.ReportProgress(progress, results);
+        }
+
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             loadingImage.Visibility = Visibility.Hidden;
             tabs.Visibility = Visibility.Visible;
@@ -314,23 +299,7 @@ namespace OBJExporterUI
             //previewControl.BakeTexture("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
 #endif
         }
-
-        private void exportworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            exportButton.IsEnabled = true;
-            progressBar.Value = 100;
-            loadingLabel.Content = "Done";
-            wmoCheckBox.IsEnabled = true;
-            m2CheckBox.IsEnabled = true;
-            modelListBox.IsEnabled = true;
-
-            /* ADT specific UI */
-            exportTileButton.IsEnabled = true;
-            mapListBox.IsEnabled = true;
-            tileListBox.IsEnabled = true;
-        }
-
-        private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             var state = (string)e.UserState;
 
@@ -341,51 +310,7 @@ namespace OBJExporterUI
 
             progressBar.Value = e.ProgressPercentage;
         }
-
-        private void exportworker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            var selectedFiles = (System.Collections.IList)e.Argument;
-
-            foreach (string selectedFile in selectedFiles)
-            {
-                if (!CASC.cascHandler.FileExists(selectedFile)) { continue; }
-                if (selectedFile.EndsWith(".wmo"))
-                {
-                    Exporters.OBJ.WMOExporter.exportWMO(selectedFile, exportworker);
-                }
-                else if (selectedFile.EndsWith(".m2"))
-                {
-                    Exporters.OBJ.M2Exporter.exportM2(selectedFile, exportworker);
-                }
-                else if (selectedFile.EndsWith(".adt"))
-                {
-                    Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
-                }
-                else if (selectedFile.EndsWith(".blp"))
-                {
-                    try
-                    {
-                        var blp = new WoWFormatLib.FileReaders.BLPReader();
-                        blp.LoadBLP(selectedFile);
-
-                        var bmp = blp.bmp;
-
-                        if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(selectedFile))))
-                        {
-                            Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(selectedFile)));
-                        }
-
-                        bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(selectedFile), Path.GetFileNameWithoutExtension(selectedFile)) + ".png");
-                    }
-                    catch (Exception blpException)
-                    {
-                        Console.WriteLine(blpException.Message);
-                    }
-                }
-            }
-        }
-
-        private void worker_DoWork(object sender, DoWorkEventArgs e)
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             worker.ReportProgress(0, "Loading listfile..");
 
@@ -453,7 +378,76 @@ namespace OBJExporterUI
             lines = null;
         }
 
-        private void CheckBoxChanged(object sender, RoutedEventArgs e)
+        private void Exportworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            exportButton.IsEnabled = true;
+            progressBar.Value = 100;
+            loadingLabel.Content = "Done";
+            wmoCheckBox.IsEnabled = true;
+            m2CheckBox.IsEnabled = true;
+            modelListBox.IsEnabled = true;
+
+            /* ADT specific UI */
+            exportTileButton.IsEnabled = true;
+            mapListBox.IsEnabled = true;
+            tileListBox.IsEnabled = true;
+        }
+        private void Exportworker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var selectedFiles = (System.Collections.IList)e.Argument;
+
+            foreach (string selectedFile in selectedFiles)
+            {
+                if (!CASC.cascHandler.FileExists(selectedFile)) { continue; }
+                if (selectedFile.EndsWith(".wmo"))
+                {
+                    Exporters.OBJ.WMOExporter.exportWMO(selectedFile, exportworker);
+                }
+                else if (selectedFile.EndsWith(".m2"))
+                {
+                    Exporters.OBJ.M2Exporter.exportM2(selectedFile, exportworker);
+                }
+                else if (selectedFile.EndsWith(".adt"))
+                {
+                    Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
+                }
+                else if (selectedFile.EndsWith(".blp"))
+                {
+                    try
+                    {
+                        var blp = new WoWFormatLib.FileReaders.BLPReader();
+                        blp.LoadBLP(selectedFile);
+
+                        var bmp = blp.bmp;
+
+                        if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(selectedFile))))
+                        {
+                            Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(selectedFile)));
+                        }
+
+                        bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(selectedFile), Path.GetFileNameWithoutExtension(selectedFile)) + ".png");
+                    }
+                    catch (Exception blpException)
+                    {
+                        Console.WriteLine(blpException.Message);
+                    }
+                }
+            }
+        }
+
+        /* Model tab */
+        private void ModelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (modelListBox.SelectedItems.Count == 1)
+            {
+                previewButton.IsEnabled = true;
+            }
+            else
+            {
+                previewButton.IsEnabled = false;
+            }
+        }
+        private void ModelCheckBoxChanged(object sender, RoutedEventArgs e)
         {
             if (exportButton == null) { return; }
             if (m2CheckBox == null) { return; }
@@ -476,18 +470,7 @@ namespace OBJExporterUI
             worker.RunWorkerAsync();
         }
 
-        private void modelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (modelListBox.SelectedItems.Count == 1)
-            {
-                previewButton.IsEnabled = true;
-            }
-            else
-            {
-                previewButton.IsEnabled = false;
-            }
-        }
-
+        /* Texture tab */
         private void TexturesTab_GotFocus(object sender, RoutedEventArgs e)
         {
             if (!texturesLoaded)
@@ -496,22 +479,7 @@ namespace OBJExporterUI
                 texturesLoaded = true;
             }
         }
-
-        private void exportTextureButton_Click(object sender, RoutedEventArgs e)
-        {
-            progressBar.Value = 0;
-            progressBar.Visibility = Visibility.Visible;
-            loadingLabel.Content = "";
-            loadingLabel.Visibility = Visibility.Visible;
-            wmoCheckBox.IsEnabled = false;
-            m2CheckBox.IsEnabled = false;
-            exportButton.IsEnabled = false;
-            modelListBox.IsEnabled = false;
-
-            exportworker.RunWorkerAsync(textureListBox.SelectedItems);
-        }
-
-        private void textureListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TextureListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var file = (string)textureListBox.SelectedItem;
             try
@@ -542,8 +510,22 @@ namespace OBJExporterUI
                 Console.WriteLine(blpException.Message);
             }
         }
+        private void ExportTextureButton_Click(object sender, RoutedEventArgs e)
+        {
+            progressBar.Value = 0;
+            progressBar.Visibility = Visibility.Visible;
+            loadingLabel.Content = "";
+            loadingLabel.Visibility = Visibility.Visible;
+            wmoCheckBox.IsEnabled = false;
+            m2CheckBox.IsEnabled = false;
+            exportButton.IsEnabled = false;
+            modelListBox.IsEnabled = false;
 
-        private void exportTileButton_Click(object sender, RoutedEventArgs e)
+            exportworker.RunWorkerAsync(textureListBox.SelectedItems);
+        }
+
+        /* Map tab */
+        private void ExportTileButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedMap = (MapListItem)mapListBox.SelectedItem;
             var selectedTile = (string)tileListBox.SelectedItem;
@@ -579,8 +561,7 @@ namespace OBJExporterUI
             var centery = int.Parse(coord[2]);
             previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + centery.ToString() + centerx.ToString() + ".png"));
         }
-
-        private void mapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void MapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             tileListBox.Items.Clear();
 
@@ -601,8 +582,7 @@ namespace OBJExporterUI
                 }
             }
         }
-
-        private void tileListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TileListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
@@ -644,77 +624,7 @@ namespace OBJExporterUI
                 Console.WriteLine(blpException.Message);
             }
         }
-
-        private void UpdateListfile()
-        {
-            using (var client = new WebClient())
-            using (var stream = new MemoryStream())
-            {
-                client.Headers[HttpRequestHeader.AcceptEncoding] = "gzip";
-                var responseStream = new GZipStream(client.OpenRead(ConfigurationManager.AppSettings["listfileurl"]), CompressionMode.Decompress);
-                responseStream.CopyTo(stream);
-                File.WriteAllBytes("listfile.txt", stream.ToArray());
-                responseStream.Close();
-                responseStream.Dispose();
-            }
-        }
-
-        private void UpdateMapList()
-        {
-            using (var client = new WebClient())
-            using (var stream = new MemoryStream())
-            {
-                var responseStream = client.OpenRead("https://docs.google.com/spreadsheets/d/1yYSHjWTX0l751QscolQpFNWjwdKLbD_rzviZ_XqTPfk/export?exportFormat=csv&gid=0");
-                responseStream.CopyTo(stream);
-                File.WriteAllBytes("mapnames.csv", stream.ToArray());
-                responseStream.Close();
-                responseStream.Dispose();
-            }
-        }
-
-        private void MenuPreferences_Click(object sender, RoutedEventArgs e)
-        {
-            var cfgWindow = new ConfigurationWindow(true);
-            cfgWindow.ShowDialog();
-
-            ConfigurationManager.RefreshSection("appSettings");
-        }
-
-        private void MenuQuit_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
-        private void MenuListfile_Click(object sender, RoutedEventArgs e)
-        {
-            MenuListfile.IsEnabled = false;
-
-            progressBar.Visibility = Visibility.Visible;
-            loadingLabel.Visibility = Visibility.Visible;
-            previewButton.Visibility = Visibility.Hidden;
-            exportButton.Visibility = Visibility.Hidden;
-            modelListBox.Visibility = Visibility.Hidden;
-            filterTextBox.Visibility = Visibility.Hidden;
-            filterTextLabel.Visibility = Visibility.Hidden;
-            wmoCheckBox.Visibility = Visibility.Hidden;
-            m2CheckBox.Visibility = Visibility.Hidden;
-            tabs.Visibility = Visibility.Hidden;
-
-            UpdateListfile();
-
-            models.Clear();
-            textures.Clear();
-
-            worker.RunWorkerAsync();
-        }
-
-        private void MenuVersion_Click(object sender, RoutedEventArgs e)
-        {
-            var vwindow = new VersionWindow();
-            vwindow.Show();
-        }
-
-        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        private void MapCheckBox_Click(object sender, RoutedEventArgs e)
         {
             var source = (CheckBox)sender;
             if (string.IsNullOrEmpty((string)source.Content))
@@ -757,31 +667,29 @@ namespace OBJExporterUI
                 UpdateMapListView();
             }
         }
-
-        private int ExpansionNameToID(string name)
+        private void MapViewerButton_Click(object sender, RoutedEventArgs e)
         {
-            switch (name)
-            {
-                case "Vanilla":
-                    return 1;
-                case "Burning Crusade":
-                    return 2;
-                case "Wrath of the Lich King":
-                    return 3;
-                case "Cataclysm":
-                    return 4;
-                case "Mists of Pandaria":
-                    return 5;
-                case "Warlords of Draenor":
-                    return 6;
-                case "Legion":
-                    return 7;
-                default:
-                    return 1;
-            }
-        }
+            var selectedItem = (MapListItem)mapListBox.SelectedItem;
+            if (selectedItem == null) return;
 
-        private void tileViewerButton_Click(object sender, RoutedEventArgs e)
+            var selectedTile = tileListBox.SelectedItem;
+            if (selectedTile == null) return;
+
+            var tiles = selectedTile.ToString().Split('_');
+            var x = int.Parse(tiles[0]);
+            var y = int.Parse(tiles[1]);
+
+            var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
+
+            previewControl.LoadModel(adtFile);
+        }
+        private void ExportCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["exportEverything"].Value = exportEverything.IsChecked.ToString();
+            config.Save(ConfigurationSaveMode.Full);
+        }
+        private void TileViewerButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = (MapListItem)mapListBox.SelectedItem;
             if (selectedItem == null) return;
@@ -789,6 +697,119 @@ namespace OBJExporterUI
             var mw = new MapWindow(selectedItem.Internal);
             mw.Show();
 
+        }
+        private void BakeTextureButton_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = (MapListItem)mapListBox.SelectedItem;
+            if (selectedItem == null) return;
+
+            var selectedTile = tileListBox.SelectedItem;
+            if (selectedTile == null) return;
+
+            var tiles = selectedTile.ToString().Split('_');
+            var x = int.Parse(tiles[0]);
+            var y = int.Parse(tiles[1]);
+
+            var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
+
+            if (CASC.cascHandler.FileExists(adtFile))
+            {
+                bakeTextureButton.IsEnabled = false;
+
+                previewControl.BakeTexture(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".png");
+
+                bakeTextureButton.IsEnabled = true;
+            }
+        }
+        public static void SelectTile(string tile)
+        {
+            tileBox.SelectedValue = tile;
+        }
+        public class MapListItem
+        {
+            public string Type { get; set; }
+            public string Name { get; set; }
+            public string Internal { get; set; }
+            public string Image { get; set; }
+        }
+        public class NiceMapEntry
+        {
+            public string ID { get; set; }
+            public string Name { get; set; }
+            public string Internal { get; set; }
+            public string Type { get; set; }
+            public string Expansion { get; set; }
+        }
+
+        /* Menu */
+        private void MenuMapNames_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateMapList();
+        }
+        private void MenuPreferences_Click(object sender, RoutedEventArgs e)
+        {
+            var cfgWindow = new ConfigurationWindow(true);
+            cfgWindow.ShowDialog();
+
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+        private void MenuListfile_Click(object sender, RoutedEventArgs e)
+        {
+            MenuListfile.IsEnabled = false;
+
+            progressBar.Visibility = Visibility.Visible;
+            loadingLabel.Visibility = Visibility.Visible;
+            previewButton.Visibility = Visibility.Hidden;
+            exportButton.Visibility = Visibility.Hidden;
+            modelListBox.Visibility = Visibility.Hidden;
+            filterTextBox.Visibility = Visibility.Hidden;
+            filterTextLabel.Visibility = Visibility.Hidden;
+            wmoCheckBox.Visibility = Visibility.Hidden;
+            m2CheckBox.Visibility = Visibility.Hidden;
+            tabs.Visibility = Visibility.Hidden;
+
+            UpdateListfile();
+
+            models.Clear();
+            textures.Clear();
+
+            worker.RunWorkerAsync();
+        }
+        private void MenuVersion_Click(object sender, RoutedEventArgs e)
+        {
+            var vwindow = new VersionWindow();
+            vwindow.Show();
+        }
+        private void MenuQuit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        /* Utilities */
+        private void UpdateListfile()
+        {
+            using (var client = new WebClient())
+            using (var stream = new MemoryStream())
+            {
+                client.Headers[HttpRequestHeader.AcceptEncoding] = "gzip";
+                var responseStream = new GZipStream(client.OpenRead(ConfigurationManager.AppSettings["listfileurl"]), CompressionMode.Decompress);
+                responseStream.CopyTo(stream);
+                File.WriteAllBytes("listfile.txt", stream.ToArray());
+                responseStream.Close();
+                responseStream.Dispose();
+            }
+        }
+        private void UpdateMapList()
+        {
+            using (var client = new WebClient())
+            using (var stream = new MemoryStream())
+            {
+                var responseStream = client.OpenRead("https://docs.google.com/spreadsheets/d/1yYSHjWTX0l751QscolQpFNWjwdKLbD_rzviZ_XqTPfk/export?exportFormat=csv&gid=0");
+                responseStream.CopyTo(stream);
+                File.WriteAllBytes("mapnames.csv", stream.ToArray());
+                responseStream.Close();
+                responseStream.Dispose();
+            }
         }
         private void UpdateMapListView()
         {
@@ -869,75 +890,27 @@ namespace OBJExporterUI
 
             mapsLoaded = true;
         }
-
-        private void MenuMapNames_Click(object sender, RoutedEventArgs e)
+        private int ExpansionNameToID(string name)
         {
-            UpdateMapList();
-        }
-
-        public class MapListItem
-        {
-            public string Type { get; set; }
-            public string Name { get; set; }
-            public string Internal { get; set; }
-            public string Image { get; set; }
-        }
-
-        public class NiceMapEntry
-        {
-            public string ID { get; set; }
-            public string Name { get; set; }
-            public string Internal { get; set; }
-            public string Type { get; set; }
-            public string Expansion { get; set; }
-        }
-
-        private void mapViewerButton_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedItem = (MapListItem)mapListBox.SelectedItem;
-            if (selectedItem == null) return;
-
-            var selectedTile = tileListBox.SelectedItem;
-            if (selectedTile == null) return;
-
-            var tiles = selectedTile.ToString().Split('_');
-            var x = int.Parse(tiles[0]);
-            var y = int.Parse(tiles[1]);
-
-            var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
-
-            previewControl.LoadModel(adtFile);
-        }
-
-        private void bakeTextureButton_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedItem = (MapListItem)mapListBox.SelectedItem;
-            if (selectedItem == null) return;
-
-            var selectedTile = tileListBox.SelectedItem;
-            if (selectedTile == null) return;
-
-            var tiles = selectedTile.ToString().Split('_');
-            var x = int.Parse(tiles[0]);
-            var y = int.Parse(tiles[1]);
-
-            var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
-
-            if (CASC.cascHandler.FileExists(adtFile))
+            switch (name)
             {
-                bakeTextureButton.IsEnabled = false;
-
-                previewControl.BakeTexture(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".png");
-
-                bakeTextureButton.IsEnabled = true;
+                case "Vanilla":
+                    return 1;
+                case "Burning Crusade":
+                    return 2;
+                case "Wrath of the Lich King":
+                    return 3;
+                case "Cataclysm":
+                    return 4;
+                case "Mists of Pandaria":
+                    return 5;
+                case "Warlords of Draenor":
+                    return 6;
+                case "Legion":
+                    return 7;
+                default:
+                    return 1;
             }
-        }
-
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["exportEverything"].Value = exportEverything.IsChecked.ToString();
-            config.Save(ConfigurationSaveMode.Full);
         }
     }
 }
