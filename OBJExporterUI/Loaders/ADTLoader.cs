@@ -111,7 +111,7 @@ namespace OBJExporterUI.Loaders
                         }
                         else
                         {
-                            v.Color = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+                            v.Color = new Vector4(0.5f, 0.5f, 0.5f, 1.0f);
                         }
 
                         v.TexCoord = new Vector2((j + (((i % 2) != 0) ? 0.5f : 0f)) / 8f, (i * 0.5f) / 8f);
