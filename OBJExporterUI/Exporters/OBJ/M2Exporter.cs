@@ -149,8 +149,6 @@ namespace OBJExporterUI.Exporters.OBJ
                         break;
                 }
 
-                //Console.WriteLine("      Eventual filename is " + texturefilename);
-
                 materials[i].textureID = textureID + i;
                 materials[i].filename = textureFileDataID.ToString();
 
@@ -233,8 +231,6 @@ namespace OBJExporterUI.Exporters.OBJ
             // https://en.wikipedia.org/wiki/Wavefront_.obj_file#Basic_materials
             // http://wiki.unity3d.com/index.php?title=ExportOBJ
             // http://web.cse.ohio-state.edu/~hwshen/581/Site/Lab3_files/Labhelp_Obj_parser.htm
-
-            Console.WriteLine("Done loading model!");
         }
     }
 }

@@ -509,22 +509,6 @@ namespace OBJExporterUI
             modelListBox.IsEnabled = false;
 
             exportworker.RunWorkerAsync(textureListBox.SelectedItems);
-
-            // temporary hackfix because gl threading sucks
-
-            foreach (string selectedFile in textureListBox.SelectedItems)
-            {
-                if (!CASC.cascHandler.FileExists(selectedFile)) { continue; }
-                if (selectedFile.EndsWith(".adt"))
-                {
-                    var mapname = selectedFile.Replace("world/maps/", "").Substring(0, selectedFile.Replace("world/maps/", "").IndexOf("/"));
-                    var coord = selectedFile.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
-
-                    var centerx = int.Parse(coord[1]);
-                    var centery = int.Parse(coord[2]);
-                    previewControl.BakeTexture(selectedFile, Path.Combine(outdir, Path.GetDirectoryName(selectedFile), "mat" + centery.ToString() + centerx.ToString() + ".png"));
-                }
-            }
         }
 
         private void textureListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -580,10 +564,23 @@ namespace OBJExporterUI
             mapListBox.IsEnabled = false;
             tileListBox.IsEnabled = false;
 
+            var file = "world/maps/" + selectedMap.Internal.ToLower() + "/" + selectedMap.Internal.ToLower() + "_" + selectedTile + ".adt";
+
             var tempList = new List<string>();
-            tempList.Add("world/maps/" + selectedMap.Internal.ToLower() + "/" + selectedMap.Internal.ToLower() + "_" + selectedTile + ".adt");
+            tempList.Add(file);
 
             exportworker.RunWorkerAsync(tempList);
+
+            // Hackfix because I can't seem to get GL and backgroundworkers due to work well together due to threading
+            progressBar.Value = 10;
+            loadingLabel.Content = "Rendering terrain texture..";
+
+            var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
+            var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
+
+            var centerx = int.Parse(coord[1]);
+            var centery = int.Parse(coord[2]);
+            previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + centery.ToString() + centerx.ToString() + ".png"));
         }
 
         private void mapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -903,7 +900,10 @@ namespace OBJExporterUI
             var selectedItem = (MapListItem)mapListBox.SelectedItem;
             if (selectedItem == null) return;
 
-            var tiles = tileListBox.SelectedItem.ToString().Split('_');
+            var selectedTile = tileListBox.SelectedItem;
+            if (selectedTile == null) return;
+
+            var tiles = selectedTile.ToString().Split('_');
             var x = int.Parse(tiles[0]);
             var y = int.Parse(tiles[1]);
 
@@ -917,7 +917,10 @@ namespace OBJExporterUI
             var selectedItem = (MapListItem)mapListBox.SelectedItem;
             if (selectedItem == null) return;
 
-            var tiles = tileListBox.SelectedItem.ToString().Split('_');
+            var selectedTile = tileListBox.SelectedItem;
+            if (selectedTile == null) return;
+
+            var tiles = selectedTile.ToString().Split('_');
             var x = int.Parse(tiles[0]);
             var y = int.Parse(tiles[1]);
 
