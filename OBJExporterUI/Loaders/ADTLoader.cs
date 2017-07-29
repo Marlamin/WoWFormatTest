@@ -81,7 +81,7 @@ namespace OBJExporterUI.Loaders
                 {
                     material.heightScale = 0.0f;
                     material.heightOffset = 1.0f;
-                    material.scale = 0.0f;
+                    material.scale = 1.0f;
                 }
                 materials.Add(material);
             }
