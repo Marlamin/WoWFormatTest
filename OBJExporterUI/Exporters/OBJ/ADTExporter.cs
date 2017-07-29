@@ -98,7 +98,8 @@ namespace OBJExporterUI.Exporters.OBJ
                     //    Console.WriteLine("No maptextures, this map will have missing textures.");
                     //}
 
-                    Renderer.RenderMinimap.Generate(curfile, Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + y.ToString() + x.ToString() + ".png"));
+                    // called after exporter is done because shit threading
+                    //Renderer.RenderMinimap.Generate(curfile, Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + y.ToString() + x.ToString() + ".png"));
 
                     materials.Add(1, "mat" + y.ToString() + x.ToString());
                     //List<Material> materials = new List<Material>();

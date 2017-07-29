@@ -44,6 +44,12 @@ namespace OBJExporterUI
             }
         }
 
+        public void BakeTexture(string filename, string outname)
+        {
+            var minimapRenderer = new Renderer.RenderMinimap();
+            minimapRenderer.Generate(filename, outname, cache);
+        }
+
         public void LoadModel(string filename)
         {
             ready = false;
@@ -61,6 +67,8 @@ namespace OBJExporterUI
                 modelType = "m2";
                 ActiveCamera.switchMode("perspective");
                 ActiveCamera.Pos = new Vector3((cache.doodadBatches[filename].boundingBox.max.Z) + 11.0f, 0.0f, 4.0f);
+
+                ready = true;
             }
             else if (filename.EndsWith(".wmo"))
             {
@@ -70,6 +78,8 @@ namespace OBJExporterUI
                 }
                 ActiveCamera.switchMode("perspective");
                 modelType = "wmo";
+
+                ready = true;
             }
             else if (filename.EndsWith(".adt"))
             {
@@ -77,12 +87,11 @@ namespace OBJExporterUI
                 {
                     ADTLoader.LoadADT(filename, cache, adtShaderProgram);
                 }
-                //ActiveCamera.switchMode("ortho");
                 ActiveCamera.Pos = new Vector3(cache.terrain[filename].startPos.Position.X, cache.terrain[filename].startPos.Position.Y, cache.terrain[filename].startPos.Position.Z);
                 modelType = "adt";
-            }
 
-            ready = true;
+                ready = true;
+            }
         }
 
         public void WindowsFormsHost_Initialized(object sender, EventArgs e)
@@ -198,6 +207,7 @@ namespace OBJExporterUI
                         GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
                     }
 
+                    // TODO: Merge alpha layers into one rgb texture
                     for (int j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
                     {
                         var textureLoc = GL.GetUniformLocation(adtShaderProgram, "alphaLayer" + j);

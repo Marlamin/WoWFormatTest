@@ -33,6 +33,7 @@ namespace OBJExporterUI
         private readonly BackgroundWorker exportworker = new BackgroundWorker();
         private readonly BackgroundWorkerEx cascworker = new BackgroundWorkerEx();
         private readonly BackgroundWorkerEx fileworker = new BackgroundWorkerEx();
+        private readonly BackgroundWorkerEx tileworker = new BackgroundWorkerEx();
 
         private bool showM2 = true;
         private bool showWMO = true;
@@ -308,11 +309,9 @@ namespace OBJExporterUI
             modelListBox.DataContext = models;
             textureListBox.DataContext = textures;
 
-            previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
+            //previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
-            previewControl.renderCanvas.Context.MakeCurrent(null);
-            Renderer.RenderMinimap.Generate("world\\maps\\draenor\\draenor_35_24.adt", "draenor_35_24.png");
-            previewControl.renderCanvas.MakeCurrent();
+            //previewControl.BakeTexture("world\\maps\\troll raid\\troll raid_23_22.adt", "troll raid_23_22.png");
 #endif
         }
 
@@ -510,6 +509,22 @@ namespace OBJExporterUI
             modelListBox.IsEnabled = false;
 
             exportworker.RunWorkerAsync(textureListBox.SelectedItems);
+
+            // temporary hackfix because gl threading sucks
+
+            foreach (string selectedFile in textureListBox.SelectedItems)
+            {
+                if (!CASC.cascHandler.FileExists(selectedFile)) { continue; }
+                if (selectedFile.EndsWith(".adt"))
+                {
+                    var mapname = selectedFile.Replace("world/maps/", "").Substring(0, selectedFile.Replace("world/maps/", "").IndexOf("/"));
+                    var coord = selectedFile.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
+
+                    var centerx = int.Parse(coord[1]);
+                    var centery = int.Parse(coord[2]);
+                    previewControl.BakeTexture(selectedFile, Path.Combine(outdir, Path.GetDirectoryName(selectedFile), "mat" + centery.ToString() + centerx.ToString() + ".png"));
+                }
+            }
         }
 
         private void textureListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -908,12 +923,14 @@ namespace OBJExporterUI
 
             var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
 
-            previewControl.renderCanvas.Context.MakeCurrent(null);
             if (CASC.cascHandler.FileExists(adtFile))
             {
-                Renderer.RenderMinimap.Generate(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".bmp");
+                bakeTextureButton.IsEnabled = false;
+
+                previewControl.BakeTexture(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".png");
+
+                bakeTextureButton.IsEnabled = true;
             }
-            previewControl.renderCanvas.MakeCurrent();
         }
     }
 }
