@@ -46,9 +46,9 @@
                 <Grid>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="71,10,0,0" VerticalAlignment="Top"/>
-                    <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="modelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
-                    <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="297,0,10,10" VerticalAlignment="Bottom" Click="exportButton_Click"/>
-                    <Button x:Name="previewButton"  Height="25" Content="Preview model" HorizontalAlignment="Stretch" Margin="10,0,300,10" VerticalAlignment="Bottom" Click="previewButton_Click"/>
+                    <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="ModelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
+                    <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="297,0,10,10" VerticalAlignment="Bottom" Click="ExportButton_Click"/>
+                    <Button x:Name="previewButton"  Height="25" Content="Preview model" HorizontalAlignment="Stretch" Margin="10,0,300,10" VerticalAlignment="Bottom" Click="PreviewButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TexturesTab" Header="Textures" GotFocus="TexturesTab_GotFocus">
@@ -57,11 +57,11 @@
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="2*" />
                     </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0" x:Name="textureListBox" SelectionMode="Extended" SelectionChanged="textureListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
+                    <ListBox Grid.Row="0" x:Name="textureListBox" SelectionMode="Extended" SelectionChanged="TextureListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
                     <Border Grid.Row="1" BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,10,40">
                         <Image x:Name="blpImage"/>
                     </Border>
-                    <Button Grid.Row="1" x:Name="exportTextureButton" Height="25" Content="Export texture to PNG!" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="exportTextureButton_Click"/>
+                    <Button Grid.Row="1" x:Name="exportTextureButton" Height="25" Content="Export texture to PNG!" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="ExportTextureButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="MapsTab" Header="Maps">
@@ -75,7 +75,7 @@
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Grid.Row="0" x:Name="mapListBox" SelectionMode="Single" SelectionChanged="mapListBox_SelectionChanged" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding}" Margin="-1,109,0,214" Grid.ColumnSpan="2" Grid.RowSpan="2">
+                    <ListView Grid.Row="0" x:Name="mapListBox" SelectionMode="Single" SelectionChanged="MapListBox_SelectionChanged" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding}" Margin="-1,109,0,214" Grid.ColumnSpan="2" Grid.RowSpan="2">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Expansion" Width="60">
@@ -93,17 +93,17 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
-                    <Button x:Name="tileViewerButton" Click="tileViewerButton_Click" Content="Tile viewer" Margin="83,0,88.6,188.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
-                    <Button x:Name="mapViewerButton" Click="mapViewerButton_Click" Content="Preview ADT" IsEnabled="False" Margin="83,0,88.6,163.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
-                    <Button x:Name="bakeTextureButton" Click="bakeTextureButton_Click" Content="Bake texture" Margin="83,0,88.6,140" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
+                    <Button x:Name="tileViewerButton" Click="TileViewerButton_Click" Content="Tile viewer" Margin="83,0,88.6,188.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
+                    <Button x:Name="mapViewerButton" Click="MapViewerButton_Click" Content="Preview ADT" IsEnabled="False" Margin="83,0,88.6,163.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
+                    <Button x:Name="bakeTextureButton" Click="BakeTextureButton_Click" Content="Bake texture" Margin="83,0,88.6,140" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportEverything" Content="Export WMOs and M2s" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,114.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportCheckBox_Checked"/>
                     <!--<CheckBox x:Name="exportADTM2" Grid.Row="1" Grid.Column="0" Content="Export terrain doodads" IsChecked="True" HorizontalAlignment="Left" Margin="90,106.2,0,0" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportADTWMO" Grid.Row="1" Grid.Column="0" Content="Export terrain WMOs" IsChecked="True" HorizontalAlignment="Left" Margin="90,126.2,0,0" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportADTWMOM2" Grid.Row="1" Grid.Column="0" Content="Export WMO doodads" IsChecked="True" HorizontalAlignment="Left" Margin="90,146.2,0,0" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportM2PHYS"  Grid.Row="1" Grid.Column="0" Content="Export doodad collisions" IsChecked="False" HorizontalAlignment="Left" Margin="90,166.2,0,0" VerticalAlignment="Bottom"/>-->
                     <Image x:Name="tileImage" Grid.Column="1" Grid.Row="1" Margin="93,19,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
-                    <ListBox x:Name="tileListBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0"  SelectionChanged="tileListBox_SelectionChanged" Height="209" Width="75" Margin="3,0,0,59" VerticalContentAlignment="Bottom" Grid.RowSpan="2"/>
-                    <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="exportTileButton" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="exportTileButton_Click"/>
+                    <ListBox x:Name="tileListBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0"  SelectionChanged="TileListBox_SelectionChanged" Height="209" Width="75" Margin="3,0,0,59" VerticalContentAlignment="Bottom" Grid.RowSpan="2"/>
+                    <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="exportTileButton" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="ExportTileButton_Click"/>
                     <Label Content="World" HorizontalAlignment="Left" Margin="-1,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
                     <CheckBox Loaded="MapCheckBox_Click" Content="Continent" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True" Width="82"/>
                     <CheckBox Loaded="MapCheckBox_Click" Content="PvP" HorizontalAlignment="Left" Margin="10,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
