@@ -84,8 +84,6 @@ namespace WoWFormatLib.FileReaders
                             }
                         }
                     }
-
-                    //File.WriteAllBytes("shader.dump", targetStream.ToArray());
                 }
 
                 // Start reading decompressed data
@@ -99,6 +97,14 @@ namespace WoWFormatLib.FileReaders
                         bin.BaseStream.Position = shaderFile.ofsShaderBlocks[i];
 
                         shaderFile.shaderBlocks[i].header = bin.Read<ShaderBlockHeader>();
+
+                        // Skip non-GL shaders for now
+                        var magic = new string(bin.ReadChars(4));
+                        if(magic != "3SLG")
+                        {
+                            break; 
+                        }
+                        bin.BaseStream.Position -= 4;
 
                         var GLSL3start = bin.BaseStream.Position;
 
