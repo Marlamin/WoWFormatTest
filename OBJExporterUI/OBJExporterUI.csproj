@@ -101,7 +101,6 @@
     <Compile Include="Renderer\Shader.cs" />
     <Compile Include="Renderer\Structs.cs" />
     <Compile Include="Structs.cs" />
-    <Compile Include="PreviewWindow.cs" />
     <Compile Include="VersionWindow.xaml.cs">
       <DependentUpon>VersionWindow.xaml</DependentUpon>
     </Compile>
