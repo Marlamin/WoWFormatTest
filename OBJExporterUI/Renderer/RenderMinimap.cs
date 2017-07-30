@@ -130,7 +130,6 @@ namespace OBJExporterUI.Renderer
 
             GL.DeleteFramebuffer(frameBuffer);
             GL.UseProgram(0);
-            GL.DeleteProgram(bakeShaderProgram);
         }
     }
 }
