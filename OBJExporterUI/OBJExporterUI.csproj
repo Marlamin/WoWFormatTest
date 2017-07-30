@@ -85,7 +85,6 @@
     </ApplicationDefinition>
     <Compile Include="Loaders\ADTLoader.cs" />
     <Compile Include="Renderer\CacheStorage.cs" />
-    <Compile Include="Exporters\glTF\WMOExporter.cs" />
     <Compile Include="Exporters\OBJ\ADTExporter.cs" />
     <Compile Include="Exporters\OBJ\M2Exporter.cs" />
     <Compile Include="Exporters\OBJ\WMOExporter.cs" />
@@ -258,6 +257,10 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exporters\FBX\" />
+    <Folder Include="Exporters\glTF\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

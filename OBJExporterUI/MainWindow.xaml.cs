@@ -9,17 +9,12 @@ using System.Windows.Controls;
 using WoWFormatLib.DBC;
 using WoWFormatLib.Utils;
 using CASCExplorer;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Drawing.Imaging;
 using System.Windows.Media.Imaging;
 using System.Net;
 using System.IO.Compression;
 using Microsoft.VisualBasic.FileIO;
-using OpenTK.Graphics.OpenGL;
-using System.Drawing;
 using System.Windows.Media;
-using System.Windows.Input;
 
 namespace OBJExporterUI
 {
@@ -71,7 +66,7 @@ namespace OBJExporterUI
 
             tileBox = tileListBox;
 
-            Title = "Marlamin's OBJ Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Title = "Marlamin's WoW Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             previewControl = new PreviewControl(renderCanvas);
             CompositionTarget.Rendering += previewControl.CompositionTarget_Rendering;

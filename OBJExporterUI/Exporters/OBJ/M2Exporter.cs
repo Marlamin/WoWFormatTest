@@ -59,7 +59,7 @@ namespace OBJExporterUI.Exporters.OBJ
                 objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".obj")));
             }
 
-            objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
+            objsw.WriteLine("# Written by Marlamin's WoW Exporter. Original file: " + file);
             objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file) + ".mtl");
 
             foreach (var vertex in vertices)
@@ -208,7 +208,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
                 objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".phys.obj")));
 
-                objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
+                objsw.WriteLine("# Written by Marlamin's WoW Exporter. Original file: " + file);
 
                 for (int i = 0; i < reader.model.boundingvertices.Count(); i++)
                 {

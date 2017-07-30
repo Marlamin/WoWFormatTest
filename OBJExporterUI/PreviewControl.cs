@@ -4,7 +4,6 @@ using OpenTK.Graphics.OpenGL;
 using OBJExporterUI.Loaders;
 using System.Drawing;
 using OpenTK.Input;
-using System.IO;
 
 namespace OBJExporterUI
 {
@@ -65,9 +64,9 @@ namespace OBJExporterUI
                 {
                     M2Loader.LoadM2(filename, cache, m2ShaderProgram);
                 }
-                modelType = "m2";
                 ActiveCamera.switchMode("perspective");
                 ActiveCamera.Pos = new Vector3((cache.doodadBatches[filename].boundingBox.max.Z) + 11.0f, 0.0f, 4.0f);
+                modelType = "m2";
 
                 ready = true;
             }
@@ -212,21 +211,22 @@ namespace OBJExporterUI
                     GL.BindTexture(TextureTarget.Texture2D, cache.worldModelBatches[filename].wmoRenderBatch[j].materialID[0]);
                     GL.DrawElements(PrimitiveType.Triangles, (int)cache.worldModelBatches[filename].wmoRenderBatch[j].numFaces, DrawElementsType.UnsignedInt, (int)cache.worldModelBatches[filename].wmoRenderBatch[j].firstFace * 4);
                 }
-            }else if(modelType == "adt")
+            }
+            else if(modelType == "adt")
             {
                 GL.UseProgram(adtShaderProgram);
 
                 ActiveCamera.setupGLRenderMatrix(adtShaderProgram);
                 ActiveCamera.flyMode = true;
 
+                var heightScaleLoc = GL.GetUniformLocation(adtShaderProgram, "pc_heightScale");
+                var heightOffsetLoc = GL.GetUniformLocation(adtShaderProgram, "pc_heightOffset");
+
                 GL.BindVertexArray(cache.terrain[filename].vao);
 
                 for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                 {
-                    var heightScaleLoc = GL.GetUniformLocation(adtShaderProgram, "pc_heightScale");
                     GL.Uniform4(heightScaleLoc, cache.terrain[filename].renderBatches[i].heightScales);
-
-                    var heightOffsetLoc = GL.GetUniformLocation(adtShaderProgram, "pc_heightOffset");
                     GL.Uniform4(heightOffsetLoc, cache.terrain[filename].renderBatches[i].heightOffsets);
 
                     for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)

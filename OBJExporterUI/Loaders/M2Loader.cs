@@ -30,7 +30,6 @@ namespace OBJExporterUI.Loaders
             }
             else
             {
-                //Load model from file
                 if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(filename))
                 {
                     var modelreader = new M2Reader();
@@ -44,11 +43,14 @@ namespace OBJExporterUI.Loaders
                 }
             }
 
-            var ddBatch = new Renderer.Structs.DoodadBatch();
-
-            ddBatch.boundingBox = new Renderer.Structs.BoundingBox();
-            ddBatch.boundingBox.min = new Vector3(model.boundingbox[0].X, model.boundingbox[0].Y, model.boundingbox[0].Z);
-            ddBatch.boundingBox.max = new Vector3(model.boundingbox[1].X, model.boundingbox[1].Y, model.boundingbox[1].Z);
+            var ddBatch = new Renderer.Structs.DoodadBatch()
+            {
+                boundingBox = new Renderer.Structs.BoundingBox()
+                {
+                    min = new Vector3(model.boundingbox[0].X, model.boundingbox[0].Y, model.boundingbox[0].Z),
+                    max = new Vector3(model.boundingbox[1].X, model.boundingbox[1].Y, model.boundingbox[1].Z)
+                }
+            };
 
             // Textures
             ddBatch.mats = new Renderer.Structs.Material[model.textures.Count()];
@@ -78,7 +80,6 @@ namespace OBJExporterUI.Loaders
                     case 2:
                         if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
                         {
-                            // Console.WriteLine("      BLP exists!");
                             texturefilename = System.IO.Path.ChangeExtension(filename, ".blp");
                         }
                         else
