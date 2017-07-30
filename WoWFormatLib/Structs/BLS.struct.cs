@@ -22,10 +22,10 @@ namespace WoWFormatLib.Structs.BLS
     {
         public ShaderBlockHeader header;
         public ShaderBlockHeader_GLSL3 GLSL3Header;
-        public InputShaderInfo inputShaderInfo;
-        public OutputShaderInfo outputShaderInfo;
-        public UniformBufferInfo uniformBufferInfo;
-        public SamplerShaderInfo sampleShaderInfo;
+        public InputShaderInfo[] inputShaderInfo;
+        public OutputShaderInfo[] outputShaderInfo;
+        public UniformBufferInfo[] uniformBufferInfo;
+        public SamplerShaderInfo[] sampleShaderInfo;
         public string shaderContent;
     }
 
@@ -71,22 +71,27 @@ namespace WoWFormatLib.Structs.BLS
     public struct InputShaderInfo
     {
         public uint glslParamNameOffset; //Offset to zero terminated string
+        public string glslParamName;
         public uint unk0;
         public uint internalParamNameOffset;
+        public string internalParamName;
         public uint unk1;
     }
 
     public struct OutputShaderInfo
     {
         public uint glslParamNameOffset; //Offset to zero terminated string
+        public string glslParamName;
         public uint unk0;
         public uint internalParamNameOffset;
+        public string internalParamName;
         public uint unk1;
     }
 
     public struct UniformBufferInfo
     {
         public uint glslParamNameOffset; //Offset to zero terminated string
+        public string glslParamName;
         public uint unk0;
         public uint unk1;
     }
@@ -94,6 +99,7 @@ namespace WoWFormatLib.Structs.BLS
     public struct SamplerShaderInfo
     {
         public uint glslParamNameOffset; //Offset to zero terminated string
+        public string glslParamName;
         public uint unk0;
         public uint unk1;
         public uint unk2;
