@@ -141,10 +141,33 @@ namespace OBJExporterUI
                 ActiveCamera.setupGLRenderMatrix(m2ShaderProgram);
                 ActiveCamera.flyMode = false;
 
+                var alphaRefLoc = GL.GetUniformLocation(m2ShaderProgram, "alphaRef");
+
                 GL.BindVertexArray(cache.doodadBatches[filename].vao);
 
                 for (int i = 0; i < cache.doodadBatches[filename].submeshes.Length; i++)
                 {
+                    switch (cache.doodadBatches[filename].submeshes[i].blendType)
+                    {
+                        case 0:
+                            GL.Disable(EnableCap.Blend);
+                            GL.Uniform1(alphaRefLoc, -1.0f);
+                            break;
+                        case 1:
+                            GL.Disable(EnableCap.Blend);
+                            GL.Uniform1(alphaRefLoc, 0.90393700787f);
+                            break;
+                        case 2:
+                            GL.Enable(EnableCap.Blend);
+                            GL.Uniform1(alphaRefLoc, -1.0f);
+                            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+                            break;
+                        default:
+                            GL.Disable(EnableCap.Blend);
+                            GL.Uniform1(alphaRefLoc, -1.0f);
+                            break;
+                    }
+
                     GL.BindTexture(TextureTarget.Texture2D, cache.doodadBatches[filename].submeshes[i].material);
                     GL.DrawElements(PrimitiveType.Triangles, (int)cache.doodadBatches[filename].submeshes[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.doodadBatches[filename].submeshes[i].firstFace * 4);
                 }
