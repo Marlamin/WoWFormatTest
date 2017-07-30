@@ -24,6 +24,7 @@ namespace OBJExporterUI
         private int adtShaderProgram;
         private int wmoShaderProgram;
         private int m2ShaderProgram;
+        private int bakeShaderProgram;
 
         public PreviewControl(GLControl renderCanvas)
         {
@@ -47,7 +48,7 @@ namespace OBJExporterUI
         public void BakeTexture(string filename, string outname)
         {
             var minimapRenderer = new Renderer.RenderMinimap();
-            minimapRenderer.Generate(filename, outname, cache);
+            minimapRenderer.Generate(filename, outname, cache, bakeShaderProgram);
         }
 
         public void LoadModel(string filename)
@@ -118,6 +119,7 @@ namespace OBJExporterUI
             adtShaderProgram = Shader.CompileShader("adt");
             wmoShaderProgram = Shader.CompileShader("wmo");
             m2ShaderProgram = Shader.CompileShader("m2");
+            bakeShaderProgram = Shader.CompileShader("baketexture");
 
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);

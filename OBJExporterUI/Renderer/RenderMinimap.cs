@@ -8,7 +8,7 @@ namespace OBJExporterUI.Renderer
 {
     class RenderMinimap
     {
-        public void Generate(string filename, string outName, CacheStorage cache)
+        public void Generate(string filename, string outName, CacheStorage cache, int bakeShaderProgram)
         {
             float TileSize = 1600.0f / 3.0f; //533.333
             float ChunkSize = TileSize / 16.0f; //33.333
@@ -19,8 +19,6 @@ namespace OBJExporterUI.Renderer
 
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            var bakeShaderProgram = Shader.CompileShader("baketexture");
 
             GL.UseProgram(bakeShaderProgram);
 
