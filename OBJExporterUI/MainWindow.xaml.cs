@@ -282,7 +282,6 @@ namespace OBJExporterUI
             filterTextBox.Visibility = Visibility.Visible;
             filterTextLabel.Visibility = Visibility.Visible;
             exportButton.Visibility = Visibility.Visible;
-            previewButton.Visibility = Visibility.Visible;
             wmoCheckBox.Visibility = Visibility.Visible;
             m2CheckBox.Visibility = Visibility.Visible;
 
@@ -440,11 +439,7 @@ namespace OBJExporterUI
         {
             if (modelListBox.SelectedItems.Count == 1)
             {
-                previewButton.IsEnabled = true;
-            }
-            else
-            {
-                previewButton.IsEnabled = false;
+                previewControl.LoadModel((string)modelListBox.SelectedItem);
             }
         }
         private void ModelCheckBoxChanged(object sender, RoutedEventArgs e)
@@ -457,7 +452,6 @@ namespace OBJExporterUI
 
             progressBar.Visibility = Visibility.Visible;
             loadingLabel.Visibility = Visibility.Visible;
-            previewButton.Visibility = Visibility.Hidden;
             exportButton.Visibility = Visibility.Hidden;
             modelListBox.Visibility = Visibility.Hidden;
             filterTextBox.Visibility = Visibility.Hidden;
@@ -759,7 +753,6 @@ namespace OBJExporterUI
 
             progressBar.Visibility = Visibility.Visible;
             loadingLabel.Visibility = Visibility.Visible;
-            previewButton.Visibility = Visibility.Hidden;
             exportButton.Visibility = Visibility.Hidden;
             modelListBox.Visibility = Visibility.Hidden;
             filterTextBox.Visibility = Visibility.Hidden;

@@ -47,8 +47,7 @@
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="71,10,0,0" VerticalAlignment="Top"/>
                     <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="ModelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
-                    <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="297,0,10,10" VerticalAlignment="Bottom" Click="ExportButton_Click"/>
-                    <Button x:Name="previewButton"  Height="25" Content="Preview model" HorizontalAlignment="Stretch" Margin="10,0,300,10" VerticalAlignment="Bottom" Click="PreviewButton_Click"/>
+                    <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="10,0,10.4,10" VerticalAlignment="Bottom" Click="ExportButton_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="TexturesTab" Header="Textures" GotFocus="TexturesTab_GotFocus">
