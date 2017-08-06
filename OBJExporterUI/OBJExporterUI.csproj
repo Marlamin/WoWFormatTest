@@ -52,6 +52,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.0-pre\lib\net20\OpenTK.dll</HintPath>
     </Reference>
@@ -83,6 +86,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Exporters\glTF\glTF.cs" />
+    <Compile Include="Exporters\glTF\WMOExporter.cs" />
     <Compile Include="Loaders\ADTLoader.cs" />
     <Compile Include="Renderer\CacheStorage.cs" />
     <Compile Include="Exporters\OBJ\ADTExporter.cs" />
@@ -260,7 +265,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Exporters\FBX\" />
-    <Folder Include="Exporters\glTF\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -73,8 +73,6 @@ namespace OBJExporterUI.Exporters.OBJ
                 groups[g].indices = indicelist.ToArray();
             }
 
-            exportworker.ReportProgress(55, "Exporting textures..");
-
             if (destinationOverride == null)
             {
                 // Create output directory
@@ -95,7 +93,7 @@ namespace OBJExporterUI.Exporters.OBJ
                 doodadSW = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_ModelPlacementInformation.csv"));
             }
 
-            exportworker.ReportProgress(65, "Exporting doodads..");
+            exportworker.ReportProgress(55, "Exporting doodads..");
 
             doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationW;RotationX;RotationY;RotationZ;ScaleFactor;DoodadSet");
 
@@ -135,6 +133,8 @@ namespace OBJExporterUI.Exporters.OBJ
             }
 
             doodadSW.Close();
+
+            exportworker.ReportProgress(65, "Exporting textures..");
 
             var mtlsb = new StringBuilder();
             var textureID = 0;
