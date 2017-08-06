@@ -290,7 +290,7 @@ namespace OBJExporterUI
 
             previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
-            Exporters.glTF.WMOExporter.exportWMO("world/wmo/kalimdor/buildings/classicalelfruins/azrclassicalelfruin01.wmo");
+            //Exporters.glTF.WMOExporter.exportWMO("world/wmo/kalimdor/buildings/classicalelfruins/azrclassicalelfruin01.wmo");
 #endif
         }
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)

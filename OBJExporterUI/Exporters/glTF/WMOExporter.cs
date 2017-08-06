@@ -234,67 +234,62 @@ namespace OBJExporterUI.Exporters.glTF
 
             exportworker.ReportProgress(65, "Exporting textures..");
 
-            var textureID = 0;
-
             if (reader.wmofile.materials == null) { Console.WriteLine("Materials empty"); return; }
-            var materials = new Structs.Material[reader.wmofile.materials.Count()];
 
-            glTF.images = new Image[materials.Count()];
-            glTF.textures = new Texture[materials.Count()];
-            glTF.materials = new Material[materials.Count()];
+            var materialCount = reader.wmofile.materials.Count();
 
-            for (int i = 0; i < reader.wmofile.materials.Count(); i++)
+            glTF.images = new Image[materialCount];
+            glTF.textures = new Texture[materialCount];
+            glTF.materials = new Material[materialCount];
+
+            for (int i = 0; i < materialCount; i++)
             {
                 for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
                 {
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
                     {
-                        materials[i].textureID = textureID + i;
-                        materials[i].filename = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename);
+                        var textureFilename = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename).ToLower();
+                        if(textureFilename.EndsWith("_lod2") || textureFilename.EndsWith("_lod3"))
+                        {
+                            continue;
+                        }
 
-                        glTF.images[i].uri = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename) + ".png";
+                        glTF.images[i].uri = textureFilename + ".png";
 
                         glTF.textures[i].sampler = 0;
                         glTF.textures[i].source = i;
 
-                        glTF.materials[i].name = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename);
+                        glTF.materials[i].name = textureFilename;
                         glTF.materials[i].pbrMetallicRoughness = new PBRMetallicRoughness();
                         glTF.materials[i].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
                         glTF.materials[i].pbrMetallicRoughness.baseColorTexture.index = i;
                         glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
 
-                        if (reader.wmofile.materials[i].blendMode == 0)
+                        var saveLocation = "";
+
+                        if(destinationOverride == null)
                         {
-                            materials[i].transparent = false;
+                            saveLocation = Path.Combine(outdir, Path.GetDirectoryName(file), textureFilename + ".png");
                         }
                         else
                         {
-                            materials[i].transparent = true;
+                            saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".png");
                         }
 
-                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"))){
+                        if (!File.Exists(saveLocation)){
                             var blpreader = new BLPReader();
 
                             blpreader.LoadBLP(reader.wmofile.textures[ti].filename);
 
                             try
                             {
-                                if (destinationOverride == null)
-                                {
-                                    blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
-                                }
-                                else
-                                {
-                                    blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
-                                }
+                                blpreader.bmp.Save(saveLocation);
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine(e.Message);
+                                Console.WriteLine("Error exporting texture " + reader.wmofile.textures[ti].filename + ": " + e.Message);
                             }
                         }
-
-                        textureID++;
                     }
                 }
             }
@@ -306,7 +301,7 @@ namespace OBJExporterUI.Exporters.glTF
             glTF.samplers[0].wrapT = 10497;
 
             glTF.scenes = new Scene[1];
-            glTF.scenes[0].name = "Test";
+            glTF.scenes[0].name = Path.GetFileNameWithoutExtension(file);
 
             glTF.nodes = new Node[meshes.Count()];
             var meshIDs = new List<int>();
