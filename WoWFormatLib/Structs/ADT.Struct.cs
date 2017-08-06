@@ -54,8 +54,6 @@ namespace WoWFormatLib.Structs.ADT
         public byte holesHighRes_5;
         public byte holesHighRes_6;
         public byte holesHighRes_7;
-        // public uint ofsMCVT;
-        // public uint ofsMCNR;
         public uint ofsMCLY;
         public uint ofsMCRF;
         public uint ofsMCAL;

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
-using System.Text;
 using WoWFormatLib.FileReaders;
-using OpenTK;
 using System.IO;
 using Newtonsoft.Json;
 

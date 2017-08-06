@@ -425,6 +425,10 @@ namespace OBJExporterUI
                     {
                         Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
                     }
+                    else if (exportFormat == "glTF")
+                    {
+                        Exporters.glTF.ADTExporter.exportADT(selectedFile, exportworker);
+                    }
                 }
                 else if (selectedFile.EndsWith(".blp"))
                 {
