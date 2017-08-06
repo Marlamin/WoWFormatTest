@@ -390,20 +390,41 @@ namespace OBJExporterUI
         {
             var selectedFiles = (System.Collections.IList)e.Argument;
 
+            var exportFormat = "OBJ";
+
+            ConfigurationManager.RefreshSection("appSettings");
+            if (ConfigurationManager.AppSettings["exportFormat"] != null && ConfigurationManager.AppSettings["exportFormat"] == "glTF")
+            {
+                exportFormat = "glTF";
+            }
+
             foreach (string selectedFile in selectedFiles)
             {
                 if (!CASC.cascHandler.FileExists(selectedFile)) { continue; }
                 if (selectedFile.EndsWith(".wmo"))
                 {
-                    Exporters.OBJ.WMOExporter.exportWMO(selectedFile, exportworker);
+                    if(exportFormat == "OBJ")
+                    {
+                        Exporters.OBJ.WMOExporter.exportWMO(selectedFile, exportworker);
+                    }
+                    else if(exportFormat == "glTF")
+                    {
+                        Exporters.glTF.WMOExporter.exportWMO(selectedFile, exportworker);
+                    }
                 }
                 else if (selectedFile.EndsWith(".m2"))
                 {
-                    Exporters.OBJ.M2Exporter.exportM2(selectedFile, exportworker);
+                    if (exportFormat == "OBJ")
+                    {
+                        Exporters.OBJ.M2Exporter.exportM2(selectedFile, exportworker);
+                    }
                 }
                 else if (selectedFile.EndsWith(".adt"))
                 {
-                    Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
+                    if (exportFormat == "OBJ")
+                    {
+                        Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
+                    }
                 }
                 else if (selectedFile.EndsWith(".blp"))
                 {

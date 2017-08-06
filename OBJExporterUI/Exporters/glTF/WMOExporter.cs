@@ -53,8 +53,6 @@ namespace OBJExporterUI.Exporters.glTF
                 }
             };
 
-            uint totalVertices = 0;
-
             var groups = new Structs.WMOGroup[reader.wmofile.group.Count()];
             FileStream stream;
 
@@ -94,22 +92,41 @@ namespace OBJExporterUI.Exporters.glTF
                     target = 34962
                 };
 
+                var minPosX = float.MaxValue;
+                var minPosY = float.MaxValue;
+                var minPosZ = float.MaxValue;
+
+                var maxPosX = float.MinValue;
+                var maxPosY = float.MinValue;
+                var maxPosZ = float.MinValue;
+
                 for (int i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
                 {
                     writer.Write(reader.wmofile.group[g].mogp.vertices[i].vector.X * -1);
                     writer.Write(reader.wmofile.group[g].mogp.vertices[i].vector.Z);
                     writer.Write(reader.wmofile.group[g].mogp.vertices[i].vector.Y);
+
+                    if (reader.wmofile.group[g].mogp.vertices[i].vector.X * -1 < minPosX) minPosX = reader.wmofile.group[g].mogp.vertices[i].vector.X * -1;
+                    if (reader.wmofile.group[g].mogp.vertices[i].vector.Z < minPosY) minPosY = reader.wmofile.group[g].mogp.vertices[i].vector.Z;
+                    if (reader.wmofile.group[g].mogp.vertices[i].vector.Y < minPosZ) minPosZ = reader.wmofile.group[g].mogp.vertices[i].vector.Y;
+
+                    if (reader.wmofile.group[g].mogp.vertices[i].vector.X * -1 > maxPosX) maxPosX = reader.wmofile.group[g].mogp.vertices[i].vector.X * -1;
+                    if (reader.wmofile.group[g].mogp.vertices[i].vector.Z > maxPosY) maxPosY = reader.wmofile.group[g].mogp.vertices[i].vector.Z;
+                    if (reader.wmofile.group[g].mogp.vertices[i].vector.Y > maxPosZ) maxPosZ = reader.wmofile.group[g].mogp.vertices[i].vector.Y;
                 }
 
                 vPosBuffer.byteLength = (uint)writer.BaseStream.Position - vPosBuffer.byteOffset;
 
                 accessorInfo.Add(new Accessor()
                 {
+                    name = "vPos",
                     bufferView = bufferViews.Count(),
                     byteOffset = 0,
                     componentType = 5126,
                     count = (uint)reader.wmofile.group[g].mogp.vertices.Count(),
-                    type = "VEC3"
+                    type = "VEC3",
+                    min = new float[] { minPosX, minPosY, minPosZ },
+                    max = new float[] { maxPosX, maxPosY, maxPosZ}
                 });
 
                 bufferViews.Add(vPosBuffer);
@@ -132,6 +149,7 @@ namespace OBJExporterUI.Exporters.glTF
 
                 accessorInfo.Add(new Accessor()
                 {
+                    name = "vTex",
                     bufferView = bufferViews.Count(),
                     byteOffset = 0,
                     componentType = 5126,
@@ -157,6 +175,7 @@ namespace OBJExporterUI.Exporters.glTF
 
                 accessorInfo.Add(new Accessor()
                 {
+                    name = "indices",
                     bufferView = bufferViews.Count(),
                     byteOffset = 0,
                     componentType = 5123,
@@ -185,6 +204,11 @@ namespace OBJExporterUI.Exporters.glTF
 
             if (reader.wmofile.materials == null) { Console.WriteLine("Materials empty"); return; }
             var materials = new Structs.Material[reader.wmofile.materials.Count()];
+
+            glTF.images = new Image[materials.Count()];
+            glTF.textures = new Texture[materials.Count()];
+            glTF.materials = new Material[materials.Count()];
+
             for (int i = 0; i < reader.wmofile.materials.Count(); i++)
             {
                 for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
@@ -193,6 +217,17 @@ namespace OBJExporterUI.Exporters.glTF
                     {
                         materials[i].textureID = textureID + i;
                         materials[i].filename = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename);
+
+                        glTF.images[i].uri = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename) + ".png";
+
+                        glTF.textures[i].sampler = 0;
+                        glTF.textures[i].source = i;
+
+                        glTF.materials[i].name = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename);
+                        glTF.materials[i].pbrMetallicRoughness = new PBRMetallicRoughness();
+                        glTF.materials[i].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
+                        glTF.materials[i].pbrMetallicRoughness.baseColorTexture.index = i;
+                        glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
 
                         if (reader.wmofile.materials[i].blendMode == 0)
                         {
@@ -230,11 +265,29 @@ namespace OBJExporterUI.Exporters.glTF
                 }
             }
 
-            glTF.images = new Image[materials.Count()];
-            for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
+            glTF.samplers = new Sampler[1];
+            glTF.samplers[0].minFilter = 9986;
+            glTF.samplers[0].magFilter = 9729;
+            glTF.samplers[0].wrapS = 10497;
+            glTF.samplers[0].wrapT = 10497;
+
+            glTF.scenes = new Scene[1];
+            glTF.scenes[0].name = "Test";
+            glTF.scenes[0].nodes = new uint[] { 0 };
+
+            glTF.nodes = new Node[1];
+            glTF.nodes[0].mesh = 0;
+
+            glTF.meshes = new Mesh[1];
+            glTF.meshes[0].name = "Test";
+            glTF.meshes[0].primitives = new Primitive[1];
+            glTF.meshes[0].primitives[0].attributes = new Dictionary<string, uint>
             {
-                glTF.images[ti].uri = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename) + ".png";
-            }
+                { "POSITION", 0 },
+                { "TEXCOORD_0", 1 }
+            };
+            glTF.meshes[0].primitives[0].indices = 2;
+            glTF.meshes[0].primitives[0].material = 0;
 
             exportworker.ReportProgress(75, "Exporting model..");
 

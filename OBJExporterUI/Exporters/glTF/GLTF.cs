@@ -17,7 +17,6 @@ namespace OBJExporterUI.Exporters.glTF
         public Mesh[] meshes;
         public Node[] nodes;
         public Sampler[] samplers;
-        public uint scene;
         public Scene[] scenes;
         public Texture[] textures;
     }
@@ -31,6 +30,7 @@ namespace OBJExporterUI.Exporters.glTF
         public float[] max;
         public float[] min;
         public string type;
+        public string name;
     }
 
     public struct Asset
@@ -71,13 +71,14 @@ namespace OBJExporterUI.Exporters.glTF
 
     public struct PBRMetallicRoughness
     {
-        public TextureIndex[] baseColorTexture;
+        public TextureIndex baseColorTexture;
+        public float metallicFactor;
         public TextureIndex[] metallicRoughnessTexture;
     }
 
     public struct TextureIndex
     {
-        public uint index;
+        public int index;
     }
 
     public struct Mesh
@@ -102,7 +103,10 @@ namespace OBJExporterUI.Exporters.glTF
 
     public struct Sampler
     {
-
+        public int magFilter;
+        public int minFilter;
+        public int wrapS;
+        public int wrapT;
     }
 
     public struct Scene
@@ -113,7 +117,7 @@ namespace OBJExporterUI.Exporters.glTF
 
     public struct Texture
     {
-        public uint sampler;
-        public uint source;
+        public int sampler;
+        public int source;
     }
 }
