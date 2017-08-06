@@ -41,7 +41,7 @@ namespace OBJExporterUI.Exporters.glTF
                 }
             }
 
-            exportworker.ReportProgress(30, "Reading WMO..");
+            exportworker.ReportProgress(25, "Generating glTF..");
 
             var glTF = new glTF()
             {
@@ -74,7 +74,6 @@ namespace OBJExporterUI.Exporters.glTF
 
             for (int g = 0; g < reader.wmofile.group.Count(); g++)
             {
-                Console.WriteLine("Loading group #" + g);
                 if (reader.wmofile.group[g].mogp.vertices == null) { Console.WriteLine("Group has no vertices!");  continue; }
                 for (int i = 0; i < reader.wmofile.groupNames.Count(); i++)
                 {
@@ -231,7 +230,7 @@ namespace OBJExporterUI.Exporters.glTF
             writer.Close();
             writer.Dispose();
 
-            exportworker.ReportProgress(55, "Exporting doodads..");
+            //exportworker.ReportProgress(50, "Exporting doodads..");
 
             exportworker.ReportProgress(65, "Exporting textures..");
 
@@ -319,50 +318,9 @@ namespace OBJExporterUI.Exporters.glTF
 
             glTF.scenes[0].nodes = meshIDs.ToArray();
 
-            exportworker.ReportProgress(75, "Exporting model..");
-
-            int numRenderbatches = 0;
-            for (int i = 0; i < reader.wmofile.group.Count(); i++)
-            {
-                if (reader.wmofile.group[i].mogp.renderBatches == null) { continue; }
-                numRenderbatches = numRenderbatches + reader.wmofile.group[i].mogp.renderBatches.Count();
-            }
-
-            int rb = 0;
-
-            for (int g = 0; g < reader.wmofile.group.Count(); g++)
-            {
-                groups[g].renderBatches = new Structs.RenderBatch[numRenderbatches];
-
-                var group = reader.wmofile.group[g];
-                if (group.mogp.renderBatches == null) { continue; }
-                for (int i = 0; i < group.mogp.renderBatches.Count(); i++)
-                {
-                    var batch = group.mogp.renderBatches[i];
-
-                    groups[g].renderBatches[rb].firstFace = batch.firstFace;
-                    groups[g].renderBatches[rb].numFaces = batch.numFaces;
-
-                    if (batch.flags == 2)
-                    {
-                        groups[g].renderBatches[rb].materialID = (uint)batch.possibleBox2_3;
-                    }
-                    else
-                    {
-                        groups[g].renderBatches[rb].materialID = batch.materialID;
-                    }
-                    groups[g].renderBatches[rb].blendType = reader.wmofile.materials[batch.materialID].blendMode;
-                    groups[g].renderBatches[rb].groupID = (uint)g;
-                    rb++;
-
-                    var mesh = new Mesh();
-
-                }
-            }
-
             glTF.meshes = meshes.ToArray();
 
-            exportworker.ReportProgress(95, "Writing files..");
+            exportworker.ReportProgress(95, "Writing to file..");
 
             if (destinationOverride == null)
             {
