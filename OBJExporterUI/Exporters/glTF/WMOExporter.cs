@@ -70,6 +70,8 @@ namespace OBJExporterUI.Exporters.glTF
             var bufferViews = new List<BufferView>();
             var accessorInfo = new List<Accessor>();
 
+            var meshes = new List<Mesh>();
+
             for (int g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 Console.WriteLine("Loading group #" + g);
@@ -117,6 +119,8 @@ namespace OBJExporterUI.Exporters.glTF
 
                 vPosBuffer.byteLength = (uint)writer.BaseStream.Position - vPosBuffer.byteOffset;
 
+                var posLoc = accessorInfo.Count();
+
                 accessorInfo.Add(new Accessor()
                 {
                     name = "vPos",
@@ -147,6 +151,8 @@ namespace OBJExporterUI.Exporters.glTF
 
                 texCoordBuffer.byteLength = (uint)writer.BaseStream.Position - texCoordBuffer.byteOffset;
 
+                var texLoc = accessorInfo.Count();
+
                 accessorInfo.Add(new Accessor()
                 {
                     name = "vTex",
@@ -158,6 +164,45 @@ namespace OBJExporterUI.Exporters.glTF
                 });
 
                 bufferViews.Add(texCoordBuffer);
+
+                var indexBufferPos = bufferViews.Count();
+
+                for (int i = 0; i < reader.wmofile.group[g].mogp.renderBatches.Count(); i++)
+                {
+                    var batch = reader.wmofile.group[g].mogp.renderBatches[i];
+
+                    accessorInfo.Add(new Accessor()
+                    {
+                        name = "indices",
+                        bufferView = indexBufferPos,
+                        byteOffset = batch.firstFace * 2,
+                        componentType = 5123,
+                        count = batch.numFaces,
+                        type = "SCALAR"
+                    });
+
+                    var mesh = new Mesh();
+                    mesh.name = groups[g].name + "_" + i;
+                    mesh.primitives = new Primitive[1];
+                    mesh.primitives[0].attributes = new Dictionary<string, int>
+                    {
+                        { "POSITION", posLoc },
+                        { "TEXCOORD_0", texLoc }
+                    };
+
+                    mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;
+
+                    if (batch.flags == 2)
+                    {
+                        mesh.primitives[0].material = (uint)batch.possibleBox2_3;
+                    }
+                    else
+                    {
+                        mesh.primitives[0].material = batch.materialID;
+                    }
+
+                    meshes.Add(mesh);
+                }
 
                 var indiceBuffer = new BufferView()
                 {
@@ -172,16 +217,6 @@ namespace OBJExporterUI.Exporters.glTF
                 }
 
                 indiceBuffer.byteLength = (uint)writer.BaseStream.Position - indiceBuffer.byteOffset;
-
-                accessorInfo.Add(new Accessor()
-                {
-                    name = "indices",
-                    bufferView = bufferViews.Count(),
-                    byteOffset = 0,
-                    componentType = 5123,
-                    count = (uint)reader.wmofile.group[g].mogp.indices.Count(),
-                    type = "SCALAR"
-                });
 
                 bufferViews.Add(indiceBuffer);
             }
@@ -273,21 +308,16 @@ namespace OBJExporterUI.Exporters.glTF
 
             glTF.scenes = new Scene[1];
             glTF.scenes[0].name = "Test";
-            glTF.scenes[0].nodes = new uint[] { 0 };
 
-            glTF.nodes = new Node[1];
-            glTF.nodes[0].mesh = 0;
-
-            glTF.meshes = new Mesh[1];
-            glTF.meshes[0].name = "Test";
-            glTF.meshes[0].primitives = new Primitive[1];
-            glTF.meshes[0].primitives[0].attributes = new Dictionary<string, uint>
+            glTF.nodes = new Node[meshes.Count()];
+            var meshIDs = new List<int>();
+            for(var i = 0; i < meshes.Count(); i++)
             {
-                { "POSITION", 0 },
-                { "TEXCOORD_0", 1 }
-            };
-            glTF.meshes[0].primitives[0].indices = 2;
-            glTF.meshes[0].primitives[0].material = 0;
+                glTF.nodes[i].mesh = i;
+                meshIDs.Add(i);
+            }
+
+            glTF.scenes[0].nodes = meshIDs.ToArray();
 
             exportworker.ReportProgress(75, "Exporting model..");
 
@@ -299,6 +329,7 @@ namespace OBJExporterUI.Exporters.glTF
             }
 
             int rb = 0;
+
             for (int g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 groups[g].renderBatches = new Structs.RenderBatch[numRenderbatches];
@@ -323,8 +354,13 @@ namespace OBJExporterUI.Exporters.glTF
                     groups[g].renderBatches[rb].blendType = reader.wmofile.materials[batch.materialID].blendMode;
                     groups[g].renderBatches[rb].groupID = (uint)g;
                     rb++;
+
+                    var mesh = new Mesh();
+
                 }
             }
+
+            glTF.meshes = meshes.ToArray();
 
             exportworker.ReportProgress(95, "Writing files..");
 

@@ -89,14 +89,14 @@ namespace OBJExporterUI.Exporters.glTF
 
     public struct Primitive
     {
-        public Dictionary<string, uint> attributes;
+        public Dictionary<string, int> attributes;
         public uint indices;
         public uint material;
     }
 
     public struct Node
     {
-        public uint mesh;
+        public int mesh;
         public string name;
         public float[] rotation;
     }
@@ -112,7 +112,7 @@ namespace OBJExporterUI.Exporters.glTF
     public struct Scene
     {
         public string name;
-        public uint[] nodes;
+        public int[] nodes;
     }
 
     public struct Texture
