@@ -86,6 +86,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Exporters\glTF\ADTExporter.cs" />
     <Compile Include="Exporters\glTF\glTF.cs" />
     <Compile Include="Exporters\glTF\WMOExporter.cs" />
     <Compile Include="Loaders\ADTLoader.cs" />

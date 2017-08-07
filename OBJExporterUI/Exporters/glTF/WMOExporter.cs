@@ -132,6 +132,37 @@ namespace OBJExporterUI.Exporters.glTF
 
                 bufferViews.Add(vPosBuffer);
 
+                // Normal bufferview
+                var normalBuffer = new BufferView()
+                {
+                    buffer = 0,
+                    byteOffset = (uint)writer.BaseStream.Position,
+                    target = 34962
+                };
+
+                for (int i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                {
+                    writer.Write(reader.wmofile.group[g].mogp.normals[i].normal.X);
+                    writer.Write(reader.wmofile.group[g].mogp.normals[i].normal.Z);
+                    writer.Write(reader.wmofile.group[g].mogp.normals[i].normal.Y);
+                }
+
+                normalBuffer.byteLength = (uint)writer.BaseStream.Position - normalBuffer.byteOffset;
+
+                var normalLoc = accessorInfo.Count();
+
+                accessorInfo.Add(new Accessor()
+                {
+                    name = "vNormal",
+                    bufferView = bufferViews.Count(),
+                    byteOffset = 0,
+                    componentType = 5126,
+                    count = (uint)reader.wmofile.group[g].mogp.vertices.Count(),
+                    type = "VEC3"
+                });
+
+                bufferViews.Add(normalBuffer);
+
                 // TexCoord bufferview
                 var texCoordBuffer = new BufferView()
                 {
@@ -184,6 +215,7 @@ namespace OBJExporterUI.Exporters.glTF
                     mesh.primitives[0].attributes = new Dictionary<string, int>
                     {
                         { "POSITION", posLoc },
+                        { "NORMAL", normalLoc },
                         { "TEXCOORD_0", texLoc }
                     };
 
