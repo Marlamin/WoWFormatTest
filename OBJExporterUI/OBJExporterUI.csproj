@@ -88,6 +88,7 @@
     </ApplicationDefinition>
     <Compile Include="Exporters\glTF\ADTExporter.cs" />
     <Compile Include="Exporters\glTF\glTF.cs" />
+    <Compile Include="Exporters\glTF\M2Exporter.cs" />
     <Compile Include="Exporters\glTF\WMOExporter.cs" />
     <Compile Include="Loaders\ADTLoader.cs" />
     <Compile Include="Renderer\CacheStorage.cs" />
@@ -168,7 +169,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="OpenTK.dll.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using Newtonsoft.Json;
+using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,9 +36,18 @@ namespace OBJExporterUI.Exporters.glTF
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
 
             List<Structs.RenderBatch> renderBatches = new List<Structs.RenderBatch>();
-            List<Structs.Vertex> verticelist = new List<Structs.Vertex>();
             List<int> indicelist = new List<Int32>();
             Dictionary<int, string> materials = new Dictionary<int, string>();
+
+            var glTF = new glTF()
+            {
+                asset = new Asset()
+                {
+                    version = "2.0",
+                    generator = "Marlamin's WoW Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                    copyright = "Contents are owned by Blizzard Entertainment"
+                }
+            };
 
             if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
             {
@@ -53,7 +63,8 @@ namespace OBJExporterUI.Exporters.glTF
             exportworker.ReportProgress(0, "Loading ADT " + file);
 
             ADTReader reader = new ADTReader();
-            reader.LoadADT(file);
+            
+            reader.LoadADT(file.Replace('/', '\\'));
 
             if (reader.adtfile.chunks == null)
             {
@@ -66,13 +77,17 @@ namespace OBJExporterUI.Exporters.glTF
             var stream = new FileStream(Path.Combine(outdir, file.Replace(".adt", ".bin")), FileMode.OpenOrCreate);
             var writer = new BinaryWriter(stream);
 
+            var bufferViews = new List<BufferView>();
+            var accessorInfo = new List<Accessor>();
+            var meshes = new List<Mesh>();
+
+            List<Structs.Vertex> verticelist = new List<Structs.Vertex>();
+
             for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
             {
                 var chunk = reader.adtfile.chunks[c];
 
                 int off = verticelist.Count();
-
-                Structs.RenderBatch batch = new Structs.RenderBatch();
 
                 for (int i = 0, idx = 0; i < 17; i++)
                 {
@@ -87,7 +102,117 @@ namespace OBJExporterUI.Exporters.glTF
                     }
                 }
 
-                batch.firstFace = (uint)indicelist.Count();
+                var vPosBuffer = new BufferView()
+                {
+                    buffer = 0,
+                    byteOffset = (uint)writer.BaseStream.Position,
+                    target = 34962
+                };
+
+                var minPosX = float.MaxValue;
+                var minPosY = float.MaxValue;
+                var minPosZ = float.MaxValue;
+
+                var maxPosX = float.MinValue;
+                var maxPosY = float.MinValue;
+                var maxPosZ = float.MinValue;
+
+                // Position buffer
+                foreach (var vertex in verticelist)
+                {
+                    writer.Write(vertex.Position.X);
+                    writer.Write(vertex.Position.Y);
+                    writer.Write(vertex.Position.Z);
+
+                    if (vertex.Position.X < minPosX) minPosX = vertex.Position.X;
+                    if (vertex.Position.Y < minPosY) minPosY = vertex.Position.Y;
+                    if (vertex.Position.Z < minPosZ) minPosZ = vertex.Position.Z;
+
+                    if (vertex.Position.X  > maxPosX) maxPosX = vertex.Position.X;
+                    if (vertex.Position.Y > maxPosY) maxPosY = vertex.Position.Y;
+                    if (vertex.Position.Z > maxPosZ) maxPosZ = vertex.Position.Z;
+                }
+
+                vPosBuffer.byteLength = (uint)writer.BaseStream.Position - vPosBuffer.byteOffset;
+
+                var posLoc = accessorInfo.Count();
+
+                accessorInfo.Add(new Accessor()
+                {
+                    name = "vPos",
+                    bufferView = bufferViews.Count(),
+                    byteOffset = 0,
+                    componentType = 5126,
+                    count = (uint)verticelist.Count(),
+                    type = "VEC3",
+                    min = new float[] { minPosX, minPosY, minPosZ },
+                    max = new float[] { maxPosX, maxPosY, maxPosZ }
+                });
+
+                bufferViews.Add(vPosBuffer);
+
+                // Normal buffer
+                var normalBuffer = new BufferView()
+                {
+                    buffer = 0,
+                    byteOffset = (uint)writer.BaseStream.Position,
+                    target = 34962
+                };
+
+                foreach (var vertex in verticelist)
+                {
+                    writer.Write(vertex.Normal.X);
+                    writer.Write(vertex.Normal.Y);
+                    writer.Write(vertex.Normal.Z);
+                }
+
+                normalBuffer.byteLength = (uint)writer.BaseStream.Position - normalBuffer.byteOffset;
+
+                var normalLoc = accessorInfo.Count();
+
+                accessorInfo.Add(new Accessor()
+                {
+                    name = "vNormal",
+                    bufferView = bufferViews.Count(),
+                    byteOffset = 0,
+                    componentType = 5126,
+                    count = (uint)verticelist.Count(),
+                    type = "VEC3"
+                });
+
+                bufferViews.Add(normalBuffer);
+
+                // Texcoord buffer
+                var texCoordBuffer = new BufferView()
+                {
+                    buffer = 0,
+                    byteOffset = (uint)writer.BaseStream.Position,
+                    target = 34962
+                };
+
+                foreach (var vertex in verticelist)
+                {
+                    writer.Write(vertex.TexCoord.X);
+                    writer.Write(vertex.TexCoord.Y);
+                }
+
+                texCoordBuffer.byteLength = (uint)writer.BaseStream.Position - texCoordBuffer.byteOffset;
+
+                var texLoc = accessorInfo.Count();
+
+                accessorInfo.Add(new Accessor()
+                {
+                    name = "vTex",
+                    bufferView = bufferViews.Count(),
+                    byteOffset = 0,
+                    componentType = 5126,
+                    count = (uint)verticelist.Count(),
+                    type = "VEC2"
+                });
+
+                bufferViews.Add(texCoordBuffer);
+
+                var indexBufferPos = bufferViews.Count();
 
                 // Stupid C# and its structs
                 var holesHighRes = new byte[8];
@@ -100,6 +225,7 @@ namespace OBJExporterUI.Exporters.glTF
                 holesHighRes[6] = chunk.header.holesHighRes_6;
                 holesHighRes[7] = chunk.header.holesHighRes_7;
 
+                var indiceCount = 0;
                 for (int j = 9, xx = 0, yy = 0; j < 145; j++, xx++)
                 {
                     if (xx >= 8) { xx = 0; ++yy; }
@@ -131,7 +257,7 @@ namespace OBJExporterUI.Exporters.glTF
                         indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
                         indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j });
                         indicelist.AddRange(new Int32[] { off + j + 9, off + j + 8, off + j });
-
+                        indiceCount += 12;
                         // Generates quads instead of 4x triangles
                         /*
                         indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j - 8 });
@@ -142,16 +268,100 @@ namespace OBJExporterUI.Exporters.glTF
                     if ((j + 1) % (9 + 8) == 0) j += 9;
                 }
 
-                batch.materialID = (uint)materials.Count();
+                accessorInfo.Add(new Accessor()
+                {
+                    name = "indices",
+                    bufferView = indexBufferPos,
+                    byteOffset = (uint)(indicelist.Count() - indiceCount) * 4,
+                    componentType = 5123,
+                    count = (uint)indiceCount,
+                    type = "SCALAR"
+                });
 
-                batch.numFaces = (uint)(indicelist.Count()) - batch.firstFace;
+                var mesh = new Mesh();
+                mesh.primitives = new Primitive[1];
+                mesh.primitives[0].attributes = new Dictionary<string, int>
+                    {
+                        { "POSITION", posLoc },
+                        { "NORMAL", normalLoc },
+                        { "TEXCOORD_0", texLoc }
+                    };
 
-                renderBatches.Add(batch);
+                mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;
+                mesh.primitives[0].material = 0;
+
+                meshes.Add(mesh);
             }
+
+            var indiceBuffer = new BufferView()
+            {
+                buffer = 0,
+                byteOffset = (uint)writer.BaseStream.Position,
+                target = 34963
+            };
+
+            for (int i = 0; i < indicelist.Count(); i++)
+            {
+                writer.Write(indicelist[i]);
+            }
+
+            indiceBuffer.byteLength = (uint)writer.BaseStream.Position - indiceBuffer.byteOffset;
+
+            bufferViews.Add(indiceBuffer);
+            glTF.bufferViews = bufferViews.ToArray();
+            glTF.accessors = accessorInfo.ToArray();
+
+            glTF.buffers = new Buffer[1];
+            glTF.buffers[0].byteLength = (uint)writer.BaseStream.Length;
+            glTF.buffers[0].uri = Path.GetFileNameWithoutExtension(file) + ".bin";
+
+            writer.Close();
+            writer.Dispose();
+
+            glTF.images = new Image[1];
+            glTF.images[0].uri = Path.GetFileNameWithoutExtension(file) + ".png";
+            glTF.textures = new Texture[1];
+            glTF.textures[0].sampler = 0;
+            glTF.textures[0].source = 0;
+            glTF.materials = new Material[1];
+            glTF.materials[0].pbrMetallicRoughness = new PBRMetallicRoughness();
+            glTF.materials[0].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
+            glTF.materials[0].pbrMetallicRoughness.baseColorTexture.index = 0;
+            glTF.materials[0].pbrMetallicRoughness.metallicFactor = 0.0f;
+
+            glTF.samplers = new Sampler[1];
+            glTF.samplers[0].minFilter = 9986;
+            glTF.samplers[0].magFilter = 9729;
+            glTF.samplers[0].wrapS = 10497;
+            glTF.samplers[0].wrapT = 10497;
+
+            glTF.scenes = new Scene[1];
+            glTF.scenes[0].name = Path.GetFileNameWithoutExtension(file);
+
+            glTF.nodes = new Node[meshes.Count()];
+            var meshIDs = new List<int>();
+            for (var i = 0; i < meshes.Count(); i++)
+            {
+                glTF.nodes[i].mesh = i;
+                meshIDs.Add(i);
+            }
+
+            glTF.scenes[0].nodes = meshIDs.ToArray();
+
+            glTF.meshes = meshes.ToArray();
+
+            exportworker.ReportProgress(95, "Writing to file..");
+
+            File.WriteAllText(Path.Combine(outdir, file.Replace(".adt", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            }));
 
             ConfigurationManager.RefreshSection("appSettings");
 
-            if (ConfigurationManager.AppSettings["exportEverything"] == "True")
+            // Disabled for now, can actually be in glTF!
+            //if (ConfigurationManager.AppSettings["exportEverything"] == "True")
+            if(false)
             {
                 exportworker.ReportProgress(25, "Exporting WMOs");
 
@@ -177,34 +387,8 @@ namespace OBJExporterUI.Exporters.glTF
 
                     if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj"))
                     {
-                        //M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                       M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                     }
-                }
-            }
-
-            exportworker.ReportProgress(85, "Exporting terrain geometry..");
-
-            var indices = indicelist.ToArray();
-
-            var adtname = Path.GetFileNameWithoutExtension(file);
-
-            foreach (var vertex in verticelist)
-            {
-                //objsw.WriteLine("v " + vertex.Position.X + " " + vertex.Position.Y + " " + vertex.Position.Z);
-                //objsw.WriteLine("vt " + vertex.TexCoord.X + " " + -vertex.TexCoord.Y);
-                //objsw.WriteLine("vn " + vertex.Normal.X + " " + vertex.Normal.Y + " " + vertex.Normal.Z);
-            }
-
-            foreach (var renderBatch in renderBatches)
-            {
-                var i = renderBatch.firstFace;
-                if (materials.ContainsKey((int)renderBatch.materialID)) {
-                    //objsw.WriteLine("usemtl " + materials[(int)renderBatch.materialID]); objsw.WriteLine("s 1");
-                }
-                while (i < (renderBatch.firstFace + renderBatch.numFaces))
-                {
-                    //objsw.WriteLine("f " + (indices[i + 2] + 1) + "/" + (indices[i + 2] + 1) + "/" + (indices[i + 2] + 1) + " " + (indices[i + 1] + 1) + "/" + (indices[i + 1] + 1) + "/" + (indices[i + 1] + 1) + " " + (indices[i] + 1) + "/" + (indices[i] + 1) + "/" + (indices[i] + 1));
-                    i = i + 3;
                 }
             }
         }

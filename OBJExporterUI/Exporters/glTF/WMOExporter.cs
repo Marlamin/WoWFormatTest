@@ -67,7 +67,6 @@ namespace OBJExporterUI.Exporters.glTF
 
             var bufferViews = new List<BufferView>();
             var accessorInfo = new List<Accessor>();
-
             var meshes = new List<Mesh>();
 
             for (int g = 0; g < reader.wmofile.group.Count(); g++)
