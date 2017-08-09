@@ -43,6 +43,12 @@ namespace OBJExporterUI.Exporters.OBJ
                 vertices[i].TexCoord = new Vector2(reader.model.vertices[i].textureCoordX, reader.model.vertices[i].textureCoordY);
             }
 
+            // Don't export models without vertices
+            if (reader.model.vertices.Count() == 0)
+            {
+                return;
+            }
+
             StreamWriter objsw;
 
             if(destinationOverride == null)
