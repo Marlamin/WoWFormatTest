@@ -47,7 +47,8 @@ namespace OBJExporterUI.Exporters.glTF
                 {
                     version = "2.0",
                     generator = "Marlamin's WoW Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                    copyright = "Contents are owned by Blizzard Entertainment"
+                    copyright = "Contents are owned by Blizzard Entertainment",
+                    minVersion = "2.0"
                 }
             };
 
@@ -324,6 +325,7 @@ namespace OBJExporterUI.Exporters.glTF
             }
 
             glTF.samplers = new Sampler[1];
+            glTF.samplers[0].name = "Default Sampler";
             glTF.samplers[0].minFilter = 9986;
             glTF.samplers[0].magFilter = 9729;
             glTF.samplers[0].wrapS = 10497;
@@ -336,6 +338,7 @@ namespace OBJExporterUI.Exporters.glTF
             var meshIDs = new List<int>();
             for(var i = 0; i < meshes.Count(); i++)
             {
+                glTF.nodes[i].name = meshes[i].name;
                 glTF.nodes[i].mesh = i;
                 meshIDs.Add(i);
             }
@@ -343,6 +346,8 @@ namespace OBJExporterUI.Exporters.glTF
             glTF.scenes[0].nodes = meshIDs.ToArray();
 
             glTF.meshes = meshes.ToArray();
+
+            glTF.scene = 0;
 
             exportworker.ReportProgress(95, "Writing to file..");
 

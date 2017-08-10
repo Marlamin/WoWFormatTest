@@ -253,16 +253,16 @@ namespace OBJExporterUI.Exporters.glTF
 
                     if (!isHole)
                     {
-                        indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
-                        indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
-                        indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j });
-                        indicelist.AddRange(new Int32[] { off + j + 9, off + j + 8, off + j });
-                        indiceCount += 12;
+                        //indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
+                        //indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
+                        //indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j });
+                        //indicelist.AddRange(new Int32[] { off + j + 9, off + j + 8, off + j });
+                        indiceCount += 6;
                         // Generates quads instead of 4x triangles
-                        /*
+                        
                         indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j - 8 });
                         indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j + 8 });
-                        */
+                        
                     }
 
                     if ((j + 1) % (9 + 8) == 0) j += 9;
@@ -289,7 +289,7 @@ namespace OBJExporterUI.Exporters.glTF
 
                 mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;
                 mesh.primitives[0].material = 0;
-
+                mesh.name = "MCNK #" + c;
                 meshes.Add(mesh);
             }
 
@@ -342,6 +342,7 @@ namespace OBJExporterUI.Exporters.glTF
             var meshIDs = new List<int>();
             for (var i = 0; i < meshes.Count(); i++)
             {
+                glTF.nodes[i].name = meshes[i].name;
                 glTF.nodes[i].mesh = i;
                 meshIDs.Add(i);
             }
@@ -349,6 +350,8 @@ namespace OBJExporterUI.Exporters.glTF
             glTF.scenes[0].nodes = meshIDs.ToArray();
 
             glTF.meshes = meshes.ToArray();
+
+            glTF.scene = 0;
 
             exportworker.ReportProgress(95, "Writing to file..");
 

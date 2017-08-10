@@ -18,6 +18,7 @@ namespace OBJExporterUI.Exporters.glTF
         public Node[] nodes;
         public Sampler[] samplers;
         public Scene[] scenes;
+        public uint scene;
         public Texture[] textures;
     }
 
@@ -36,6 +37,7 @@ namespace OBJExporterUI.Exporters.glTF
     public struct Asset
     {
         public string version;
+        public string minVersion;
         public string generator;
         public string copyright;
     }
@@ -103,6 +105,7 @@ namespace OBJExporterUI.Exporters.glTF
 
     public struct Sampler
     {
+        public string name;
         public int magFilter;
         public int minFilter;
         public int wrapS;
