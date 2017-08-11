@@ -94,6 +94,7 @@ namespace OBJExporterUI.Exporters.glTF
         public Dictionary<string, int> attributes;
         public uint indices;
         public uint material;
+        public uint mode;
     }
 
     public struct Node

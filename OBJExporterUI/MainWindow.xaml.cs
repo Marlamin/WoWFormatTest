@@ -573,7 +573,7 @@ namespace OBJExporterUI
 
             var centerx = int.Parse(coord[1]);
             var centery = int.Parse(coord[2]);
-            previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + centery.ToString() + centerx.ToString() + ".png"));
+            //previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + centery.ToString() + centerx.ToString() + ".png"));
         }
         private void MapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
