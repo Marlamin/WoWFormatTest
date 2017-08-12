@@ -73,15 +73,27 @@ namespace OBJExporterUI.Exporters.glTF
             var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
             var initialChunkX = reader.adtfile.chunks[0].header.position.X;
 
+            ConfigurationManager.RefreshSection("appSettings");
+            var bakeQuality = ConfigurationManager.AppSettings["bakeQuality"];
+
             var bufferViews = new List<BufferView>();
             var accessorInfo = new List<Accessor>();
             var meshes = new List<Mesh>();
 
             glTF.buffers = new Buffer[1];
-            glTF.images = new Image[256];
-            glTF.materials = new Material[256];
-            glTF.textures = new Texture[256];
 
+            if (bakeQuality == "low" || bakeQuality == "medium")
+            {
+                glTF.images = new Image[1];
+                glTF.materials = new Material[1];
+                glTF.textures = new Texture[1];
+            }
+            else if (bakeQuality == "high")
+            {
+                glTF.images = new Image[256];
+                glTF.materials = new Material[256];
+                glTF.textures = new Texture[256];
+            }
             var stream = new FileStream(Path.Combine(outdir, file.Replace(".adt", ".bin")), FileMode.OpenOrCreate);
             var writer = new BinaryWriter(stream);
             for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
@@ -97,7 +109,14 @@ namespace OBJExporterUI.Exporters.glTF
                         v.Normal = new OpenTK.Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
                         v.Position = new OpenTK.Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
                         if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
-                        v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / ChunkSize, -(v.Position.Z - initialChunkY) / ChunkSize);
+                        if (bakeQuality == "low" || bakeQuality == "medium")
+                        {
+                            v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize);
+                        }
+                        else if (bakeQuality == "high")
+                        {
+                            v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / ChunkSize, -(v.Position.Z - initialChunkY) / ChunkSize);
+                        }
                         localVertices[idx - 1] = v;
                     }
                 }
@@ -311,7 +330,15 @@ namespace OBJExporterUI.Exporters.glTF
                     };
 
                 mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;
-                mesh.primitives[0].material = c;
+                if (bakeQuality == "low" || bakeQuality == "medium")
+                {
+                    mesh.primitives[0].material = 0;
+                }
+                else if (bakeQuality == "high")
+                {
+                    mesh.primitives[0].material = c;
+                }
+
                 mesh.primitives[0].mode = 4;
                 mesh.name = "MCNK #" + c;
                 meshes.Add(mesh);
@@ -319,13 +346,26 @@ namespace OBJExporterUI.Exporters.glTF
                 glTF.buffers[0].byteLength = (uint)writer.BaseStream.Length;
                 glTF.buffers[0].uri = Path.GetFileNameWithoutExtension(file) + ".bin";
 
-                glTF.images[c].uri = Path.GetFileNameWithoutExtension(file) + "_" + c + ".png";
-                glTF.textures[c].sampler = 0;
-                glTF.textures[c].source = (int)c;
-                glTF.materials[c].pbrMetallicRoughness = new PBRMetallicRoughness();
-                glTF.materials[c].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
-                glTF.materials[c].pbrMetallicRoughness.baseColorTexture.index = (int)c;
-                glTF.materials[c].pbrMetallicRoughness.metallicFactor = 0.0f;
+                if (bakeQuality == "low" || bakeQuality == "medium")
+                {
+                    glTF.images[0].uri = Path.GetFileNameWithoutExtension(file) + ".png";
+                    glTF.textures[0].sampler = 0;
+                    glTF.textures[0].source = 0;
+                    glTF.materials[0].pbrMetallicRoughness = new PBRMetallicRoughness();
+                    glTF.materials[0].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
+                    glTF.materials[0].pbrMetallicRoughness.baseColorTexture.index = 0;
+                    glTF.materials[0].pbrMetallicRoughness.metallicFactor = 0.0f;
+                }
+                else if (bakeQuality == "high")
+                {
+                    glTF.images[c].uri = Path.GetFileNameWithoutExtension(file) + "_" + c + ".png";
+                    glTF.textures[c].sampler = 0;
+                    glTF.textures[c].source = (int)c;
+                    glTF.materials[c].pbrMetallicRoughness = new PBRMetallicRoughness();
+                    glTF.materials[c].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
+                    glTF.materials[c].pbrMetallicRoughness.baseColorTexture.index = (int)c;
+                    glTF.materials[c].pbrMetallicRoughness.metallicFactor = 0.0f;
+                }
             }
 
             writer.Close();
