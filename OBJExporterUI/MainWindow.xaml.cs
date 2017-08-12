@@ -290,8 +290,8 @@ namespace OBJExporterUI
 
             previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
-            var file = "world/maps/azeroth/azeroth_39_23.adt";
-            Exporters.glTF.ADTExporter.exportADT("world/maps/azeroth/azeroth_39_23.adt");
+            //var file = "world/maps/azeroth/azeroth_39_23.adt";
+            //Exporters.glTF.ADTExporter.exportADT(file);
             //previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".png"), true);
 
 #endif
