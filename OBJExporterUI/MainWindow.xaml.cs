@@ -750,6 +750,18 @@ namespace OBJExporterUI
             config.AppSettings.Settings["bakeQuality"].Value = ((ComboBoxItem)bakeSize.SelectedItem).Name;
             config.Save(ConfigurationSaveMode.Full);
         }
+        private void bakeSize_Loaded(object sender, RoutedEventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            foreach (ComboBoxItem cbi in bakeSize.Items)
+            {
+                if (cbi.Name == config.AppSettings.Settings["bakeQuality"].Value)
+                {
+                    bakeSize.SelectedItem = cbi;
+                    break;
+                }
+            }
+        }
         public static void SelectTile(string tile)
         {
             tileBox.SelectedValue = tile;

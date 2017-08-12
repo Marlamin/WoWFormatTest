@@ -96,7 +96,7 @@
                     <Button x:Name="mapViewerButton" Click="MapViewerButton_Click" Content="Preview ADT" Margin="83,0,88.6,163.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <Button x:Name="bakeTextureButton" Click="BakeTextureButton_Click" Content="Bake texture" Margin="83,0,88.6,140" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportEverything" Content="Export WMOs and M2s" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,114.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportCheckBox_Checked"/>
-                    <ComboBox x:Name="bakeSize" SelectedIndex="0" DropDownClosed="bakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="92,0,0,42.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
+                    <ComboBox x:Name="bakeSize" Loaded="bakeSize_Loaded" DropDownClosed="bakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="92,0,0,42.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
                         <ComboBoxItem Name="low">4K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="medium">8K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="high">16K (split files)</ComboBoxItem>
