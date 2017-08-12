@@ -3,19 +3,37 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OBJExporterUI.Loaders;
 using System.Drawing;
+using System.Configuration;
 
 namespace OBJExporterUI.Renderer
 {
     class RenderMinimap
     {
-        public void Generate(string filename, string outName, CacheStorage cache, int bakeShaderProgram, bool splitFiles = false)
+        public void Generate(string filename, string outName, CacheStorage cache, int bakeShaderProgram)
         {
             float TileSize = 1600.0f / 3.0f; //533.333
             float ChunkSize = TileSize / 16.0f; //33.333
             float UnitSize = ChunkSize / 8.0f; //4.166666
             float MapMidPoint = 32.0f / ChunkSize;
 
-            var bakeSize = 8192;
+            var bakeSize = 4096;
+            var splitFiles = false;
+
+            ConfigurationManager.RefreshSection("appSettings");
+
+            var size = ConfigurationManager.AppSettings["bakeQuality"];
+
+            if (size == "low")
+            {
+                bakeSize = 4096;
+            }else if(size == "medium")
+            {
+                bakeSize = 8192;
+            }else if(size == "high")
+            {
+                bakeSize = 1024;
+                splitFiles = true;
+            }
 
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -27,18 +45,16 @@ namespace OBJExporterUI.Renderer
                 ADTLoader.LoadADT(filename, cache, bakeShaderProgram);
             }
 
+            var firstPos = cache.terrain[filename].startPos.Position;
+            var projectionMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "projection_matrix");
+            var modelviewMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "modelview_matrix");
+            var firstPosLocation = GL.GetUniformLocation(bakeShaderProgram, "firstPos");
+            var heightScaleLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightScale");
+            var heightOffsetLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightOffset");
+
             if (splitFiles)
             {
-                bakeSize = 1024;
-
                 GL.BindVertexArray(cache.terrain[filename].vao);
-
-                var firstPos = cache.terrain[filename].startPos.Position;
-                var projectionMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "projection_matrix");
-                var modelviewMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "modelview_matrix");
-                var firstPosLocation = GL.GetUniformLocation(bakeShaderProgram, "firstPos");
-                var heightScaleLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightScale");
-                var heightOffsetLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightOffset");
 
                 for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                 {
@@ -167,18 +183,14 @@ namespace OBJExporterUI.Renderer
                     Console.WriteLine(error);
                 }
 
-                var firstPos = cache.terrain[filename].startPos.Position;
                 var projectionMatrix = Matrix4.CreateOrthographic(TileSize, TileSize, -1500f, 1500f);
-                var projectionMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "projection_matrix");
                 GL.UniformMatrix4(projectionMatrixLocation, false, ref projectionMatrix);
 
-                var modelviewMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "modelview_matrix");
                 var eye = new Vector3(-TileSize / 2, -TileSize / 2, 400f);
                 var target = new Vector3(-TileSize / 2, -TileSize / 2, 399.9999f);
                 Matrix4 modelViewMatrix = Matrix4.LookAt(eye, target, new Vector3(0f, 1f, 0f));
                 GL.UniformMatrix4(modelviewMatrixLocation, false, ref modelViewMatrix);
 
-                var firstPosLocation = GL.GetUniformLocation(bakeShaderProgram, "firstPos");
                 GL.Uniform3(firstPosLocation, ref firstPos);
 
                 GL.Viewport(0, 0, bakeSize, bakeSize);
@@ -187,10 +199,7 @@ namespace OBJExporterUI.Renderer
 
                 for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                 {
-                    var heightScaleLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightScale");
                     GL.Uniform4(heightScaleLoc, cache.terrain[filename].renderBatches[i].heightScales);
-
-                    var heightOffsetLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightOffset");
                     GL.Uniform4(heightOffsetLoc, cache.terrain[filename].renderBatches[i].heightOffsets);
 
                     for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)

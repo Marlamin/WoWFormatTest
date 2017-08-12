@@ -44,10 +44,10 @@ namespace OBJExporterUI
             }
         }
 
-        public void BakeTexture(string filename, string outname, bool splitFiles = false)
+        public void BakeTexture(string filename, string outname)
         {
             var minimapRenderer = new Renderer.RenderMinimap();
-            minimapRenderer.Generate(filename, outname, cache, bakeShaderProgram, splitFiles);
+            minimapRenderer.Generate(filename, outname, cache, bakeShaderProgram);
         }
 
         public void LoadModel(string filename)

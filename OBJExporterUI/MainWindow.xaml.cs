@@ -547,6 +547,12 @@ namespace OBJExporterUI
             var selectedMap = (MapListItem)mapListBox.SelectedItem;
             var selectedTile = (string)tileListBox.SelectedItem;
 
+            if(selectedMap == null || selectedTile == null)
+            {
+                Console.WriteLine("Nothing selected, not exporting.");
+                return;
+            }
+
             Console.WriteLine(selectedMap.Name + ", " + selectedMap.Internal + ", " + selectedTile);
 
             progressBar.Value = 0;
@@ -576,7 +582,7 @@ namespace OBJExporterUI
 
             var centerx = int.Parse(coord[1]);
             var centery = int.Parse(coord[2]);
-            //previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), "mat" + centery.ToString() + centerx.ToString() + ".png"));
+            previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname + "_" + centerx + "_" + centery + ".png"));
         }
         private void MapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -737,6 +743,12 @@ namespace OBJExporterUI
 
                 bakeTextureButton.IsEnabled = true;
             }
+        }
+        private void bakeSize_DropDownClosed(object sender, EventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["bakeQuality"].Value = ((ComboBoxItem)bakeSize.SelectedItem).Name;
+            config.Save(ConfigurationSaveMode.Full);
         }
         public static void SelectTile(string tile)
         {
@@ -928,5 +940,6 @@ namespace OBJExporterUI
                     return 1;
             }
         }
+
     }
 }

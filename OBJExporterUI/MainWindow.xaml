@@ -96,11 +96,10 @@
                     <Button x:Name="mapViewerButton" Click="MapViewerButton_Click" Content="Preview ADT" Margin="83,0,88.6,163.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <Button x:Name="bakeTextureButton" Click="BakeTextureButton_Click" Content="Bake texture" Margin="83,0,88.6,140" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportEverything" Content="Export WMOs and M2s" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,114.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportCheckBox_Checked"/>
-                    <ComboBox x:Name="bakeSize" SelectedIndex="2" HorizontalAlignment="Left" Margin="83,0,0,89.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="126">
-                        <ComboBoxItem Name="low">512px (one file)</ComboBoxItem>
-                        <ComboBoxItem Name="medium">4K (one file)</ComboBoxItem>
-                        <ComboBoxItem Name="high">8K (one file)</ComboBoxItem>
-                        <ComboBoxItem Name="ultra">16K (split files)</ComboBoxItem>
+                    <ComboBox x:Name="bakeSize" SelectedIndex="0" DropDownClosed="bakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="92,0,0,42.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
+                        <ComboBoxItem Name="low">4K (one file)</ComboBoxItem>
+                        <ComboBoxItem Name="medium">8K (one file)</ComboBoxItem>
+                        <ComboBoxItem Name="high">16K (split files)</ComboBoxItem>
                     </ComboBox>
                     <!--<CheckBox x:Name="exportADTM2" Grid.Row="1" Grid.Column="0" Content="Export terrain doodads" IsChecked="True" HorizontalAlignment="Left" Margin="90,106.2,0,0" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportADTWMO" Grid.Row="1" Grid.Column="0" Content="Export terrain WMOs" IsChecked="True" HorizontalAlignment="Left" Margin="90,126.2,0,0" VerticalAlignment="Bottom"/>
@@ -137,6 +136,7 @@
                     <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="136,13,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow5.png"/>
                     <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="171,13,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow6.png"/>
                     <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="206,11,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow7.png"/>
+                    <Label Content="Baked texture size:" HorizontalAlignment="Left" Margin="78,144.2,0,0" Grid.Row="1" VerticalAlignment="Top" Width="109" Height="24"/>
                     <!--<Label Content="Settings" HorizontalAlignment="Left" Margin="85,80.2,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="71"/>-->
                 </Grid>
             </TabItem>

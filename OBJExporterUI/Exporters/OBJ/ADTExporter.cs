@@ -51,6 +51,10 @@ namespace OBJExporterUI.Exporters.OBJ
                 Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
             }
 
+            ConfigurationManager.RefreshSection("appSettings");
+
+            var bakeQuality = ConfigurationManager.AppSettings["bakeQuality"];
+
             for (int y = centery; y < centery + distance; y++)
             {
                 for (int x = centerx; x < centerx + distance; x++)
@@ -74,7 +78,6 @@ namespace OBJExporterUI.Exporters.OBJ
                         continue;
                     }
 
-                    materials.Add(1, "mat" + y.ToString() + x.ToString());
 
                     var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
                     var initialChunkX = reader.adtfile.chunks[0].header.position.X;
@@ -95,7 +98,14 @@ namespace OBJExporterUI.Exporters.OBJ
                                 v.Normal = new OpenTK.Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
                                 v.Position = new OpenTK.Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
                                 if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
-                                v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize);
+                                if(bakeQuality == "low" || bakeQuality == "medium")
+                                {
+                                    v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize);
+                                }
+                                else if(bakeQuality == "high")
+                                {
+                                    v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / ChunkSize, -(v.Position.Z - initialChunkY) / ChunkSize);
+                                }
                                 verticelist.Add(v);
                             }
                         }
@@ -159,7 +169,16 @@ namespace OBJExporterUI.Exporters.OBJ
                             if ((j + 1) % (9 + 8) == 0) j += 9;
                         }
 
-                        batch.materialID = (uint)materials.Count();
+                        if (bakeQuality == "low" || bakeQuality == "medium")
+                        {
+                            materials.Add(1, mapname + "_" + centerx + "_" + centery);
+                            batch.materialID = (uint)materials.Count();
+                        }
+                        else
+                        {
+                            materials.Add((int)c + 1, mapname + "_" + centerx + "_" + centery + "_" + c);
+                            batch.materialID = c + 1;
+                        }
 
                         batch.numFaces = (uint)(indicelist.Count()) - batch.firstFace;
 
