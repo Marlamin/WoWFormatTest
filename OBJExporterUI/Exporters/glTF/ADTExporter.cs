@@ -92,7 +92,7 @@ namespace OBJExporterUI.Exporters.glTF
                     for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                     {
                         Structs.Vertex v = new Structs.Vertex();
-                        v.Normal = new OpenTK.Vector3(chunk.normals.normal_1[idx] / 127f, chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f);
+                        v.Normal = new OpenTK.Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
                         v.Position = new OpenTK.Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
                         if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
                         v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize);
@@ -149,66 +149,66 @@ namespace OBJExporterUI.Exporters.glTF
 
                 bufferViews.Add(vPosBuffer);
 
-                //// Normal buffer
-                //var normalBuffer = new BufferView()
-                //{
-                //    buffer = c,
-                //    byteOffset = (uint)writer.BaseStream.Position,
-                //    target = 34962
-                //};
+                // Normal buffer
+                var normalBuffer = new BufferView()
+                {
+                    buffer = c,
+                    byteOffset = (uint)writer.BaseStream.Position,
+                    target = 34962
+                };
 
-                //foreach (var vertex in localVertices)
-                //{
-                //    writer.Write(vertex.Normal.X);
-                //    writer.Write(vertex.Normal.Y);
-                //    writer.Write(vertex.Normal.Z);
-                //}
+                foreach (var vertex in localVertices)
+                {
+                    writer.Write(vertex.Normal.X);
+                    writer.Write(vertex.Normal.Y);
+                    writer.Write(vertex.Normal.Z);
+                }
 
-                //normalBuffer.byteLength = (uint)writer.BaseStream.Position - normalBuffer.byteOffset;
+                normalBuffer.byteLength = (uint)writer.BaseStream.Position - normalBuffer.byteOffset;
 
-                //var normalLoc = accessorInfo.Count();
+                var normalLoc = accessorInfo.Count();
 
-                //accessorInfo.Add(new Accessor()
-                //{
-                //    name = "vNormal",
-                //    bufferView = bufferViews.Count(),
-                //    byteOffset = 0,
-                //    componentType = 5126,
-                //    count = 145,
-                //    type = "VEC3"
-                //});
+                accessorInfo.Add(new Accessor()
+                {
+                    name = "vNormal",
+                    bufferView = bufferViews.Count(),
+                    byteOffset = 0,
+                    componentType = 5126,
+                    count = 145,
+                    type = "VEC3"
+                });
 
-                //bufferViews.Add(normalBuffer);
+                bufferViews.Add(normalBuffer);
 
                 // Texcoord buffer
-                //var texCoordBuffer = new BufferView()
-                //{
-                //    buffer = c,
-                //    byteOffset = (uint)writer.BaseStream.Position,
-                //    target = 34962
-                //};
+                var texCoordBuffer = new BufferView()
+                {
+                    buffer = c,
+                    byteOffset = (uint)writer.BaseStream.Position,
+                    target = 34962
+                };
 
-                //foreach (var vertex in localVertices)
-                //{
-                //    writer.Write(vertex.TexCoord.X);
-                //    writer.Write(vertex.TexCoord.Y);
-                //}
+                foreach (var vertex in localVertices)
+                {
+                    writer.Write(vertex.TexCoord.X);
+                    writer.Write(vertex.TexCoord.Y);
+                }
 
-                //texCoordBuffer.byteLength = (uint)writer.BaseStream.Position - texCoordBuffer.byteOffset;
+                texCoordBuffer.byteLength = (uint)writer.BaseStream.Position - texCoordBuffer.byteOffset;
 
-                //var texLoc = accessorInfo.Count();
+                var texLoc = accessorInfo.Count();
 
-                //accessorInfo.Add(new Accessor()
-                //{
-                //    name = "vTex",
-                //    bufferView = bufferViews.Count(),
-                //    byteOffset = 0,
-                //    componentType = 5126,
-                //    count = 145,
-                //    type = "VEC2"
-                //});
+                accessorInfo.Add(new Accessor()
+                {
+                    name = "vTex",
+                    bufferView = bufferViews.Count(),
+                    byteOffset = 0,
+                    componentType = 5126,
+                    count = 145,
+                    type = "VEC2"
+                });
 
-                //bufferViews.Add(texCoordBuffer);
+                bufferViews.Add(texCoordBuffer);
 
                 var indexBufferPos = bufferViews.Count();
 
@@ -252,10 +252,17 @@ namespace OBJExporterUI.Exporters.glTF
 
                     if (!isHole)
                     {
-                        indicelist.AddRange(new Int32[] { j + 8, j - 9, j });
-                        indicelist.AddRange(new Int32[] { j - 9, j - 8, j });
-                        indicelist.AddRange(new Int32[] { j - 8, j + 9, j });
-                        indicelist.AddRange(new Int32[] { j + 9, j + 8, j });
+                        indicelist.AddRange(new Int32[] { j + 8, j, j - 9 });
+                        indicelist.AddRange(new Int32[] { j - 9, j, j - 8 });
+                        indicelist.AddRange(new Int32[] { j - 8, j, j + 9 });
+                        indicelist.AddRange(new Int32[] { j + 9, j, j + 8 });
+
+
+                        // j = 9
+                        // 17, 0, 9
+                        // 0, 1, 9
+                        // 1, 18, 9
+                        // 18, 17, 9
                         // Generates quads instead of 4x triangles
                         
                         //indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j - 8 });
@@ -297,8 +304,8 @@ namespace OBJExporterUI.Exporters.glTF
                 mesh.primitives[0].attributes = new Dictionary<string, int>
                     {
                         { "POSITION", posLoc },
-                       // { "NORMAL", normalLoc },
-                       // { "TEXCOORD_0", texLoc }
+                        { "NORMAL", normalLoc },
+                        { "TEXCOORD_0", texLoc }
                     };
 
                 mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;

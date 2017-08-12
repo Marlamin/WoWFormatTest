@@ -13,17 +13,28 @@ namespace WoWFormatLib
         private static void Main(string[] args)
         {
             //CASC.InitCasc(null, @"C:\World of Warcraft", "wow");
-            //Console.WriteLine("CASC loaded!");
+            CASC.InitCasc(null, null, "wowt");
+            Console.WriteLine("CASC loaded!");
+
+            if (!File.Exists("listfile.txt"))
+            {
+                throw new Exception("Listfile not found!");
+            }
 
             var reader = new BLSReader();
-            reader.LoadBLS("shaders/pixel/glfs_420/terrain.bls");
+            reader.LoadBLS(1694483);
 
-            var shader = reader.shaderFile;
+            var shaderFile = reader.shaderFile;
+            //foreach (var line in File.ReadAllLines("listfile.txt"))
+            //{
+            //    if (CASC.cascHandler.FileExists(line) && line.EndsWith(".bls", StringComparison.CurrentCultureIgnoreCase))
+            //    {
+            //        Console.WriteLine("Loading " + line);
+            //        var reader = new BLSReader();
+            //        reader.LoadBLS(line);
+            //    }
+            //}
 
-            for(var i = 0; i < shader.nShaders; i++)
-            {
-                File.WriteAllText(i + ".txt", shader.shaderBlocks[i].shaderContent);
-            }
         }
     }
 }
