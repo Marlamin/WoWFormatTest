@@ -569,21 +569,30 @@ namespace OBJExporterUI
             mapListBox.IsEnabled = false;
             tileListBox.IsEnabled = false;
 
-            var file = "world/maps/" + selectedMap.Internal.ToLower() + "/" + selectedMap.Internal.ToLower() + "_" + selectedTile + ".adt";
+            var tileList = new List<string>();
 
-            var tempList = new List<string>();
-            tempList.Add(file);
+            progressBar.Value = 10;
+            loadingLabel.Content = "Baking map textures, this will take a while.";
 
-            exportworker.RunWorkerAsync(tempList);
+            Dispatcher.Invoke(new Action(() => { }), System.Windows.Threading.DispatcherPriority.ContextIdle, null);
 
-            // Hackfix because I can't seem to get GL and backgroundworkers due to work well together due to threading, will freeze everything
-            var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
-            var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
+            foreach (var item in tileListBox.SelectedItems)
+            {
+                var file = "world/maps/" + selectedMap.Internal.ToLower() + "/" + selectedMap.Internal.ToLower() + "_" + item + ".adt";
+                tileList.Add(file);
 
-            var centerx = int.Parse(coord[1]);
-            var centery = int.Parse(coord[2]);
-            previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname + "_" + centerx + "_" + centery + ".png"));
+                // Hackfix because I can't seem to get GL and backgroundworkers due to work well together due to threading, will freeze everything
+                var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
+                var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
+
+                var centerx = int.Parse(coord[1]);
+                var centery = int.Parse(coord[2]);
+                previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname + "_" + centerx + "_" + centery + ".png"));
+            }
+
+            exportworker.RunWorkerAsync(tileList);
         }
+
         private void MapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             tileListBox.Items.Clear();

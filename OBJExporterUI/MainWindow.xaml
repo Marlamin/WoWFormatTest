@@ -96,6 +96,7 @@
                     <Button x:Name="mapViewerButton" Click="MapViewerButton_Click" Content="Preview ADT" Margin="83,0,88.6,163.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <Button x:Name="bakeTextureButton" Click="BakeTextureButton_Click" Content="Bake texture" Margin="83,0,88.6,140" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportEverything" Content="Export WMOs and M2s" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,114.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportCheckBox_Checked"/>
+                    <Label Content="Baked texture size:" HorizontalAlignment="Left" Margin="78,0,0,72.8" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Width="109" Height="24"/>
                     <ComboBox x:Name="bakeSize" Loaded="bakeSize_Loaded" DropDownClosed="bakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="92,0,0,42.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
                         <ComboBoxItem Name="low">4K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="medium">8K (one file)</ComboBoxItem>
@@ -106,7 +107,7 @@
                     <CheckBox x:Name="exportADTWMOM2" Grid.Row="1" Grid.Column="0" Content="Export WMO doodads" IsChecked="True" HorizontalAlignment="Left" Margin="90,146.2,0,0" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportM2PHYS"  Grid.Row="1" Grid.Column="0" Content="Export doodad collisions" IsChecked="False" HorizontalAlignment="Left" Margin="90,166.2,0,0" VerticalAlignment="Bottom"/>-->
                     <Image x:Name="tileImage" Grid.Column="1" Grid.Row="1" Margin="93,19,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
-                    <ListBox x:Name="tileListBox" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0"  SelectionChanged="TileListBox_SelectionChanged" Height="209" Width="75" Margin="3,0,0,59" VerticalContentAlignment="Bottom" Grid.RowSpan="2"/>
+                    <ListBox x:Name="tileListBox" SelectionMode="Extended" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0"  SelectionChanged="TileListBox_SelectionChanged" Height="209" Width="75" Margin="3,0,0,59" VerticalContentAlignment="Bottom" Grid.RowSpan="2"/>
                     <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="exportTileButton" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="ExportTileButton_Click"/>
                     <Label Content="World" HorizontalAlignment="Left" Margin="-1,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
                     <CheckBox Loaded="MapCheckBox_Click" Content="Continent" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True" Width="82"/>
@@ -136,7 +137,6 @@
                     <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="136,13,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow5.png"/>
                     <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="171,13,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow6.png"/>
                     <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="206,11,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow7.png"/>
-                    <Label Content="Baked texture size:" HorizontalAlignment="Left" Margin="78,144.2,0,0" Grid.Row="1" VerticalAlignment="Top" Width="109" Height="24"/>
                     <!--<Label Content="Settings" HorizontalAlignment="Left" Margin="85,80.2,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="71"/>-->
                 </Grid>
             </TabItem>

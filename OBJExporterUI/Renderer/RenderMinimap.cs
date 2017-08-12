@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL;
 using OBJExporterUI.Loaders;
 using System.Drawing;
 using System.Configuration;
+using System.IO;
 
 namespace OBJExporterUI.Renderer
 {
@@ -35,6 +36,11 @@ namespace OBJExporterUI.Renderer
                 splitFiles = true;
             }
 
+            if (!Directory.Exists(Path.GetDirectoryName(outName)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(outName));
+            }
+
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -58,6 +64,11 @@ namespace OBJExporterUI.Renderer
 
                 for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                 {
+                    if(File.Exists(outName.Replace(".png", "_" + i + ".png")))
+                    {
+                        continue;
+                    }
+
                     var x = i / 16;
                     var y = i % 16;
 
@@ -163,6 +174,11 @@ namespace OBJExporterUI.Renderer
             }
             else
             {
+                if (File.Exists(outName))
+                {
+                    return;
+                }
+
                 var frameBuffer = GL.GenFramebuffer();
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBuffer);
 
