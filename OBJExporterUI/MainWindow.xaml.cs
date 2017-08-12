@@ -290,7 +290,10 @@ namespace OBJExporterUI
 
             previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
-            //Exporters.glTF.WMOExporter.exportWMO("world/wmo/kalimdor/buildings/classicalelfruins/azrclassicalelfruin01.wmo");
+            var file = "world/maps/azeroth/azeroth_39_23.adt";
+            Exporters.glTF.ADTExporter.exportADT("world/maps/azeroth/azeroth_39_23.adt");
+            //previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".png"), true);
+
 #endif
         }
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)

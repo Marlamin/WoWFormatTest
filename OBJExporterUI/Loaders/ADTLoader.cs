@@ -50,7 +50,6 @@ namespace OBJExporterUI.Loaders
                 material.filename = adt.textures.filenames[ti];
                 material.textureID = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
 
-
                 if (adt.texParams != null && adt.texParams.Count() >= ti)
                 {
                     material.scale = (float)Math.Pow(2, (adt.texParams[ti].flags & 0xF0) >> 4);
@@ -96,6 +95,8 @@ namespace OBJExporterUI.Loaders
                 int off = verticelist.Count();
 
                 RenderBatch batch = new RenderBatch();
+
+                batch.groupID = c;
 
                 for (int i = 0, idx = 0; i < 17; i++)
                 {

@@ -78,6 +78,9 @@ namespace OBJExporterUI.Exporters.glTF
             var meshes = new List<Mesh>();
 
             glTF.buffers = new Buffer[1];
+            glTF.images = new Image[256];
+            glTF.materials = new Material[256];
+            glTF.textures = new Texture[256];
 
             var stream = new FileStream(Path.Combine(outdir, file.Replace(".adt", ".bin")), FileMode.OpenOrCreate);
             var writer = new BinaryWriter(stream);
@@ -94,7 +97,7 @@ namespace OBJExporterUI.Exporters.glTF
                         v.Normal = new OpenTK.Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
                         v.Position = new OpenTK.Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
                         if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
-                        v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize);
+                        v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / ChunkSize, -(v.Position.Z - initialChunkY) / ChunkSize);
                         localVertices[idx - 1] = v;
                     }
                 }
@@ -308,13 +311,21 @@ namespace OBJExporterUI.Exporters.glTF
                     };
 
                 mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;
-                mesh.primitives[0].material = 0;
+                mesh.primitives[0].material = c;
                 mesh.primitives[0].mode = 4;
                 mesh.name = "MCNK #" + c;
                 meshes.Add(mesh);
                
                 glTF.buffers[0].byteLength = (uint)writer.BaseStream.Length;
-                glTF.buffers[0].uri = Path.GetFileNameWithoutExtension(file) + ".bin";            
+                glTF.buffers[0].uri = Path.GetFileNameWithoutExtension(file) + ".bin";
+
+                glTF.images[c].uri = Path.GetFileNameWithoutExtension(file) + "_" + c + ".png";
+                glTF.textures[c].sampler = 0;
+                glTF.textures[c].source = (int)c;
+                glTF.materials[c].pbrMetallicRoughness = new PBRMetallicRoughness();
+                glTF.materials[c].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
+                glTF.materials[c].pbrMetallicRoughness.baseColorTexture.index = (int)c;
+                glTF.materials[c].pbrMetallicRoughness.metallicFactor = 0.0f;
             }
 
             writer.Close();
@@ -322,17 +333,6 @@ namespace OBJExporterUI.Exporters.glTF
 
             glTF.bufferViews = bufferViews.ToArray();
             glTF.accessors = accessorInfo.ToArray();
-
-            glTF.images = new Image[1];
-            glTF.images[0].uri = Path.GetFileNameWithoutExtension(file) + ".png";
-            glTF.textures = new Texture[1];
-            glTF.textures[0].sampler = 0;
-            glTF.textures[0].source = 0;
-            glTF.materials = new Material[1];
-            glTF.materials[0].pbrMetallicRoughness = new PBRMetallicRoughness();
-            glTF.materials[0].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
-            glTF.materials[0].pbrMetallicRoughness.baseColorTexture.index = 0;
-            glTF.materials[0].pbrMetallicRoughness.metallicFactor = 0.0f;
 
             glTF.samplers = new Sampler[1];
             glTF.samplers[0].minFilter = 9986;
