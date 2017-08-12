@@ -77,13 +77,12 @@ namespace OBJExporterUI.Exporters.glTF
             var accessorInfo = new List<Accessor>();
             var meshes = new List<Mesh>();
 
-            glTF.buffers = new Buffer[256];
+            glTF.buffers = new Buffer[1];
 
+            var stream = new FileStream(Path.Combine(outdir, file.Replace(".adt", ".bin")), FileMode.OpenOrCreate);
+            var writer = new BinaryWriter(stream);
             for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
             {
-                var stream = new FileStream(Path.Combine(outdir, file.Replace(".adt", "_" + c + ".bin")), FileMode.OpenOrCreate);
-                var writer = new BinaryWriter(stream);
-
                 var chunk = reader.adtfile.chunks[c];
 
                 var localVertices = new Structs.Vertex[145];
@@ -102,7 +101,7 @@ namespace OBJExporterUI.Exporters.glTF
 
                 var vPosBuffer = new BufferView()
                 {
-                    buffer = c,
+                    buffer = 0,
                     byteOffset = (uint)writer.BaseStream.Position,
                     target = 34962
                 };
@@ -152,7 +151,7 @@ namespace OBJExporterUI.Exporters.glTF
                 // Normal buffer
                 var normalBuffer = new BufferView()
                 {
-                    buffer = c,
+                    buffer = 0,
                     byteOffset = (uint)writer.BaseStream.Position,
                     target = 34962
                 };
@@ -183,7 +182,7 @@ namespace OBJExporterUI.Exporters.glTF
                 // Texcoord buffer
                 var texCoordBuffer = new BufferView()
                 {
-                    buffer = c,
+                    buffer = 0,
                     byteOffset = (uint)writer.BaseStream.Position,
                     target = 34962
                 };
@@ -285,7 +284,7 @@ namespace OBJExporterUI.Exporters.glTF
 
                 var indiceBuffer = new BufferView()
                 {
-                    buffer = c,
+                    buffer = 0,
                     byteOffset = (uint)writer.BaseStream.Position,
                     target = 34963
                 };
@@ -314,13 +313,13 @@ namespace OBJExporterUI.Exporters.glTF
                 mesh.name = "MCNK #" + c;
                 meshes.Add(mesh);
                
-                glTF.buffers[c].byteLength = (uint)writer.BaseStream.Length;
-                glTF.buffers[c].uri = Path.GetFileNameWithoutExtension(file) + "_" + c + ".bin";
-
-                writer.Close();
-                writer.Dispose();
+                glTF.buffers[0].byteLength = (uint)writer.BaseStream.Length;
+                glTF.buffers[0].uri = Path.GetFileNameWithoutExtension(file) + ".bin";            
             }
- 
+
+            writer.Close();
+            writer.Dispose();
+
             glTF.bufferViews = bufferViews.ToArray();
             glTF.accessors = accessorInfo.ToArray();
 
