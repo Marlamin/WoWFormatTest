@@ -650,6 +650,8 @@ namespace OBJExporterUI
                     tileImage.Source = bitmapImage;
                 }
 
+                selectedTileLabel.Content = "Selected tile: " + file.Insert(2, "_");
+
             }
             catch (Exception blpException)
             {
@@ -659,7 +661,7 @@ namespace OBJExporterUI
         private void MapCheckBox_Click(object sender, RoutedEventArgs e)
         {
             var source = (CheckBox)sender;
-            if (string.IsNullOrEmpty((string)source.Content))
+            if (source.Name.StartsWith("wow"))
             {
                 // Expansion filter
                 //Console.WriteLine("Checkbox event on " + source.Name);
@@ -730,29 +732,7 @@ namespace OBJExporterUI
             mw.Show();
 
         }
-        private void BakeTextureButton_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedItem = (MapListItem)mapListBox.SelectedItem;
-            if (selectedItem == null) return;
-
-            var selectedTile = tileListBox.SelectedItem;
-            if (selectedTile == null) return;
-
-            var tiles = selectedTile.ToString().Split('_');
-            var x = int.Parse(tiles[0]);
-            var y = int.Parse(tiles[1]);
-
-            var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
-
-            if (CASC.cascHandler.FileExists(adtFile))
-            {
-                bakeTextureButton.IsEnabled = false;
-
-                previewControl.BakeTexture(adtFile, selectedItem.Internal + "_" + x + "_" + y + ".png");
-
-                bakeTextureButton.IsEnabled = true;
-            }
-        }
+      
         private void bakeSize_DropDownClosed(object sender, EventArgs e)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);

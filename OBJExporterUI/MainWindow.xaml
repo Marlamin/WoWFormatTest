@@ -65,15 +65,38 @@
             <TabItem x:Name="MapsTab" Header="Maps">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="2*" />
-                        <RowDefinition Height="0.5*" />
+                        <RowDefinition Height="125"/>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="250" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Grid.Row="0" x:Name="mapListBox" SelectionMode="Single" SelectionChanged="MapListBox_SelectionChanged" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding}" Margin="-1,109,0,214" Grid.ColumnSpan="2" Grid.RowSpan="2">
+                    <!-- Row 0-->
+                    <Label Content="World" HorizontalAlignment="Left" Margin="-1,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Continent" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True" Width="82"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="PvP" HorizontalAlignment="Left" Margin="10,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
+                    <Label Content="Instances" HorizontalAlignment="Left" Margin="90,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Instance" HorizontalAlignment="Left" Margin="100,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Raid" HorizontalAlignment="Left" Margin="100,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Scenario" HorizontalAlignment="Left" Margin="100,68,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
+                    <Label Content="Other" HorizontalAlignment="Left" Margin="179,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14" Height="29"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Garrison" HorizontalAlignment="Left" Margin="188,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Dev" HorizontalAlignment="Left" Margin="188,68,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Artifact" HorizontalAlignment="Left" Margin="188,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="World" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Starter" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Unknown" HorizontalAlignment="Left" Margin="188,88,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
+                    <Label Content="Expansion" HorizontalAlignment="Left" Margin="281,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14" Height="29" Grid.ColumnSpan="2"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Vanilla" IsChecked="True" HorizontalAlignment="Left" Name="wow1" Margin="287,29,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="TBC" IsChecked="True" HorizontalAlignment="Left" Name="wow2" Margin="287,49,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="WotLK" IsChecked="True" HorizontalAlignment="Left" Name="wow3" Margin="287,69,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Cata" IsChecked="True" HorizontalAlignment="Left" Name="wow4" Margin="287,88,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="MoP" IsChecked="True" HorizontalAlignment="Left" Name="wow5" Margin="352,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="WoD" IsChecked="True" HorizontalAlignment="Left" Name="wow6" Margin="352,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="Legion" IsChecked="True" HorizontalAlignment="Left" Name="wow7" Margin="352,68,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
+                    <!-- Row 1 -->
+                    <ListView Grid.Row="1" Grid.Column="0" x:Name="mapListBox" SelectionMode="Single" SelectionChanged="MapListBox_SelectionChanged" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding}" Grid.ColumnSpan="2" Margin="0,0,0,0"  >
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Expansion" Width="60">
@@ -91,52 +114,20 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
-                    <Button x:Name="tileViewerButton" Click="TileViewerButton_Click" Content="Tile viewer" Margin="83,0,88.6,188.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
-                    <Button x:Name="mapViewerButton" Click="MapViewerButton_Click" Content="Preview ADT" Margin="83,0,88.6,163.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
-                    <Button x:Name="bakeTextureButton" Click="BakeTextureButton_Click" Content="Bake texture" Margin="83,0,88.6,140" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
-                    <CheckBox x:Name="exportEverything" Content="Export WMOs and M2s" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,114.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportCheckBox_Checked"/>
-                    <Label Content="Baked texture size:" HorizontalAlignment="Left" Margin="78,0,0,72.8" Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Width="109" Height="24"/>
-                    <ComboBox x:Name="bakeSize" Loaded="bakeSize_Loaded" DropDownClosed="bakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="92,0,0,42.8" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
+                    <!-- Row 2 -->
+                    <ListBox x:Name="tileListBox" SelectionMode="Extended" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="2" SelectionChanged="TileListBox_SelectionChanged" Height="209" Width="75" Margin="3,0,0,34" VerticalContentAlignment="Bottom"/>
+                    <Button x:Name="tileViewerButton" Click="TileViewerButton_Click" Content="View map" Margin="83,0,387.4,220" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
+                    <Button x:Name="mapViewerButton" Click="MapViewerButton_Click" Content="View tile in 3D" Margin="83,0,387.4,195" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
+                    <CheckBox x:Name="exportEverything" Content="Export WMOs and M2s" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,170" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportCheckBox_Checked"/>
+                    <Label Content="Terrain texture size:" HorizontalAlignment="Left" Margin="78,0,0,146" Grid.Row="2" VerticalAlignment="Bottom" Width="113" Height="24"/>
+                    <ComboBox x:Name="bakeSize" SelectedIndex="1" Loaded="bakeSize_Loaded" DropDownClosed="bakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="90,0,0,116" Grid.Row="2" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
                         <ComboBoxItem Name="low">4K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="medium">8K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="high">16K (split files)</ComboBoxItem>
                     </ComboBox>
-                    <!--<CheckBox x:Name="exportADTM2" Grid.Row="1" Grid.Column="0" Content="Export terrain doodads" IsChecked="True" HorizontalAlignment="Left" Margin="90,106.2,0,0" VerticalAlignment="Bottom"/>
-                    <CheckBox x:Name="exportADTWMO" Grid.Row="1" Grid.Column="0" Content="Export terrain WMOs" IsChecked="True" HorizontalAlignment="Left" Margin="90,126.2,0,0" VerticalAlignment="Bottom"/>
-                    <CheckBox x:Name="exportADTWMOM2" Grid.Row="1" Grid.Column="0" Content="Export WMO doodads" IsChecked="True" HorizontalAlignment="Left" Margin="90,146.2,0,0" VerticalAlignment="Bottom"/>
-                    <CheckBox x:Name="exportM2PHYS"  Grid.Row="1" Grid.Column="0" Content="Export doodad collisions" IsChecked="False" HorizontalAlignment="Left" Margin="90,166.2,0,0" VerticalAlignment="Bottom"/>-->
-                    <Image x:Name="tileImage" Grid.Column="1" Grid.Row="1" Margin="93,19,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
-                    <ListBox x:Name="tileListBox" SelectionMode="Extended" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0"  SelectionChanged="TileListBox_SelectionChanged" Height="209" Width="75" Margin="3,0,0,59" VerticalContentAlignment="Bottom" Grid.RowSpan="2"/>
-                    <Button Grid.Row="2" Grid.ColumnSpan="2" x:Name="exportTileButton" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Click="ExportTileButton_Click"/>
-                    <Label Content="World" HorizontalAlignment="Left" Margin="-1,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Continent" HorizontalAlignment="Left" Margin="10,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True" Width="82"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="PvP" HorizontalAlignment="Left" Margin="10,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
-                    <Label Content="Instances" HorizontalAlignment="Left" Margin="90,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Instance" HorizontalAlignment="Left" Margin="100,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Raid" HorizontalAlignment="Left" Margin="100,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Scenario" HorizontalAlignment="Left" Margin="100,68,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
-                    <Label Content="Other" HorizontalAlignment="Left" Margin="179,-1,0,0" VerticalAlignment="Top" Width="74" FontSize="14" Height="29"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Garrison" HorizontalAlignment="Left" Margin="188,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Dev" HorizontalAlignment="Left" Margin="188,68,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Artifact" HorizontalAlignment="Left" Margin="188,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="World" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Starter" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
-                    <CheckBox Loaded="MapCheckBox_Click" Content="Unknown" HorizontalAlignment="Left" Margin="188,88,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" IsChecked="True"/>
-                    <CheckBox Loaded="MapCheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow1" Margin="10,31,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="1"/>
-                    <CheckBox Loaded="MapCheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow2" Margin="40,31,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="1"/>
-                    <CheckBox Loaded="MapCheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow3" Margin="72,31,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="1"/>
-                    <CheckBox Loaded="MapCheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow4" Margin="107,31,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="1"/>
-                    <CheckBox Loaded="MapCheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow5" Margin="142,31,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="1"/>
-                    <CheckBox Loaded="MapCheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow6" Margin="180,31,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="1"/>
-                    <CheckBox Loaded="MapCheckBox_Click" IsChecked="True" HorizontalAlignment="Left" Name="wow7" Margin="212,31,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="1"/>
-                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="16" Height="16" Margin="10,10,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow1.png"/>
-                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="31,11,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow2.png"/>
-                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="66,10,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow3.png"/>
-                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="101,11,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow4.png"/>
-                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="136,13,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow5.png"/>
-                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="171,13,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow6.png"/>
-                    <Image Grid.Column="1" HorizontalAlignment="Left" Width="30" Height="15" Margin="206,11,0,0" VerticalAlignment="Top" Source="pack://application:,,,/Resources/wow7.png"/>
-                    <!--<Label Content="Settings" HorizontalAlignment="Left" Margin="85,80.2,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="71"/>-->
+                    <Image x:Name="tileImage" Grid.Row="2" Margin="100,0,0,50" VerticalAlignment="Top" HorizontalAlignment="Right"/>
+                    <Label x:Name="selectedTileLabel" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Selected tile: none" Margin="0,0,0.4,30" Width="160"/>
+                    <Button Grid.Row="2" x:Name="exportTileButton" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" Click="ExportTileButton_Click"/>
                 </Grid>
             </TabItem>
         </TabControl>
