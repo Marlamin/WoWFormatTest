@@ -293,7 +293,6 @@ namespace OBJExporterUI
             //var file = "world/maps/azeroth/azeroth_39_23.adt";
             //Exporters.glTF.ADTExporter.exportADT(file);
             //previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file) + ".png"), true);
-
 #endif
         }
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -311,7 +310,7 @@ namespace OBJExporterUI
         {
             worker.ReportProgress(0, "Loading listfile..");
 
-            List<string> linelist = new List<string>();
+            var linelist = new List<string>();
 
             if (!File.Exists("listfile.txt"))
             {
@@ -333,17 +332,19 @@ namespace OBJExporterUI
 
             linelist.Sort();
 
-            string[] lines = linelist.ToArray();
+            var lines = linelist.ToArray();
 
             linelist = null;
 
-            List<string> unwantedExtensions = new List<String>();
+            var unwantedExtensions = new List<String>();
             for (int u = 0; u < 512; u++)
             {
                 unwantedExtensions.Add("_" + u.ToString().PadLeft(3, '0') + ".wmo");
             }
 
-            string[] unwanted = unwantedExtensions.ToArray();
+            var unwanted = unwantedExtensions.ToArray();
+
+            unwantedExtensions = null;
 
             for (int i = 0; i < lines.Count(); i++)
             {
@@ -592,7 +593,6 @@ namespace OBJExporterUI
 
             exportworker.RunWorkerAsync(tileList);
         }
-
         private void MapListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             tileListBox.Items.Clear();
