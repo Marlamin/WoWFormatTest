@@ -89,6 +89,12 @@ namespace WoWFormatLib.FileReaders
                         model.physFileID = (int)bin.ReadUInt32();
                         break;
                     case "TXAC":
+                    case "EXPT":
+                    case "EXP2":
+                    case "PADC":
+                    case "PSBC":
+                    case "PEDC":
+                    case "SKID":
                         break;
                     default:
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
