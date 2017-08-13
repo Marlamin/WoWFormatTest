@@ -20,7 +20,7 @@
         <Button x:Name="basedirBrowse" Content="Browse.." Visibility="Hidden" Click="basedirBrowse_Click" HorizontalAlignment="Center" Margin="84,193,84,0" VerticalAlignment="Top" Width="75"/>
         <Separator HorizontalAlignment="Stretch" Height="5" Margin="0,220,0,0" VerticalAlignment="Top"/>
         <Button x:Name="button" Content="Confirm settings" HorizontalAlignment="Center" Margin="0,235,0,0" VerticalAlignment="Top" Width="125" Click="button_Click"/>
-        <Label x:Name="onlineLabel" Visibility="Visible" Content="Online mode will use the web to retrieve data &#xD;&#xA;and as such its speed will be dependent on &#xD;&#xA;the speed of your connection.&#xA;" HorizontalAlignment="Left" Margin="16,70,0,0" VerticalAlignment="Top" Width="262" FontSize="10.667" Height="59"/>
-        <Label x:Name="localLabel" Visibility="Hidden" Content="Local mode will use your local WoW installation to &#xD;&#xA;retrieve data which is much faster than Online mode." HorizontalAlignment="Left" Margin="16,71,0,0" VerticalAlignment="Top" Width="262" FontSize="10.667" Height="59"/>
+        <Label x:Name="onlineLabel" Visibility="Visible" Content="Online mode will use the web to retrieve data, &#xD;&#xA;as such its speed will be dependent on the speed  &#xD;&#xA;of your internet connection.&#xA;" HorizontalAlignment="Left" Margin="16,70,0,0" VerticalAlignment="Top" Width="262" FontSize="10.667" Height="59"/>
+        <Label x:Name="localLabel" Visibility="Hidden" Content="Local mode will use your local WoW installation to &#xD;&#xA;retrieve data which is much faster than Online mode &#xD;&#xA;but also very prone to data corruption." HorizontalAlignment="Left" Margin="16,71,0,0" VerticalAlignment="Top" Width="262" FontSize="10.667" Height="59"/>
     </Grid>
 </Window>
