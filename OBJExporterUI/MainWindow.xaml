@@ -4,13 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:opentk="clr-namespace:OpenTK;assembly=OpenTK.GLControl"
-        xmlns:local="clr-namespace:OBJExporterUI"
         mc:Ignorable="d"
         ResizeMode="CanResize"
         Icon="Resources/icon32.png"
         ContentRendered="Window_ContentRendered"
         KeyboardNavigation.DirectionalNavigation="None"
-        Title="OBJ Exporter" MinHeight="650" Height="650" MinWidth="615" Width="615">
+        Title="OBJ Exporter" MinHeight="650" Height="650" MinWidth="615" Width="1230">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="600" />
