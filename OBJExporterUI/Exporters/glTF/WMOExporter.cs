@@ -230,6 +230,8 @@ namespace OBJExporterUI.Exporters.glTF
                         mesh.primitives[0].material = batch.materialID;
                     }
 
+                    mesh.primitives[0].mode = 4;
+
                     meshes.Add(mesh);
                 }
 
