@@ -297,6 +297,26 @@ namespace OBJExporterUI.Exporters.glTF
                         glTF.materials[i].pbrMetallicRoughness.baseColorTexture.index = i;
                         glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
 
+                        switch (reader.wmofile.materials[i].blendMode)
+                        {
+                            case 0:
+                                glTF.materials[i].alphaMode = "OPAQUE";
+                                glTF.materials[i].alphaCutoff = 0.0f;
+                                break;
+                            case 1:
+                                glTF.materials[i].alphaMode = "MASK";
+                                glTF.materials[i].alphaCutoff = 0.90393700787f;
+                                break;
+                            case 2:
+                                glTF.materials[i].alphaMode = "MASK";
+                                glTF.materials[i].alphaCutoff = 0.5f;
+                                break;
+                            default:
+                                glTF.materials[i].alphaMode = "OPAQUE";
+                                glTF.materials[i].alphaCutoff = 0.0f;
+                                break;
+                        }
+
                         var saveLocation = "";
 
                         if(destinationOverride == null)

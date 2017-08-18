@@ -69,6 +69,8 @@ namespace OBJExporterUI.Exporters.glTF
         public TextureIndex[] normalTexture;
         public TextureIndex[] occlusionTexture;
         public PBRMetallicRoughness pbrMetallicRoughness;
+        public string alphaMode;
+        public float alphaCutoff;
     }
 
     public struct PBRMetallicRoughness
