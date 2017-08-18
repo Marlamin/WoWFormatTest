@@ -102,27 +102,27 @@ namespace WoWFormatLib.DBC
 
     public sealed class MapEntry72
     {
-        public string directory;
-        public int[] flags;
-        public float minimapIconScale;
-        public float[] corpseCoords;
-        public string mapname_lang;
-        public string mapDescription0_lang;
-        public string mapDescription1_lang;
-        public string unk0;
-        public string unk1;
-        public ushort areaTableID;
-        public short loadingScreenID;
-        public short corpseMapID;
-        public short timeOfDayoverride;
-        public short parentMapID;
-        public short cosmeticParentMapID;
-        public short unk2;
-        public byte instanceType;
-        public byte mapType;
-        public byte expansionID;
-        public byte maxPlayers;
-        public byte timeOffset;
+        public string directory { get; private set; }
+        public int[] flags { get; private set; }
+        public float minimapIconScale { get; private set; }
+        public float[] corpseCoords { get; private set; }
+        public string mapname_lang { get; private set; }
+        public string mapDescription0_lang { get; private set; }
+        public string mapDescription1_lang { get; private set; }
+        public string unk0 { get; private set; }
+        public string unk1 { get; private set; }
+        public ushort areaTableID { get; private set; }
+        public short loadingScreenID { get; private set; }
+        public short corpseMapID { get; private set; }
+        public short timeOfDayoverride { get; private set; }
+        public short parentMapID { get; private set; }
+        public short cosmeticParentMapID { get; private set; }
+        public short unk2 { get; private set; }
+        public byte instanceType { get; private set; }
+        public byte mapType { get; private set; }
+        public byte expansionID { get; private set; }
+        public byte maxPlayers { get; private set; }
+        public byte timeOffset { get; private set; }
     }
 
     public sealed class ModelFileDataEntry
