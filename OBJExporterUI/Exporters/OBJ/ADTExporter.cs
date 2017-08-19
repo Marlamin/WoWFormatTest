@@ -55,12 +55,6 @@ namespace OBJExporterUI.Exporters.OBJ
 
             var curfile = "world\\maps\\" + mapname + "\\" + mapname + "_" + centerx + "_" + centery + ".adt";
 
-            if (!CASC.cascHandler.FileExists(file))
-            {
-                Console.WriteLine("File " + file + " does not exist");
-                return;
-            }
-
             exportworker.ReportProgress(0, "Loading ADT " + curfile);
 
             ADTReader reader = new ADTReader();

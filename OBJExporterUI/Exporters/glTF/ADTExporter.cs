@@ -52,12 +52,6 @@ namespace OBJExporterUI.Exporters.glTF
                 Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
             }
 
-            if (!CASC.cascHandler.FileExists(file))
-            {
-                Console.WriteLine("File " + file + " does not exist");
-                return;
-            }
-
             exportworker.ReportProgress(0, "Loading ADT " + file);
 
             ADTReader reader = new ADTReader();
