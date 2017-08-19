@@ -338,7 +338,7 @@ namespace OBJExporterUI.Exporters.glTF
                     glTF.materials[0].pbrMetallicRoughness.baseColorTexture.index = 0;
                     glTF.materials[0].pbrMetallicRoughness.metallicFactor = 0.0f;
                     glTF.materials[0].alphaMode = "OPAQUE";
-                    glTF.materials[c].alphaCutoff = 0.0f;
+                    glTF.materials[0].alphaCutoff = 0.0f;
                 }
                 else if (bakeQuality == "high")
                 {
