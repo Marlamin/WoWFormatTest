@@ -72,7 +72,7 @@ namespace OBJExporterUI.Exporters.OBJ
             {
                 objsw.WriteLine("v " + vertex.Position.X + " " + vertex.Position.Y + " " + vertex.Position.Z);
                 objsw.WriteLine("vt " + vertex.TexCoord.X + " " + -vertex.TexCoord.Y);
-                objsw.WriteLine("vn " + vertex.Position.X.ToString("F12") + " " + vertex.Position.Y.ToString("F12") + " " + vertex.Normal.Z.ToString("F12"));
+                objsw.WriteLine("vn " + vertex.Normal.X.ToString("F12") + " " + vertex.Normal.Y.ToString("F12") + " " + vertex.Normal.Z.ToString("F12"));
             }
 
             List<uint> indicelist = new List<uint>();
