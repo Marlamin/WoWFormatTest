@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
 using WoWFormatLib.Utils;
+using CASCExplorer;
+using Newtonsoft.Json;
 
 namespace OBJExporterUI.Exporters.glTF
 {
@@ -20,76 +22,204 @@ namespace OBJExporterUI.Exporters.glTF
                 exportworker.WorkerReportsProgress = true;
             }
 
+            Logger.WriteLine("M2 glTF Exporter: Loading file {0}...", file);
+
+            exportworker.ReportProgress(5, "Reading M2..");
+
+            var outdir = ConfigurationManager.AppSettings["outdir"];
+            var reader = new M2Reader();
+            reader.LoadM2(file);
+
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
-            var fileDataID = CASC.getFileDataIdByName(file);
-            var outdir = ConfigurationManager.AppSettings["outdir"];
-            var reader = new M2Reader();
-
-            exportworker.ReportProgress(15, "Reading M2..");
-
-            if (!CASC.cascHandler.FileExists(fileDataID)) { throw new Exception("404 M2 not found!"); }
-
-            reader.LoadM2(fileDataID);
-
-            Structs.Vertex[] vertices = new Structs.Vertex[reader.model.vertices.Count()];
-
-            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            if (destinationOverride == null)
             {
-                vertices[i].Position = new OpenTK.Vector3(reader.model.vertices[i].position.X, reader.model.vertices[i].position.Z, reader.model.vertices[i].position.Y * -1);
-                vertices[i].Normal = new OpenTK.Vector3(reader.model.vertices[i].normal.X, reader.model.vertices[i].normal.Z, reader.model.vertices[i].normal.Y);
-                vertices[i].TexCoord = new Vector2(reader.model.vertices[i].textureCoordX, reader.model.vertices[i].textureCoordY);
-            }
-
-            // Don't export models without vertices
-            if (reader.model.vertices.Count() == 0)
-            {
-                return;
-            }
-
-            StreamWriter objsw;
-
-            if(destinationOverride == null)
-            {
-                // Create output directory
                 if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
                 {
                     Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
                 }
-
-                objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".obj")));
-            }
-            else {
-                objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".obj")));
             }
 
-            objsw.WriteLine("# Written by Marlamin's WoW Exporter. Original file: " + file);
-            objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file) + ".mtl");
+            file = file.ToLower();
 
-            foreach (var vertex in vertices)
+            if (reader.model.vertices.Count() == 0)
             {
-                objsw.WriteLine("v " + vertex.Position.X + " " + vertex.Position.Y + " " + vertex.Position.Z);
-                objsw.WriteLine("vt " + vertex.TexCoord.X + " " + -vertex.TexCoord.Y);
-                objsw.WriteLine("vn " + vertex.Position.X.ToString("F12") + " " + vertex.Position.Y.ToString("F12") + " " + vertex.Normal.Z.ToString("F12"));
+                Logger.WriteLine("M2 glTF Exporter: File {0} has no vertices, skipping export!", file);
+                return;
             }
 
-            List<uint> indicelist = new List<uint>();
-            for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
+
+
+            exportworker.ReportProgress(25, "Generating glTF..");
+
+            var glTF = new glTF()
             {
-                var t = reader.model.skins[0].triangles[i];
-                indicelist.Add(t.pt1);
-                indicelist.Add(t.pt2);
-                indicelist.Add(t.pt3);
+                asset = new Asset()
+                {
+                    version = "2.0",
+                    generator = "Marlamin's WoW Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                    copyright = "Contents are owned by Blizzard Entertainment",
+                    minVersion = "2.0"
+                }
+            };
+
+            FileStream stream;
+
+            if (destinationOverride == null)
+            {
+                stream = new FileStream(Path.Combine(outdir, file.Replace(".m2", ".bin")), FileMode.OpenOrCreate);
+            }
+            else
+            {
+                stream = new FileStream(Path.Combine(outdir, destinationOverride, file.Replace(".m2", ".bin")), FileMode.OpenOrCreate);
             }
 
-            var indices = indicelist.ToArray();
-            exportworker.ReportProgress(35, "Writing files..");
+            var writer = new BinaryWriter(stream);
+            var bufferViews = new List<BufferView>();
+            var accessorInfo = new List<Accessor>();
+            var meshes = new List<Mesh>();
 
-            var renderbatches = new Structs.RenderBatch[reader.model.skins[0].submeshes.Count()];
+            // Position bufferview
+            var vPosBuffer = new BufferView()
+            {
+                buffer = 0,
+                byteOffset = (uint)writer.BaseStream.Position,
+                target = 34962
+            };
+
+            var minPosX = float.MaxValue;
+            var minPosY = float.MaxValue;
+            var minPosZ = float.MaxValue;
+
+            var maxPosX = float.MinValue;
+            var maxPosY = float.MinValue;
+            var maxPosZ = float.MinValue;
+
+            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            {
+                writer.Write(reader.model.vertices[i].position.X);
+                writer.Write(reader.model.vertices[i].position.Z);
+                writer.Write(reader.model.vertices[i].position.Y * -1);
+
+                if (reader.model.vertices[i].position.X < minPosX) minPosX = reader.model.vertices[i].position.X;
+                if (reader.model.vertices[i].position.Z < minPosY) minPosY = reader.model.vertices[i].position.Z;
+                if (reader.model.vertices[i].position.Y * -1 < minPosZ) minPosZ = reader.model.vertices[i].position.Y * -1;
+
+                if (reader.model.vertices[i].position.X > maxPosX) maxPosX = reader.model.vertices[i].position.X;
+                if (reader.model.vertices[i].position.Z > maxPosY) maxPosY = reader.model.vertices[i].position.Z;
+                if (reader.model.vertices[i].position.Y * -1 > maxPosZ) maxPosZ = reader.model.vertices[i].position.Y * -1;
+            }
+
+            vPosBuffer.byteLength = (uint)writer.BaseStream.Position - vPosBuffer.byteOffset;
+
+            var posLoc = accessorInfo.Count();
+
+            accessorInfo.Add(new Accessor()
+            {
+                name = "vPos",
+                bufferView = bufferViews.Count(),
+                byteOffset = 0,
+                componentType = 5126,
+                count = (uint)reader.model.vertices.Count(),
+                type = "VEC3",
+                min = new float[] { minPosX, minPosY, minPosZ },
+                max = new float[] { maxPosX, maxPosY, maxPosZ }
+            });
+
+            bufferViews.Add(vPosBuffer);
+
+            // Normal bufferview
+            var normalBuffer = new BufferView()
+            {
+                buffer = 0,
+                byteOffset = (uint)writer.BaseStream.Position,
+                target = 34962
+            };
+
+            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            {
+                writer.Write(reader.model.vertices[i].normal.X);
+                writer.Write(reader.model.vertices[i].normal.Z);
+                writer.Write(reader.model.vertices[i].normal.Y);
+            }
+
+            normalBuffer.byteLength = (uint)writer.BaseStream.Position - normalBuffer.byteOffset;
+
+            var normalLoc = accessorInfo.Count();
+
+            accessorInfo.Add(new Accessor()
+            {
+                name = "vNormal",
+                bufferView = bufferViews.Count(),
+                byteOffset = 0,
+                componentType = 5126,
+                count = (uint)reader.model.vertices.Count(),
+                type = "VEC3"
+            });
+
+            bufferViews.Add(normalBuffer);
+
+            // TexCoord bufferview
+            var texCoordBuffer = new BufferView()
+            {
+                buffer = 0,
+                byteOffset = (uint)writer.BaseStream.Position,
+                target = 34962
+            };
+
+            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            {
+                writer.Write(reader.model.vertices[i].textureCoordX);
+                writer.Write(reader.model.vertices[i].textureCoordY);
+            }
+
+            texCoordBuffer.byteLength = (uint)writer.BaseStream.Position - texCoordBuffer.byteOffset;
+
+            var texLoc = accessorInfo.Count();
+
+            accessorInfo.Add(new Accessor()
+            {
+                name = "vTex",
+                bufferView = bufferViews.Count(),
+                byteOffset = 0,
+                componentType = 5126,
+                count = (uint)reader.model.vertices.Count(),
+                type = "VEC2"
+            });
+
+            bufferViews.Add(texCoordBuffer);
+
+            var indexBufferPos = bufferViews.Count();
+
             for (int i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
             {
+                var batch = reader.model.skins[0].submeshes[i];
+
+                accessorInfo.Add(new Accessor()
+                {
+                    name = "indices",
+                    bufferView = indexBufferPos,
+                    byteOffset = reader.model.skins[0].submeshes[i].startTriangle * 2,
+                    componentType = 5123,
+                    count = reader.model.skins[0].submeshes[i].nTriangles,
+                    type = "SCALAR"
+                });
+
+                var mesh = new Mesh();
+                mesh.name = "Group #" + i;
+                mesh.primitives = new Primitive[1];
+                mesh.primitives[0].attributes = new Dictionary<string, int>
+                    {
+                        { "POSITION", posLoc },
+                        { "NORMAL", normalLoc },
+                        { "TEXCOORD_0", texLoc }
+                    };
+
+                mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;
+
+                // Texture stuff
                 if (file.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (reader.model.skins[0].submeshes[i].submeshID != 0)
@@ -101,31 +231,54 @@ namespace OBJExporterUI.Exporters.glTF
                     }
                 }
 
-                renderbatches[i].firstFace = reader.model.skins[0].submeshes[i].startTriangle;
-                renderbatches[i].numFaces = reader.model.skins[0].submeshes[i].nTriangles;
-                renderbatches[i].groupID = (uint)i;
                 for (int tu = 0; tu < reader.model.skins[0].textureunit.Count(); tu++)
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
-                        renderbatches[i].blendType = reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode;
-                        renderbatches[i].materialID = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
+                        mesh.primitives[0].material = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
+                        
+                        // todo
+                        //renderbatches[i].blendType = reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode;
+
                     }
                 }
             }
 
+            var indiceBuffer = new BufferView()
+            {
+                buffer = 0,
+                byteOffset = (uint)writer.BaseStream.Position,
+                target = 34963
+            };
+
+            for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
+            {
+                var t = reader.model.skins[0].triangles[i];
+                writer.Write(t.pt1);
+                writer.Write(t.pt2);
+                writer.Write(t.pt3);
+            }
+
+            indiceBuffer.byteLength = (uint)writer.BaseStream.Position - indiceBuffer.byteOffset;
+            bufferViews.Add(indiceBuffer);
+
+            glTF.bufferViews = bufferViews.ToArray();
+            glTF.accessors = accessorInfo.ToArray();
+
+            glTF.buffers = new Buffer[1];
+            glTF.buffers[0].byteLength = (uint)writer.BaseStream.Length;
+            glTF.buffers[0].uri = Path.GetFileNameWithoutExtension(file) + ".bin";
+
+            writer.Close();
+            writer.Dispose();
+
             exportworker.ReportProgress(65, "Exporting textures..");
 
-            StreamWriter mtlsb;
+            var materialCount = reader.model.textures.Count();
 
-            if (destinationOverride == null)
-            {
-                mtlsb = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".mtl")));
-            }
-            else
-            {
-                mtlsb = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".mtl")));
-            }
+            glTF.images = new Image[materialCount];
+            glTF.textures = new Texture[materialCount];
+            glTF.materials = new Material[materialCount];
 
             var textureID = 0;
             var materials = new Structs.Material[reader.model.textures.Count()];
@@ -143,6 +296,7 @@ namespace OBJExporterUI.Exporters.glTF
                     case 1:
                     case 2:
                     case 11:
+                        var fileDataID = CASC.getFileDataIdByName(file);
                         uint[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Count(); ti++)
                         {
@@ -180,17 +334,49 @@ namespace OBJExporterUI.Exporters.glTF
 
             exportworker.ReportProgress(85, "Writing files..");
 
-            foreach (var material in materials)
+            glTF.samplers = new Sampler[1];
+            glTF.samplers[0].name = "Default Sampler";
+            glTF.samplers[0].minFilter = 9986;
+            glTF.samplers[0].magFilter = 9729;
+            glTF.samplers[0].wrapS = 10497;
+            glTF.samplers[0].wrapT = 10497;
+
+            glTF.scenes = new Scene[1];
+            glTF.scenes[0].name = Path.GetFileNameWithoutExtension(file);
+
+            glTF.nodes = new Node[meshes.Count()];
+            var meshIDs = new List<int>();
+            for (var i = 0; i < meshes.Count(); i++)
             {
-                mtlsb.WriteLine("newmtl " + "tex_" + material.filename);
-                mtlsb.WriteLine("illum 2");
-                mtlsb.WriteLine("map_Ka " + "tex_" + material.filename + ".png");
-                mtlsb.WriteLine("map_Kd " + "tex_" + material.filename + ".png");
+                glTF.nodes[i].name = meshes[i].name;
+                glTF.nodes[i].mesh = i;
+                meshIDs.Add(i);
             }
 
-            mtlsb.Close();
+            glTF.scenes[0].nodes = meshIDs.ToArray();
 
-            objsw.WriteLine("g " + Path.GetFileNameWithoutExtension(file));
+            glTF.meshes = meshes.ToArray();
+
+            glTF.scene = 0;
+
+            exportworker.ReportProgress(95, "Writing to file..");
+
+            if (destinationOverride == null)
+            {
+                File.WriteAllText(Path.Combine(outdir, file.Replace(".m2", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                }));
+            }
+            else
+            {
+                File.WriteAllText(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".wmo", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                }));
+            }
+            /*
+             * objsw.WriteLine("g " + Path.GetFileNameWithoutExtension(file));
 
             foreach (var renderbatch in renderbatches)
             {
@@ -236,6 +422,7 @@ namespace OBJExporterUI.Exporters.glTF
             // https://en.wikipedia.org/wiki/Wavefront_.obj_file#Basic_materials
             // http://wiki.unity3d.com/index.php?title=ExportOBJ
             // http://web.cse.ohio-state.edu/~hwshen/581/Site/Lab3_files/Labhelp_Obj_parser.htm
+            */
         }
     }
 }

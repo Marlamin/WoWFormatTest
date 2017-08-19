@@ -443,6 +443,10 @@ namespace OBJExporterUI
                     {
                         Exporters.OBJ.M2Exporter.exportM2(selectedFile, exportworker);
                     }
+                    else if (exportFormat == "glTF")
+                    {
+                        Exporters.glTF.M2Exporter.exportM2(selectedFile, exportworker);
+                    }
                 }
                 else if (selectedFile.EndsWith(".adt"))
                 {

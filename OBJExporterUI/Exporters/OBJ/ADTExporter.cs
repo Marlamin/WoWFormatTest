@@ -6,6 +6,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
+using CASCExplorer;
 
 namespace OBJExporterUI.Exporters.OBJ
 {
@@ -32,7 +33,7 @@ namespace OBJExporterUI.Exporters.OBJ
             var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
 
-            CASCExplorer.Logger.WriteLine("ADT OBJ Exporter: Starting export of {0}..", file);
+            Logger.WriteLine("ADT OBJ Exporter: Starting export of {0}..", file);
 
             if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
             {
@@ -46,7 +47,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
             if (reader.adtfile.chunks == null)
             {
-                CASCExplorer.Logger.WriteLine("ADT OBJ Exporter: File {0} has no chunks, skipping export!", file);
+                Logger.WriteLine("ADT OBJ Exporter: File {0} has no chunks, skipping export!", file);
                 return;
             }
 
@@ -74,8 +75,8 @@ namespace OBJExporterUI.Exporters.OBJ
                     for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                     {
                         Structs.Vertex v = new Structs.Vertex();
-                        v.Normal = new OpenTK.Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
-                        v.Position = new OpenTK.Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
+                        v.Normal = new Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
+                        v.Position = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
                         if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
                         if(bakeQuality == "low" || bakeQuality == "medium")
                         {

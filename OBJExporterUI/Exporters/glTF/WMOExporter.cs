@@ -6,6 +6,7 @@ using System.Linq;
 using WoWFormatLib.FileReaders;
 using System.IO;
 using Newtonsoft.Json;
+using CASCExplorer;
 
 namespace OBJExporterUI.Exporters.glTF
 {
@@ -13,18 +14,18 @@ namespace OBJExporterUI.Exporters.glTF
     {
         public static void exportWMO(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
         {
-            if(exportworker == null)
+            if (exportworker == null)
             {
                 exportworker = new BackgroundWorker();
                 exportworker.WorkerReportsProgress = true;
             }
 
-            Console.WriteLine("Loading WMO file..");
+            Logger.WriteLine("WMO glTF Exporter: Loading file {0}...", file);
 
             exportworker.ReportProgress(5, "Reading WMO..");
 
             var outdir = ConfigurationManager.AppSettings["outdir"];
-            WMOReader reader = new WMOReader();
+            var reader = new WMOReader();
             reader.LoadWMO(file);
 
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
@@ -262,11 +263,9 @@ namespace OBJExporterUI.Exporters.glTF
             writer.Close();
             writer.Dispose();
 
-            //exportworker.ReportProgress(50, "Exporting doodads..");
-
             exportworker.ReportProgress(65, "Exporting textures..");
 
-            if (reader.wmofile.materials == null) { Console.WriteLine("Materials empty"); return; }
+            if (reader.wmofile.materials == null) { Logger.WriteLine("WMO glTF exporter: Materials empty"); return; }
 
             var materialCount = reader.wmofile.materials.Count();
 
@@ -388,7 +387,7 @@ namespace OBJExporterUI.Exporters.glTF
                 }));
             }
 
-            Console.WriteLine("Done loading WMO file!");
+            Logger.WriteLine("Done exporting WMO file!");
         }
     }
 }
