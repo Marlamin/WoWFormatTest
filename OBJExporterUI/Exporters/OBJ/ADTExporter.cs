@@ -78,7 +78,6 @@ namespace OBJExporterUI.Exporters.OBJ
                         continue;
                     }
 
-
                     var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
                     var initialChunkX = reader.adtfile.chunks[0].header.position.X;
 
@@ -171,7 +170,10 @@ namespace OBJExporterUI.Exporters.OBJ
 
                         if (bakeQuality == "low" || bakeQuality == "medium")
                         {
-                            materials.Add(1, mapname + "_" + centerx + "_" + centery);
+                            if (!materials.ContainsKey(1))
+                            {
+                                materials.Add(1, mapname + "_" + centerx + "_" + centery);
+                            }
                             batch.materialID = (uint)materials.Count();
                         }
                         else

@@ -30,7 +30,6 @@ namespace OBJExporterUI.Exporters.glTF
             float TileSize = 1600.0f / 3.0f; //533.333
             float ChunkSize = TileSize / 16.0f; //33.333
             float UnitSize = ChunkSize / 8.0f; //4.166666
-            float MapMidPoint = 32.0f / ChunkSize;
 
             var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
@@ -277,18 +276,6 @@ namespace OBJExporterUI.Exporters.glTF
                         indicelist.AddRange(new Int32[] { j - 9, j, j - 8 });
                         indicelist.AddRange(new Int32[] { j - 8, j, j + 9 });
                         indicelist.AddRange(new Int32[] { j + 9, j, j + 8 });
-
-
-                        // j = 9
-                        // 17, 0, 9
-                        // 0, 1, 9
-                        // 1, 18, 9
-                        // 18, 17, 9
-                        // Generates quads instead of 4x triangles
-                        
-                        //indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j - 8 });
-                        //indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j + 8 });
-                        
                     }
 
                     if ((j + 1) % (9 + 8) == 0) j += 9;
