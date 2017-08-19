@@ -33,6 +33,7 @@ namespace OBJExporterUI.Exporters.glTF
             var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
 
+            CASCExplorer.Logger.WriteLine("ADT glTF Exporter: Starting export of {0}..", file);
 
             if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
             {
@@ -46,6 +47,7 @@ namespace OBJExporterUI.Exporters.glTF
 
             if (reader.adtfile.chunks == null)
             {
+                CASCExplorer.Logger.WriteLine("ADT glTF Exporter: File {0} has no chunks, skipping export!", file);
                 return;
             }
 
