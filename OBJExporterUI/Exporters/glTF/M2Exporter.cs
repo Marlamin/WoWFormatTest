@@ -192,6 +192,7 @@ namespace OBJExporterUI.Exporters.glTF
             bufferViews.Add(texCoordBuffer);
 
             var indexBufferPos = bufferViews.Count();
+            var materialBlends = new Dictionary<int, ushort>();
 
             for (int i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
             {
@@ -218,28 +219,27 @@ namespace OBJExporterUI.Exporters.glTF
                     };
 
                 mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;
+                mesh.primitives[0].mode = 4;
 
+                meshes.Add(mesh);
                 // Texture stuff
-                if (file.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    if (reader.model.skins[0].submeshes[i].submeshID != 0)
-                    {
-                        if (!reader.model.skins[0].submeshes[i].submeshID.ToString().EndsWith("01"))
-                        {
-                            continue;
-                        }
-                    }
-                }
-
                 for (int tu = 0; tu < reader.model.skins[0].textureunit.Count(); tu++)
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
                         mesh.primitives[0].material = reader.model.texlookup[reader.model.skins[0].textureunit[tu].texture].textureID;
-                        
-                        // todo
-                        //renderbatches[i].blendType = reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode;
 
+                        // todo
+                        if (!materialBlends.ContainsKey(i))
+                        {
+                            // add texture 
+                            materialBlends.Add(i, reader.model.renderflags[reader.model.skins[0].textureunit[tu].renderFlags].blendingMode);
+                        }
+                        else
+                        {
+                            // already exists
+                            Logger.WriteLine("Material "+ mesh.primitives[0].material + " already exists in blend map with value " + materialBlends[i]);
+                        }
                     }
                 }
             }
@@ -290,7 +290,6 @@ namespace OBJExporterUI.Exporters.glTF
                 switch (reader.model.textures[i].type)
                 {
                     case 0:
-                        //Console.WriteLine("      Texture given in file!");
                         textureFileDataID = CASC.getFileDataIdByName(reader.model.textures[i].filename);
                         break;
                     case 1:
@@ -309,21 +308,34 @@ namespace OBJExporterUI.Exporters.glTF
                 }
 
                 materials[i].textureID = textureID + i;
+
                 materials[i].filename = textureFileDataID.ToString();
 
+                glTF.materials[i].name = materials[i].filename;
+                glTF.materials[i].pbrMetallicRoughness = new PBRMetallicRoughness();
+                glTF.materials[i].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
+                glTF.materials[i].pbrMetallicRoughness.baseColorTexture.index = i;
+                glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
+
+                glTF.materials[i].alphaMode = "MASK";
+                glTF.materials[i].alphaCutoff = 0.5f;
+
+                glTF.images[i].uri = "tex_" + materials[i].filename + ".png";
+                glTF.textures[i].sampler = 0;
+                glTF.textures[i].source = i;
+
                 var blpreader = new BLPReader();
-
                 blpreader.LoadBLP(textureFileDataID);
-
+                
                 try
                 {
                     if (destinationOverride == null)
                     {
-                        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), "tex_" + materials[i].filename + ".png"));
+                        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), glTF.images[i].uri));
                     }
                     else
                     {
-                        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, "tex_" + materials[i].filename.ToLower() + ".png"));
+                        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, glTF.images[i].uri));
                     }
                 }
                 catch (Exception e)
