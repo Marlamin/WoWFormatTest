@@ -150,13 +150,13 @@ namespace OBJExporterUI.Exporters.OBJ
                 {
                     if (!materials.ContainsKey(1))
                     {
-                        materials.Add(1, mapname + "_" + centerx + "_" + centery);
+                        materials.Add(1, Path.GetFileNameWithoutExtension(file));
                     }
                     batch.materialID = (uint)materials.Count();
                 }
                 else
                 {
-                    materials.Add((int)c + 1, mapname + "_" + centerx + "_" + centery + "_" + c);
+                    materials.Add((int)c + 1, Path.GetFileNameWithoutExtension(file) + "_" + c);
                     batch.materialID = c + 1;
                 }
 
