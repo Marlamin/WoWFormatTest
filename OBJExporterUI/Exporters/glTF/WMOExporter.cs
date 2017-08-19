@@ -280,10 +280,6 @@ namespace OBJExporterUI.Exporters.glTF
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
                     {
                         var textureFilename = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename).ToLower();
-                        if(textureFilename.EndsWith("_lod2") || textureFilename.EndsWith("_lod3"))
-                        {
-                            continue;
-                        }
 
                         glTF.images[i].uri = textureFilename + ".png";
 
