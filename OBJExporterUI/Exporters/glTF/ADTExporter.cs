@@ -7,7 +7,6 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
-using WoWFormatLib.Utils;
 
 namespace OBJExporterUI.Exporters.glTF
 {
@@ -34,6 +33,22 @@ namespace OBJExporterUI.Exporters.glTF
             var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
 
+
+            if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
+            {
+                Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
+            }
+
+            exportworker.ReportProgress(0, "Loading ADT " + file);
+
+            ADTReader reader = new ADTReader();
+            reader.LoadADT(file.Replace('/', '\\'));
+
+            if (reader.adtfile.chunks == null)
+            {
+                return;
+            }
+
             List<Structs.RenderBatch> renderBatches = new List<Structs.RenderBatch>();
             Dictionary<int, string> materials = new Dictionary<int, string>();
 
@@ -46,22 +61,6 @@ namespace OBJExporterUI.Exporters.glTF
                     copyright = "Contents are owned by Blizzard Entertainment"
                 }
             };
-
-            if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
-            {
-                Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
-            }
-
-            exportworker.ReportProgress(0, "Loading ADT " + file);
-
-            ADTReader reader = new ADTReader();
-            
-            reader.LoadADT(file.Replace('/', '\\'));
-
-            if (reader.adtfile.chunks == null)
-            {
-                return;
-            }
 
             var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
             var initialChunkX = reader.adtfile.chunks[0].header.position.X;

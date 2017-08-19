@@ -6,7 +6,6 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
-using WoWFormatLib.Utils;
 
 namespace OBJExporterUI.Exporters.OBJ
 {
@@ -20,7 +19,6 @@ namespace OBJExporterUI.Exporters.OBJ
                 exportworker.WorkerReportsProgress = true;
             }
 
-            //CASC.InitCasc(null, @"C:\World of Warcraft Beta", "wow_beta");
             var outdir = ConfigurationManager.AppSettings["outdir"];
 
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
@@ -29,42 +27,34 @@ namespace OBJExporterUI.Exporters.OBJ
 
             float TileSize = 1600.0f / 3.0f; //533.333
             float ChunkSize = TileSize / 16.0f; //33.333
-            float UnitSize = ChunkSize / 8.0f; //4.166666 // ~~fun fact time with marlamin~~ this /2 ends up being pixelspercoord on minimap
-            float MapMidPoint = 32.0f / ChunkSize;
+            float UnitSize = ChunkSize / 8.0f; //4.166666
 
             var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
 
-            var centerx = int.Parse(coord[1]);
-            var centery = int.Parse(coord[2]);
+
+            if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
+            {
+                Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
+            }
+
+            exportworker.ReportProgress(0, "Loading ADT " + file);
+
+            ADTReader reader = new ADTReader();
+            reader.LoadADT(file.Replace('/', '\\'));
+
+            if (reader.adtfile.chunks == null)
+            {
+                return;
+            }
 
             List<Structs.RenderBatch> renderBatches = new List<Structs.RenderBatch>();
             List<Structs.Vertex> verticelist = new List<Structs.Vertex>();
             List<int> indicelist = new List<Int32>();
             Dictionary<int, string> materials = new Dictionary<int, string>();
 
-            // Create output directory
-            if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
-            {
-                Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
-            }
-
             ConfigurationManager.RefreshSection("appSettings");
-
             var bakeQuality = ConfigurationManager.AppSettings["bakeQuality"];
-
-            var curfile = "world\\maps\\" + mapname + "\\" + mapname + "_" + centerx + "_" + centery + ".adt";
-
-            exportworker.ReportProgress(0, "Loading ADT " + curfile);
-
-            ADTReader reader = new ADTReader();
-            reader.LoadADT(curfile);
-
-            // No chunks? Let's get the hell out of here
-            if (reader.adtfile.chunks == null)
-            {
-                return;
-            }
 
             var initialChunkY = reader.adtfile.chunks[0].header.position.Y;
             var initialChunkX = reader.adtfile.chunks[0].header.position.X;
