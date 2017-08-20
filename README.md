@@ -3,12 +3,10 @@ Messing around with parsing WoW file formats for educational purposes.
 Built from the ground up, but with lots of copy pasta from older projects (noted in thanks paragraph).
 
 ## Supported expansions
-Built for (latest) Legion files. Backwards compatibility with Warlords of Draenor not guaranteed. Mists of Pandaria and lower probably won't work at all.
-
-MPQ support is currently not planned. Very basic support for the new CASC file format introduced in Warlords of Draenor is present..
+Built for (latest) Legion files. No backwards compatibility with anything older than current retail version.
 
 ## Configuration
-If you have World of Warcraft (7.0 or higher) fully installed you can use your installed data instead of falling back to downloading stuff. To set this up, simply change the basedir setting in (executable).config to the directory that contains WoW.exe.
+If you have World of Warcraft (7.2.5 or higher) fully installed you can use your installed data instead of falling back to downloading stuff. To set this up, simply change the basedir setting in (executable).config to the directory that contains WoW.exe.
 
 ## Requirements
 - [OpenTK](http://www.opentk.com/) (recent version already included)
@@ -30,22 +28,9 @@ App used to test CASC (file system) related things.
 App used to test DBC structures.
 #### WoWFormatTest  
 First app used to test some formats with.
-#### WoWShaderTest
-Eventual replacement project for WoWOpenGL.
-#### HeightmapGenerator
-Generates heightmaps. ¯\_(ツ)_/¯
-#### WDLtextopentk
-Making a color heightmap from a WDL file, code ported from Noggit to C#. Based on a simple OpenTK example.
-
-### Discontinued/archived projects
-#### WoWRenderLib 
-Got data from WoWFormatLib and did some preprocessing before going to WoWFormatUI.
-#### WoWFormatUI 
-Initial test of rendering, gets data from WoWRenderLib and tries to display it in DirectX. No longer actively developed.
-#### RenderTestWPF 
-Rendering test with WPF.
 	
 ## Thanks (in no particular order)
+- Belvane
 - TOM_RUS
 - Schlumpf
 - Warpten
