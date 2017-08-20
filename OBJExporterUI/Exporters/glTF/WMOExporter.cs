@@ -62,7 +62,7 @@ namespace OBJExporterUI.Exporters.glTF
             }
             else
             {
-                stream = new FileStream(Path.Combine(outdir, destinationOverride, file.Replace(".wmo", ".bin")), FileMode.OpenOrCreate);
+                stream = new FileStream(Path.Combine(destinationOverride, Path.GetFileNameWithoutExtension(file) + ".bin"), FileMode.OpenOrCreate);
             }
 
             var writer = new BinaryWriter(stream);
@@ -366,6 +366,39 @@ namespace OBJExporterUI.Exporters.glTF
 
             glTF.scene = 0;
 
+            string currentDoodadSetName = "";
+            for (int i = 0; i < reader.wmofile.doodadDefinitions.Count(); i++)
+            {
+                var doodadDefinition = reader.wmofile.doodadDefinitions[i];
+
+                foreach (var doodadSet in reader.wmofile.doodadSets)
+                {
+                    if (doodadSet.firstInstanceIndex == i)
+                    {
+                        Console.WriteLine("At set: " + doodadSet.setName);
+                        currentDoodadSetName = doodadSet.setName.Replace("Set_", "").Replace("SET_", "").Replace("$DefaultGlobal", "Default");
+                    }
+                }
+
+                foreach (var doodadNameEntry in reader.wmofile.doodadNames)
+                {
+                    if (doodadNameEntry.startOffset == doodadDefinition.offset)
+                    {
+                        if (!File.Exists(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".gltf"))
+                        {
+                            if (destinationOverride == null)
+                            {
+                                M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                            }
+                            else
+                            {
+                                M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
+                            }
+                        }
+                    }
+                }
+            }
+
             exportworker.ReportProgress(95, "Writing to file..");
 
             if (destinationOverride == null)
@@ -377,7 +410,7 @@ namespace OBJExporterUI.Exporters.glTF
             }
             else
             {
-                File.WriteAllText(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".wmo", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
+                File.WriteAllText(Path.Combine(destinationOverride, Path.GetFileName(file.ToLower()).Replace(".wmo", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 }));

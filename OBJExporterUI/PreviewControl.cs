@@ -87,10 +87,11 @@ namespace OBJExporterUI
                 {
                     ADTLoader.LoadADT(filename, cache, adtShaderProgram);
                 }
+
                 ActiveCamera.Pos = new Vector3(cache.terrain[filename].startPos.Position.X, cache.terrain[filename].startPos.Position.Y, cache.terrain[filename].startPos.Position.Z);
                 ActiveCamera.Pos.Y -= 533.33333f / 2;
                 ActiveCamera.Pos.X += 533.33333f / 2;
-                ActiveCamera.Pos.Z += 100f;
+                ActiveCamera.Pos.Z += 50f;
                 modelType = "adt";
 
                 ready = true;

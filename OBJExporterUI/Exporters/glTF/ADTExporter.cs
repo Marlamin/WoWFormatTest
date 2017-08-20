@@ -393,9 +393,7 @@ namespace OBJExporterUI.Exporters.glTF
 
             ConfigurationManager.RefreshSection("appSettings");
 
-            // Disabled for now, can actually be in glTF!
-            //if (ConfigurationManager.AppSettings["exportEverything"] == "True")
-            if(false)
+            if (ConfigurationManager.AppSettings["exportEverything"] == "True")
             {
                 exportworker.ReportProgress(25, "Exporting WMOs");
 
@@ -405,9 +403,9 @@ namespace OBJExporterUI.Exporters.glTF
 
                     var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
 
-                    if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj"))
+                    if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".gltf"))
                     {
-                        WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        WMOExporter.exportWMO(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                     }
                 }
 
@@ -419,9 +417,9 @@ namespace OBJExporterUI.Exporters.glTF
 
                     var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
 
-                    if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj"))
+                    if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".gltf"))
                     {
-                       M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                       M2Exporter.exportM2(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                     }
                 }
             }

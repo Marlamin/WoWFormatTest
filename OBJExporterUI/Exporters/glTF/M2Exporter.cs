@@ -73,7 +73,7 @@ namespace OBJExporterUI.Exporters.glTF
             }
             else
             {
-                stream = new FileStream(Path.Combine(outdir, destinationOverride, file.Replace(".m2", ".bin")), FileMode.OpenOrCreate);
+                stream = new FileStream(Path.Combine(destinationOverride, Path.GetFileNameWithoutExtension(file).ToLower() + ".bin"), FileMode.OpenOrCreate);
             }
 
             var writer = new BinaryWriter(stream);
@@ -382,7 +382,7 @@ namespace OBJExporterUI.Exporters.glTF
             }
             else
             {
-                File.WriteAllText(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".wmo", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
+                File.WriteAllText(Path.Combine(destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 }));
