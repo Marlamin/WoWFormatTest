@@ -102,6 +102,7 @@ namespace WoWFormatLib.FileReaders
                         case "MOLT": // Lighting Infroamtion
                         case "MFOG": // Fog Information
                         case "MCVP": // Convex Volume Planes
+                        case "MOUV": // 7.3 - ?
                         case "GFID": // Legion
                             break;
                         default:
