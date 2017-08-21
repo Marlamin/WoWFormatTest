@@ -203,7 +203,6 @@ namespace WoWFormatLib.FileReaders
             for (var i = 0; i < num; i++)
             {
                 materials[i] = bin.Read<MOMT>();
-                bin.ReadBytes(16);
             }
             return materials;
         }

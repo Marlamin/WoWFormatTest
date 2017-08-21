@@ -99,8 +99,10 @@ namespace WoWFormatLib.Structs.WMO
         public uint texture3;
         public uint color3;
         public uint flags3;
-        //public nsafe fixed uint unk[3];
-        //public nsafe fixed uint runTimeData[4];
+        public uint runtimeData0;
+        public uint runtimeData1;
+        public uint runtimeData2;
+        public uint runtimeData3;
     }
 
     //Group names
