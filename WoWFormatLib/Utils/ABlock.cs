@@ -17,7 +17,7 @@ namespace WoWFormatLib
     public struct ArrayReference<T> where T : struct
     {
         public uint Number;
-        private long elementsOffset;
+        private uint elementsOffset;
 
         public IEnumerable<T> GetElements(BinaryReader bin)
         {
