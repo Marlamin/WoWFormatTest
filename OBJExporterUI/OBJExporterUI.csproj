@@ -152,16 +152,25 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="Utils\io_scene_adt\import_adtobj.py">
+    <Content Include="Utils\Blender plugins\io_scene_adt\import_adtobj.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Utils\io_scene_adt\__init__.py">
+    <Content Include="Utils\Blender plugins\io_scene_adt\__init__.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Utils\io_scene_wmo\import_wmoobj.py">
+    <Content Include="Utils\Blender plugins\io_scene_wmo\import_wmoobj.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Utils\io_scene_wmo\__init__.py">
+    <Content Include="Utils\Blender plugins\io_scene_wmo\__init__.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Blender plugins\readme.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Cinema 4D plugin %28by Remo Pini%29\res\c4d_symbols.h">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Cinema 4D plugin %28by Remo Pini%29\res\Icon.tif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -201,7 +210,12 @@
     <Content Include="Shaders\baketexture.fragment.shader">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Utils\io_scene_wmo\import_wmoobj.pyc" />
+    <Content Include="Utils\Cinema 4D plugin %28by Remo Pini%29\readme.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Cinema 4D plugin %28by Remo Pini%29\wow_import.pyp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -269,6 +283,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Exporters\FBX\" />
+    <Folder Include="Utils\Cinema 4D plugin %28by Remo Pini%29\res\description\" />
+    <Folder Include="Utils\Cinema 4D plugin %28by Remo Pini%29\res\dialogs\" />
+    <Folder Include="Utils\Cinema 4D plugin %28by Remo Pini%29\res\strings_us\description\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
