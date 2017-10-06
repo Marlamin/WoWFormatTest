@@ -72,8 +72,7 @@ namespace WoWFormatLib.Structs.ADT
         public short lowQualityTexturingMap_5;
         public short lowQualityTexturingMap_6;
         public short lowQualityTexturingMap_7;
-        public uint predTex;
-        public uint noEffectDoodad;
+        public long noEffectDoodad;
         public uint ofsMCSE;
         public uint numMCSE;
         public uint ofsMCLQ;
