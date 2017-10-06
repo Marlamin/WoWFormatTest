@@ -34,6 +34,12 @@ namespace OBJExporterUI.Exporters.OBJ
 
             reader.LoadM2(fileDataID);
 
+            // Don't export models without vertices
+            if (reader.model.vertices.Count() == 0)
+            {
+                return;
+            }
+
             Structs.Vertex[] vertices = new Structs.Vertex[reader.model.vertices.Count()];
 
             for (int i = 0; i < reader.model.vertices.Count(); i++)
@@ -41,12 +47,6 @@ namespace OBJExporterUI.Exporters.OBJ
                 vertices[i].Position = new OpenTK.Vector3(reader.model.vertices[i].position.X, reader.model.vertices[i].position.Z, reader.model.vertices[i].position.Y * -1);
                 vertices[i].Normal = new OpenTK.Vector3(reader.model.vertices[i].normal.X, reader.model.vertices[i].normal.Z, reader.model.vertices[i].normal.Y);
                 vertices[i].TexCoord = new Vector2(reader.model.vertices[i].textureCoordX, reader.model.vertices[i].textureCoordY);
-            }
-
-            // Don't export models without vertices
-            if (reader.model.vertices.Count() == 0)
-            {
-                return;
             }
 
             StreamWriter objsw;

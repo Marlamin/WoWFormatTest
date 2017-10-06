@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using WoWFormatLib.DBC;
 using WoWFormatLib.Utils;
-using CASCExplorer;
+using CASCLib;
 using System.Drawing.Imaging;
 using System.Windows.Media.Imaging;
 using System.Net;

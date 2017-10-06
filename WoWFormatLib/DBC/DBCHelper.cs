@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WoWFormatLib.Utils;
-using CASCExplorer;
+using CASCLib;
 
 namespace WoWFormatLib.DBC
 {

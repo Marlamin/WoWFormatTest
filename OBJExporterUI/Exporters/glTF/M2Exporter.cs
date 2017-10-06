@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
 using WoWFormatLib.Utils;
-using CASCExplorer;
+using CASCLib;
 using Newtonsoft.Json;
 
 namespace OBJExporterUI.Exporters.glTF

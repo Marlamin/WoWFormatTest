@@ -6,7 +6,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using WoWFormatLib.FileReaders;
-using CASCExplorer;
+using CASCLib;
 
 namespace OBJExporterUI.Exporters.OBJ
 {
