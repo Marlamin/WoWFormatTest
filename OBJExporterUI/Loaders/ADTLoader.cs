@@ -61,7 +61,8 @@ namespace OBJExporterUI.Loaders
                         var heightName = adt.textures.filenames[ti].Replace(".blp", "_h.blp");
                         if (!WoWFormatLib.Utils.CASC.cascHandler.FileExists(heightName))
                         {
-                            throw new Exception(heightName + " does not exist!");
+                            Console.WriteLine("Height texture: " + heightName + " does not exist! Falling back to original texture (hack)..");
+                            material.heightTexture = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
                         }
                         else
                         {
