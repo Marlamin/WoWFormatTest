@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL;
 using OBJExporterUI.Loaders;
 using System.Drawing;
 using OpenTK.Input;
+using System.Collections.Generic;
 
 namespace OBJExporterUI
 {
@@ -24,6 +25,8 @@ namespace OBJExporterUI
         private int wmoShaderProgram;
         private int m2ShaderProgram;
         private int bakeShaderProgram;
+
+        private List<string> adtList;
 
         public PreviewControl(GLControl renderCanvas)
         {
@@ -48,6 +51,27 @@ namespace OBJExporterUI
         {
             var minimapRenderer = new Renderer.RenderMinimap();
             minimapRenderer.Generate(filename, outname, cache, bakeShaderProgram);
+        }
+        
+        public void LoadModel(List<string> tileList)
+        {
+            foreach(var tile in tileList)
+            {
+                if (!cache.terrain.ContainsKey(tile))
+                {
+                    ADTLoader.LoadADT(tile, cache, adtShaderProgram);
+                }
+
+                ActiveCamera.Pos = new Vector3(cache.terrain[tile].startPos.Position.X, cache.terrain[tile].startPos.Position.Y, cache.terrain[tile].startPos.Position.Z);
+                ActiveCamera.Pos.Y -= 533.33333f / 2;
+                ActiveCamera.Pos.X += 533.33333f / 2;
+                ActiveCamera.Pos.Z += 50f;
+                modelType = "adt";
+
+                ready = true;
+            }
+
+            adtList = tileList;
         }
 
         public void LoadModel(string filename)
@@ -78,21 +102,6 @@ namespace OBJExporterUI
                 }
                 ActiveCamera.switchMode("perspective");
                 modelType = "wmo";
-
-                ready = true;
-            }
-            else if (filename.EndsWith(".adt"))
-            {
-                if (!cache.terrain.ContainsKey(filename))
-                {
-                    ADTLoader.LoadADT(filename, cache, adtShaderProgram);
-                }
-
-                ActiveCamera.Pos = new Vector3(cache.terrain[filename].startPos.Position.X, cache.terrain[filename].startPos.Position.Y, cache.terrain[filename].startPos.Position.Z);
-                ActiveCamera.Pos.Y -= 533.33333f / 2;
-                ActiveCamera.Pos.X += 533.33333f / 2;
-                ActiveCamera.Pos.Z += 50f;
-                modelType = "adt";
 
                 ready = true;
             }
@@ -223,52 +232,55 @@ namespace OBJExporterUI
                 var heightScaleLoc = GL.GetUniformLocation(adtShaderProgram, "pc_heightScale");
                 var heightOffsetLoc = GL.GetUniformLocation(adtShaderProgram, "pc_heightOffset");
 
-                GL.BindVertexArray(cache.terrain[filename].vao);
-
-                for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
+                foreach(var filename in adtList)
                 {
-                    GL.Uniform4(heightScaleLoc, cache.terrain[filename].renderBatches[i].heightScales);
-                    GL.Uniform4(heightOffsetLoc, cache.terrain[filename].renderBatches[i].heightOffsets);
+                    GL.BindVertexArray(cache.terrain[filename].vao);
 
-                    for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
+                    for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                     {
-                        var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_layer" + j);
-                        GL.Uniform1(textureLoc, j);
+                        GL.Uniform4(heightScaleLoc, cache.terrain[filename].renderBatches[i].heightScales);
+                        GL.Uniform4(heightOffsetLoc, cache.terrain[filename].renderBatches[i].heightOffsets);
 
-                        var scaleLoc = GL.GetUniformLocation(adtShaderProgram, "layer" + j + "scale");
-                        GL.Uniform1(scaleLoc, cache.terrain[filename].renderBatches[i].scales[j]);
+                        for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
+                        {
+                            var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_layer" + j);
+                            GL.Uniform1(textureLoc, j);
 
-                        GL.ActiveTexture(TextureUnit.Texture0 + j);
-                        GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
+                            var scaleLoc = GL.GetUniformLocation(adtShaderProgram, "layer" + j + "scale");
+                            GL.Uniform1(scaleLoc, cache.terrain[filename].renderBatches[i].scales[j]);
+
+                            GL.ActiveTexture(TextureUnit.Texture0 + j);
+                            GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
+                        }
+
+                        for (int j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
+                        {
+                            var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_blend" + j);
+                            GL.Uniform1(textureLoc, 3 + j);
+
+                            GL.ActiveTexture(TextureUnit.Texture3 + j);
+                            GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
+                        }
+
+                        for (int j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
+                        {
+                            var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_height" + j);
+                            GL.Uniform1(textureLoc, 7 + j);
+
+                            GL.ActiveTexture(TextureUnit.Texture7 + j);
+                            GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].heightMaterialIDs[j]);
+                        }
+
+                        GL.DrawElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.terrain[filename].renderBatches[i].firstFace * 4);
+
+                        for (int j = 0; j < 11; j++)
+                        {
+                            GL.ActiveTexture(TextureUnit.Texture0 + j);
+                            GL.BindTexture(TextureTarget.Texture2D, 0);
+                        }
+
+                        GL.DrawRangeElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].firstFace, (int)cache.terrain[filename].renderBatches[i].firstFace + (int)cache.terrain[filename].renderBatches[i].numFaces, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.terrain[filename].renderBatches[i].firstFace * 4));
                     }
-
-                    for (int j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
-                    {
-                        var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_blend" + j);
-                        GL.Uniform1(textureLoc, 3 + j);
-
-                        GL.ActiveTexture(TextureUnit.Texture3 + j);
-                        GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
-                    }
-
-                    for (int j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
-                    {
-                        var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_height" + j);
-                        GL.Uniform1(textureLoc, 7 + j);
-
-                        GL.ActiveTexture(TextureUnit.Texture7 + j);
-                        GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].heightMaterialIDs[j]);
-                    }
-
-                    GL.DrawElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.terrain[filename].renderBatches[i].firstFace * 4);
-
-                    for (int j = 0; j < 11; j++)
-                    {
-                        GL.ActiveTexture(TextureUnit.Texture0 + j);
-                        GL.BindTexture(TextureTarget.Texture2D, 0);
-                    }
-
-                    GL.DrawRangeElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].firstFace, (int)cache.terrain[filename].renderBatches[i].firstFace + (int)cache.terrain[filename].renderBatches[i].numFaces, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, new IntPtr(cache.terrain[filename].renderBatches[i].firstFace * 4));
                 }
             }
 

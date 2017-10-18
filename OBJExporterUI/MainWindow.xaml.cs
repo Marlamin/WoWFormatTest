@@ -728,20 +728,24 @@ namespace OBJExporterUI
         }
         private void MapViewerButton_Click(object sender, RoutedEventArgs e)
         {
+            var tileList = new List<string>();
+
             var selectedItem = (MapListItem)mapListBox.SelectedItem;
             if (selectedItem == null) return;
 
-            var selectedTile = tileListBox.SelectedItem;
-            if (selectedTile == null) return;
+            foreach (var selectedTile in tileListBox.SelectedItems)
+            {
+                var tiles = selectedTile.ToString().Split('_');
+                var x = int.Parse(tiles[0]);
+                var y = int.Parse(tiles[1]);
 
-            var tiles = selectedTile.ToString().Split('_');
-            var x = int.Parse(tiles[0]);
-            var y = int.Parse(tiles[1]);
+                var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
+                tileList.Add(adtFile);
+            }
 
-            var adtFile = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + "_" + x + "_" + y + ".adt";
-
-            previewControl.LoadModel(adtFile);
+            previewControl.LoadModel(tileList);
         }
+
         private void ExportCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
