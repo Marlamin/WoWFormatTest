@@ -154,7 +154,11 @@ namespace WoWFormatLib.FileReaders
                 nGroups = bin.ReadUInt32(),
                 nPortals = bin.ReadUInt32(),
                 nLights = bin.ReadUInt32(),
-                nModels = bin.ReadUInt32()
+                nModels = bin.ReadUInt32(),
+                nDoodads = bin.ReadUInt32(),
+                nSets = bin.ReadUInt32(),
+                ambientColor = bin.ReadUInt32(),
+                areaTableID = bin.ReadUInt32()
             };
 
             return header;
