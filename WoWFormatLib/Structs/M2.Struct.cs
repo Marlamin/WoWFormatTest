@@ -24,6 +24,8 @@ namespace WoWFormatLib.Structs.M2
         public uint version;
 
         public int physFileID;
+        public int skelFileID;
+
         public int[] boneFileDataIDs;
         public int[] skinFileDataIDs;
         public int[] lod_skinFileDataIDs;
@@ -39,7 +41,7 @@ namespace WoWFormatLib.Structs.M2
         public KeyBoneLookup[] keybonelookup;
         public Vertice[] vertices;
         public uint nViews;
-        public WoWFormatLib.Structs.SKIN.SKIN[] skins;
+        public SKIN.SKIN[] skins;
         public Color[] colors;
         public Texture[] textures;
         public Transparency[] transparency;

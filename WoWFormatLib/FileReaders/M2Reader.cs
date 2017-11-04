@@ -86,6 +86,9 @@ namespace WoWFormatLib.FileReaders
                     case "PFID": // Phys file IDs
                         model.physFileID = (int)bin.ReadUInt32();
                         break;
+                    case "SKID":
+                        model.skelFileID = (int)bin.ReadUInt32();
+                        break;
                     case "TXAC":
                     case "EXPT":
                     case "EXP2":
@@ -93,7 +96,6 @@ namespace WoWFormatLib.FileReaders
                     case "PABC":
                     case "PSBC":
                     case "PEDC":
-                    case "SKID":
                         break;
                     default:
 #if DEBUG
