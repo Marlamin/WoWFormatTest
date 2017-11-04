@@ -92,6 +92,7 @@ namespace WoWFormatLib.FileReaders
                     case "EXPT":
                     case "EXP2":
                     case "PADC":
+                    case "PABC":
                     case "PSBC":
                     case "PEDC":
                     case "SKID":
