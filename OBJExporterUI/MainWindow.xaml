@@ -45,6 +45,7 @@
                 <Grid>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="71,10,0,0" VerticalAlignment="Top"/>
+                    <CheckBox Checked="previewCheckbox_Checked" Unchecked="previewCheckbox_Checked" IsChecked="True" x:Name="previewCheckbox" Content="Enable preview" HorizontalAlignment="Left" Margin="485,10,0,0" VerticalAlignment="Top"/>
                     <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="ModelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
                     <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="10,0,10.4,10" VerticalAlignment="Bottom" Click="ExportButton_Click"/>
                 </Grid>

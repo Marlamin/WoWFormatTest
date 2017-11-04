@@ -34,6 +34,7 @@ namespace OBJExporterUI
 
         private bool mapsLoaded = false;
         private bool texturesLoaded = false;
+        private bool previewsEnabled = true;
 
         private List<string> models;
         private List<string> textures;
@@ -486,7 +487,7 @@ namespace OBJExporterUI
         /* Model tab */
         private void ModelListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (modelListBox.SelectedItems.Count == 1)
+            if (previewsEnabled && modelListBox.SelectedItems.Count == 1)
             {
                 previewControl.LoadModel((string)modelListBox.SelectedItem);
             }
@@ -971,5 +972,9 @@ namespace OBJExporterUI
             }
         }
 
+        private void previewCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            previewsEnabled = (bool) previewCheckbox.IsChecked;
+        }
     }
 }
