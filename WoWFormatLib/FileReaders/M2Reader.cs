@@ -14,9 +14,7 @@
   0. You just DO WHAT THE FUCK YOU WANT TO.
 */
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using WoWFormatLib.Structs.M2;
 using WoWFormatLib.Utils;
 
@@ -98,7 +96,12 @@ namespace WoWFormatLib.FileReaders
                     case "SKID":
                         break;
                     default:
+#if DEBUG
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
+#else
+                        CASCLib.Logger.WriteLine(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
+                        break;
+#endif
                 }
             }
 
