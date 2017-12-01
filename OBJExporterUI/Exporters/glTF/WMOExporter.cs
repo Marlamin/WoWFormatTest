@@ -12,7 +12,7 @@ namespace OBJExporterUI.Exporters.glTF
 {
     public class WMOExporter
     {
-        public static void exportWMO(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
+        public static void ExportWMO(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
         {
             if (exportworker == null)
             {
@@ -28,7 +28,7 @@ namespace OBJExporterUI.Exporters.glTF
             var reader = new WMOReader();
             reader.LoadWMO(file);
 
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
@@ -71,10 +71,10 @@ namespace OBJExporterUI.Exporters.glTF
             var accessorInfo = new List<Accessor>();
             var meshes = new List<Mesh>();
 
-            for (int g = 0; g < reader.wmofile.group.Count(); g++)
+            for (var g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 if (reader.wmofile.group[g].mogp.vertices == null) { Console.WriteLine("Group has no vertices!");  continue; }
-                for (int i = 0; i < reader.wmofile.groupNames.Count(); i++)
+                for (var i = 0; i < reader.wmofile.groupNames.Count(); i++)
                 {
                     if (reader.wmofile.group[g].mogp.nameOffset == reader.wmofile.groupNames[i].offset)
                     {
@@ -100,7 +100,7 @@ namespace OBJExporterUI.Exporters.glTF
                 var maxPosY = float.MinValue;
                 var maxPosZ = float.MinValue;
 
-                for (int i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
                 {
                     writer.Write(reader.wmofile.group[g].mogp.vertices[i].vector.X * -1);
                     writer.Write(reader.wmofile.group[g].mogp.vertices[i].vector.Z);
@@ -141,7 +141,7 @@ namespace OBJExporterUI.Exporters.glTF
                     target = 34962
                 };
 
-                for (int i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
                 {
                     writer.Write(reader.wmofile.group[g].mogp.normals[i].normal.X);
                     writer.Write(reader.wmofile.group[g].mogp.normals[i].normal.Z);
@@ -172,7 +172,7 @@ namespace OBJExporterUI.Exporters.glTF
                     target = 34962
                 };
 
-                for (int i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
                 {
                     writer.Write(reader.wmofile.group[g].mogp.textureCoords[0][i].X);
                     writer.Write(reader.wmofile.group[g].mogp.textureCoords[0][i].Y);
@@ -196,7 +196,7 @@ namespace OBJExporterUI.Exporters.glTF
 
                 var indexBufferPos = bufferViews.Count();
 
-                for (int i = 0; i < reader.wmofile.group[g].mogp.renderBatches.Count(); i++)
+                for (var i = 0; i < reader.wmofile.group[g].mogp.renderBatches.Count(); i++)
                 {
                     var batch = reader.wmofile.group[g].mogp.renderBatches[i];
 
@@ -243,7 +243,7 @@ namespace OBJExporterUI.Exporters.glTF
                     target = 34963
                 };
 
-                for (int i = 0; i < reader.wmofile.group[g].mogp.indices.Count(); i++)
+                for (var i = 0; i < reader.wmofile.group[g].mogp.indices.Count(); i++)
                 {
                     writer.Write(reader.wmofile.group[g].mogp.indices[i].indice);
                 }
@@ -273,9 +273,9 @@ namespace OBJExporterUI.Exporters.glTF
             glTF.textures = new Texture[materialCount];
             glTF.materials = new Material[materialCount];
 
-            for (int i = 0; i < materialCount; i++)
+            for (var i = 0; i < materialCount; i++)
             {
-                for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
+                for (var ti = 0; ti < reader.wmofile.textures.Count(); ti++)
                 {
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
                     {
@@ -366,8 +366,8 @@ namespace OBJExporterUI.Exporters.glTF
 
             glTF.scene = 0;
 
-            string currentDoodadSetName = "";
-            for (int i = 0; i < reader.wmofile.doodadDefinitions.Count(); i++)
+            var currentDoodadSetName = "";
+            for (var i = 0; i < reader.wmofile.doodadDefinitions.Count(); i++)
             {
                 var doodadDefinition = reader.wmofile.doodadDefinitions[i];
 
@@ -388,11 +388,11 @@ namespace OBJExporterUI.Exporters.glTF
                         {
                             if (destinationOverride == null)
                             {
-                                M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                                M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                             }
                             else
                             {
-                                M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
+                                M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
                             }
                         }
                     }

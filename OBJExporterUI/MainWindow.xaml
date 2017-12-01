@@ -45,7 +45,7 @@
                 <Grid>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="71,10,0,0" VerticalAlignment="Top"/>
-                    <CheckBox Checked="previewCheckbox_Checked" Unchecked="previewCheckbox_Checked" IsChecked="True" x:Name="previewCheckbox" Content="Enable preview" HorizontalAlignment="Left" Margin="485,10,0,0" VerticalAlignment="Top"/>
+                    <CheckBox Checked="PreviewCheckbox_Checked" Unchecked="PreviewCheckbox_Checked" IsChecked="True" x:Name="previewCheckbox" Content="Enable preview" HorizontalAlignment="Left" Margin="485,10,0,0" VerticalAlignment="Top"/>
                     <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="ModelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
                     <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="10,0,10.4,10" VerticalAlignment="Bottom" Click="ExportButton_Click"/>
                 </Grid>
@@ -121,7 +121,7 @@
                     <Button x:Name="mapViewerButton" Click="MapViewerButton_Click" Content="View tile in 3D" Margin="83,0,387.4,195" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportEverything" Content="Export WMOs and M2s" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,170" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportCheckBox_Checked"/>
                     <Label Content="Terrain texture size:" HorizontalAlignment="Left" Margin="78,0,0,146" Grid.Row="2" VerticalAlignment="Bottom" Width="113" Height="24"/>
-                    <ComboBox x:Name="bakeSize" SelectedIndex="1" Loaded="bakeSize_Loaded" DropDownClosed="bakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="90,0,0,116" Grid.Row="2" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
+                    <ComboBox x:Name="bakeSize" SelectedIndex="1" Loaded="BakeSize_Loaded" DropDownClosed="BakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="90,0,0,116" Grid.Row="2" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
                         <ComboBoxItem Name="low">4K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="medium">8K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="high">16K (split files)</ComboBoxItem>

@@ -12,23 +12,25 @@ namespace OBJExporterUI.Exporters.glTF
 {
     public class ADTExporter
     {
-        public static void exportADT(string file, BackgroundWorker exportworker = null)
+        public static void ExportADT(string file, BackgroundWorker exportworker = null)
         {
             if (exportworker == null)
             {
-                exportworker = new BackgroundWorker();
-                exportworker.WorkerReportsProgress = true;
+                exportworker = new BackgroundWorker
+                {
+                    WorkerReportsProgress = true
+                };
             }
 
             var outdir = ConfigurationManager.AppSettings["outdir"];
 
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
-            float TileSize = 1600.0f / 3.0f; //533.333
-            float ChunkSize = TileSize / 16.0f; //33.333
-            float UnitSize = ChunkSize / 8.0f; //4.166666
+            var TileSize = 1600.0f / 3.0f; //533.333
+            var ChunkSize = TileSize / 16.0f; //33.333
+            var UnitSize = ChunkSize / 8.0f; //4.166666
 
             var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
@@ -42,7 +44,7 @@ namespace OBJExporterUI.Exporters.glTF
 
             exportworker.ReportProgress(0, "Loading ADT " + file);
 
-            ADTReader reader = new ADTReader();
+            var reader = new ADTReader();
             reader.LoadADT(file.Replace('/', '\\'));
 
             if (reader.adtfile.chunks == null)
@@ -51,8 +53,8 @@ namespace OBJExporterUI.Exporters.glTF
                 return;
             }
 
-            List<Structs.RenderBatch> renderBatches = new List<Structs.RenderBatch>();
-            Dictionary<int, string> materials = new Dictionary<int, string>();
+            var renderBatches = new List<Structs.RenderBatch>();
+            var materials = new Dictionary<int, string>();
 
             var glTF = new glTF()
             {
@@ -90,18 +92,21 @@ namespace OBJExporterUI.Exporters.glTF
             }
             var stream = new FileStream(Path.Combine(outdir, file.Replace(".adt", ".bin")), FileMode.OpenOrCreate);
             var writer = new BinaryWriter(stream);
-            for (uint c = 0; c < reader.adtfile.chunks.Count(); c++)
+            for (var c = 0; c < reader.adtfile.chunks.Count(); c++)
             {
                 var chunk = reader.adtfile.chunks[c];
 
                 var localVertices = new Structs.Vertex[145];
                 for (int i = 0, idx = 0; i < 17; i++)
                 {
-                    for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
+                    for (var j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                     {
-                        Structs.Vertex v = new Structs.Vertex();
-                        v.Normal = new OpenTK.Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
-                        v.Position = new OpenTK.Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
+                        var v = new Structs.Vertex
+                        {
+                            Normal = new Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f),
+                            Position = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f))
+                        };
+
                         if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
                         if (bakeQuality == "low" || bakeQuality == "medium")
                         {
@@ -238,12 +243,12 @@ namespace OBJExporterUI.Exporters.glTF
                 holesHighRes[6] = chunk.header.holesHighRes_6;
                 holesHighRes[7] = chunk.header.holesHighRes_7;
 
-                List<int> indicelist = new List<Int32>();
+                var indicelist = new List<int>();
 
                 for (int j = 9, xx = 0, yy = 0; j < 145; j++, xx++)
                 {
                     if (xx >= 8) { xx = 0; ++yy; }
-                    bool isHole = true;
+                    var isHole = true;
 
                     if ((chunk.header.flags & 0x10000) == 0)
                     {
@@ -267,10 +272,10 @@ namespace OBJExporterUI.Exporters.glTF
 
                     if (!isHole)
                     {
-                        indicelist.AddRange(new Int32[] { j + 8, j, j - 9 });
-                        indicelist.AddRange(new Int32[] { j - 9, j, j - 8 });
-                        indicelist.AddRange(new Int32[] { j - 8, j, j + 9 });
-                        indicelist.AddRange(new Int32[] { j + 9, j, j + 8 });
+                        indicelist.AddRange(new int[] { j + 8, j, j - 9 });
+                        indicelist.AddRange(new int[] { j - 9, j, j - 8 });
+                        indicelist.AddRange(new int[] { j - 8, j, j + 9 });
+                        indicelist.AddRange(new int[] { j + 9, j, j + 8 });
                     }
 
                     if ((j + 1) % (9 + 8) == 0) j += 9;
@@ -293,7 +298,7 @@ namespace OBJExporterUI.Exporters.glTF
                     target = 34963
                 };
 
-                for (int i = 0; i < indicelist.Count(); i++)
+                for (var i = 0; i < indicelist.Count(); i++)
                 {
                     writer.Write(indicelist[i]);
                 }
@@ -318,7 +323,7 @@ namespace OBJExporterUI.Exporters.glTF
                 }
                 else if (bakeQuality == "high")
                 {
-                    mesh.primitives[0].material = c;
+                    mesh.primitives[0].material = (uint)c;
                 }
 
                 mesh.primitives[0].mode = 4;
@@ -397,7 +402,7 @@ namespace OBJExporterUI.Exporters.glTF
             {
                 exportworker.ReportProgress(25, "Exporting WMOs");
 
-                for (int mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
+                for (var mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
                 {
                     var wmo = reader.adtfile.objects.worldModels.entries[mi];
 
@@ -405,13 +410,13 @@ namespace OBJExporterUI.Exporters.glTF
 
                     if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".gltf"))
                     {
-                        WMOExporter.exportWMO(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        WMOExporter.ExportWMO(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                     }
                 }
 
                 exportworker.ReportProgress(50, "Exporting M2s");
 
-                for (int mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
+                for (var mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
                 {
                     var doodad = reader.adtfile.objects.models.entries[mi];
 
@@ -419,7 +424,7 @@ namespace OBJExporterUI.Exporters.glTF
 
                     if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".gltf"))
                     {
-                       M2Exporter.exportM2(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                       M2Exporter.ExportM2(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                     }
                 }
             }

@@ -14,7 +14,7 @@ namespace OBJExporterUI.Exporters.glTF
 {
     class M2Exporter
     {
-        public static void exportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
+        public static void ExportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
         {
             if (exportworker == null)
             {
@@ -30,7 +30,7 @@ namespace OBJExporterUI.Exporters.glTF
             var reader = new M2Reader();
             reader.LoadM2(file);
 
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
@@ -97,7 +97,7 @@ namespace OBJExporterUI.Exporters.glTF
             var maxPosY = float.MinValue;
             var maxPosZ = float.MinValue;
 
-            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            for (var i = 0; i < reader.model.vertices.Count(); i++)
             {
                 writer.Write(reader.model.vertices[i].position.X);
                 writer.Write(reader.model.vertices[i].position.Z);
@@ -138,7 +138,7 @@ namespace OBJExporterUI.Exporters.glTF
                 target = 34962
             };
 
-            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            for (var i = 0; i < reader.model.vertices.Count(); i++)
             {
                 writer.Write(reader.model.vertices[i].normal.X);
                 writer.Write(reader.model.vertices[i].normal.Z);
@@ -169,7 +169,7 @@ namespace OBJExporterUI.Exporters.glTF
                 target = 34962
             };
 
-            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            for (var i = 0; i < reader.model.vertices.Count(); i++)
             {
                 writer.Write(reader.model.vertices[i].textureCoordX);
                 writer.Write(reader.model.vertices[i].textureCoordY);
@@ -194,7 +194,7 @@ namespace OBJExporterUI.Exporters.glTF
             var indexBufferPos = bufferViews.Count();
             var materialBlends = new Dictionary<int, ushort>();
 
-            for (int i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
+            for (var i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
             {
                 var batch = reader.model.skins[0].submeshes[i];
 
@@ -223,7 +223,7 @@ namespace OBJExporterUI.Exporters.glTF
 
                 meshes.Add(mesh);
                 // Texture stuff
-                for (int tu = 0; tu < reader.model.skins[0].textureunit.Count(); tu++)
+                for (var tu = 0; tu < reader.model.skins[0].textureunit.Count(); tu++)
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
@@ -251,7 +251,7 @@ namespace OBJExporterUI.Exporters.glTF
                 target = 34963
             };
 
-            for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
+            for (var i = 0; i < reader.model.skins[0].triangles.Count(); i++)
             {
                 var t = reader.model.skins[0].triangles[i];
                 writer.Write(t.pt1);
@@ -283,9 +283,9 @@ namespace OBJExporterUI.Exporters.glTF
             var textureID = 0;
             var materials = new Structs.Material[reader.model.textures.Count()];
 
-            for (int i = 0; i < reader.model.textures.Count(); i++)
+            for (var i = 0; i < reader.model.textures.Count(); i++)
             {
-                int textureFileDataID = 840426;
+                var textureFileDataID = 840426;
                 materials[i].flags = reader.model.textures[i].flags;
                 switch (reader.model.textures[i].type)
                 {
@@ -296,8 +296,8 @@ namespace OBJExporterUI.Exporters.glTF
                     case 2:
                     case 11:
                         var fileDataID = CASC.getFileDataIdByName(file);
-                        uint[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
-                        for (int ti = 0; ti < cdifilenames.Count(); ti++)
+                        var cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
+                        for (var ti = 0; ti < cdifilenames.Count(); ti++)
                         {
                             textureFileDataID = (int)cdifilenames[0];
                         }

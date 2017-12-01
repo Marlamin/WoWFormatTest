@@ -101,12 +101,12 @@ namespace OBJExporterUI
         }
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            List<string> filtered = new List<string>();
+            var filtered = new List<string>();
 
             var selectedTab = (TabItem)tabs.SelectedItem;
             if ((string)selectedTab.Header == "Textures")
             {
-                for (int i = 0; i < textures.Count(); i++)
+                for (var i = 0; i < textures.Count(); i++)
                 {
                     if (textures[i].IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
                     {
@@ -144,7 +144,7 @@ namespace OBJExporterUI
                     exportButton.Content = "Export model to OBJ!";
                 }
 
-                for (int i = 0; i < models.Count(); i++)
+                for (var i = 0; i < models.Count(); i++)
                 {
                     if (models[i].IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1)
                     {
@@ -350,8 +350,8 @@ namespace OBJExporterUI
 
             linelist = null;
 
-            var unwantedExtensions = new List<String>();
-            for (int u = 0; u < 512; u++)
+            var unwantedExtensions = new List<string>();
+            for (var u = 0; u < 512; u++)
             {
                 unwantedExtensions.Add("_" + u.ToString().PadLeft(3, '0') + ".wmo");
             }
@@ -360,7 +360,7 @@ namespace OBJExporterUI
 
             unwantedExtensions = null;
 
-            for (int i = 0; i < lines.Count(); i++)
+            for (var i = 0; i < lines.Count(); i++)
             {
                 if (showWMO && lines[i].EndsWith(".wmo"))
                 {
@@ -435,7 +435,7 @@ namespace OBJExporterUI
                     }
                     else if(exportFormat == "glTF")
                     {
-                        Exporters.glTF.WMOExporter.exportWMO(selectedFile, exportworker);
+                        Exporters.glTF.WMOExporter.ExportWMO(selectedFile, exportworker);
                     }
                 }
                 else if (selectedFile.EndsWith(".m2"))
@@ -446,7 +446,7 @@ namespace OBJExporterUI
                     }
                     else if (exportFormat == "glTF")
                     {
-                        Exporters.glTF.M2Exporter.exportM2(selectedFile, exportworker);
+                        Exporters.glTF.M2Exporter.ExportM2(selectedFile, exportworker);
                     }
                 }
                 else if (selectedFile.EndsWith(".adt"))
@@ -457,7 +457,7 @@ namespace OBJExporterUI
                     }
                     else if (exportFormat == "glTF")
                     {
-                        Exporters.glTF.ADTExporter.exportADT(selectedFile, exportworker);
+                        Exporters.glTF.ADTExporter.ExportADT(selectedFile, exportworker);
                     }
                 }
                 else if (selectedFile.EndsWith(".blp"))
@@ -763,13 +763,13 @@ namespace OBJExporterUI
 
         }
       
-        private void bakeSize_DropDownClosed(object sender, EventArgs e)
+        private void BakeSize_DropDownClosed(object sender, EventArgs e)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.AppSettings.Settings["bakeQuality"].Value = ((ComboBoxItem)bakeSize.SelectedItem).Name;
             config.Save(ConfigurationSaveMode.Full);
         }
-        private void bakeSize_Loaded(object sender, RoutedEventArgs e)
+        private void BakeSize_Loaded(object sender, RoutedEventArgs e)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             foreach (ComboBoxItem cbi in bakeSize.Items)
@@ -879,13 +879,13 @@ namespace OBJExporterUI
 
             if (File.Exists("mapnames.csv") && mapNames.Count == 0)
             {
-                using (TextFieldParser parser = new TextFieldParser("mapnames.csv"))
+                using (var parser = new TextFieldParser("mapnames.csv"))
                 {
                     parser.TextFieldType = FieldType.Delimited;
                     parser.SetDelimiters(",");
                     while (!parser.EndOfData)
                     {
-                        string[] fields = parser.ReadFields();
+                        var fields = parser.ReadFields();
                         if (fields[0] != "ID")
                         {
                             mapNames.Add(int.Parse(fields[0]), new NiceMapEntry { ID = fields[0], Name = fields[4], Internal = fields[2], Type = fields[3], Expansion = fields[5] });
@@ -897,55 +897,54 @@ namespace OBJExporterUI
             mapListBox.DisplayMemberPath = "Value";
             mapListBox.Items.Clear();
 
-            // try
-            //{
-            CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2").ExtractToFile("DBFilesClient", "Map.db2");
-            var mapsData = new DBFilesClient.NET.Storage<MapEntry72>(@"DBFilesClient/Map.db2");
-
-            foreach (var mapEntry in mapsData)
+            try
             {
-                if (CASC.cascHandler.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
+                CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2").ExtractToFile("DBFilesClient", "Map.db2");
+                var mapsData = new DBFilesClient.NET.Storage<MapEntry72>(@"DBFilesClient/Map.db2");
+
+                foreach (var mapEntry in mapsData)
                 {
-                    var mapItem = new MapListItem { Internal = mapEntry.Value.directory };
-
-                    if (mapNames.ContainsKey(mapEntry.Key))
+                    if (CASC.cascHandler.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
                     {
-                        mapItem.Name = mapNames[mapEntry.Key].Name;
-                        mapItem.Type = mapNames[mapEntry.Key].Type;
-                        var expansionID = ExpansionNameToID(mapNames[mapEntry.Key].Expansion);
-                        mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
+                        var mapItem = new MapListItem { Internal = mapEntry.Value.directory };
 
-                        if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                        if (mapNames.ContainsKey(mapEntry.Key))
                         {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        mapItem.Name = mapEntry.Value.mapname_lang;
-                        mapItem.Type = "UNKNOWN";
-                        mapItem.Image = "pack://application:,,,/Resources/wow7.png";
-                    }
+                            mapItem.Name = mapNames[mapEntry.Key].Name;
+                            mapItem.Type = mapNames[mapEntry.Key].Type;
+                            var expansionID = ExpansionNameToID(mapNames[mapEntry.Key].Expansion);
+                            mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
 
-                    if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.mapname_lang.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
-                    {
-                        mapListBox.Items.Add(mapItem);
+                            if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                            {
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            mapItem.Name = mapEntry.Value.mapname_lang;
+                            mapItem.Type = "UNKNOWN";
+                            mapItem.Image = "pack://application:,,,/Resources/wow7.png";
+                        }
+
+                        if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.mapname_lang.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                        {
+                            mapListBox.Items.Add(mapItem);
+                        }
                     }
                 }
             }
-
-            /*}
             catch (Exception ex)
             {
                 Console.WriteLine("An error occured during DBC reading.. falling back to CSV!" + ex.Message);
                 foreach (var map in mapNames)
                 {
-                    if (CASC.FileExists("World/Maps/" + map.Value.Internal + "/" + map.Value.Internal + ".wdt"))
+                    if (CASC.cascHandler.FileExists("World/Maps/" + map.Value.Internal + "/" + map.Value.Internal + ".wdt"))
                     {
                         mapListBox.Items.Add(new MapListItem { Name = map.Value.Name, Internal = map.Value.Internal, Type = map.Value.Type });
                     }
                 }
-            }*/
+            }
 
             mapsLoaded = true;
         }
@@ -972,7 +971,7 @@ namespace OBJExporterUI
             }
         }
 
-        private void previewCheckbox_Checked(object sender, RoutedEventArgs e)
+        private void PreviewCheckbox_Checked(object sender, RoutedEventArgs e)
         {
             previewsEnabled = (bool) previewCheckbox.IsChecked;
         }
