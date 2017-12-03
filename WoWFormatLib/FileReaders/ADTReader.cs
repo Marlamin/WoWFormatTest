@@ -46,7 +46,7 @@ namespace WoWFormatLib.FileReaders
             using (var bin = new BinaryReader(adt))
             {
                 long position = 0;
-                int MCNKi = 0;
+                var MCNKi = 0;
                 adtfile.chunks = new MCNK[16 * 16];
 
                 while (position < adt.Length)
@@ -61,7 +61,7 @@ namespace WoWFormatLib.FileReaders
                     switch (chunkName)
                     {
                         case "MVER":
-                            uint version = bin.ReadUInt32();
+                            var version = bin.ReadUInt32();
                             if (version != 18)
                             {
                                 throw new Exception("Unsupported ADT version!");
@@ -87,7 +87,7 @@ namespace WoWFormatLib.FileReaders
                         case "MBNV":
                             break;
                         default:
-                            throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position, filename));
+                            throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position, filename));
                     }
                 }
             }
@@ -107,7 +107,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MCNK ReadMCNKChunk(uint size, BinaryReader bin)
         {
-            MCNK mapchunk = new MCNK()
+            var mapchunk = new MCNK()
             {
                 header = bin.Read<MCNKheader>()
             };
@@ -146,7 +146,7 @@ namespace WoWFormatLib.FileReaders
                         case "MCLV":
                             continue;
                         default:
-                            throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, subpos.ToString()));
+                            throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, subpos.ToString()));
                     }
                 }
             }
@@ -155,12 +155,12 @@ namespace WoWFormatLib.FileReaders
         }
         private MCVT ReadMCVTSubChunk(BinaryReader bin)
         {
-            MCVT vtchunk = new MCVT()
+            var vtchunk = new MCVT()
             {
                 vertices = new float[145]
             };
 
-            for (int i = 0; i < 145; i++)
+            for (var i = 0; i < 145; i++)
             {
                 vtchunk.vertices[i] = bin.ReadSingle();
             }
@@ -168,7 +168,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MCCV ReadMCCVSubChunk(BinaryReader bin)
         {
-            MCCV vtchunk = new MCCV()
+            var vtchunk = new MCCV()
             {
                 red = new byte[145],
                 green = new byte[145],
@@ -176,7 +176,7 @@ namespace WoWFormatLib.FileReaders
                 alpha = new byte[145]
             };
 
-            for (int i = 0; i < 145; i++)
+            for (var i = 0; i < 145; i++)
             {
                 vtchunk.red[i] = bin.ReadByte();
                 vtchunk.green[i] = bin.ReadByte();
@@ -188,14 +188,14 @@ namespace WoWFormatLib.FileReaders
         }
         private MCNR ReadMCNRSubChunk(BinaryReader bin)
         {
-            MCNR nrchunk = new MCNR()
+            var nrchunk = new MCNR()
             {
                 normal_0 = new short[145],
                 normal_1 = new short[145],
                 normal_2 = new short[145]
             };
 
-            for (int i = 0; i < 145; i++)
+            for (var i = 0; i < 145; i++)
             {
                 nrchunk.normal_0[i] = bin.ReadSByte();
                 nrchunk.normal_1[i] = bin.ReadSByte();
@@ -206,7 +206,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MCSE ReadMCSESubChunk(uint size, BinaryReader bin)
         {
-            MCSE sechunk = new MCSE()
+            var sechunk = new MCSE()
             {
                 raw = bin.ReadBytes((int)size)
             };
@@ -216,8 +216,8 @@ namespace WoWFormatLib.FileReaders
         private MCBB[] ReadMCBBSubChunk(uint size, BinaryReader bin)
         {
             var count = size / 20;
-            MCBB[] bbchunk = new MCBB[count];
-            for (int i = 0; i < count; i++)
+            var bbchunk = new MCBB[count];
+            for (var i = 0; i < count; i++)
             {
                 bbchunk[i] = bin.Read<MCBB>();
             }
@@ -268,7 +268,7 @@ namespace WoWFormatLib.FileReaders
                             // TODO
                             break;
                         default:
-                            throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position));
+                            throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position));
                     }
                 }
             }
@@ -277,10 +277,10 @@ namespace WoWFormatLib.FileReaders
         {
             var m2FilesChunk = bin.ReadBytes((int)size);
 
-            MMDX mmdx = new MMDX();
+            var mmdx = new MMDX();
             var str = new StringBuilder();
 
-            List<uint> offsets = new List<uint>();
+            var offsets = new List<uint>();
 
             for (var i = 0; i < m2FilesChunk.Length; i++)
             {
@@ -304,12 +304,12 @@ namespace WoWFormatLib.FileReaders
         {
             var count = size / 4;
 
-            MMID mmid = new MMID()
+            var mmid = new MMID()
             {
                 offsets = new uint[count]
             };
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 mmid.offsets[i] = bin.ReadUInt32();
             }
@@ -320,12 +320,12 @@ namespace WoWFormatLib.FileReaders
         {
             var wmoFilesChunk = bin.ReadBytes((int)size);
 
-            MWMO mwmo = new MWMO();
+            var mwmo = new MWMO();
             var str = new StringBuilder();
 
-            List<uint> offsets = new List<uint>();
+            var offsets = new List<uint>();
 
-            for (int i = 0; i < wmoFilesChunk.Length; i++)
+            for (var i = 0; i < wmoFilesChunk.Length; i++)
             {
                 if (wmoFilesChunk[i] == '\0')
                 {
@@ -347,12 +347,12 @@ namespace WoWFormatLib.FileReaders
         {
             var count = size / 4;
 
-            MWID mwid = new MWID()
+            var mwid = new MWID()
             {
                 offsets = new uint[count]
             };
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 mwid.offsets[i] = bin.ReadUInt32();
             }
@@ -361,13 +361,13 @@ namespace WoWFormatLib.FileReaders
         }
         private MDDF ReadMDDFChunk(uint size, BinaryReader bin)
         {
-            MDDF mddf = new MDDF();
+            var mddf = new MDDF();
 
             var count = size / 36; 
 
             mddf.entries = new MDDFEntry[count];
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 mddf.entries[i] = bin.Read<MDDFEntry>();
             }
@@ -376,12 +376,12 @@ namespace WoWFormatLib.FileReaders
         }
         private MODF ReadMODFChunk(uint size, BinaryReader bin)
         {
-            MODF modf = new MODF();
+            var modf = new MODF();
 
             var count = size / 64; 
 
             modf.entries = new MODFEntry[count];
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 modf.entries[i] = bin.Read<MODFEntry>();
             }
@@ -395,7 +395,7 @@ namespace WoWFormatLib.FileReaders
             using (var bin = new BinaryReader(adtTexStream))
             {
                 long position = 0;
-                int MCNKi = 0;
+                var MCNKi = 0;
                 adtfile.texChunks = new TexMCNK[16 * 16];
 
                 while (position < adtTexStream.Length)
@@ -423,14 +423,14 @@ namespace WoWFormatLib.FileReaders
                         case "MAMP":
                             break;
                         default:
-                            throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position));
+                            throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position));
                     }
                 }
             }
         }
         private TexMCNK ReadTexMCNKChunk(uint size, BinaryReader bin)
         {
-            TexMCNK mapchunk = new TexMCNK();
+            var mapchunk = new TexMCNK();
 
             using (var stream = new MemoryStream(bin.ReadBytes((int)size)))
             using (var subbin = new BinaryReader(stream))
@@ -457,7 +457,7 @@ namespace WoWFormatLib.FileReaders
                         case "MCMT":
                             break;
                         default:
-                            throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, subpos.ToString()));
+                            throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, subpos.ToString()));
                     }
                 }
             }
@@ -466,7 +466,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MTEX ReadMTEXChunk(uint size, BinaryReader bin)
         {
-            MTEX txchunk = new MTEX();
+            var txchunk = new MTEX();
 
             //List of BLP filenames
             var blpFilesChunk = bin.ReadBytes((int)size);
@@ -495,7 +495,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MTXP[] ReadMTXPChunk(int count, BinaryReader bin)
         {
-            MTXP[] txparams = new MTXP[count];
+            var txparams = new MTXP[count];
 
             for(var i = 0; i < count; i++)
             {
@@ -509,14 +509,14 @@ namespace WoWFormatLib.FileReaders
             var mcal = new MCAL[mapchunk.layers.Length];
 
             mcal[0].layer = new byte[64 * 64];
-            for (int i = 0; i < 64 * 64; i++)
+            for (var i = 0; i < 64 * 64; i++)
             {
                 mcal[0].layer[i] = 255;
             }
 
             uint read_offset = 0;
 
-            for (int layer = 1; layer < mapchunk.layers.Length; ++layer)
+            for (var layer = 1; layer < mapchunk.layers.Length; ++layer)
             {
                 // we assume that we have read as many bytes as this next layer's mcal offset. we then read depending on encoding
                 if (mapchunk.layers[layer].offsetInMCAL != read_offset)
@@ -536,13 +536,13 @@ namespace WoWFormatLib.FileReaders
                     uint out_offset = 0;
                     while (out_offset < 4096)
                     {
-                        byte info = bin.ReadByte(); ++in_offset;
-                        uint mode = (uint)(info & 0x80) >> 7; // 0 = copy, 1 = fill
-                        uint count = (uint)(info & 0x7f); // do mode operation count times
+                        var info = bin.ReadByte(); ++in_offset;
+                        var mode = (uint)(info & 0x80) >> 7; // 0 = copy, 1 = fill
+                        var count = (uint)(info & 0x7f); // do mode operation count times
 
                         if (mode != 0)
                         {
-                            byte val = bin.ReadByte(); ++in_offset;
+                            var val = bin.ReadByte(); ++in_offset;
                             while (count-- > 0 && out_offset < 4096)
                             {
                                 mcal[layer].layer[out_offset] = val;
@@ -575,7 +575,7 @@ namespace WoWFormatLib.FileReaders
                     mcal[layer].layer = new byte[64 * 64];
                     var mcal_data = bin.ReadBytes(2048);
                     read_offset += 2048;
-                    for (int i = 0; i < 2048; ++i)
+                    for (var i = 0; i < 2048; ++i)
                     {
                         // maybe nibbles swapped
                         mcal[layer].layer[2 * i + 0] = (byte)(((mcal_data[i] & 0x0F) >> 0) * 17);
@@ -591,8 +591,8 @@ namespace WoWFormatLib.FileReaders
         private MCLY[] ReadMCLYSubChunk(uint size, BinaryReader bin)
         {
             var count = size / 16;
-            MCLY[] mclychunks = new MCLY[count];
-            for (int i = 0; i < count; i++)
+            var mclychunks = new MCLY[count];
+            for (var i = 0; i < count; i++)
             {
                 mclychunks[i].textureId = bin.ReadUInt32();
                 mclychunks[i].flags = (mclyFlags)bin.ReadUInt32();

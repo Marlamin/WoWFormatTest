@@ -83,19 +83,19 @@ namespace WoWFormatLib.FileReaders
                         }
                         model.skinFileDataIDs = sfids;
                         break;
-                    case "PFID": // Phys file IDs
+                    case "PFID": // Phys file ID
                         model.physFileID = (int)bin.ReadUInt32();
                         break;
-                    case "SKID":
+                    case "SKID": // Skel file DI
                         model.skelFileID = (int)bin.ReadUInt32();
                         break;
                     case "TXAC":
-                    case "EXPT":
-                    case "EXP2":
-                    case "PADC":
+                    case "EXPT": // Extended Particles
+                    case "EXP2": // Extended Particles 2
                     case "PABC":
-                    case "PSBC":
+                    case "PADC":
                     case "PEDC":
+                    case "PSBC":
                         break;
                     default:
 #if DEBUG

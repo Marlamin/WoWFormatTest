@@ -34,7 +34,7 @@ namespace WoWFormatLib.FileReaders
 
             if (CASC.cascHandler.FileExists(filename))
             {
-                using (Stream wmoStream = CASC.cascHandler.OpenFile(filename))
+                using (var wmoStream = CASC.cascHandler.OpenFile(filename))
                 {
                     ReadWMO(filename, wmoStream);
                 }
@@ -94,6 +94,8 @@ namespace WoWFormatLib.FileReaders
                             wmofile.doodadDefinitions = ReadMODDChunk(chunkSize, bin);
                             break;
                         case "MOSB": // Skybox
+                            wmofile.skybox = ReadMOSBChunk(chunkSize, bin);
+                            break;
                         case "MOPV": // Portal Vertices
                         case "MOPR": // Portal References
                         case "MOPT": // Portal Information
@@ -106,15 +108,15 @@ namespace WoWFormatLib.FileReaders
                         case "GFID": // Legion
                             break;
                         default:
-                            throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
+                            throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                     }
                 }
             }
 
-            WMOGroupFile[] groupFiles = new WMOGroupFile[wmofile.header.nGroups];
-            for (int i = 0; i < wmofile.header.nGroups; i++)
+            var groupFiles = new WMOGroupFile[wmofile.header.nGroups];
+            for (var i = 0; i < wmofile.header.nGroups; i++)
             {
-                string groupfilename = filename.ToLower().Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
+                var groupfilename = filename.ToLower().Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo");
 
                 if (_lod)
                 {
@@ -136,7 +138,7 @@ namespace WoWFormatLib.FileReaders
 
                 if (CASC.cascHandler.FileExists(groupfilename))
                 {
-                    using (Stream wmoStream = CASC.cascHandler.OpenFile(groupfilename))
+                    using (var wmoStream = CASC.cascHandler.OpenFile(groupfilename))
                     {
                         groupFiles[i] = ReadWMOGroupFile(groupfilename, wmoStream);
                     }
@@ -158,7 +160,7 @@ namespace WoWFormatLib.FileReaders
                 nDoodads = bin.ReadUInt32(),
                 nSets = bin.ReadUInt32(),
                 ambientColor = bin.ReadUInt32(),
-                areaTableID = bin.ReadUInt32()
+                wmoID = bin.ReadUInt32()
             };
 
             return header;
@@ -167,8 +169,8 @@ namespace WoWFormatLib.FileReaders
         {
             //List of BLP filenames
             var blpFilesChunk = bin.ReadBytes((int)size);
-            List<String> blpFiles = new List<string>();
-            List<int> blpOffset = new List<int>();
+            var blpFiles = new List<string>();
+            var blpOffset = new List<int>();
             var str = new StringBuilder();
 
             var buildingString = false;
@@ -214,8 +216,8 @@ namespace WoWFormatLib.FileReaders
         {
             var wmoGroupsChunk = bin.ReadBytes((int)size);
             var str = new StringBuilder();
-            var nameList = new List<String>();
-            List<int> nameOffset = new List<int>();
+            var nameList = new List<string>();
+            var nameOffset = new List<int>();
             for (var i = 0; i < wmoGroupsChunk.Length; i++)
             {
                 if (wmoGroupsChunk[i] == '\0')
@@ -271,8 +273,8 @@ namespace WoWFormatLib.FileReaders
         {
             //List of M2 filenames, but are still named after MDXs internally. Have to rename!
             var m2FilesChunk = bin.ReadBytes((int)size);
-            List<String> m2Files = new List<string>();
-            List<int> m2Offset = new List<int>();
+            var m2Files = new List<string>();
+            var m2Offset = new List<int>();
             var str = new StringBuilder();
 
             for (var i = 0; i < m2FilesChunk.Length; i++)
@@ -321,10 +323,15 @@ namespace WoWFormatLib.FileReaders
             return doodads;
         }
 
+        private string ReadMOSBChunk(uint size, BinaryReader bin)
+        {
+            return bin.ReadStringNull();
+        }
+
         /* GROUP */
         private WMOGroupFile ReadWMOGroupFile(string filename, Stream wmo)
         {
-            WMOGroupFile groupFile = new WMOGroupFile();
+            var groupFile = new WMOGroupFile();
 
             using (var bin = new BinaryReader(wmo))
             {
@@ -349,7 +356,7 @@ namespace WoWFormatLib.FileReaders
                             groupFile.mogp = ReadMOGPChunk(chunkSize, bin);
                             continue;
                         default:
-                            throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
+                            throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                     }
                 }
             }
@@ -358,7 +365,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MOGP ReadMOGPChunk(uint size, BinaryReader bin)
         {
-            MOGP mogp = new MOGP()
+            var mogp = new MOGP()
             {
                 nameOffset = bin.ReadUInt32(),
                 descriptiveNameOffset = bin.ReadUInt32(),
@@ -381,7 +388,7 @@ namespace WoWFormatLib.FileReaders
             using (var subbin = new BinaryReader(stream))
             {
                 long position = 0;
-                int MOTVi = 0;
+                var MOTVi = 0;
 
                 if (mogp.flags.HasFlag(MOGPFlags.Flag_0x40000000))
                 {
@@ -442,7 +449,7 @@ namespace WoWFormatLib.FileReaders
                         case "MOLS": //Unknown
                             continue;
                         default:
-                            throw new Exception(String.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, position.ToString()));
+                            throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, position.ToString()));
                     }
                 }
             }

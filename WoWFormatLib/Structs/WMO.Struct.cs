@@ -31,6 +31,7 @@ namespace WoWFormatLib.Structs.WMO
         public MOGN[] groupNames;
         public MOGI[] groupInfo;
         public WMOGroupFile[] group;
+        public string  skybox;
     }
 
     public struct MVER
@@ -48,7 +49,7 @@ namespace WoWFormatLib.Structs.WMO
         public uint nDoodads;
         public uint nSets;
         public uint ambientColor;
-        public uint areaTableID;
+        public uint wmoID;
         public Vector3 boundingBox1;
         public Vector3 boundingBox2;
         public uint flags;
