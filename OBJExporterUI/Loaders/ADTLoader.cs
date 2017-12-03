@@ -10,7 +10,7 @@ namespace OBJExporterUI.Loaders
 {
     class ADTLoader
     {
-        public static Terrain LoadADT(string filename, CacheStorage cache, int shaderProgram)
+        public static Terrain LoadADT(string filename, CacheStorage cache, int shaderProgram, bool loadModels = false)
         {
             WoWFormatLib.Structs.ADT.ADT adt = new WoWFormatLib.Structs.ADT.ADT();
 
@@ -127,7 +127,7 @@ namespace OBJExporterUI.Loaders
                 result.startPos = verticelist[0];
 
                 batch.firstFace = (uint)indicelist.Count();
-                for (int j = 9; j < 145; j++)
+                for (var j = 9; j < 145; j++)
                 {
                     indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
                     indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
@@ -195,9 +195,80 @@ namespace OBJExporterUI.Loaders
                 renderBatches.Add(batch);
             }
 
+            var doodads = new List<Doodad>();
+            var worldModelBatches = new List<WorldModelBatch>();
+
+            if (loadModels)
+            {
+                for (var mi = 0; mi < adt.objects.models.entries.Count(); mi++)
+                {
+                    Console.WriteLine("Loading model #" + mi);
+
+                    var modelentry = adt.objects.models.entries[mi];
+                    var mmid = adt.objects.m2NameOffsets.offsets[modelentry.mmidEntry];
+
+                    var modelfilename = "";
+                    for (var mmi = 0; mmi < adt.objects.m2Names.offsets.Count(); mmi++)
+                    {
+                        if (adt.objects.m2Names.offsets[mmi] == mmid)
+                        {
+                            modelfilename = adt.objects.m2Names.filenames[mmi].ToLower();
+                            break;
+                        }
+                    }
+
+                    doodads.Add(new Doodad
+                    {
+                        filename = modelfilename,
+                        position = new Vector3(-(modelentry.position.X - 17066), modelentry.position.Y, -(modelentry.position.Z - 17066)),
+                        rotation = new Vector3(modelentry.rotation.X, modelentry.rotation.Y, modelentry.rotation.Z),
+                        scale = modelentry.scale
+                    });
+
+                    if (!cache.doodadBatches.ContainsKey(modelfilename))
+                    {
+                        M2Loader.LoadM2(modelfilename, cache, shaderProgram);
+                    }
+                }
+
+                for (var wmi = 0; wmi < adt.objects.worldModels.entries.Count(); wmi++)
+                {
+                    var wmofilename = "";
+
+                    var wmodelentry = adt.objects.worldModels.entries[wmi];
+                    var mwid = adt.objects.wmoNameOffsets.offsets[wmodelentry.mwidEntry];
+
+                    for (var wmfi = 0; wmfi < adt.objects.wmoNames.offsets.Count(); wmfi++)
+                    {
+                        if (adt.objects.wmoNames.offsets[wmfi] == mwid)
+                        {
+                            wmofilename = adt.objects.wmoNames.filenames[wmfi].ToLower();
+                            break;
+                        }
+                    }
+
+                    if (wmofilename.Length == 0)
+                    {
+                        throw new Exception("Unable to find filename for WMO!");
+                    }
+
+                    if (!cache.worldModelBatches.ContainsKey(wmofilename))
+                    {
+                        WMOLoader.LoadWMO(wmofilename, cache, shaderProgram);
+                    }
+
+                    worldModelBatches.Add(new WorldModelBatch
+                    {
+                        position = new Vector3(-(wmodelentry.position.X - 17066.666f), wmodelentry.position.Y, -(wmodelentry.position.Z - 17066.666f)),
+                        rotation = new Vector3(wmodelentry.rotation.X, wmodelentry.rotation.Y, wmodelentry.rotation.Z),
+                        worldModel = cache.worldModelBatches[wmofilename]
+                    });
+                }
+            }
+
             result.renderBatches = renderBatches.ToArray();
-            //result.doodads = doodads.ToArray();
-            //result.worldModelBatches = worldModelBatches.ToArray();
+            result.doodads = doodads.ToArray();
+            result.worldModelBatches = worldModelBatches.ToArray();
 
             cache.terrain.Add(filename, result);
             return result;

@@ -216,6 +216,12 @@
     <Content Include="Utils\Cinema 4D plugin %28by Remo Pini%29\wow_import.pyp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Shaders\bakeFullMinimap.fragment.shader">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shaders\bakeFullMinimap.vertex.shader">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

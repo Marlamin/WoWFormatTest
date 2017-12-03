@@ -129,6 +129,7 @@
                     <Image x:Name="tileImage" Grid.Row="2" Margin="100,0,0,50" VerticalAlignment="Top" HorizontalAlignment="Right"/>
                     <Label x:Name="selectedTileLabel" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Selected tile: none" Margin="0,0,0.4,30" Width="160"/>
                     <Button Grid.Row="2" x:Name="exportTileButton" Content="Export maptile" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" Click="ExportTileButton_Click"/>
+                    <Button x:Name="renderMinimapButton" Click="RenderMinimapButton_Click" Content="[DEV] Render minimap" Margin="83,0,387.4,36" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                 </Grid>
             </TabItem>
         </TabControl>

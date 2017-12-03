@@ -10,12 +10,12 @@ namespace OBJExporterUI.Renderer
 {
     class RenderMinimap
     {
-        public void Generate(string filename, string outName, CacheStorage cache, int bakeShaderProgram)
+        public void Generate(string filename, string outName, CacheStorage cache, int bakeShaderProgram, bool loadModels = false)
         {
-            float TileSize = 1600.0f / 3.0f; //533.333
-            float ChunkSize = TileSize / 16.0f; //33.333
-            float UnitSize = ChunkSize / 8.0f; //4.166666
-            float MapMidPoint = 32.0f / ChunkSize;
+            var TileSize = 1600.0f / 3.0f; //533.333
+            var ChunkSize = TileSize / 16.0f; //33.333
+            var UnitSize = ChunkSize / 8.0f; //4.166666
+            var MapMidPoint = 32.0f / ChunkSize;
 
             var bakeSize = 4096;
             var splitFiles = false;
@@ -24,7 +24,10 @@ namespace OBJExporterUI.Renderer
 
             var size = ConfigurationManager.AppSettings["bakeQuality"];
 
-            if (size == "low")
+            if(size == "minimap")
+            {
+                bakeSize = 256;
+            }else if (size == "low")
             {
                 bakeSize = 4096;
             }else if(size == "medium")
@@ -48,13 +51,14 @@ namespace OBJExporterUI.Renderer
 
             if (!cache.terrain.ContainsKey(filename))
             {
-                ADTLoader.LoadADT(filename, cache, bakeShaderProgram);
+                ADTLoader.LoadADT(filename, cache, bakeShaderProgram, loadModels);
             }
 
             var firstPos = cache.terrain[filename].startPos.Position;
             var projectionMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "projection_matrix");
             var modelviewMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "modelview_matrix");
             var firstPosLocation = GL.GetUniformLocation(bakeShaderProgram, "firstPos");
+            var doodadOffsLocation = GL.GetUniformLocation(bakeShaderProgram, "doodadOffs");
             var heightScaleLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightScale");
             var heightOffsetLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightOffset");
 
@@ -62,7 +66,7 @@ namespace OBJExporterUI.Renderer
             {
                 GL.BindVertexArray(cache.terrain[filename].vao);
 
-                for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
+                for (var i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                 {
                     if(File.Exists(outName.Replace(".png", "_" + i + ".png")))
                     {
@@ -98,7 +102,7 @@ namespace OBJExporterUI.Renderer
                     var eye = new Vector3(-ChunkSize / 2, (-ChunkSize / 2), 400f);
                     var target = new Vector3(-ChunkSize / 2, (-ChunkSize / 2), 399.9999f);
 
-                    Matrix4 modelViewMatrix = Matrix4.LookAt(eye, target, new Vector3(0f, 1f, 0f));
+                    var modelViewMatrix = Matrix4.LookAt(eye, target, new Vector3(0f, 1f, 0f));
                     GL.UniformMatrix4(modelviewMatrixLocation, false, ref modelViewMatrix);
 
                     var chunkPos = firstPos;
@@ -113,7 +117,7 @@ namespace OBJExporterUI.Renderer
 
                     GL.Uniform4(heightOffsetLoc, cache.terrain[filename].renderBatches[i].heightOffsets);
 
-                    for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
+                    for (var j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
                     {
                         var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_layer" + j);
                         GL.Uniform1(textureLoc, j);
@@ -125,7 +129,7 @@ namespace OBJExporterUI.Renderer
                         GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
                     }
 
-                    for (int j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
+                    for (var j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
                     {
                         var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_blend" + j);
                         GL.Uniform1(textureLoc, 3 + j);
@@ -134,7 +138,7 @@ namespace OBJExporterUI.Renderer
                         GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
                     }
 
-                    for (int j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
+                    for (var j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
                     {
                         var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_height" + j);
                         GL.Uniform1(textureLoc, 7 + j);
@@ -145,7 +149,7 @@ namespace OBJExporterUI.Renderer
 
                     GL.DrawElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.terrain[filename].renderBatches[i].firstFace * 4);
 
-                    for (int j = 0; j < 11; j++)
+                    for (var j = 0; j < 11; j++)
                     {
                         GL.ActiveTexture(TextureUnit.Texture0 + j);
                         GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -157,8 +161,8 @@ namespace OBJExporterUI.Renderer
                         Console.WriteLine(error);
                     }
 
-                    Bitmap bmp = new Bitmap(bakeSize, bakeSize);
-                    System.Drawing.Imaging.BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                    var bmp = new Bitmap(bakeSize, bakeSize);
+                    var data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
                     GL.ReadPixels(0, 0, bakeSize, bakeSize, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
                     bmp.UnlockBits(data);
 
@@ -204,7 +208,7 @@ namespace OBJExporterUI.Renderer
 
                 var eye = new Vector3(-TileSize / 2, -TileSize / 2, 400f);
                 var target = new Vector3(-TileSize / 2, -TileSize / 2, 399.9999f);
-                Matrix4 modelViewMatrix = Matrix4.LookAt(eye, target, new Vector3(0f, 1f, 0f));
+                var modelViewMatrix = Matrix4.LookAt(eye, target, new Vector3(0f, 1f, 0f));
                 GL.UniformMatrix4(modelviewMatrixLocation, false, ref modelViewMatrix);
 
                 GL.Uniform3(firstPosLocation, ref firstPos);
@@ -213,12 +217,12 @@ namespace OBJExporterUI.Renderer
 
                 GL.BindVertexArray(cache.terrain[filename].vao);
 
-                for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
+                for (var i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                 {
                     GL.Uniform4(heightScaleLoc, cache.terrain[filename].renderBatches[i].heightScales);
                     GL.Uniform4(heightOffsetLoc, cache.terrain[filename].renderBatches[i].heightOffsets);
 
-                    for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
+                    for (var j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
                     {
                         var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_layer" + j);
                         GL.Uniform1(textureLoc, j);
@@ -230,7 +234,7 @@ namespace OBJExporterUI.Renderer
                         GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
                     }
 
-                    for (int j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
+                    for (var j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
                     {
                         var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_blend" + j);
                         GL.Uniform1(textureLoc, 3 + j);
@@ -239,7 +243,7 @@ namespace OBJExporterUI.Renderer
                         GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
                     }
 
-                    for (int j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
+                    for (var j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
                     {
                         var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_height" + j);
                         GL.Uniform1(textureLoc, 7 + j);
@@ -250,7 +254,7 @@ namespace OBJExporterUI.Renderer
 
                     GL.DrawElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.terrain[filename].renderBatches[i].firstFace * 4);
 
-                    for (int j = 0; j < 11; j++)
+                    for (var j = 0; j < 11; j++)
                     {
                         GL.ActiveTexture(TextureUnit.Texture0 + j);
                         GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -263,8 +267,12 @@ namespace OBJExporterUI.Renderer
                     }
                 }
 
-                Bitmap bmp = new Bitmap(bakeSize, bakeSize);
-                System.Drawing.Imaging.BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                foreach (var batch in cache.terrain[filename].worldModelBatches)
+                {
+                }
+
+                var bmp = new Bitmap(bakeSize, bakeSize);
+                var data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
                 GL.ReadPixels(0, 0, bakeSize, bakeSize, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
                 bmp.UnlockBits(data);
 

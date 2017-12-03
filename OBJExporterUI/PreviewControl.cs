@@ -25,6 +25,7 @@ namespace OBJExporterUI
         private int wmoShaderProgram;
         private int m2ShaderProgram;
         private int bakeShaderProgram;
+        private int bakeFullMinimapShaderProgram;
 
         private List<string> adtList;
 
@@ -47,10 +48,17 @@ namespace OBJExporterUI
             }
         }
 
-        public void BakeTexture(string filename, string outname)
+        public void BakeTexture(string filename, string outname, bool minimap = false)
         {
             var minimapRenderer = new Renderer.RenderMinimap();
-            minimapRenderer.Generate(filename, outname, cache, bakeShaderProgram);
+            if (minimap)
+            {
+                minimapRenderer.Generate(filename, outname, cache, bakeFullMinimapShaderProgram);
+            }
+            else
+            {
+                minimapRenderer.Generate(filename, outname, cache, bakeShaderProgram);
+            }
         }
         
         public void LoadModel(List<string> tileList)
@@ -132,6 +140,7 @@ namespace OBJExporterUI
             wmoShaderProgram = Shader.CompileShader("wmo");
             m2ShaderProgram = Shader.CompileShader("m2");
             bakeShaderProgram = Shader.CompileShader("baketexture");
+            bakeFullMinimapShaderProgram = Shader.CompileShader("bakeFullMinimap");
 
             GL.ClearColor(Color.Black);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);

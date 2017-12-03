@@ -975,5 +975,40 @@ namespace OBJExporterUI
         {
             previewsEnabled = (bool) previewCheckbox.IsChecked;
         }
+
+        private void RenderMinimapButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in tileListBox.SelectedItems)
+            {
+                var selectedMap = (MapListItem)mapListBox.SelectedItem;
+                var selectedTile = (string)tileListBox.SelectedItem;
+
+                if (selectedMap == null || selectedTile == null)
+                {
+                    Console.WriteLine("Nothing selected, not exporting.");
+                    return;
+                }
+
+                var file = "world/maps/" + selectedMap.Internal.ToLower() + "/" + selectedMap.Internal.ToLower() + "_" + item + ".adt";
+
+                // Hackfix because I can't seem to get GL and backgroundworkers due to work well together due to threading, will freeze everything
+                var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
+                var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
+
+                var centerx = int.Parse(coord[1]);
+                var centery = int.Parse(coord[2]);
+
+                var prevConfig = ConfigurationManager.AppSettings["bakeQuality"];
+
+                var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                config.AppSettings.Settings["bakeQuality"].Value = "minimap";
+                config.Save(ConfigurationSaveMode.Full);
+
+                previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname.Replace(" ", "") + "_" + centerx + "_" + centery + ".png"), true);
+
+                config.AppSettings.Settings["bakeQuality"].Value = prevConfig;
+                config.Save(ConfigurationSaveMode.Full);
+            }
+        }
     }
 }
