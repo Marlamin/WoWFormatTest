@@ -614,7 +614,7 @@ namespace OBJExporterUI
 
                 var centerx = int.Parse(coord[1]);
                 var centery = int.Parse(coord[2]);
-                previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname + "_" + centerx + "_" + centery + ".png"));
+                previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname.Replace(" ", "") + "_" + centerx + "_" + centery + ".png"));
             }
 
             exportworker.RunWorkerAsync(tileList);

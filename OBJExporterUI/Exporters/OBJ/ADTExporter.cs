@@ -22,13 +22,13 @@ namespace OBJExporterUI.Exporters.OBJ
 
             var outdir = ConfigurationManager.AppSettings["outdir"];
 
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
-            float TileSize = 1600.0f / 3.0f; //533.333
-            float ChunkSize = TileSize / 16.0f; //33.333
-            float UnitSize = ChunkSize / 8.0f; //4.166666
+            var TileSize = 1600.0f / 3.0f; //533.333
+            var ChunkSize = TileSize / 16.0f; //33.333
+            var UnitSize = ChunkSize / 8.0f; //4.166666
 
             var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
             var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
@@ -42,7 +42,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(0, "Loading ADT " + file);
 
-            ADTReader reader = new ADTReader();
+            var reader = new ADTReader();
             reader.LoadADT(file.Replace('/', '\\'));
 
             if (reader.adtfile.chunks == null)
@@ -51,10 +51,10 @@ namespace OBJExporterUI.Exporters.OBJ
                 return;
             }
 
-            List<Structs.RenderBatch> renderBatches = new List<Structs.RenderBatch>();
-            List<Structs.Vertex> verticelist = new List<Structs.Vertex>();
-            List<int> indicelist = new List<Int32>();
-            Dictionary<int, string> materials = new Dictionary<int, string>();
+            var renderBatches = new List<Structs.RenderBatch>();
+            var verticelist = new List<Structs.Vertex>();
+            var indicelist = new List<int>();
+            var materials = new Dictionary<int, string>();
 
             ConfigurationManager.RefreshSection("appSettings");
             var bakeQuality = ConfigurationManager.AppSettings["bakeQuality"];
@@ -66,15 +66,15 @@ namespace OBJExporterUI.Exporters.OBJ
             {
                 var chunk = reader.adtfile.chunks[c];
 
-                int off = verticelist.Count();
+                var off = verticelist.Count();
 
-                Structs.RenderBatch batch = new Structs.RenderBatch();
+                var batch = new Structs.RenderBatch();
 
                 for (int i = 0, idx = 0; i < 17; i++)
                 {
-                    for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
+                    for (var j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                     {
-                        Structs.Vertex v = new Structs.Vertex();
+                        var v = new Structs.Vertex();
                         v.Normal = new Vector3(chunk.normals.normal_2[idx] / 127f, chunk.normals.normal_0[idx] / 127f, chunk.normals.normal_1[idx] / 127f);
                         v.Position = new Vector3(chunk.header.position.Y - (j * UnitSize), chunk.vertices.vertices[idx++] + chunk.header.position.Z, chunk.header.position.X - (i * UnitSize * 0.5f));
                         if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
@@ -106,7 +106,7 @@ namespace OBJExporterUI.Exporters.OBJ
                 for (int j = 9, xx = 0, yy = 0; j < 145; j++, xx++)
                 {
                     if (xx >= 8) { xx = 0; ++yy; }
-                    bool isHole = true;
+                    var isHole = true;
 
                     // Check if chunk is using low-res holes
                     if ((chunk.header.flags & 0x10000) == 0)
@@ -134,10 +134,10 @@ namespace OBJExporterUI.Exporters.OBJ
 
                     if (!isHole)
                     {
-                        indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
-                        indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
-                        indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j });
-                        indicelist.AddRange(new Int32[] { off + j + 9, off + j + 8, off + j });
+                        indicelist.AddRange(new int[] { off + j + 8, off + j - 9, off + j });
+                        indicelist.AddRange(new int[] { off + j - 9, off + j - 8, off + j });
+                        indicelist.AddRange(new int[] { off + j - 8, off + j + 9, off + j });
+                        indicelist.AddRange(new int[] { off + j + 9, off + j + 8, off + j });
 
                         // Generates quads instead of 4x triangles
                         /*
@@ -179,7 +179,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
                 exportworker.ReportProgress(25, "Exporting WMOs");
 
-                for (int mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
+                for (var mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
                 {
                     var wmo = reader.adtfile.objects.worldModels.entries[mi];
 
@@ -195,7 +195,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
                 exportworker.ReportProgress(50, "Exporting M2s");
 
-                for (int mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
+                for (var mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
                 {
                     var doodad = reader.adtfile.objects.models.entries[mi];
 
@@ -219,11 +219,11 @@ namespace OBJExporterUI.Exporters.OBJ
             //No idea how MTL files really work yet. Needs more investigation.
             foreach (var material in materials)
             {
-                mtlsw.WriteLine("newmtl " + material.Value);
+                mtlsw.WriteLine("newmtl " + material.Value.Replace(" ", ""));
                 mtlsw.WriteLine("Ka 1.000000 1.000000 1.000000");
                 mtlsw.WriteLine("Kd 0.640000 0.640000 0.640000");
-                mtlsw.WriteLine("map_Ka " + material.Value + ".png");
-                mtlsw.WriteLine("map_Kd " + material.Value + ".png");
+                mtlsw.WriteLine("map_Ka " + material.Value.Replace(" ", "") + ".png");
+                mtlsw.WriteLine("map_Kd " + material.Value.Replace(" ", "") + ".png");
             }
 
             mtlsw.Close();
@@ -234,11 +234,11 @@ namespace OBJExporterUI.Exporters.OBJ
 
             var adtname = Path.GetFileNameWithoutExtension(file);
 
-            var objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".adt", ".obj")));
+            var objsw = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".obj"));
 
             objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
             objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".mtl");
-            objsw.WriteLine("g " + adtname);
+            objsw.WriteLine("g " + adtname.Replace(" ", ""));
 
             foreach (var vertex in verticelist)
             {
