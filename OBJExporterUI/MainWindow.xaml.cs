@@ -941,7 +941,7 @@ namespace OBJExporterUI
                 {
                     if (CASC.cascHandler.FileExists("World/Maps/" + map.Value.Internal + "/" + map.Value.Internal + ".wdt"))
                     {
-                        mapListBox.Items.Add(new MapListItem { Name = map.Value.Name, Internal = map.Value.Internal, Type = map.Value.Type });
+                        mapListBox.Items.Add(new MapListItem { Name = map.Value.Name, Internal = map.Value.Internal, Type = map.Value.Type, Image = "pack://application:,,,/Resources/wow" + ExpansionNameToID(map.Value.Expansion) + ".png" });
                     }
                 }
             }
