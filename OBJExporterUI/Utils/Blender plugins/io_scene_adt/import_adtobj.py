@@ -123,44 +123,46 @@ def load(context,
                             wmodoodad_path, wmodoodad_filename = os.path.split(filepath)
                             wmonewpath = os.path.join(wmodoodad_path, wmorow['ModelFile'])
                             # Import the doodad
-                            bpy.ops.import_scene.obj(filepath=wmonewpath)
-                            # Select the imported doodad
-                            wmoobj_objects = bpy.context.selected_objects[:]
-                            for wmoobj in wmoobj_objects:
-                                # Prepend name
-                                wmoobj.name = "(" + wmorow['DoodadSet'] + ") " + wmoobj.name
-                                # Set parent
-                                wmoobj.parent = parent
-                                # Set position
-                                wmoobj.location = (float(wmorow['PositionX']) * -1, float(wmorow['PositionY']) * -1, float(wmorow['PositionZ']))
-                                # Set rotation
-                                rotQuat = Quaternion((float(wmorow['RotationW']), float(wmorow['RotationX']), float(wmorow['RotationY']), float(wmorow['RotationZ'])))
-                                rotEul = rotQuat.to_euler()
-                                rotEul.x += radians(90);
-                                #rotEul.z += radians(90);
-                                wmoobj.rotation_euler = rotEul
-                                # Set scale
-                                if wmorow['ScaleFactor']:
-                                    wmoobj.scale = (float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']))
+                            if(os.path.exists(wmonewpath)):
+	                            bpy.ops.import_scene.obj(filepath=wmonewpath)
+	                            # Select the imported doodad
+	                            wmoobj_objects = bpy.context.selected_objects[:]
+	                            for wmoobj in wmoobj_objects:
+	                                # Prepend name
+	                                wmoobj.name = "(" + wmorow['DoodadSet'] + ") " + wmoobj.name
+	                                # Set parent
+	                                wmoobj.parent = parent
+	                                # Set position
+	                                wmoobj.location = (float(wmorow['PositionX']) * -1, float(wmorow['PositionY']) * -1, float(wmorow['PositionZ']))
+	                                # Set rotation
+	                                rotQuat = Quaternion((float(wmorow['RotationW']), float(wmorow['RotationX']), float(wmorow['RotationY']), float(wmorow['RotationZ'])))
+	                                rotEul = rotQuat.to_euler()
+	                                rotEul.x += radians(90);
+	                                #rotEul.z += radians(90);
+	                                wmoobj.rotation_euler = rotEul
+	                                # Set scale
+	                                if wmorow['ScaleFactor']:
+	                                    wmoobj.scale = (float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']))
                 else:
                     print("m2")
-                    bpy.ops.import_scene.obj(filepath=newpath)
-                    obj_objects = bpy.context.selected_objects[:]
-                    for obj in obj_objects:
-                        # Set parent
-                        obj.parent = doodadparent
+                    if(os.path.exists(newpath)):
+	                    bpy.ops.import_scene.obj(filepath=newpath)
+	                    obj_objects = bpy.context.selected_objects[:]
+	                    for obj in obj_objects:
+	                        # Set parent
+	                        obj.parent = doodadparent
 
-                        # Set location
-                        obj.location.x = (17066 - float(row['PositionX']))
-                        obj.location.y = (17066 - float(row['PositionZ'])) * -1
-                        obj.location.z = float(row['PositionY'])
-                        obj.rotation_euler.x += radians(float(row['RotationZ']))
-                        obj.rotation_euler.y += radians(float(row['RotationX']))
-                        obj.rotation_euler.z = radians(90 + float(row['RotationY'])) # okay
+	                        # Set location
+	                        obj.location.x = (17066 - float(row['PositionX']))
+	                        obj.location.y = (17066 - float(row['PositionZ'])) * -1
+	                        obj.location.z = float(row['PositionY'])
+	                        obj.rotation_euler.x += radians(float(row['RotationZ']))
+	                        obj.rotation_euler.y += radians(float(row['RotationX']))
+	                        obj.rotation_euler.z = radians(90 + float(row['RotationY'])) # okay
 
-                        # Set scale
-                        if row['ScaleFactor']:
-                            obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
+	                        # Set scale
+	                        if row['ScaleFactor']:
+	                            obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
 
         progress.leave_substeps("Finished importing: %r" % filepath)
 
