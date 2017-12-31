@@ -129,7 +129,7 @@ namespace WoWFormatLib.Structs.ADT
         public UInt16 flags;
         public UInt16 doodadSet;
         public UInt16 nameSet;
-        public UInt16 padding;
+        public UInt16 scale;
     }
 
     [Flags]
