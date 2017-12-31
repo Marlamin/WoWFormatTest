@@ -61,7 +61,8 @@ namespace OBJExporterUI.Exporters.OBJ
 
                 objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".obj")));
             }
-            else {
+            else
+            {
                 objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".obj")));
             }
 

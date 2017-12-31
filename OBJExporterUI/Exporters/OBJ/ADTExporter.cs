@@ -182,15 +182,14 @@ namespace OBJExporterUI.Exporters.OBJ
                 for (var mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
                 {
                     var wmo = reader.adtfile.objects.worldModels.entries[mi];
-
+                    
                     var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
 
-                    if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj"))
+                    if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
                     {
-                        WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)), wmo.doodadSet);
                     }
 
-                    doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";;" + wmo.uniqueId + ";wmo");
                     doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";" + wmo.scale / 1024f + ";" + wmo.uniqueId + ";wmo");
                 }
 
@@ -202,7 +201,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
                     var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
 
-                    if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj"))
+                    if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
                     {
                         M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                     }

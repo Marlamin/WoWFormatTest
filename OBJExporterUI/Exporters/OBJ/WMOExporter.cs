@@ -12,9 +12,9 @@ namespace OBJExporterUI.Exporters.OBJ
 {
     public class WMOExporter
     {
-        public static void exportWMO(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
+        public static void exportWMO(string file, BackgroundWorker exportworker = null, string destinationOverride = null, ushort doodadSetExportID = ushort.MaxValue)
         {
-            if(exportworker == null)
+            if (exportworker == null)
             {
                 exportworker = new BackgroundWorker();
                 exportworker.WorkerReportsProgress = true;
@@ -38,11 +38,12 @@ namespace OBJExporterUI.Exporters.OBJ
 
             var groups = new Structs.WMOGroup[reader.wmofile.group.Count()];
 
-            for (int g = 0; g < reader.wmofile.group.Count(); g++)
+            for (var g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 Console.WriteLine("Loading group #" + g);
-                if (reader.wmofile.group[g].mogp.vertices == null) { Console.WriteLine("Group has no vertices!");  continue; }
-                for (int i = 0; i < reader.wmofile.groupNames.Count(); i++)
+                if (reader.wmofile.group[g].mogp.vertices == null)
+                { Console.WriteLine("Group has no vertices!"); continue; }
+                for (var i = 0; i < reader.wmofile.groupNames.Count(); i++)
                 {
                     if (reader.wmofile.group[g].mogp.nameOffset == reader.wmofile.groupNames[i].offset)
                     {
@@ -50,12 +51,13 @@ namespace OBJExporterUI.Exporters.OBJ
                     }
                 }
 
-                if (groups[g].name == "antiportal") { Console.WriteLine("Group is antiportal"); continue; }
+                if (groups[g].name == "antiportal")
+                { Console.WriteLine("Group is antiportal"); continue; }
 
                 groups[g].verticeOffset = totalVertices;
                 groups[g].vertices = new Structs.Vertex[reader.wmofile.group[g].mogp.vertices.Count()];
 
-                for (int i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
                 {
                     groups[g].vertices[i].Position = new Vector3(reader.wmofile.group[g].mogp.vertices[i].vector.X * -1, reader.wmofile.group[g].mogp.vertices[i].vector.Z, reader.wmofile.group[g].mogp.vertices[i].vector.Y);
                     groups[g].vertices[i].Normal = new Vector3(reader.wmofile.group[g].mogp.normals[i].normal.X, reader.wmofile.group[g].mogp.normals[i].normal.Z, reader.wmofile.group[g].mogp.normals[i].normal.Y);
@@ -65,7 +67,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
                 var indicelist = new List<uint>();
 
-                for (int i = 0; i < reader.wmofile.group[g].mogp.indices.Count(); i++)
+                for (var i = 0; i < reader.wmofile.group[g].mogp.indices.Count(); i++)
                 {
                     indicelist.Add(reader.wmofile.group[g].mogp.indices[i].indice);
                 }
@@ -97,37 +99,52 @@ namespace OBJExporterUI.Exporters.OBJ
 
             doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationW;RotationX;RotationY;RotationZ;ScaleFactor;DoodadSet");
 
-            string currentDoodadSetName = "";
-            for (int i = 0; i < reader.wmofile.doodadDefinitions.Count(); i++)
+            for (var i = 0; i < reader.wmofile.doodadSets.Count(); i++)
             {
-                var doodadDefinition = reader.wmofile.doodadDefinitions[i];
+                var doodadSet = reader.wmofile.doodadSets[i];
 
-                foreach (var doodadSet in reader.wmofile.doodadSets)
+                var currentDoodadSetName = doodadSet.setName.Replace("Set_", "").Replace("SET_", "").Replace("$DefaultGlobal", "Default");
+
+                if (doodadSetExportID != ushort.MaxValue)
                 {
-                    if (doodadSet.firstInstanceIndex == i)
+                    //if (i != 0 && i != doodadSetExportID) // Is 0 always exported? Double check?
+                    if (i != doodadSetExportID)
                     {
-                        Console.WriteLine("At set: " + doodadSet.setName);
-                        currentDoodadSetName = doodadSet.setName.Replace("Set_", "").Replace("SET_", "").Replace("$DefaultGlobal", "Default");
+                        Console.WriteLine("Skipping doodadset with ID " + i + " (" + currentDoodadSetName + ") because export filter is set to " + doodadSetExportID);
+                        continue;
                     }
                 }
 
-                foreach (var doodadNameEntry in reader.wmofile.doodadNames)
+                Console.WriteLine("At doodadset " + i + " (" + currentDoodadSetName + ")");
+
+                for (var j = doodadSet.firstInstanceIndex; j < (doodadSet.firstInstanceIndex + doodadSet.numDoodads); j++)
                 {
-                    if(doodadNameEntry.startOffset == doodadDefinition.offset)
+                    foreach (var doodadNameEntry in reader.wmofile.doodadNames)
                     {
-                        if (!File.Exists(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj"))
+                        var doodadDefinition = reader.wmofile.doodadDefinitions[j];
+
+                        if (doodadNameEntry.startOffset == doodadDefinition.offset)
                         {
+                            var doodadFileName = doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2");
+
                             if (destinationOverride == null)
                             {
-                                M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2"), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                                if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
+                                {
+                                    M2Exporter.exportM2(doodadFileName, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                                }
                             }
                             else
                             {
-                                M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2"), null, destinationOverride);
+                                if (!File.Exists(Path.Combine(destinationOverride, Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
+                                {
+                                    M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2"), null, destinationOverride);
+                                }
                             }
-                               
+
+                            doodadSW.WriteLine(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj;" + doodadDefinition.position.X.ToString("F09") + ";" + doodadDefinition.position.Y.ToString("F09") + ";" + doodadDefinition.position.Z.ToString("F09") + ";" + doodadDefinition.rotation.W.ToString("F15") + ";" + doodadDefinition.rotation.X.ToString("F15") + ";" + doodadDefinition.rotation.Y.ToString("F15") + ";" + doodadDefinition.rotation.Z.ToString("F15") + ";" + doodadDefinition.scale + ";" + currentDoodadSetName);
+                            break;
                         }
-                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj;" + doodadDefinition.position.X.ToString("F09") + ";" + doodadDefinition.position.Y.ToString("F09") + ";" + doodadDefinition.position.Z.ToString("F09") + ";" + doodadDefinition.rotation.W.ToString("F15") + ";" + doodadDefinition.rotation.X.ToString("F15") + ";" + doodadDefinition.rotation.Y.ToString("F15") + ";" + doodadDefinition.rotation.Z.ToString("F15") + ";" + doodadDefinition.scale + ";" + currentDoodadSetName);
                     }
                 }
             }
@@ -139,11 +156,16 @@ namespace OBJExporterUI.Exporters.OBJ
             var mtlsb = new StringBuilder();
             var textureID = 0;
 
-            if (reader.wmofile.materials == null) { Console.WriteLine("Materials empty"); return; }
-            var materials = new Structs.Material[reader.wmofile.materials.Count()];
-            for (int i = 0; i < reader.wmofile.materials.Count(); i++)
+            if (reader.wmofile.materials == null)
             {
-                for (int ti = 0; ti < reader.wmofile.textures.Count(); ti++)
+                Console.WriteLine("Materials empty");
+                return;
+            }
+
+            var materials = new Structs.Material[reader.wmofile.materials.Count()];
+            for (var i = 0; i < reader.wmofile.materials.Count(); i++)
+            {
+                for (var ti = 0; ti < reader.wmofile.textures.Count(); ti++)
                 {
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
                     {
@@ -160,7 +182,8 @@ namespace OBJExporterUI.Exporters.OBJ
                             materials[i].transparent = true;
                         }
 
-                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"))){
+                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png")))
+                        {
                             var blpreader = new BLPReader();
 
                             blpreader.LoadBLP(reader.wmofile.textures[ti].filename);
@@ -217,23 +240,30 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(75, "Exporting model..");
 
-            int numRenderbatches = 0;
+            var numRenderbatches = 0;
             //Get total amount of render batches
-            for (int i = 0; i < reader.wmofile.group.Count(); i++)
+            for (var i = 0; i < reader.wmofile.group.Count(); i++)
             {
-                if (reader.wmofile.group[i].mogp.renderBatches == null) { continue; }
+                if (reader.wmofile.group[i].mogp.renderBatches == null)
+                {
+                    continue;
+                }
                 numRenderbatches = numRenderbatches + reader.wmofile.group[i].mogp.renderBatches.Count();
             }
 
 
-            int rb = 0;
-            for (int g = 0; g < reader.wmofile.group.Count(); g++)
+            var rb = 0;
+            for (var g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 groups[g].renderBatches = new Structs.RenderBatch[numRenderbatches];
 
                 var group = reader.wmofile.group[g];
-                if (group.mogp.renderBatches == null) { continue; }
-                for (int i = 0; i < group.mogp.renderBatches.Count(); i++)
+                if (group.mogp.renderBatches == null)
+                {
+                    continue;
+                }
+
+                for (var i = 0; i < group.mogp.renderBatches.Count(); i++)
                 {
                     var batch = group.mogp.renderBatches[i];
 
@@ -272,7 +302,10 @@ namespace OBJExporterUI.Exporters.OBJ
 
             foreach (var group in groups)
             {
-                if (group.vertices == null) { continue; }
+                if (group.vertices == null)
+                {
+                    continue;
+                }
                 Console.WriteLine("Writing " + group.name);
                 objsw.WriteLine("g " + group.name);
 
