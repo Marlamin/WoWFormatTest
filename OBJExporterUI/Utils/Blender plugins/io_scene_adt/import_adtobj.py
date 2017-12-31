@@ -107,7 +107,7 @@ def load(context,
                     #obj.rotation_euler.x += (radians(90 + float(row['RotationX']))) # TODO
                     #obj.rotation_euler.y -= radians(float(row['RotationY']))        # TODO
                     parent.rotation_euler.z = radians((-90 + float(row['RotationY'])))
-
+                    parent.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
                     bpy.ops.import_scene.obj(filepath=newpath)
                     obj_objects = bpy.context.selected_objects[:]
 
@@ -138,7 +138,7 @@ def load(context,
 	                                rotQuat = Quaternion((float(wmorow['RotationW']), float(wmorow['RotationX']), float(wmorow['RotationY']), float(wmorow['RotationZ'])))
 	                                rotEul = rotQuat.to_euler()
 	                                rotEul.x += radians(90);
-	                                #rotEul.z += radians(90);
+	                                rotEul.z += radians(180);
 	                                wmoobj.rotation_euler = rotEul
 	                                # Set scale
 	                                if wmorow['ScaleFactor']:
