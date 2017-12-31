@@ -107,7 +107,9 @@ def load(context,
                     #obj.rotation_euler.x += (radians(90 + float(row['RotationX']))) # TODO
                     #obj.rotation_euler.y -= radians(float(row['RotationY']))        # TODO
                     parent.rotation_euler.z = radians((-90 + float(row['RotationY'])))
-                    parent.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
+                    if row['ScaleFactor']:
+                        parent.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
+
                     bpy.ops.import_scene.obj(filepath=newpath)
                     obj_objects = bpy.context.selected_objects[:]
 
