@@ -28,7 +28,15 @@ namespace WoWFormatLib.FileReaders
         {
             if (CASC.cascHandler.FileExists(filename))
             {
-                LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
+                try
+                {
+                    LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
+                }
+                catch(Exception e)
+                {
+                    CASCLib.Logger.WriteLine("Error during reading file: {0}", e.Message);
+                    return;
+                }
             }
             else
             {
@@ -38,7 +46,7 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadM2(int fileDataID)
         {
-            Stream m2 = CASC.cascHandler.OpenFile(fileDataID);
+            var m2 = CASC.cascHandler.OpenFile(fileDataID);
             var bin = new BinaryReader(m2);
             long position = 0;
             while (position < m2.Length)

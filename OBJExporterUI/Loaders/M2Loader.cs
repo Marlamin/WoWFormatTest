@@ -22,7 +22,7 @@ namespace OBJExporterUI.Loaders
                 return;
             }
 
-            WoWFormatLib.Structs.M2.M2Model model = new WoWFormatLib.Structs.M2.M2Model();
+            var model = new WoWFormatLib.Structs.M2.M2Model();
 
             if (cache.models.ContainsKey(filename))
             {
@@ -41,6 +41,12 @@ namespace OBJExporterUI.Loaders
                 {
                     throw new Exception("Model " + filename + " does not exist!");
                 }
+            }
+
+            if (model.boundingbox == null)
+            {
+                CASCLib.Logger.WriteLine("Error during loading file: {0}", filename);
+                return;
             }
 
             var ddBatch = new Renderer.Structs.DoodadBatch()

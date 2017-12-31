@@ -96,6 +96,12 @@ namespace OBJExporterUI
                 {
                     M2Loader.LoadM2(filename, cache, m2ShaderProgram);
                 }
+
+                if (!cache.doodadBatches.ContainsKey(filename))
+                {
+                    return;
+                }
+
                 ActiveCamera.switchMode("perspective");
                 ActiveCamera.Pos = new Vector3((cache.doodadBatches[filename].boundingBox.max.Z) + 11.0f, 0.0f, 4.0f);
                 modelType = "m2";
