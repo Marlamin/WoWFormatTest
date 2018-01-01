@@ -79,6 +79,8 @@ namespace WoWFormatLib.FileReaders
                             adtfile.header = bin.Read<MHDR>();
                             break;
                         case "MH2O":
+                            adtfile.mh2o = ReadMH20SubChunk(chunkSize, bin);
+                            break;
                         case "MFBO":
                         //model.blob stuff
                         case "MBMH":
@@ -223,7 +225,18 @@ namespace WoWFormatLib.FileReaders
             }
             return bbchunk;
         }
-
+        private MH2O ReadMH20SubChunk(uint size, BinaryReader bin)
+        {
+            var chunk = new MH2O();
+            chunk.headers = new MH2OHeader[256];
+            for(var i = 0; i < 256; i++)
+            {
+                chunk.headers[i].offsetInstances = bin.ReadUInt32();
+                chunk.headers[i].layerCount = bin.ReadUInt32();
+                chunk.headers[i].offsetAttributes = bin.ReadUInt32();
+            }
+            return chunk;
+        }
         /* OBJ */
         private void ReadObjFile(Stream adtObjStream)
         {

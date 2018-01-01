@@ -11,6 +11,7 @@ namespace WoWFormatLib.Structs.ADT
         public MTXP[] texParams;
         public MCNK[] chunks;
         public TexMCNK[] texChunks;
+        public MH2O mh2o;
         public Obj objects;
     }
 
@@ -217,6 +218,18 @@ namespace WoWFormatLib.Structs.ADT
         public uint indexFirst;
         public uint vertexCount;
         public uint vertexFirst;
+    }
+
+    public struct MH2O
+    {
+        public MH2OHeader[] headers;
+    }
+
+    public struct MH2OHeader
+    {
+        public uint offsetInstances;
+        public uint layerCount;
+        public uint offsetAttributes;
     }
 
     [Flags]
