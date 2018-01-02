@@ -72,14 +72,32 @@ namespace WoWFormatLib.Structs.M2
         public ParticleEmitter[] particleemitters;
     }
 
+    /* Retrieved from https://wowdev.wiki/M2 */
     [Flags]
-    public enum GlobalModelFlags
+    public enum GlobalModelFlags : uint
     {
-        Flag_0x1_TiltX = 0x1,
-        Flag_0x2_TiltY = 0x2,
-        Flag_0x4 = 0x4,
-        Flag_0x8_ExtraHeaderField = 0x8,
-        Flag_0x10 = 0x10,
+        Flag_TiltX                      = 0x1,
+        Flag_TiltY                      = 0x2,
+        Flag_0x4                        = 0x4,
+        Flag_UseTextureCombinerCombos   = 0x8,
+        Flag_0x10                       = 0x10,
+        Flag_LoadPhysData               = 0x20,
+        Flag_0x40                       = 0x40,
+        Flag_0x80                       = 0x80,
+        Flag_CameraRelated              = 0x100,
+        Flag_NewParticleRecord          = 0x200,
+        Flag_0x400                      = 0x400,
+        Flag_0xTextureTransUseBoneSeq   = 0x800,    // When set, texture transforms are animated using the sequence being played on the bone found by index in tex_unit_lookup_table[textureTransformIndex], instead of using the sequence being played on the model's first bone. Example model: 6DU_HellfireRaid_FelSiege03_Creature
+        Flag_0x1000                     = 0x1000,
+        Flag_0x2000                     = 0x2000,   // seen in various legion models
+        Flag_0x4000                     = 0x4000,
+        Flag_0x8000                     = 0x8000,   // seen in UI_MainMenu_Legion
+        Flag_0x10000                    = 0x10000,
+        Flag_0x20000                    = 0x20000,
+        Flag_0x40000                    = 0x40000,
+        Flag_0x80000                    = 0x80000,
+        Flag_0x100000                   = 0x100000,
+        Flag_0x200000                   = 0x200000  // apparently: use 24500 upgraded model format: chunked .anim files, change in the exporter reordering sequence+bone blocks before name
     }
 
     [Flags]
@@ -336,3 +354,4 @@ namespace WoWFormatLib.Structs.M2
 
 
 }
+ 

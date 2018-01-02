@@ -199,7 +199,7 @@ namespace WoWFormatLib.FileReaders
             var nParticleEmitters = bin.ReadUInt32();
             var ofsParticleEmitters = bin.ReadUInt32();
 
-            if (GlobalModelFlags.Flag_0x8_ExtraHeaderField != 0) //models with flag 8 have extra field
+            if (GlobalModelFlags.Flag_UseTextureCombinerCombos != 0) //models with flag 8 have extra field
             {
                 var nUnk2 = bin.ReadUInt32();
                 var ofsUnk2 = bin.ReadUInt32();
