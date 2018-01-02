@@ -14,7 +14,6 @@
   0. You just DO WHAT THE FUCK YOU WANT TO.
 */
 using System;
-using System.Collections.Generic;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.Structs.M2
@@ -83,11 +82,11 @@ namespace WoWFormatLib.Structs.M2
         Flag_0x10                       = 0x10,
         Flag_LoadPhysData               = 0x20,
         Flag_0x40                       = 0x40,
-        Flag_0x80                       = 0x80,
+        Flag_0x80                       = 0x80,     // set on all models since cata alpha
         Flag_CameraRelated              = 0x100,
         Flag_NewParticleRecord          = 0x200,
         Flag_0x400                      = 0x400,
-        Flag_0xTextureTransUseBoneSeq   = 0x800,    // When set, texture transforms are animated using the sequence being played on the bone found by index in tex_unit_lookup_table[textureTransformIndex], instead of using the sequence being played on the model's first bone. Example model: 6DU_HellfireRaid_FelSiege03_Creature
+        Flag_TextureTransUseBoneSeq     = 0x800,    // When set, texture transforms are animated using the sequence being played on the bone found by index in tex_unit_lookup_table[textureTransformIndex], instead of using the sequence being played on the model's first bone. Example model: 6DU_HellfireRaid_FelSiege03_Creature
         Flag_0x1000                     = 0x1000,
         Flag_0x2000                     = 0x2000,   // seen in various legion models
         Flag_0x4000                     = 0x4000,
@@ -351,7 +350,4 @@ namespace WoWFormatLib.Structs.M2
         public TextureFlags flags;
         public string filename;
     }
-
-
 }
- 
