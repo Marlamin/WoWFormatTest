@@ -252,10 +252,10 @@ namespace WoWFormatLib.FileReaders
         {
             bin.BaseStream.Position = ofsAnimations;
             var animations = new Animation[nAnimations];
-            for (int i = 0; i < nAnimations; i++)
+            for (var i = 0; i < nAnimations; i++)
             {
                 animations[i] = bin.Read<Animation>();
-                if ((animations[i].flags & 0x130) == 0)
+                if (((uint)animations[i].flags & 0x130) == 0)
                 {
                     // Animation in other file
                     //foreach(var afid in model.animFileData)

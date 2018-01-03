@@ -122,13 +122,31 @@ namespace WoWFormatLib.Structs.M2
         public uint fileDataID;
     }
 
+
+    [Flags]
+    public enum AnimFlags : uint
+    {
+        Flag_0x1                        = 0x1,
+        Flag_0x2                        = 0x2,
+        Flag_0x4                        = 0x4,
+        Flag_0x8                        = 0x8,
+        Flag_0x10                       = 0x10,
+        Flag_0x20                       = 0x20,
+        Flag_0x40                       = 0x40,
+        Flag_0x80                       = 0x80,
+        Flag_0x100                      = 0x100,
+        Flag_0x200                      = 0x200,
+        Flag_0x400                      = 0x400,
+        Flag_0x800                      = 0x800,
+    }
+
     public struct Animation
     {
         public ushort animationID;
         public ushort subAnimationID;
         public uint length;
         public float movingSpeed;
-        public uint flags;
+        public AnimFlags flags;
         public short probability;
         public ushort unused;
         public uint unk1;
