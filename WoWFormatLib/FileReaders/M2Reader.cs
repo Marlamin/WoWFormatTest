@@ -206,7 +206,7 @@ namespace WoWFormatLib.FileReaders
             }
 
             bin.BaseStream.Position = ofsModelname;
-            model.name = new string(bin.ReadChars(int.Parse(lenModelname.ToString())));
+            model.name = new string(bin.ReadChars((int)lenModelname));
             model.name = model.name.Remove(model.name.Length - 1); //remove last char, empty
             model.sequences = ReadSequences(nSequences, ofsSequences, bin);
             model.animations = ReadAnimations(nAnimations, ofsAnimations, bin);
