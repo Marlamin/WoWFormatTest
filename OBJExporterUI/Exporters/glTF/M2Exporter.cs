@@ -191,6 +191,71 @@ namespace OBJExporterUI.Exporters.glTF
 
             bufferViews.Add(texCoordBuffer);
 
+            // Joints bufferview
+            var jointBuffer = new BufferView()
+            {
+                buffer = 0,
+                byteOffset = (uint)writer.BaseStream.Position,
+                target = 34962
+            };
+
+            for (var i = 0; i < reader.model.vertices.Count(); i++)
+            {
+                writer.Write(reader.model.vertices[i].boneIndices_0);
+                writer.Write(reader.model.vertices[i].boneIndices_1);
+                writer.Write(reader.model.vertices[i].boneIndices_2);
+                writer.Write(reader.model.vertices[i].boneIndices_3);
+            }
+
+            jointBuffer.byteOffset = (uint)writer.BaseStream.Position - jointBuffer.byteOffset;
+
+            var jointLoc = accessorInfo.Count();
+
+            accessorInfo.Add(new Accessor()
+            {
+                name = "vJoint",
+                bufferView = bufferViews.Count(),
+                byteOffset = 0,
+                componentType = 5121,
+                count = (uint)reader.model.vertices.Count(),
+                type = "VEC4"
+            });
+
+            bufferViews.Add(jointBuffer);
+
+            // Weight bufferview
+            var weightBuffer = new BufferView()
+            {
+                buffer = 0,
+                byteOffset = (uint)writer.BaseStream.Position,
+                target = 34962
+            };
+
+            for (var i = 0; i < reader.model.vertices.Count(); i++)
+            {
+                writer.Write(reader.model.vertices[i].boneWeight_0);
+                writer.Write(reader.model.vertices[i].boneWeight_1);
+                writer.Write(reader.model.vertices[i].boneWeight_2);
+                writer.Write(reader.model.vertices[i].boneWeight_3);
+            }
+
+            weightBuffer.byteOffset = (uint)writer.BaseStream.Position - weightBuffer.byteOffset;
+
+            var weightLoc = accessorInfo.Count();
+
+            accessorInfo.Add(new Accessor()
+            {
+                name = "vWeight",
+                bufferView = bufferViews.Count(),
+                byteOffset = 0,
+                componentType = 5121,
+                count = (uint)reader.model.vertices.Count(),
+                type = "VEC4"
+            });
+
+            bufferViews.Add(weightBuffer);
+
+            // End of element bufferviews
             var indexBufferPos = bufferViews.Count();
             var materialBlends = new Dictionary<int, ushort>();
 
@@ -215,7 +280,9 @@ namespace OBJExporterUI.Exporters.glTF
                     {
                         { "POSITION", posLoc },
                         { "NORMAL", normalLoc },
-                        { "TEXCOORD_0", texLoc }
+                        { "TEXCOORD_0", texLoc },
+                        { "JOINTS_0", jointLoc },
+                        { "WEIGHTS_0", weightLoc }
                     };
 
                 mesh.primitives[0].indices = (uint)accessorInfo.Count() - 1;

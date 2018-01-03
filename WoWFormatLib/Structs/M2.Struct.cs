@@ -192,8 +192,8 @@ namespace WoWFormatLib.Structs.M2
         public Vector3 normal;
         public float textureCoordX;
         public float textureCoordY;
-        public float unk_0;
-        public float unk_1;
+        public float textureCoordX2;
+        public float textureCoordY2;
     }
 
     public struct AttachLookup
