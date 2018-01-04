@@ -258,13 +258,13 @@ namespace WoWFormatLib.FileReaders
                 if (((uint)animations[i].flags & 0x130) == 0)
                 {
                     // Animation in other file
-                    //foreach(var afid in model.animFileData)
-                    //{
-                    //    if(animations[i].animationID == afid.animID && animations[i].subAnimationID == animations[i].subAnimationID)
-                    //    {
-                    //        Console.WriteLine(".anim filedata id " + afid.fileDataID);
-                    //    }
-                    //}
+                    foreach (var afid in model.animFileData)
+                    {
+                        if (animations[i].animationID == afid.animID && animations[i].subAnimationID == animations[i].subAnimationID)
+                        {
+                            Console.WriteLine(".anim filedata id " + afid.fileDataID);
+                        }
+                    }
                 }
                 else
                 {

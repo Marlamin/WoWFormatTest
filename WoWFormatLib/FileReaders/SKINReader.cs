@@ -40,7 +40,7 @@ namespace WoWFormatLib.FileReaders
         {
             bin.BaseStream.Position = ofsIndices;
             var indices = new Indice[nIndices];
-            for (int i = 0; i < nIndices; i++)
+            for (var i = 0; i < nIndices; i++)
             {
                 indices[i] = bin.Read<Indice>();
             }
@@ -50,7 +50,7 @@ namespace WoWFormatLib.FileReaders
         {
             bin.BaseStream.Position = ofsProperties;
             var properties = new Property[nProperties];
-            for (int i = 0; i < nProperties; i++)
+            for (var i = 0; i < nProperties; i++)
             {
                 properties[i] = bin.Read<Property>();
             }
@@ -61,7 +61,7 @@ namespace WoWFormatLib.FileReaders
             bin.BaseStream.Position = ofsSubmeshes;
             var submeshes = new Submesh[nSubmeshes];
             
-            for (int i = 0; i < nSubmeshes; i++)
+            for (var i = 0; i < nSubmeshes; i++)
             {
                 submeshes[i].submeshID = bin.ReadUInt16();
                 submeshes[i].unk1 = bin.ReadUInt16();
@@ -90,7 +90,7 @@ namespace WoWFormatLib.FileReaders
         {
             bin.BaseStream.Position = ofsTextureUnits;
             var textureunits = new TextureUnit[nTextureUnits];
-            for (int i = 0; i < nTextureUnits; i++)
+            for (var i = 0; i < nTextureUnits; i++)
             {
                 textureunits[i] = bin.Read<TextureUnit>();
             }
@@ -100,7 +100,7 @@ namespace WoWFormatLib.FileReaders
         {
             bin.BaseStream.Position = ofsTriangles;
             var triangles = new Triangle[nTriangles / 3];
-            for (int i = 0; i < nTriangles / 3; i++)
+            for (var i = 0; i < nTriangles / 3; i++)
             {
                 triangles[i] = bin.Read<Triangle>();
             }
