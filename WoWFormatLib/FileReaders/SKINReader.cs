@@ -73,7 +73,7 @@ namespace WoWFormatLib.FileReaders
                 }
                 else
                 {
-                    submeshes[i].startTriangle = (uint)bin.ReadUInt16();
+                    submeshes[i].startTriangle = bin.ReadUInt16();
                 }
                 submeshes[i].nTriangles = bin.ReadUInt16();
                 submeshes[i].nBones = bin.ReadUInt16();

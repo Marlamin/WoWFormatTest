@@ -49,6 +49,7 @@
     <Compile Include="FileReaders\BLPReader.cs" />
     <Compile Include="FileReaders\BLSReader.cs" />
     <Compile Include="FileReaders\M2Reader.cs" />
+    <Compile Include="FileReaders\SKELReader.cs" />
     <Compile Include="FileReaders\SKINReader.cs" />
     <Compile Include="FileReaders\TEXReader.cs" />
     <Compile Include="FileReaders\WDLReader.cs" />
