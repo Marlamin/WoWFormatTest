@@ -159,7 +159,7 @@ namespace WoWFormatLib.Structs.ADT
     }
 
     [Flags]
-    public enum MDDFFlags
+    public enum MDDFFlags : ushort
     {
         mddf_biodome                = 0x1,
         mddf_shrubbery              = 0x2, //probably deprecated < 18179

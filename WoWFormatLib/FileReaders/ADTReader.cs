@@ -385,7 +385,7 @@ namespace WoWFormatLib.FileReaders
                 mddf.entries[i] = bin.Read<MDDFEntry>();
                 if (mddf.entries[i].flags.HasFlag(MDDFFlags.mddf_entry_is_filedataid))
                 {
-                    CASCLib.Logger.WriteLine("ADT Reader: Found a filedataid reference while parsing MDDF: ", mddf.entries[i].mmidEntry);
+                    Console.WriteLine("ADT Reader: Found a filedataid reference while parsing MDDF: {0}", mddf.entries[i].mmidEntry);
                 }
             }
 
@@ -403,7 +403,7 @@ namespace WoWFormatLib.FileReaders
                 modf.entries[i] = bin.Read<MODFEntry>();
                 if (modf.entries[i].flags.HasFlag(MODFFlags.modf_entry_is_filedataid))
                 {
-                    CASCLib.Logger.WriteLine("ADT Reader: Found a filedataid reference while parsing MODF: ", modf.entries[i].mwidEntry);
+                    Console.WriteLine("ADT Reader: Found a filedataid reference while parsing MODF: {0}", modf.entries[i].mwidEntry);
                 }
             }
 
