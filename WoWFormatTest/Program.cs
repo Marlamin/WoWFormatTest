@@ -12,28 +12,23 @@ namespace WoWFormatLib
     {
         private static void Main(string[] args)
         {
-            //CASC.InitCasc(null, @"C:\World of Warcraft", "wow");
             CASC.InitCasc(null, null, "wowt");
-            Console.WriteLine("CASC loaded!");
 
             if (!File.Exists("listfile.txt"))
             {
                 throw new Exception("Listfile not found!");
             }
 
-            var reader = new BLSReader();
-            reader.LoadBLS(1694483);
-
-            var shaderFile = reader.shaderFile;
-            //foreach (var line in File.ReadAllLines("listfile.txt"))
-            //{
-            //    if (CASC.cascHandler.FileExists(line) && line.EndsWith(".bls", StringComparison.CurrentCultureIgnoreCase))
-            //    {
-            //        Console.WriteLine("Loading " + line);
-            //        var reader = new BLSReader();
-            //        reader.LoadBLS(line);
-            //    }
-            //}
+            foreach (var line in File.ReadAllLines("listfile.txt"))
+            {
+                var cleaned = line.Replace("/", "\\");
+                if (CASC.cascHandler.FileExists(cleaned) && cleaned.EndsWith(".adt", StringComparison.CurrentCultureIgnoreCase) && !cleaned.Contains("_obj") && !cleaned.Contains("_lod") && !cleaned.Contains("_tex"))
+                {
+                    Console.WriteLine("Loading " + cleaned);
+                    var reader = new ADTReader();
+                    reader.LoadADT(cleaned, true);
+                }
+            }
 
         }
     }
