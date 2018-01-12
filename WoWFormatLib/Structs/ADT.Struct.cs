@@ -127,16 +127,19 @@ namespace WoWFormatLib.Structs.ADT
         public Vector3 rotation;
         public Vector3 lowerBounds;
         public Vector3 upperBounds;
-        public UInt16 flags;
-        public UInt16 doodadSet;
-        public UInt16 nameSet;
-        public UInt16 scale;
+        public MODFFlags flags;
+        public ushort doodadSet;
+        public ushort nameSet;
+        public ushort scale;
     }
 
     [Flags]
-    public enum MODFFlags
+    public enum MODFFlags : ushort
     {
-        modf_destroyable = 0x1, //who cares
+        modf_destroyable            = 0x1,
+        modf_use_lod                = 0x2,
+        modf_0x4_unk                = 0x4,
+        modf_entry_is_filedataid    = 0x8,
     }
 
     //M2 placement
@@ -151,15 +154,20 @@ namespace WoWFormatLib.Structs.ADT
         public uint uniqueId;
         public Vector3 position;
         public Vector3 rotation;
-        public UInt16 scale;
-        public UInt16 flags;
+        public ushort scale;
+        public ushort flags;
     }
 
     [Flags]
     public enum MDDFFlags
     {
-        mddf_biodome = 0x1,
-        mddf_shrubbery = 0x2, //probably deprecated
+        mddf_biodome                = 0x1,
+        mddf_shrubbery              = 0x2, //probably deprecated < 18179
+        mddf_0x4                    = 0x4,
+        mddf_0x8                    = 0x8,
+        mddf_liquid_known           = 0x20,
+        mddf_entry_is_filedataid    = 0x40,
+        mddf_0x100                  = 0x100,
     }
 
     //List of filenames for M2 models that appear in this map tile.
@@ -233,7 +241,7 @@ namespace WoWFormatLib.Structs.ADT
     }
 
     [Flags]
-    public enum mclyFlags
+    public enum mclyFlags : uint
     {
         Flag_0x1 = 0x1,
         Flag_0x2 = 0x2,
