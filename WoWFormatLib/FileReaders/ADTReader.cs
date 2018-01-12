@@ -383,6 +383,10 @@ namespace WoWFormatLib.FileReaders
             for (var i = 0; i < count; i++)
             {
                 mddf.entries[i] = bin.Read<MDDFEntry>();
+                if (mddf.entries[i].flags.HasFlag(MDDFFlags.mddf_entry_is_filedataid))
+                {
+                    CASCLib.Logger.WriteLine("ADT Reader: Found a filedataid reference while parsing MDDF: ", mddf.entries[i].mmidEntry);
+                }
             }
 
             return mddf;
@@ -397,6 +401,10 @@ namespace WoWFormatLib.FileReaders
             for (var i = 0; i < count; i++)
             {
                 modf.entries[i] = bin.Read<MODFEntry>();
+                if (modf.entries[i].flags.HasFlag(MODFFlags.modf_entry_is_filedataid))
+                {
+                    CASCLib.Logger.WriteLine("ADT Reader: Found a filedataid reference while parsing MODF: ", modf.entries[i].mwidEntry);
+                }
             }
 
             return modf;

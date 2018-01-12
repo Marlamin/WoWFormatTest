@@ -155,7 +155,7 @@ namespace WoWFormatLib.Structs.ADT
         public Vector3 position;
         public Vector3 rotation;
         public ushort scale;
-        public ushort flags;
+        public MDDFFlags flags;
     }
 
     [Flags]
