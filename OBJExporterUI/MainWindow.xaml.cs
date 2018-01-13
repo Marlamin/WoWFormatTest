@@ -966,6 +966,8 @@ namespace OBJExporterUI
                     return 6;
                 case "Legion":
                     return 7;
+                case "Battle for Azeroth":
+                    return 8;
                 default:
                     return 1;
             }
