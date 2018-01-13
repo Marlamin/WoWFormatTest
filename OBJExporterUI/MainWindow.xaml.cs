@@ -900,13 +900,13 @@ namespace OBJExporterUI
             try
             {
                 CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2").ExtractToFile("DBFilesClient", "Map.db2");
-                var mapsData = new DBFilesClient.NET.Storage<MapEntry72>(@"DBFilesClient/Map.db2");
+                var mapsData = new DBFilesClient.NET.Storage<MapEntry>(@"DBFilesClient/Map.db2");
 
                 foreach (var mapEntry in mapsData)
                 {
-                    if (CASC.cascHandler.FileExists("World/Maps/" + mapEntry.Value.directory + "/" + mapEntry.Value.directory + ".wdt"))
+                    if (CASC.cascHandler.FileExists("World/Maps/" + mapEntry.Value.Directory + "/" + mapEntry.Value.Directory + ".wdt"))
                     {
-                        var mapItem = new MapListItem { Internal = mapEntry.Value.directory };
+                        var mapItem = new MapListItem { Internal = mapEntry.Value.Directory };
 
                         if (mapNames.ContainsKey(mapEntry.Key))
                         {
@@ -922,12 +922,12 @@ namespace OBJExporterUI
                         }
                         else
                         {
-                            mapItem.Name = mapEntry.Value.mapname_lang;
+                            mapItem.Name = mapEntry.Value.MapName;
                             mapItem.Type = "UNKNOWN";
                             mapItem.Image = "pack://application:,,,/Resources/wow7.png";
                         }
 
-                        if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.mapname_lang.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                        if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.Directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.MapName.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
                         {
                             mapListBox.Items.Add(mapItem);
                         }

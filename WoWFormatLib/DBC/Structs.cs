@@ -79,50 +79,27 @@ namespace WoWFormatLib.DBC
 
     public sealed class MapEntry
     {
-        public string directory;
+        public string Directory;
+        public string MapName;
+        public string DescriptionHorde;
+        public string DescriptionAlliance;
+        public string PvpObjective;
+        public string PvpDescription;
         public uint[] Flags;
         public float MinimapIconScale;
-        public float[] CorpsePos;
-        public string mapname_lang;
-        public string MapDescription0;
-        public string MapDescription1;
-        public int AreaTableID;
-        public int LoadingScreenID;
-        public int CorpseMapID;
+        public float[] CorpseXY;
+        public short AreaTableID;
+        public short LoadingScreenID;
+        public short CorpseMapID;
         public short TimeOfDayOverride;
-        public int ParentMapID;
-        public int CosmeticParentMapID;
-        public ushort WindSettingsID;
+        public short ParentMapID;
+        public short CosmeticParentMapID;
+        public short WindSettingsID;
         public byte InstanceType;
         public byte MapType;
         public byte ExpansionID;
         public byte MaxPlayers;
         public byte TimeOffset;
-    }
-
-    public sealed class MapEntry72
-    {
-        public string directory;
-        public int[] flags;
-        public float minimapIconScale;
-        public float[] corpseCoords;
-        public string mapname_lang;
-        public string mapDescription0_lang;
-        public string mapDescription1_lang;
-        public string unk0;
-        public string unk1;
-        public ushort areaTableID;
-        public short loadingScreenID;
-        public short corpseMapID;
-        public short timeOfDayoverride;
-        public short parentMapID;
-        public short cosmeticParentMapID;
-        public short unk2;
-        public byte instanceType;
-        public byte mapType;
-        public byte expansionID;
-        public byte maxPlayers;
-        public byte timeOffset;
     }
 
     public sealed class ModelFileDataEntry

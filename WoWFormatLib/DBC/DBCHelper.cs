@@ -10,7 +10,7 @@ namespace WoWFormatLib.DBC
     {
         public static uint[] getTexturesByModelFilename(int modelID, int flag, int texid = 0)
         {
-            List<uint> results = new List<uint>();
+            var results = new List<uint>();
             
             switch (flag)
             {
@@ -194,7 +194,7 @@ namespace WoWFormatLib.DBC
                 }
             }
            */
-            uint[] ret = results.Distinct().ToArray();
+            var ret = results.Distinct().ToArray();
             return ret;
         }
     }
