@@ -7,20 +7,40 @@
         Icon="Resources/icon32.png"
         ResizeMode="NoResize"
         WindowStyle="ToolWindow"
-        Title="Configuration" Height="300" Width="300">
+        Title="Configuration" Height="400" Width="500">
     <Grid>
-        <Label x:Name="outdirLabel" Content="Please set a directory for exported content" Visibility="Visible" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="outdirBrowse" Content="Browse.." Visibility="Visible" Click="outdirBrowse_Click" HorizontalAlignment="Center" Margin="0,40,0,0" VerticalAlignment="Top" Width="75"/>
-        <Separator HorizontalAlignment="Stretch" Height="5" Margin="0,65,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="programLabel" Content="Select the version of WoW to use:" HorizontalAlignment="Center" Margin="52,157,32,0" VerticalAlignment="Top" Width="210"/>
-        <ComboBox x:Name="programSelect" Loaded="programSelect_Loaded" HorizontalAlignment="Center" Margin="41,193,43,0" VerticalAlignment="Top" MinWidth="150" Width="Auto"/>
-        <RadioButton Checked="mode_Checked" x:Name="onlineMode" GroupName="ContentSource" Content="Online mode" HorizontalAlignment="Left" Margin="41,130,0,0" IsChecked="True" VerticalAlignment="Top"/>
-        <RadioButton Checked="mode_Checked" x:Name="localMode" GroupName="ContentSource" Content="Local mode" HorizontalAlignment="Left" Margin="171,130,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="basedirLabel" Content="No WoW directory set" Visibility="Hidden" HorizontalAlignment="Center" Margin="84,157,64,0" VerticalAlignment="Top" Width="146"/>
-        <Button x:Name="basedirBrowse" Content="Browse.." Visibility="Hidden" Click="basedirBrowse_Click" HorizontalAlignment="Center" Margin="84,193,84,0" VerticalAlignment="Top" Width="75"/>
-        <Separator HorizontalAlignment="Stretch" Height="5" Margin="0,220,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="button" Content="Confirm settings" HorizontalAlignment="Center" Margin="0,235,0,0" VerticalAlignment="Top" Width="125" Click="button_Click"/>
-        <Label x:Name="onlineLabel" Visibility="Visible" Content="Online mode will use the web to retrieve data, &#xD;&#xA;as such its speed will be dependent on the speed  &#xD;&#xA;of your internet connection.&#xA;" HorizontalAlignment="Left" Margin="16,70,0,0" VerticalAlignment="Top" Width="262" FontSize="10.667" Height="59"/>
-        <Label x:Name="localLabel" Visibility="Hidden" Content="Local mode will use your local WoW installation to &#xD;&#xA;retrieve data which is much faster than Online mode &#xD;&#xA;but also very prone to data corruption." HorizontalAlignment="Left" Margin="16,71,0,0" VerticalAlignment="Top" Width="262" FontSize="10.667" Height="59"/>
+        <TabControl Grid.Column="0" x:Name="tabs" Margin="0,5,0,30" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto">
+            <TabItem x:Name="ModelsTab" Header="General">
+                <Grid>
+                    <!-- Export location -->
+                    <Label Content="Export destination" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0" HorizontalContentAlignment="Center"/>
+                    <Label x:Name="outdirLabel" Content="Please set a location for saving exported content" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,26,0,0" HorizontalContentAlignment="Center" FontSize="10"/>
+                    <Button x:Name="outdirBrowse" Content="Browse.." Click="OutdirBrowse_Click" HorizontalAlignment="Center" Margin="0,50,0,0" VerticalAlignment="Top" Width="120"/>
+                    <Separator HorizontalAlignment="Stretch" Height="5" Margin="0,75,0,0" VerticalAlignment="Top"/>
+                    <!-- Online mode -->
+                    <Label Content="Data source" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,78,0,0" HorizontalContentAlignment="Center"/>
+                    <Label x:Name="onlineLabel" Visibility="Hidden" Content="Online mode will use the web to retrieve data, as such its speed will be &#xD;&#xA;dependent on the speed of your internet connection." HorizontalAlignment="Left" Margin="65,107,0,0" VerticalAlignment="Top" Width="368" FontSize="10" Height="59"/>
+                    <RadioButton Checked="Mode_Checked" x:Name="onlineMode" GroupName="ContentSource" Content="Online mode" HorizontalAlignment="Left" Margin="128,187,0,0" IsChecked="True" VerticalAlignment="Top"/>
+                    <Label x:Name="programLabel" HorizontalContentAlignment="Center" Content="Select the version of WoW to use:" HorizontalAlignment="Stretch" Margin="0,226,0.2,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="programSelect" Loaded="ProgramSelect_Loaded" HorizontalAlignment="Center" Margin="0,259,0,0" VerticalAlignment="Top" Width="150"/>
+                    <!-- Local mode -->
+                    <Label x:Name="localLabel" Visibility="Visible" Content="Local mode will use your local WoW installation to retrieve data which &#xD;&#xA;is much faster than Online mode but also very prone to data corruption." HorizontalAlignment="Left" Margin="65,107,0,0" VerticalAlignment="Top" Width="368" FontSize="10" Height="59"/>
+                    <RadioButton Checked="Mode_Checked" x:Name="localMode" GroupName="ContentSource" Content="Local mode" HorizontalAlignment="Left" Margin="283,187,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="basedirLabel" Content="No WoW directory set" Visibility="Hidden" HorizontalAlignment="Stretch" Margin="0,226,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
+                    <Button x:Name="basedirBrowse" Content="Browse.." Visibility="Hidden" Click="BasedirBrowse_Click" HorizontalAlignment="Center" Margin="0,262,0,0" VerticalAlignment="Top" Width="150"/>
+                    <Label Content="Changing this option requires a restart" FontSize="10" HorizontalAlignment="Stretch" Margin="0,163,0.2,0" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="ADTExportTab" Header="Terrain (ADT)" IsEnabled="False">
+
+            </TabItem>
+            <TabItem x:Name="WMOExportTab" Header="World models (WMO)" IsEnabled="False">
+
+            </TabItem>
+            <TabItem x:Name="M2ExportTab" Header="Models (M2)" IsEnabled="False">
+
+            </TabItem>
+        </TabControl>
+        <Button x:Name="button" Content="Confirm settings" HorizontalAlignment="Stretch" Margin="5,338,5,0" VerticalAlignment="Top" Click="Button_Click"/>
     </Grid>
 </Window>

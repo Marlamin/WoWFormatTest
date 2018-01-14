@@ -15,6 +15,7 @@ namespace OBJExporterUI
         private bool wowFound = false;
         private string wowLoc;
         private bool _editMode;
+        private bool needsRestart = false;
 
         public ConfigurationWindow(bool editMode = false)
         {
@@ -39,13 +40,17 @@ namespace OBJExporterUI
                     onlineMode.IsChecked = false;
                     localMode.IsChecked = true;
                 }
+
+                ADTExportTab.IsEnabled = true;
+                WMOExportTab.IsEnabled = true;
+                M2ExportTab.IsEnabled = true;
             }
             else
             {
                 // Initial config
                 try
                 {
-                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Blizzard Entertainment\\World of Warcraft"))
+                    using (var key = Registry.LocalMachine.OpenSubKey("SOFTWARE\\WOW6432Node\\Blizzard Entertainment\\World of Warcraft"))
                     {
                         if (key != null)
                         {
@@ -78,7 +83,7 @@ namespace OBJExporterUI
             }
         }
 
-        private void mode_Checked(object sender, RoutedEventArgs e)
+        private void Mode_Checked(object sender, RoutedEventArgs e)
         {
             if(basedirLabel == null) { return; }
             if ((bool) onlineMode.IsChecked)
@@ -101,13 +106,13 @@ namespace OBJExporterUI
             }
         }
 
-        private void basedirBrowse_Click(object sender, RoutedEventArgs e)
+        private void BasedirBrowse_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+            var result = dialog.ShowDialog();
             if (result.ToString() == "OK")
             {
-                if (File.Exists(System.IO.Path.Combine(dialog.SelectedPath, ".build.info")))
+                if (File.Exists(Path.Combine(dialog.SelectedPath, ".build.info")))
                 {
                     basedirLabel.Content = dialog.SelectedPath;
                 }
@@ -118,7 +123,7 @@ namespace OBJExporterUI
             }
         }
 
-        private void programSelect_Loaded(object sender, RoutedEventArgs e)
+        private void ProgramSelect_Loaded(object sender, RoutedEventArgs e)
         {
             programSelect.Items.Add(new KeyValuePair<string, string>("Live/Retail", "wow"));
             programSelect.Items.Add(new KeyValuePair<string, string>("Public Test Realm (PTR)", "wowt"));
@@ -141,7 +146,7 @@ namespace OBJExporterUI
             }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -150,12 +155,15 @@ namespace OBJExporterUI
             if ((bool)onlineMode.IsChecked)
             {
                 // Online mode
-
                 if (programSelect.SelectedValue == null) {
                     error = true;
                 }
                 else
                 {
+                    if (config.AppSettings.Settings["basedir"].Value != "" || config.AppSettings.Settings["program"].Value != ((KeyValuePair<string, string>)programSelect.SelectedValue).Value)
+                    {
+                        needsRestart = true;
+                    }
                     config.AppSettings.Settings["basedir"].Value = "";
                     config.AppSettings.Settings["program"].Value = ((KeyValuePair<string, string>)programSelect.SelectedValue).Value;
                     config.AppSettings.Settings["firstrun"].Value = "false";
@@ -171,6 +179,10 @@ namespace OBJExporterUI
                 }
                 else
                 {
+                    if (string.IsNullOrWhiteSpace(config.AppSettings.Settings["basedir"].Value) || config.AppSettings.Settings["basedir"].Value != (string)basedirLabel.Content)
+                    {
+                        needsRestart = true;
+                    }
                     config.AppSettings.Settings["basedir"].Value = (string)basedirLabel.Content;
                     config.AppSettings.Settings["program"].Value = "";
                     config.AppSettings.Settings["firstrun"].Value = "false";
@@ -192,18 +204,29 @@ namespace OBJExporterUI
             if (!error)
             {
                 config.Save(ConfigurationSaveMode.Full);
-                System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-                Application.Current.Shutdown();
+                if (needsRestart)
+                {
+                    System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+                    Application.Current.Shutdown();
+                }
+                else
+                {
+                    Close();
+                }
             }
         }
 
-        private void outdirBrowse_Click(object sender, RoutedEventArgs e)
+        private void OutdirBrowse_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+            var result = dialog.ShowDialog();
             if (result.ToString() == "OK")
             {
-                outdirLabel.Content = dialog.SelectedPath;
+                if((string)outdirLabel.Content != dialog.SelectedPath)
+                {
+                    outdirLabel.Content = dialog.SelectedPath;
+                    needsRestart = true;
+                }
             }
         }
     }

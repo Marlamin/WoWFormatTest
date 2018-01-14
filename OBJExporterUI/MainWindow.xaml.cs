@@ -42,8 +42,6 @@ namespace OBJExporterUI
         private Dictionary<int, NiceMapEntry> mapNames = new Dictionary<int, NiceMapEntry>();
         private List<string> mapFilters = new List<string>();
 
-        private string outdir;
-
         private static ListBox tileBox;
 
         private PreviewControl previewControl;
@@ -90,7 +88,6 @@ namespace OBJExporterUI
         }
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            outdir = ConfigurationManager.AppSettings["outdir"];
             cascworker.RunWorkerAsync();
         }
 
@@ -462,6 +459,8 @@ namespace OBJExporterUI
                 }
                 else if (selectedFile.EndsWith(".blp"))
                 {
+                    ConfigurationManager.RefreshSection("appSettings");
+                    var outdir = ConfigurationManager.AppSettings["outdir"];
                     try
                     {
                         var blp = new WoWFormatLib.FileReaders.BLPReader();
@@ -614,6 +613,9 @@ namespace OBJExporterUI
 
                 var centerx = int.Parse(coord[1]);
                 var centery = int.Parse(coord[2]);
+
+                ConfigurationManager.RefreshSection("appSettings");
+                var outdir = ConfigurationManager.AppSettings["outdir"];
                 previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname.Replace(" ", "") + "_" + centerx + "_" + centery + ".png"));
             }
 
@@ -1006,6 +1008,8 @@ namespace OBJExporterUI
                 config.AppSettings.Settings["bakeQuality"].Value = "minimap";
                 config.Save(ConfigurationSaveMode.Full);
 
+                ConfigurationManager.RefreshSection("appSettings");
+                var outdir = ConfigurationManager.AppSettings["outdir"];
                 previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname.Replace(" ", "") + "_" + centerx + "_" + centery + ".png"), true);
 
                 config.AppSettings.Settings["bakeQuality"].Value = prevConfig;
