@@ -134,7 +134,7 @@ namespace OBJExporterUI.Exporters.OBJ
                                     M2Exporter.exportM2(doodadFileName, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                                 }
 
-                                if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
+                                if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
                                 {
                                     doodadSW.WriteLine(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj;" + doodadDefinition.position.X.ToString("F09") + ";" + doodadDefinition.position.Y.ToString("F09") + ";" + doodadDefinition.position.Z.ToString("F09") + ";" + doodadDefinition.rotation.W.ToString("F15") + ";" + doodadDefinition.rotation.X.ToString("F15") + ";" + doodadDefinition.rotation.Y.ToString("F15") + ";" + doodadDefinition.rotation.Z.ToString("F15") + ";" + doodadDefinition.scale + ";" + currentDoodadSetName);
                                 }
@@ -146,7 +146,7 @@ namespace OBJExporterUI.Exporters.OBJ
                                     M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2"), null, destinationOverride);
                                 }
 
-                                if (!File.Exists(Path.Combine(destinationOverride, Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
+                                if (File.Exists(Path.Combine(destinationOverride, Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
                                 {
                                     doodadSW.WriteLine(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".obj;" + doodadDefinition.position.X.ToString("F09") + ";" + doodadDefinition.position.Y.ToString("F09") + ";" + doodadDefinition.position.Z.ToString("F09") + ";" + doodadDefinition.rotation.W.ToString("F15") + ";" + doodadDefinition.rotation.X.ToString("F15") + ";" + doodadDefinition.rotation.Y.ToString("F15") + ";" + doodadDefinition.rotation.Z.ToString("F15") + ";" + doodadDefinition.scale + ";" + currentDoodadSetName);
                                 }
