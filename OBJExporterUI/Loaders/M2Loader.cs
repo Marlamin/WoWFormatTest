@@ -45,7 +45,7 @@ namespace OBJExporterUI.Loaders
 
             if (model.boundingbox == null)
             {
-                CASCLib.Logger.WriteLine("Error during loading file: {0}", filename);
+                CASCLib.Logger.WriteLine("Error during loading file: {0}, bounding box is not defined", filename);
                 return;
             }
 
@@ -58,12 +58,18 @@ namespace OBJExporterUI.Loaders
                 }
             };
 
+            if (model.textures == null)
+            {
+                CASCLib.Logger.WriteLine("Error during loading file: {0}, model has no textures", filename);
+                return;
+            }
+
             // Textures
             ddBatch.mats = new Renderer.Structs.Material[model.textures.Count()];
 
-            for (int i = 0; i < model.textures.Count(); i++)
+            for (var i = 0; i < model.textures.Count(); i++)
             {
-                string texturefilename = model.textures[i].filename;
+                var texturefilename = model.textures[i].filename;
                 ddBatch.mats[i].flags = model.textures[i].flags;
 
                 switch (model.textures[i].type)
@@ -115,7 +121,7 @@ namespace OBJExporterUI.Loaders
 
             // Submeshes
             ddBatch.submeshes = new Renderer.Structs.Submesh[model.skins[0].submeshes.Count()];
-            for (int i = 0; i < model.skins[0].submeshes.Count(); i++)
+            for (var i = 0; i < model.skins[0].submeshes.Count(); i++)
             {
                 if (filename.StartsWith("character"))
                 {
@@ -130,7 +136,7 @@ namespace OBJExporterUI.Loaders
 
                 ddBatch.submeshes[i].firstFace = model.skins[0].submeshes[i].startTriangle;
                 ddBatch.submeshes[i].numFaces = model.skins[0].submeshes[i].nTriangles;
-                for (int tu = 0; tu < model.skins[0].textureunit.Count(); tu++)
+                for (var tu = 0; tu < model.skins[0].textureunit.Count(); tu++)
                 {
                     if (model.skins[0].textureunit[tu].submeshIndex == i)
                     {
@@ -155,15 +161,15 @@ namespace OBJExporterUI.Loaders
             GL.BindBuffer(BufferTarget.ArrayBuffer, ddBatch.vertexBuffer);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ddBatch.indiceBuffer);
 
-            List<uint> modelindicelist = new List<uint>();
-            for (int i = 0; i < model.skins[0].triangles.Count(); i++)
+            var modelindicelist = new List<uint>();
+            for (var i = 0; i < model.skins[0].triangles.Count(); i++)
             {
                 modelindicelist.Add(model.skins[0].triangles[i].pt1);
                 modelindicelist.Add(model.skins[0].triangles[i].pt2);
                 modelindicelist.Add(model.skins[0].triangles[i].pt3);
             }
 
-            uint[] modelindices = modelindicelist.ToArray();
+            var modelindices = modelindicelist.ToArray();
 
             //Console.WriteLine(modelindicelist.Count() + " indices!");
             ddBatch.indices = modelindices;
@@ -171,9 +177,9 @@ namespace OBJExporterUI.Loaders
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ddBatch.indiceBuffer);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ddBatch.indices.Length * sizeof(uint)), ddBatch.indices, BufferUsageHint.StaticDraw);
 
-            Renderer.Structs.M2Vertex[] modelvertices = new Renderer.Structs.M2Vertex[model.vertices.Count()];
+            var modelvertices = new Renderer.Structs.M2Vertex[model.vertices.Count()];
 
-            for (int i = 0; i < model.vertices.Count(); i++)
+            for (var i = 0; i < model.vertices.Count(); i++)
             {
                 modelvertices[i].Position = new Vector3(model.vertices[i].position.X, model.vertices[i].position.Y, model.vertices[i].position.Z);
                 modelvertices[i].Normal = new Vector3(model.vertices[i].normal.X, model.vertices[i].normal.Y, model.vertices[i].normal.Z);
