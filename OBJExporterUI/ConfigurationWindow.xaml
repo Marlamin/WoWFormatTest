@@ -31,13 +31,13 @@
                     <Label Content="Changing this option requires a restart" FontSize="10" HorizontalAlignment="Stretch" Margin="0,163,0.2,0" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
-            <TabItem x:Name="ADTExportTab" Header="Terrain (ADT)" IsEnabled="False">
+            <TabItem x:Name="ADTExportTab" Header="Terrain (ADT)" IsEnabled="False" Visibility="Hidden">
 
             </TabItem>
-            <TabItem x:Name="WMOExportTab" Header="World models (WMO)" IsEnabled="False">
+            <TabItem x:Name="WMOExportTab" Header="World models (WMO)" IsEnabled="False" Visibility="Hidden">
 
             </TabItem>
-            <TabItem x:Name="M2ExportTab" Header="Models (M2)" IsEnabled="False">
+            <TabItem x:Name="M2ExportTab" Header="Models (M2)" IsEnabled="False" Visibility="Hidden">
 
             </TabItem>
         </TabControl>
