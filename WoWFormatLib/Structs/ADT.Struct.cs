@@ -290,4 +290,18 @@ namespace WoWFormatLib.Structs.ADT
         public float offset;
         public uint unk3;
     }
+
+    public struct LODADT
+    {
+        public MLLLEntry[] lodLevels;
+    }
+
+    public struct MLLLEntry
+    {
+        public float lod;
+        public uint heightLength;
+        public uint heightIndex;
+        public uint mapAreaLowLength;
+        public uint mapAreaLowIndex;
+    }
 }
