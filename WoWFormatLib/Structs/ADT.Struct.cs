@@ -291,9 +291,14 @@ namespace WoWFormatLib.Structs.ADT
         public uint unk3;
     }
 
+    /* _lod */
     public struct LODADT
     {
+        public float[] heights;
+        public short[] indices;
         public MLLLEntry[] lodLevels;
+        public MLNDEntry[] quadTree;
+        public short[] skirtIndices;
     }
 
     public struct MLLLEntry
@@ -303,5 +308,17 @@ namespace WoWFormatLib.Structs.ADT
         public uint heightIndex;
         public uint mapAreaLowLength;
         public uint mapAreaLowIndex;
+    }
+
+    public struct MLNDEntry
+    {
+        public uint index;
+        public uint length;
+        public uint unk0;
+        public uint unk1;
+        public short indice_1;
+        public short indice_2;
+        public short indice_3;
+        public short indice_4;
     }
 }

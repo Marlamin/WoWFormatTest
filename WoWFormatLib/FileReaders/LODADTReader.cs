@@ -28,15 +28,24 @@ namespace WoWFormatLib.FileReaders
                     switch (chunkName)
                     {
                         case "MVER":
+                            break;
                         case "MLHD": // Header
+                            break;
                         case "MLVH": // Vertex Heights
+                            lodadt.heights = ReadMLVHChunk(chunkSize, bin);
+                            break;
                         case "MLVI": // Vertex Indices
+                            lodadt.indices = ReadMLVIChunk(chunkSize, bin);
                             break;
                         case "MLLL": // LOD Levels
                             lodadt.lodLevels = ReadMLLLChunk(chunkSize, bin);
                             break;
                         case "MLND": // Quad tree stuff (?)
+                            lodadt.quadTree = ReadMLNDChunk(chunkSize, bin);
+                            break;
                         case "MLSI": // "Skirt" indices (?)
+                            lodadt.skirtIndices = ReadMLSIChunk(chunkSize, bin);
+                            break;
                         /* Model.blob */
                         case "MBMH":
                         case "MBBB":
@@ -56,6 +65,32 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
+        private float[] ReadMLVHChunk(uint size, BinaryReader bin)
+        {
+            var count = size / 4;
+            var mlvh = new float[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                mlvh[i] = bin.ReadSingle();
+            }
+
+            return mlvh;
+
+        }
+        private short[] ReadMLVIChunk(uint size, BinaryReader bin)
+        {
+            var count = size / 2;
+            var mlvi = new short[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                mlvi[i] = bin.ReadInt16();
+            }
+
+            return mlvi;
+        }
+
         private MLLLEntry[] ReadMLLLChunk(uint size, BinaryReader bin)
         {
             var count = size / 24;
@@ -67,6 +102,32 @@ namespace WoWFormatLib.FileReaders
             }
 
             return mlll;
+        }
+
+        private MLNDEntry[] ReadMLNDChunk(uint size, BinaryReader bin)
+        {
+            var count = size / 24;
+            var mlnd = new MLNDEntry[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                mlnd[i] = bin.Read<MLNDEntry>();
+            }
+
+            return mlnd;
+        }
+
+        private short[] ReadMLSIChunk(uint size, BinaryReader bin)
+        {
+            var count = size / 2;
+            var mlsi = new short[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                mlsi[i] = bin.ReadInt16();
+            }
+
+            return mlsi;
         }
     }
 }
