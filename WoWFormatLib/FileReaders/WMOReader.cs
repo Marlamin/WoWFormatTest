@@ -447,6 +447,7 @@ namespace WoWFormatLib.FileReaders
                         case "MOPL": //Unknown
                         case "MOLP": //Unknown
                         case "MOLS": //Unknown
+                        case "MOPB": 
                             continue;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, position.ToString()));
