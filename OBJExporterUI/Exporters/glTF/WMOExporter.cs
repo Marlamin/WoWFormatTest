@@ -251,6 +251,12 @@ namespace OBJExporterUI.Exporters.glTF
                 indiceBuffer.byteLength = (uint)writer.BaseStream.Position - indiceBuffer.byteOffset;
 
                 bufferViews.Add(indiceBuffer);
+
+                // Buffer alignment!
+                if ((indiceBuffer.byteOffset + indiceBuffer.byteLength) % 4 != 0)
+                {
+                    writer.Write((short)0);
+                }
             }
 
             glTF.bufferViews = bufferViews.ToArray();
