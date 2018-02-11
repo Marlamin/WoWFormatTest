@@ -25,7 +25,7 @@ namespace ExporterCLI.Exporters.glTF
             exportworker.ReportProgress(5, "Reading M2..");
 
             var reader = new M2Reader();
-            reader.LoadM2(File.OpenRead(file));
+            reader.LoadM2(file);
 
             var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";

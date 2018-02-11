@@ -20,12 +20,12 @@ namespace MinimapCompiler
         {
 
             string basedir = ConfigurationManager.AppSettings["basedir"];
-            bool buildmaps = Boolean.Parse(ConfigurationManager.AppSettings["buildmaps"]);
-            bool buildWMOmaps = Boolean.Parse(ConfigurationManager.AppSettings["buildwmomaps"]);
+            bool buildmaps = bool.Parse(ConfigurationManager.AppSettings["buildmaps"]);
+            bool buildWMOmaps = bool.Parse(ConfigurationManager.AppSettings["buildwmomaps"]);
 
             Console.WriteLine("Initializing CASC..");
 
-            if(basedir != String.Empty){
+            if(basedir != string.Empty){
                 CASC.InitCasc(null, basedir);
             }else{
                 CASC.InitCasc(null, null, "wowt");

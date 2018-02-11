@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWFormatTest", "WoWFormatTest\WoWFormatTest.csproj", "{3ED7F6F2-5A92-496A-9D87-60F56638C2A7}"
 EndProject
@@ -42,6 +42,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLTEVerifier", "BLTEVerifier\BLTEVerifier.csproj", "{E25BBA08-11D6-4B64-9908-73FD9536ABF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CASCBuilder", "CASCBuilder\CASCBuilder.csproj", "{B19905BE-9D69-415C-8F37-4FC07A8DD7D9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExporterCLI", "ExporterCLI\ExporterCLI.csproj", "{6512EB7D-A427-4E43-8AC8-320C9564B21A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -321,6 +323,22 @@ Global
 		{B19905BE-9D69-415C-8F37-4FC07A8DD7D9}.Release|x64.ActiveCfg = Release|Any CPU
 		{B19905BE-9D69-415C-8F37-4FC07A8DD7D9}.Release|x86.ActiveCfg = Release|Any CPU
 		{B19905BE-9D69-415C-8F37-4FC07A8DD7D9}.Release|x86.Build.0 = Release|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Debug|x64.Build.0 = Debug|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Debug|x86.Build.0 = Debug|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Release|x64.ActiveCfg = Release|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Release|x64.Build.0 = Release|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Release|x86.ActiveCfg = Release|Any CPU
+		{6512EB7D-A427-4E43-8AC8-320C9564B21A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

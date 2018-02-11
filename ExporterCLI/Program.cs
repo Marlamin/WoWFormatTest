@@ -13,13 +13,18 @@ namespace ExporterCLI
                 Console.WriteLine("Not enough arguments, needs filename and outdir");
                 return;
             }
+
+            CASC.InitCasc(null, null, "wowz");
+
+            var target = args[0].Replace('/', '\\');
+
             var ext = Path.GetExtension(args[0]).ToLower();
             switch (ext){
                 case ".adt":
-                    Exporters.glTF.ADTExporter.ExportADT(args[0], args[1]);
+                    Exporters.glTF.ADTExporter.ExportADT(target, args[1]);
                     break;
                 case ".wmo":
-                    Exporters.glTF.WMOExporter.ExportWMO(args[0], null, args[1]);
+                    Exporters.glTF.WMOExporter.ExportWMO(target, null, args[1]);
                     break;
                 default:
                     Console.WriteLine("Unsupported file: " + ext + ". Valid files: adt, wmo");

@@ -56,3 +56,4 @@ WoWOpenGL_SH
 
 # Don't include cached data files
 WoWOpenGL/Data/*
+ExporterCLI/cache

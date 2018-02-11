@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
+using System.Drawing;
 using WoWFormatLib.SereniaBLPLib;
 using WoWFormatLib.Utils;
+using System.Drawing.Imaging;
 
 namespace WoWFormatLib.FileReaders
 {
@@ -14,7 +13,7 @@ namespace WoWFormatLib.FileReaders
 
         public MemoryStream asBitmapStream()
         {
-            MemoryStream bitmapstream = new MemoryStream();
+            var bitmapstream = new MemoryStream();
             bmp.Save(bitmapstream, ImageFormat.Bmp);
             return bitmapstream;
         }

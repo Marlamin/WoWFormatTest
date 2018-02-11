@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExporterCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "world/maps/zandalar/zandalar_32_32.adt D:/models/"
+    }
+  }
+}

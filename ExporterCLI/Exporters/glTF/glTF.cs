@@ -71,6 +71,7 @@ namespace ExporterCLI.Exporters.glTF
         public PBRMetallicRoughness pbrMetallicRoughness;
         public string alphaMode;
         public float alphaCutoff;
+        public bool doubleSided;
     }
 
     public struct PBRMetallicRoughness

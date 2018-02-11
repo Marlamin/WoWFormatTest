@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
 using System.Linq;
 using WoWFormatLib.FileReaders;
 using Newtonsoft.Json;
 using System.IO;
+using WoWFormatLib.Utils;
 
 namespace ExporterCLI.Exporters.glTF
 {
@@ -16,7 +15,9 @@ namespace ExporterCLI.Exporters.glTF
             Console.WriteLine("WMO glTF Exporter: Loading file {0}...", file);
 
             var reader = new WMOReader();
-            //reader.LoadWMO(File.OpenRead(file));
+            reader.LoadWMO(file);
+
+            file = file.Replace("\\", "/");
 
             var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
@@ -239,6 +240,11 @@ namespace ExporterCLI.Exporters.glTF
                 indiceBuffer.byteLength = (uint)writer.BaseStream.Position - indiceBuffer.byteOffset;
 
                 bufferViews.Add(indiceBuffer);
+
+                if((indiceBuffer.byteOffset + indiceBuffer.byteLength) % 4 != 0)
+                {
+                    writer.Write((short)0);
+                }
             }
 
             glTF.bufferViews = bufferViews.ToArray();
@@ -265,8 +271,8 @@ namespace ExporterCLI.Exporters.glTF
                 {
                     if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
                     {
-                        var textureFilename = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename).ToLower();
-
+                        var textureFilename = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename.Replace("\\", "/")).ToLower();
+                        Console.WriteLine(textureFilename);
                         glTF.images[i].uri = textureFilename + ".png";
 
                         glTF.textures[i].sampler = 0;
@@ -277,6 +283,7 @@ namespace ExporterCLI.Exporters.glTF
                         glTF.materials[i].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
                         glTF.materials[i].pbrMetallicRoughness.baseColorTexture.index = i;
                         glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
+                        glTF.materials[i].doubleSided = true;
 
                         switch (reader.wmofile.materials[i].blendMode)
                         {
@@ -302,26 +309,22 @@ namespace ExporterCLI.Exporters.glTF
 
                         if(destinationOverride == null)
                         {
-                            saveLocation = Path.Combine(outdir, Path.GetDirectoryName(file), textureFilename + ".png");
+                            saveLocation = Path.Combine(outdir, textureFilename + ".blp");
                         }
                         else
                         {
-                            saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".png");
+                            saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".blp");
                         }
 
-                        //if (!File.Exists(saveLocation)){
-                        //    var blpreader = new BLPReader();
-                        //    blpreader.LoadBLP(reader.wmofile.textures[ti].filename);
-
-                        //    try
-                        //    {
-                        //        blpreader.bmp.Save(saveLocation);
-                        //    }
-                        //    catch (Exception e)
-                        //    {
-                        //        Console.WriteLine("Error exporting texture " + reader.wmofile.textures[ti].filename + ": " + e.Message);
-                        //    }
-                        //}
+                        if (!File.Exists(saveLocation))
+                        {
+                            using (var cascFile = CASC.cascHandler.OpenFile(reader.wmofile.textures[ti].filename))
+                            using (var cascStream = new MemoryStream())
+                            {
+                                cascFile.CopyTo(cascStream);
+                                File.WriteAllBytes(saveLocation, cascStream.ToArray());
+                            }
+                        }
                     }
                 }
             }
@@ -373,11 +376,11 @@ namespace ExporterCLI.Exporters.glTF
                         {
                             if (destinationOverride == null)
                             {
-                                M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                                //M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                             }
                             else
                             {
-                                M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
+                               //M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
                             }
                         }
                     }

@@ -21,21 +21,17 @@ namespace ExporterCLI.Exporters.glTF
             var ChunkSize = TileSize / 16.0f; //33.333
             var UnitSize = ChunkSize / 8.0f; //4.166666
 
-            var filename = Path.GetFileNameWithoutExtension(file);
-            var coord = filename.Substring(filename.Length - 5).Split('_');
-            var mapname = filename.Substring(0, filename.Length - 6);
-
-            Console.WriteLine("Mapname: " + mapname);
-
             Console.WriteLine("ADT glTF Exporter: Starting export of {0}..", file);
 
             if (!Directory.Exists(outdir))
             {
-                Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
+                Directory.CreateDirectory(outdir);
             }
 
             var reader = new ADTReader();
-            reader.LoadADT(File.OpenRead(file));
+            reader.LoadADT(file);
+
+            file = file.Replace("\\", "/");
 
             if (reader.adtfile.chunks == null)
             {
@@ -379,24 +375,31 @@ namespace ExporterCLI.Exporters.glTF
 
             glTF.scene = 0;
 
-            File.WriteAllText(Path.Combine(outdir, Path.GetFileName(file).Replace(".adt", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
+            File.WriteAllText(Path.Combine(outdir, Path.GetFileNameWithoutExtension(file) + ".gltf"), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
             }));
 
             //ConfigurationManager.RefreshSection("appSettings");
+            var doodadSW = new StreamWriter(Path.Combine(outdir, Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_ModelPlacementInformation.csv"));
+
+            doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationX;RotationY;RotationZ;ScaleFactor;ModelId;Type");
 
             for (var mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
             {
                 var wmo = reader.adtfile.objects.worldModels.entries[mi];
 
-                var wmoname = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
+                var wmoname = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry].Replace("\\", "/").ToLower();
 
-                if (!File.Exists(Path.GetFileNameWithoutExtension(wmoname).ToLower() + ".gltf"))
+                if (!File.Exists(Path.Combine(outdir, Path.GetFileNameWithoutExtension(wmoname) + ".gltf")))
                 {
-                    WMOExporter.ExportWMO(wmoname.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                    WMOExporter.ExportWMO(wmoname, outdir);
                 }
+
+                doodadSW.WriteLine(Path.GetFileNameWithoutExtension(wmoname) + ".gltf;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";" + wmo.scale / 1024f + ";" + wmo.uniqueId + ";wmo");
             }
+
+            doodadSW.Close();
 
             //    exportworker.ReportProgress(50, "Exporting M2s");
 
