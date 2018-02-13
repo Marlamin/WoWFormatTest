@@ -324,7 +324,7 @@ namespace ExporterCLI.Exporters.glTF
                             saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".blp");
                         }
 
-                        if (!File.Exists(saveLocation))
+                        if (!File.Exists(Path.GetFileNameWithoutExtension(saveLocation) + "png")) // Check if already exported & converted version exists
                         {
                             using (var cascFile = CASC.cascHandler.OpenFile(reader.wmofile.textures[ti].filename))
                             using (var cascStream = new MemoryStream())
@@ -397,14 +397,14 @@ namespace ExporterCLI.Exporters.glTF
 
             if (destinationOverride == null)
             {
-                File.WriteAllText(Path.Combine(outdir, file.Replace(".wmo", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
+                File.WriteAllText(Path.Combine(outdir, file.Replace(".wmo", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.None, new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 }));
             }
             else
             {
-                File.WriteAllText(Path.Combine(destinationOverride, Path.GetFileName(file.ToLower()).Replace(".wmo", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.Indented, new JsonSerializerSettings
+                File.WriteAllText(Path.Combine(destinationOverride, Path.GetFileName(file.ToLower()).Replace(".wmo", ".gltf")), JsonConvert.SerializeObject(glTF, Formatting.None, new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 }));
