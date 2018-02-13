@@ -2,7 +2,7 @@
   "profiles": {
     "ExporterCLI": {
       "commandName": "Project",
-      "commandLineArgs": "world/maps/zandalar/zandalar_32_32.adt D:/models/"
+      "commandLineArgs": "1929064 3d wmo"
     }
   }
 }

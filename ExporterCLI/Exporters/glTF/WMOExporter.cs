@@ -10,12 +10,19 @@ namespace ExporterCLI.Exporters.glTF
 {
     public class WMOExporter
     {
-        public static void ExportWMO(string file, string destinationOverride = null, string outdir = "")
+        public static void ExportWMO(string file, string destinationOverride = null, string outdir = "", int filedataid = 0)
         {
             Console.WriteLine("WMO glTF Exporter: Loading file {0}...", file);
 
             var reader = new WMOReader();
-            reader.LoadWMO(file);
+            if(filedataid != 0)
+            {
+                reader.LoadWMO(filedataid);
+            }
+            else
+            {
+                reader.LoadWMO(file);
+            }
 
             file = file.Replace("\\", "/");
 

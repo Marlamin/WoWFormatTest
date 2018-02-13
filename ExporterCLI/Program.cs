@@ -10,7 +10,7 @@ namespace ExporterCLI
         {
             if(args.Length < 2)
             {
-                Console.WriteLine("Not enough arguments, needs filename and outdir");
+                Console.WriteLine("Not enough arguments, needs filename, outdir and type (if filedataid)");
                 return;
             }
 
@@ -27,7 +27,22 @@ namespace ExporterCLI
                     Exporters.glTF.WMOExporter.ExportWMO(target, null, args[1]);
                     break;
                 default:
-                    Console.WriteLine("Unsupported file: " + ext + ". Valid files: adt, wmo");
+                    if(args.Length == 3)
+                    {
+                        Console.WriteLine("Has type, assuming filedataid");
+                        if(args[2] == "wmo")
+                        {
+                            var isNumeric = int.TryParse(target, out var filedataid);
+                            if (isNumeric)
+                            {
+                                Exporters.glTF.WMOExporter.ExportWMO("wmo_" + args[0] + ".wmo", null, args[1], filedataid);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unsupported file: " + ext + ". Valid files: adt, wmo");
+                    }
                     break;
             }
         }
