@@ -70,6 +70,7 @@ namespace ExporterCLI.Exporters.glTF
             for (var g = 0; g < reader.wmofile.group.Count(); g++)
             {
                 if (reader.wmofile.group[g].mogp.vertices == null) { Console.WriteLine("Group has no vertices!");  continue; }
+                if (reader.wmofile.group[g].mogp.renderBatches == null) { Console.WriteLine("Group has no renderbatches!"); continue; }
                 for (var i = 0; i < reader.wmofile.groupNames.Count(); i++)
                 {
                     if (reader.wmofile.group[g].mogp.nameOffset == reader.wmofile.groupNames[i].offset)
