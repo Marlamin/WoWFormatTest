@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BLTEVerifier
 {
@@ -22,14 +19,14 @@ namespace BLTEVerifier
 
         static void Main(string[] args)
         {
-            if(args.Count() != 1)
+            if (args.Count() != 1)
             {
                 throw new ArgumentOutOfRangeException("Program requires one argument: directory that it will need to verify all contents of");
             }
 
             Console.WriteLine("Listing directory..");
 
-            string[] files = new string[0];
+            var files = new string[0];
 
             // Hackfix to read from txt file instead
             if (args[0].EndsWith(".txt"))
@@ -41,7 +38,7 @@ namespace BLTEVerifier
                 files = Directory.GetFiles(args[0], "*", SearchOption.AllDirectories);
             }
 
-            foreach (string file in files)
+            foreach (var file in files)
             {
                 Console.WriteLine(file);
 
@@ -63,7 +60,6 @@ namespace BLTEVerifier
 
                 if (file.EndsWith(".index"))
                 {
-                    //Console.WriteLine(" Not checking indexes");
                     continue;
                 }
 
@@ -76,15 +72,20 @@ namespace BLTEVerifier
                         if (header != 0x45544C42)
                         {
                             Console.WriteLine(" Invalid BLTE file! " + header);
-                            if(header == 0x4453425A)
+                            if (header == 0x4453425A)
                             {
                                 Console.WriteLine(" File is a patch archive!");
-                            }else if(header == 268583248){
+                            }
+                            else if (header == 268583248)
+                            {
                                 Console.WriteLine(" File is a patch index!");
-                            }else if(header == 893668643 || header == 1279870499)
+                            }
+                            else if (header == 893668643 || header == 1279870499)
                             {
                                 Console.WriteLine(" File is Overwatch root file!");
-                            }else{
+                            }
+                            else
+                            {
                                 Console.WriteLine("Unknown file encountered!");
                                 Console.ReadLine();
                             }
@@ -128,7 +129,7 @@ namespace BLTEVerifier
 
                                 chunkInfos = new BLTEChunkInfo[chunkCount];
 
-                                for (int i = 0; i < chunkCount; i++)
+                                for (var i = 0; i < chunkCount; i++)
                                 {
                                     chunkInfos[i].isFullChunk = true;
                                     chunkInfos[i].inFileSize = bin.ReadInt32(true);
@@ -139,7 +140,7 @@ namespace BLTEVerifier
 
                                 foreach (var chunk in chunkInfos)
                                 {
-                                    using (MemoryStream chunkResult = new MemoryStream())
+                                    using (var chunkResult = new MemoryStream())
                                     {
                                         if (chunk.inFileSize > bin.BaseStream.Length)
                                         {
@@ -161,8 +162,8 @@ namespace BLTEVerifier
                                             }
                                         }
 
-                                        using (MemoryStream chunkms = new MemoryStream(chunkBuffer))
-                                        using (BinaryReader chunkreader = new BinaryReader(chunkms))
+                                        using (var chunkms = new MemoryStream(chunkBuffer))
+                                        using (var chunkreader = new BinaryReader(chunkms))
                                         {
                                             var mode = chunkreader.ReadChar();
                                             switch (mode)
@@ -171,8 +172,8 @@ namespace BLTEVerifier
                                                     chunkResult.Write(chunkreader.ReadBytes(chunk.actualSize), 0, chunk.actualSize); //read actual size because we already read the N from chunkreader
                                                     break;
                                                 case 'Z': // zlib, todo
-                                                    using (MemoryStream mstream = new MemoryStream(chunkreader.ReadBytes(chunk.inFileSize - 1), 2, chunk.inFileSize - 3))
-                                                    using (DeflateStream ds = new DeflateStream(mstream, CompressionMode.Decompress))
+                                                    using (var mstream = new MemoryStream(chunkreader.ReadBytes(chunk.inFileSize - 1), 2, chunk.inFileSize - 3))
+                                                    using (var ds = new DeflateStream(mstream, CompressionMode.Decompress))
                                                     {
                                                         ds.CopyTo(chunkResult);
                                                     }
@@ -186,7 +187,7 @@ namespace BLTEVerifier
                                             }
 
                                             // Don't check integrity for unsupported chunks
-                                            if(mode == 'N' || mode == 'Z')
+                                            if (mode == 'N' || mode == 'Z')
                                             {
                                                 var chunkres = chunkResult.ToArray();
                                                 if (chunk.isFullChunk && chunkres.Length != chunk.actualSize)
