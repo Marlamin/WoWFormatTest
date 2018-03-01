@@ -112,7 +112,7 @@ namespace WoWFormatLib.FileReaders
                         case 0x4D4F5556: // MOUV Animated texture UVs
                             break;
                         default:
-                            throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filedataid));
+                            throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName.ToString("X"), position.ToString(), filedataid));
                     }
                 }
             }
@@ -341,24 +341,24 @@ namespace WoWFormatLib.FileReaders
                 while (position < wmo.Length)
                 {
                     wmo.Position = position;
-                    var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                    var chunkName = bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
                     position = wmo.Position + chunkSize;
 
                     switch (chunkName)
                     {
-                        case "MVER":
+                        case 0x4D564552:
                             groupFile.version = bin.Read<MVER>();
                             if (wmofile.version.version != 17)
                             {
                                 throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
                             }
                             continue;
-                        case "MOGP":
+                        case 0x4D4F4750:
                             groupFile.mogp = ReadMOGPChunk(chunkSize, bin);
                             continue;
                         default:
-                            throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filedataid));
+                            throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName.ToString("X"), position.ToString(), filedataid));
                     }
                 }
             }
@@ -405,54 +405,47 @@ namespace WoWFormatLib.FileReaders
                 {
                     stream.Position = position;
 
-                    var subChunkName = new string(subbin.ReadChars(4).Reverse().ToArray());
+                    var subChunkName = subbin.ReadUInt32();
                     var subChunkSize = subbin.ReadUInt32();
 
                     position = stream.Position + subChunkSize;
 
                     switch (subChunkName)
                     {
-                        case "MOVI": //Vertex indices for triangles
+                        case 0x4D4F5649: // MOVI Vertex indices for triangles
                             mogp.indices = ReadMOVIChunk(subChunkSize, subbin);
-                            //Console.WriteLine("Read " + mogp.indices.Length + " indices!");
                             break;
-
-                        case "MOVT": //Vertices chunk
+                        case 0x4D4F5654: // MOVT Vertices chunk
                             mogp.vertices = ReadMOVTChunk(subChunkSize, subbin);
                             break;
-
-                        case "MOTV": //Texture coordinates
+                        case 0x4D4F5456: // MOTV Texture coordinates
                             mogp.textureCoords[MOTVi++] = ReadMOTVChunk(subChunkSize, subbin);
                             break;
-
-                        case "MONR": //Normals
+                        case 0x4D4F4E52: // MONR Normals
                             mogp.normals = ReadMONRChunk(subChunkSize, subbin);
                             break;
-
-                        case "MOBA": //Render batches
+                        case 0x4D4F4241: // MOBA Render batches
                             mogp.renderBatches = ReadMOBAChunk(subChunkSize, subbin);
                             break;
-
-                        case "MOPY": //Material info for triangles, two bytes per triangle.
+                        case 0x4D4F5059: // MOPY Material info for triangles, two bytes per triangle.
                             mogp.materialInfo = ReadMOPYChunk(subChunkSize, subbin);
                             break;
-
-                        case "MOBS": //Unk
-                        case "MODR": //Doodad references
-                        case "MOBN": //Array of t_BSP_NODE
-                        case "MOBR": //Face indices
-                        case "MOLR": //Light references
-                        case "MOCV": //Vertex colors
-                        case "MDAL": //Unk (new in WoD?)
-                        case "MLIQ": //Liquids
-                        case "MOTA": //Unknown
-                        case "MOPL": //Unknown
-                        case "MOLP": //Unknown
-                        case "MOLS": //Unknown
-                        case "MOPB": 
+                        case 0x4D4F4253: // MOBS Unk
+                        case 0x4D4F4452: // MODR Doodad references
+                        case 0x4D4F424E: // MOBN Array of t_BSP_NODE
+                        case 0x4D4F4252: // MOBR Face indices
+                        case 0x4D4F4C52: // MOLR Light references
+                        case 0x4D4F4356: // MOCV Vertex colors
+                        case 0x4D44414C: // MDAL Unk (new in WoD)
+                        case 0x4D4C4951: // MLIQ Liquids
+                        case 0x4D4F5441: // MOTA Tangent Array
+                        case 0x4D4F504C: // MOPL Terrain Cutting PLanes
+                        case 0x4D4F4C50: // MOLP Points Lights
+                        case 0x4D4F4C53: // MOLS Spot Lights
+                        case 0x4D4F5042: // MOPB Prepass Batches
                             continue;
                         default:
-                            throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, position.ToString()));
+                            throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName.ToString("X"), position.ToString()));
                     }
                 }
             }
@@ -461,7 +454,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MONR[] ReadMONRChunk(uint size, BinaryReader bin)
         {
-            var numNormals = size / (sizeof(float) * 3);
+            var numNormals = size / 12;
             var normals = new MONR[numNormals];
             for (var i = 0; i < numNormals; i++)
             {
@@ -471,7 +464,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MOVT[] ReadMOVTChunk(uint size, BinaryReader bin)
         {
-            var numVerts = size / (sizeof(float) * 3);
+            var numVerts = size / 12;
             var vertices = new MOVT[numVerts];
             for (var i = 0; i < numVerts; i++)
             {
@@ -501,7 +494,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MOTV[] ReadMOTVChunk(uint size, BinaryReader bin)
         {
-            var numCoords = size / (sizeof(float) * 2);
+            var numCoords = size / 8;
             var textureCoords = new MOTV[numCoords];
             for (var i = 0; i < numCoords; i++)
             {
@@ -512,7 +505,7 @@ namespace WoWFormatLib.FileReaders
         }
         private MOVI[] ReadMOVIChunk(uint size, BinaryReader bin)
         {
-            var numIndices = size / sizeof(ushort);
+            var numIndices = size / 2;
             var indices = new MOVI[numIndices];
             for (var i = 0; i < numIndices; i++)
             {
