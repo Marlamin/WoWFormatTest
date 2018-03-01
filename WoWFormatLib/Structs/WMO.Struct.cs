@@ -50,10 +50,11 @@ namespace WoWFormatLib.Structs.WMO
         public uint nDoodads;
         public uint nSets;
         public uint ambientColor;
-        public uint wmoID;
+        public uint areaTableID;
         public Vector3 boundingBox1;
         public Vector3 boundingBox2;
-        public uint flags;
+        public short flags;
+        public short nLod;
     }
 
     public struct MODN

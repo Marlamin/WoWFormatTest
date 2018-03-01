@@ -26,11 +26,11 @@ namespace WoWFormatLib.FileReaders
     public class WMOReader
     {
         public WMO wmofile;
-        private bool _lod;
+        private byte lodLevel;
 
-        public void LoadWMO(int filedataid, bool lod = false)
+        public void LoadWMO(int filedataid, byte lod = 0)
         {
-            _lod = lod;
+            lodLevel = lod;
 
             if (CASC.cascHandler.FileExists(filedataid))
             {
@@ -45,9 +45,9 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void LoadWMO(string filename, bool lod = false)
+        public void LoadWMO(string filename, byte lod = 0)
         {
-            _lod = lod;
+            lodLevel = lod;
 
             if (CASC.cascHandler.FileExists(filename))
             {
@@ -87,7 +87,7 @@ namespace WoWFormatLib.FileReaders
                             }
                             break;
                         case "MOHD":
-                            wmofile.header = ReadMOHDChunk(bin);
+                            wmofile.header = bin.Read<MOHD>();
                             break;
                         case "MOTX":
                             wmofile.textures = ReadMOTXChunk(chunkSize, bin);
@@ -133,20 +133,38 @@ namespace WoWFormatLib.FileReaders
             }
 
             var groupFiles = new WMOGroupFile[wmofile.header.nGroups];
+
+            if((lodLevel + 1) > wmofile.header.nLod)
+            {
+                throw new Exception("Requested LOD (" + lodLevel + ") exceeds the max LOD for this WMO (" + (wmofile.header.nLod - 1) + ")");
+            }
+
+            var start = wmofile.header.nGroups * lodLevel;
+
             for (var i = 0; i < wmofile.header.nGroups; i++)
             {
-                var groupid = wmofile.groupFileDataIDs[i];
+                var groupFileDataID = wmofile.groupFileDataIDs[start + i];
 
-                if (_lod)
+                if (lodLevel == 3 && groupFileDataID == 0) // if lod is 3 and there's no lod3 available, fall back to lod1
                 {
-                    // TODO
+                    groupFileDataID = wmofile.groupFileDataIDs[i + (wmofile.header.nGroups * 2)];
                 }
 
-                if (CASC.cascHandler.FileExists(groupid))
+                if (lodLevel >= 2 && groupFileDataID == 0) // if lod is 2 or higher and there's no lod2 available, fall back to lod1
                 {
-                    using (var wmoStream = CASC.cascHandler.OpenFile(groupid))
+                    groupFileDataID = wmofile.groupFileDataIDs[i + (wmofile.header.nGroups * 1)];
+                }
+
+                if (lodLevel > 1 && groupFileDataID == 0) // if lod is 1 or higher check if lod1 available, fall back to lod0
+                {
+                    groupFileDataID = wmofile.groupFileDataIDs[i];
+                }
+
+                if (CASC.cascHandler.FileExists(groupFileDataID))
+                {
+                    using (var wmoStream = CASC.cascHandler.OpenFile(groupFileDataID))
                     {
-                        groupFiles[i] = ReadWMOGroupFile(groupid, wmoStream);
+                        groupFiles[i] = ReadWMOGroupFile(groupFileDataID, wmoStream);
                     }
                 }
             }
@@ -165,24 +183,6 @@ namespace WoWFormatLib.FileReaders
             return gfids;
         }
 
-        private MOHD ReadMOHDChunk(BinaryReader bin)
-        {
-            //Header for the map object. 64 bytes.
-            var header = new MOHD()
-            {
-                nMaterials = bin.ReadUInt32(),
-                nGroups = bin.ReadUInt32(),
-                nPortals = bin.ReadUInt32(),
-                nLights = bin.ReadUInt32(),
-                nModels = bin.ReadUInt32(),
-                nDoodads = bin.ReadUInt32(),
-                nSets = bin.ReadUInt32(),
-                ambientColor = bin.ReadUInt32(),
-                wmoID = bin.ReadUInt32()
-            };
-
-            return header;
-        }
         private MOTX[] ReadMOTXChunk(uint size, BinaryReader bin)
         {
             //List of BLP filenames
