@@ -26,11 +26,11 @@ namespace WoWFormatLib.FileReaders
     public class WMOReader
     {
         public WMO wmofile;
-        private bool _lod;
+        private byte lodLevel;
 
-        public void LoadWMO(int filedataid, bool lod = false)
+        public void LoadWMO(int filedataid, byte lod = 0)
         {
-            _lod = lod;
+            lodLevel = lod;
 
             if (CASC.cascHandler.FileExists(filedataid))
             {
@@ -45,9 +45,9 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void LoadWMO(string filename, bool lod = false)
+        public void LoadWMO(string filename, byte lod = 0)
         {
-            _lod = lod;
+            lodLevel = lod;
 
             if (CASC.cascHandler.FileExists(filename))
             {
@@ -72,59 +72,59 @@ namespace WoWFormatLib.FileReaders
                 {
                     wmo.Position = position;
 
-                    var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                    var chunkName = bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
 
                     position = wmo.Position + chunkSize;
 
                     switch (chunkName)
                     {
-                        case "MVER":
+                        case 0x4D564552:
                             wmofile.version = bin.Read<MVER>();
                             if (wmofile.version.version != 17)
                             {
                                 throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ") (" + filedataid + ")");
                             }
                             break;
-                        case "MOHD":
-                            wmofile.header = ReadMOHDChunk(bin);
+                        case 0x4D4F4844:
+                            wmofile.header = bin.Read<MOHD>();
                             break;
-                        case "MOTX":
+                        case 0x4D4F5458:
                             wmofile.textures = ReadMOTXChunk(chunkSize, bin);
                             break;
-                        case "MOMT":
-                            wmofile.materials = ReadMOMTChunk(bin, wmofile.header.nMaterials);
+                        case 0x4D4F4D54:
+                            wmofile.materials = ReadMOMTChunk(chunkSize, bin);
                             break;
-                        case "MOGN":
-                            wmofile.groupNames = ReadMOGNChunk(chunkSize, bin, wmofile.header.nGroups);
+                        case 0x4D4F474E:
+                            wmofile.groupNames = ReadMOGNChunk(chunkSize, bin);
                             break;
-                        case "MOGI":
-                            wmofile.groupInfo = ReadMOGIChunk(bin, wmofile.header.nGroups);
+                        case 0x4D4F4749:
+                            wmofile.groupInfo = ReadMOGIChunk(chunkSize, bin);
                             break;
-                        case "MODS":
+                        case 0x4D4F4453:
                             wmofile.doodadSets = ReadMODSChunk(chunkSize, bin);
                             break;
-                        case "MODN":
-                            wmofile.doodadNames = ReadMODNChunk(chunkSize, bin, wmofile.header.nModels);
+                        case 0x4D4F444E:
+                            wmofile.doodadNames = ReadMODNChunk(chunkSize, bin);
                             break;
-                        case "MODD":
+                        case 0x4D4F4444:
                             wmofile.doodadDefinitions = ReadMODDChunk(chunkSize, bin);
                             break;
-                        case "MOSB": // Skybox
+                        case 0x4D4F5342:
                             wmofile.skybox = ReadMOSBChunk(chunkSize, bin);
                             break;
-                        case "GFID": // Legion
+                        case 0x47464944:
                             wmofile.groupFileDataIDs = ReadGFIDChunk(chunkSize, bin);
                             break;
-                        case "MOPV": // Portal Vertices
-                        case "MOPR": // Portal References
-                        case "MOPT": // Portal Information
-                        case "MOVV": // Visible block vertices
-                        case "MOVB": // Visible block list
-                        case "MOLT": // Lighting Infroamtion
-                        case "MFOG": // Fog Information
-                        case "MCVP": // Convex Volume Planes
-                        case "MOUV": // 7.3 - ?
+                        case 0x4D4F5056: // MOPV Portal Vertices
+                        case 0x4D4F5052: // MOPR Portal References
+                        case 0x4D4F5054: // MOPT Portal Information
+                        case 0x4D4F5656: // MOVV Visible block vertices
+                        case 0x4D4F5642: // MOVB Visible block list
+                        case 0x4D4F4C54: // MOLT Lighting Information
+                        case 0x4D464F47: // MFOG Fog Information
+                        case 0x4D435650: // MCVP Convex Volume Planes
+                        case 0x4D4F5556: // MOUV Animated texture UVs
                             break;
                         default:
                             throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filedataid));
@@ -133,20 +133,38 @@ namespace WoWFormatLib.FileReaders
             }
 
             var groupFiles = new WMOGroupFile[wmofile.header.nGroups];
+
+            if((lodLevel + 1) > wmofile.header.nLod)
+            {
+                throw new Exception("Requested LOD (" + lodLevel + ") exceeds the max LOD for this WMO (" + (wmofile.header.nLod - 1) + ")");
+            }
+
+            var start = wmofile.header.nGroups * lodLevel;
+
             for (var i = 0; i < wmofile.header.nGroups; i++)
             {
-                var groupid = wmofile.groupFileDataIDs[i];
+                var groupFileDataID = wmofile.groupFileDataIDs[start + i];
 
-                if (_lod)
+                if (lodLevel == 3 && groupFileDataID == 0) // if lod is 3 and there's no lod3 available, fall back to lod1
                 {
-                    // TODO
+                    groupFileDataID = wmofile.groupFileDataIDs[i + (wmofile.header.nGroups * 2)];
                 }
 
-                if (CASC.cascHandler.FileExists(groupid))
+                if (lodLevel >= 2 && groupFileDataID == 0) // if lod is 2 or higher and there's no lod2 available, fall back to lod1
                 {
-                    using (var wmoStream = CASC.cascHandler.OpenFile(groupid))
+                    groupFileDataID = wmofile.groupFileDataIDs[i + (wmofile.header.nGroups * 1)];
+                }
+
+                if (lodLevel > 1 && groupFileDataID == 0) // if lod is 1 or higher check if lod1 available, fall back to lod0
+                {
+                    groupFileDataID = wmofile.groupFileDataIDs[i];
+                }
+
+                if (CASC.cascHandler.FileExists(groupFileDataID))
+                {
+                    using (var wmoStream = CASC.cascHandler.OpenFile(groupFileDataID))
                     {
-                        groupFiles[i] = ReadWMOGroupFile(groupid, wmoStream);
+                        groupFiles[i] = ReadWMOGroupFile(groupFileDataID, wmoStream);
                     }
                 }
             }
@@ -165,24 +183,6 @@ namespace WoWFormatLib.FileReaders
             return gfids;
         }
 
-        private MOHD ReadMOHDChunk(BinaryReader bin)
-        {
-            //Header for the map object. 64 bytes.
-            var header = new MOHD()
-            {
-                nMaterials = bin.ReadUInt32(),
-                nGroups = bin.ReadUInt32(),
-                nPortals = bin.ReadUInt32(),
-                nLights = bin.ReadUInt32(),
-                nModels = bin.ReadUInt32(),
-                nDoodads = bin.ReadUInt32(),
-                nSets = bin.ReadUInt32(),
-                ambientColor = bin.ReadUInt32(),
-                wmoID = bin.ReadUInt32()
-            };
-
-            return header;
-        }
         private MOTX[] ReadMOTXChunk(uint size, BinaryReader bin)
         {
             //List of BLP filenames
@@ -221,16 +221,17 @@ namespace WoWFormatLib.FileReaders
 
             return textures;
         }
-        private MOMT[] ReadMOMTChunk(BinaryReader bin, uint num)
+        private MOMT[] ReadMOMTChunk(uint size, BinaryReader bin)
         {
-            var materials = new MOMT[num];
-            for (var i = 0; i < num; i++)
+            var count = size / 64;
+            var materials = new MOMT[count];
+            for (var i = 0; i < count; i++)
             {
                 materials[i] = bin.Read<MOMT>();
             }
             return materials;
         }
-        private MOGN[] ReadMOGNChunk(uint size, BinaryReader bin, uint num)
+        private MOGN[] ReadMOGNChunk(uint size, BinaryReader bin)
         {
             var wmoGroupsChunk = bin.ReadBytes((int)size);
             var str = new StringBuilder();
@@ -253,10 +254,6 @@ namespace WoWFormatLib.FileReaders
                 }
             }
 
-            if (nameList.Count != num)
-            {
-                //throw new Exception("List of group names does not equal number of groups");
-            }
             var groupNames = new MOGN[nameList.Count];
             for (var i = 0; i < nameList.Count; i++)
             {
@@ -265,10 +262,11 @@ namespace WoWFormatLib.FileReaders
             }
             return groupNames;
         }
-        private MOGI[] ReadMOGIChunk(BinaryReader bin, uint num)
+        private MOGI[] ReadMOGIChunk(uint size, BinaryReader bin)
         {
-            var groupInfo = new MOGI[num];
-            for (var i = 0; i < num; i++)
+            var count = size / 32;
+            var groupInfo = new MOGI[count];
+            for (var i = 0; i < count; i++)
             {
                 groupInfo[i] = bin.Read<MOGI>();
             }
@@ -287,7 +285,7 @@ namespace WoWFormatLib.FileReaders
             }
             return doodadSets;
         }
-        private MODN[] ReadMODNChunk(uint size, BinaryReader bin, uint num)
+        private MODN[] ReadMODNChunk(uint size, BinaryReader bin)
         {
             //List of M2 filenames, but are still named after MDXs internally. Have to rename!
             var m2FilesChunk = bin.ReadBytes((int)size);
@@ -314,7 +312,8 @@ namespace WoWFormatLib.FileReaders
                     str.Append((char)m2FilesChunk[i]);
                 }
             }
-            if (num != m2Files.Count) { throw new Exception("nModels does not match doodad count"); }
+
+            var num = m2Files.Count();
 
             var doodadNames = new MODN[num];
             for (var i = 0; i < num; i++)
