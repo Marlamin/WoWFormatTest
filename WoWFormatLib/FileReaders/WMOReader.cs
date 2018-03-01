@@ -79,52 +79,52 @@ namespace WoWFormatLib.FileReaders
 
                     switch (chunkName)
                     {
-                        case 0x5245564D:
+                        case 0x4D564552:
                             wmofile.version = bin.Read<MVER>();
                             if (wmofile.version.version != 17)
                             {
                                 throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ") (" + filedataid + ")");
                             }
                             break;
-                        case 0x44484F4D:
+                        case 0x4D4F4844:
                             wmofile.header = bin.Read<MOHD>();
                             break;
-                        case 0x58544F4D:
+                        case 0x4D4F5458:
                             wmofile.textures = ReadMOTXChunk(chunkSize, bin);
                             break;
-                        case 0x544D4F4D:
+                        case 0x4D4F4D54:
                             wmofile.materials = ReadMOMTChunk(chunkSize, bin);
                             break;
-                        case 0x4E474F4D:
+                        case 0x4D4F474E:
                             wmofile.groupNames = ReadMOGNChunk(chunkSize, bin);
                             break;
-                        case 0x49474F4D:
+                        case 0x4D4F4749:
                             wmofile.groupInfo = ReadMOGIChunk(chunkSize, bin);
                             break;
-                        case 0x53444F4D:
+                        case 0x4D4F4453:
                             wmofile.doodadSets = ReadMODSChunk(chunkSize, bin);
                             break;
-                        case 0x4E444F4D:
+                        case 0x4D4F444E:
                             wmofile.doodadNames = ReadMODNChunk(chunkSize, bin);
                             break;
-                        case 0x44444F4D:
+                        case 0x4D4F4444:
                             wmofile.doodadDefinitions = ReadMODDChunk(chunkSize, bin);
                             break;
-                        case 0x42534F4D:
+                        case 0x4D4F5342:
                             wmofile.skybox = ReadMOSBChunk(chunkSize, bin);
                             break;
-                        case 0x44494647:
+                        case 0x47464944:
                             wmofile.groupFileDataIDs = ReadGFIDChunk(chunkSize, bin);
                             break;
-                        case 0x56504F4D: // MOPV Portal Vertices
-                        case 0x52504F4D: // MOPR Portal References
-                        case 0x54504F4D: // MOPT Portal Information
-                        case 0x56564F4D: // MOVV Visible block vertices
-                        case 0x42564F4D: // MOVB Visible block list
-                        case 0x544C4F4D: // MOLT Lighting Information
-                        case 0x474F464D: // MFOG Fog Information
-                        case 0x5056434D: // MCVP Convex Volume Planes
-                        case 0x56554F4D: // MOUV Animated texture UVs
+                        case 0x4D4F5056: // MOPV Portal Vertices
+                        case 0x4D4F5052: // MOPR Portal References
+                        case 0x4D4F5054: // MOPT Portal Information
+                        case 0x4D4F5656: // MOVV Visible block vertices
+                        case 0x4D4F5642: // MOVB Visible block list
+                        case 0x4D4F4C54: // MOLT Lighting Information
+                        case 0x4D464F47: // MFOG Fog Information
+                        case 0x4D435650: // MCVP Convex Volume Planes
+                        case 0x4D4F5556: // MOUV Animated texture UVs
                             break;
                         default:
                             throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filedataid));
