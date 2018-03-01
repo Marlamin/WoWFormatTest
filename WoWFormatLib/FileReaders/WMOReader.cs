@@ -93,19 +93,19 @@ namespace WoWFormatLib.FileReaders
                             wmofile.textures = ReadMOTXChunk(chunkSize, bin);
                             break;
                         case "MOMT":
-                            wmofile.materials = ReadMOMTChunk(bin, wmofile.header.nMaterials);
+                            wmofile.materials = ReadMOMTChunk(chunkSize, bin);
                             break;
                         case "MOGN":
-                            wmofile.groupNames = ReadMOGNChunk(chunkSize, bin, wmofile.header.nGroups);
+                            wmofile.groupNames = ReadMOGNChunk(chunkSize, bin);
                             break;
                         case "MOGI":
-                            wmofile.groupInfo = ReadMOGIChunk(bin, wmofile.header.nGroups);
+                            wmofile.groupInfo = ReadMOGIChunk(chunkSize, bin);
                             break;
                         case "MODS":
                             wmofile.doodadSets = ReadMODSChunk(chunkSize, bin);
                             break;
                         case "MODN":
-                            wmofile.doodadNames = ReadMODNChunk(chunkSize, bin, wmofile.header.nModels);
+                            wmofile.doodadNames = ReadMODNChunk(chunkSize, bin);
                             break;
                         case "MODD":
                             wmofile.doodadDefinitions = ReadMODDChunk(chunkSize, bin);
@@ -221,16 +221,17 @@ namespace WoWFormatLib.FileReaders
 
             return textures;
         }
-        private MOMT[] ReadMOMTChunk(BinaryReader bin, uint num)
+        private MOMT[] ReadMOMTChunk(uint size, BinaryReader bin)
         {
-            var materials = new MOMT[num];
-            for (var i = 0; i < num; i++)
+            var count = size / 64;
+            var materials = new MOMT[count];
+            for (var i = 0; i < count; i++)
             {
                 materials[i] = bin.Read<MOMT>();
             }
             return materials;
         }
-        private MOGN[] ReadMOGNChunk(uint size, BinaryReader bin, uint num)
+        private MOGN[] ReadMOGNChunk(uint size, BinaryReader bin)
         {
             var wmoGroupsChunk = bin.ReadBytes((int)size);
             var str = new StringBuilder();
@@ -253,10 +254,6 @@ namespace WoWFormatLib.FileReaders
                 }
             }
 
-            if (nameList.Count != num)
-            {
-                //throw new Exception("List of group names does not equal number of groups");
-            }
             var groupNames = new MOGN[nameList.Count];
             for (var i = 0; i < nameList.Count; i++)
             {
@@ -265,10 +262,11 @@ namespace WoWFormatLib.FileReaders
             }
             return groupNames;
         }
-        private MOGI[] ReadMOGIChunk(BinaryReader bin, uint num)
+        private MOGI[] ReadMOGIChunk(uint size, BinaryReader bin)
         {
-            var groupInfo = new MOGI[num];
-            for (var i = 0; i < num; i++)
+            var count = size / 32;
+            var groupInfo = new MOGI[count];
+            for (var i = 0; i < count; i++)
             {
                 groupInfo[i] = bin.Read<MOGI>();
             }
@@ -287,7 +285,7 @@ namespace WoWFormatLib.FileReaders
             }
             return doodadSets;
         }
-        private MODN[] ReadMODNChunk(uint size, BinaryReader bin, uint num)
+        private MODN[] ReadMODNChunk(uint size, BinaryReader bin)
         {
             //List of M2 filenames, but are still named after MDXs internally. Have to rename!
             var m2FilesChunk = bin.ReadBytes((int)size);
@@ -314,7 +312,8 @@ namespace WoWFormatLib.FileReaders
                     str.Append((char)m2FilesChunk[i]);
                 }
             }
-            if (num != m2Files.Count) { throw new Exception("nModels does not match doodad count"); }
+
+            var num = m2Files.Count();
 
             var doodadNames = new MODN[num];
             for (var i = 0; i < num; i++)
