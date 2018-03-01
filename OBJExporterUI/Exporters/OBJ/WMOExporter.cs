@@ -27,7 +27,7 @@ namespace OBJExporterUI.Exporters.OBJ
             var outdir = ConfigurationManager.AppSettings["outdir"];
             var wmo = new WMOReader().LoadWMO(file);
 
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 

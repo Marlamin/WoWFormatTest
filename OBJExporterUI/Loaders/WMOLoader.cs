@@ -18,7 +18,7 @@ namespace OBJExporterUI.Loaders
                 return cache.worldModelBatches[filename];
             }
 
-            WoWFormatLib.Structs.WMO.WMO wmo = new WoWFormatLib.Structs.WMO.WMO();
+            var wmo = new WoWFormatLib.Structs.WMO.WMO();
 
             if (cache.worldModels.ContainsKey(filename))
             {
@@ -31,6 +31,7 @@ namespace OBJExporterUI.Loaders
                 {
                     var wmofile = new WMOReader().LoadWMO(filename);
                     cache.worldModels.Add(filename, wmofile);
+                    wmo = cache.worldModels[filename];
                 }
                 else
                 {
@@ -48,9 +49,9 @@ namespace OBJExporterUI.Loaders
                 groupBatches = new Renderer.Structs.WorldModelGroupBatches[wmo.group.Count()]
             };
 
-            string[] groupNames = new string[wmo.group.Count()];
+            var groupNames = new string[wmo.group.Count()];
 
-            for (int g = 0; g < wmo.group.Count(); g++)
+            for (var g = 0; g < wmo.group.Count(); g++)
             {
                 if (wmo.group[g].mogp.vertices == null) { continue; }
 
@@ -62,9 +63,9 @@ namespace OBJExporterUI.Loaders
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, wmobatch.groupBatches[g].vertexBuffer);
 
-                Renderer.Structs.M2Vertex[] wmovertices = new Renderer.Structs.M2Vertex[wmo.group[g].mogp.vertices.Count()];
+                var wmovertices = new Renderer.Structs.M2Vertex[wmo.group[g].mogp.vertices.Count()];
 
-                for (int i = 0; i < wmo.groupNames.Count(); i++)
+                for (var i = 0; i < wmo.groupNames.Count(); i++)
                 {
                     if (wmo.group[g].mogp.nameOffset == wmo.groupNames[i].offset)
                     {
@@ -74,7 +75,7 @@ namespace OBJExporterUI.Loaders
 
                 if (groupNames[g] == "antiportal") { continue; }
 
-                for (int i = 0; i < wmo.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < wmo.group[g].mogp.vertices.Count(); i++)
                 {
                     wmovertices[i].Position = new Vector3(wmo.group[g].mogp.vertices[i].vector.X, wmo.group[g].mogp.vertices[i].vector.Y, wmo.group[g].mogp.vertices[i].vector.Z);
                     wmovertices[i].Normal = new Vector3(wmo.group[g].mogp.normals[i].normal.X, wmo.group[g].mogp.normals[i].normal.Y, wmo.group[g].mogp.normals[i].normal.Z);
@@ -107,8 +108,8 @@ namespace OBJExporterUI.Loaders
                 //Switch to Index buffer
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, wmobatch.groupBatches[g].indiceBuffer);
 
-                List<uint> wmoindicelist = new List<uint>();
-                for (int i = 0; i < wmo.group[g].mogp.indices.Count(); i++)
+                var wmoindicelist = new List<uint>();
+                for (var i = 0; i < wmo.group[g].mogp.indices.Count(); i++)
                 {
                     wmoindicelist.Add(wmo.group[g].mogp.indices[i].indice);
                 }
@@ -121,13 +122,13 @@ namespace OBJExporterUI.Loaders
             GL.Enable(EnableCap.Texture2D);
 
             wmobatch.mats = new Renderer.Structs.Material[wmo.materials.Count()];
-            for (int i = 0; i < wmo.materials.Count(); i++)
+            for (var i = 0; i < wmo.materials.Count(); i++)
             {
                 wmobatch.mats[i].texture1 = wmo.materials[i].texture1;
                 wmobatch.mats[i].texture2 = wmo.materials[i].texture2;
                 wmobatch.mats[i].texture3 = wmo.materials[i].texture3;
 
-                for (int ti = 0; ti < wmo.textures.Count(); ti++)
+                for (var ti = 0; ti < wmo.textures.Count(); ti++)
                 {
                     if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
                     {
@@ -148,9 +149,9 @@ namespace OBJExporterUI.Loaders
 
             wmobatch.doodads = new Renderer.Structs.WMODoodad[wmo.doodadDefinitions.Count()];
 
-            for(int i = 0; i < wmo.doodadDefinitions.Count(); i++)
+            for(var i = 0; i < wmo.doodadDefinitions.Count(); i++)
             {
-                for(int j = 0; j < wmo.doodadNames.Count(); j++)
+                for(var j = 0; j < wmo.doodadNames.Count(); j++)
                 {
                     if (wmo.doodadDefinitions[i].offset == wmo.doodadNames[j].startOffset)
                     {
@@ -165,9 +166,9 @@ namespace OBJExporterUI.Loaders
                 wmobatch.doodads[i].color = new Vector4(wmo.doodadDefinitions[i].color[0], wmo.doodadDefinitions[i].color[1], wmo.doodadDefinitions[i].color[2], wmo.doodadDefinitions[i].color[3]);
             }
 
-            int numRenderbatches = 0;
+            var numRenderbatches = 0;
             //Get total amount of render batches
-            for (int i = 0; i < wmo.group.Count(); i++)
+            for (var i = 0; i < wmo.group.Count(); i++)
             {
                 if (wmo.group[i].mogp.renderBatches == null) { continue; }
                 numRenderbatches = numRenderbatches + wmo.group[i].mogp.renderBatches.Count();
@@ -175,12 +176,12 @@ namespace OBJExporterUI.Loaders
 
             wmobatch.wmoRenderBatch = new Renderer.Structs.RenderBatch[numRenderbatches];
 
-            int rb = 0;
-            for (int g = 0; g < wmo.group.Count(); g++)
+            var rb = 0;
+            for (var g = 0; g < wmo.group.Count(); g++)
             {
                 var group = wmo.group[g];
                 if (group.mogp.renderBatches == null) { continue; }
-                for (int i = 0; i < group.mogp.renderBatches.Count(); i++)
+                for (var i = 0; i < group.mogp.renderBatches.Count(); i++)
                 {
                     wmobatch.wmoRenderBatch[rb].firstFace = group.mogp.renderBatches[i].firstFace;
                     wmobatch.wmoRenderBatch[rb].numFaces = group.mogp.renderBatches[i].numFaces;
@@ -196,7 +197,7 @@ namespace OBJExporterUI.Loaders
                     }
 
                     wmobatch.wmoRenderBatch[rb].materialID = new uint[3];
-                    for (int ti = 0; ti < wmobatch.mats.Count(); ti++)
+                    for (var ti = 0; ti < wmobatch.mats.Count(); ti++)
                     {
                         if (wmo.materials[matID].texture1 == wmobatch.mats[ti].texture1)
                         {

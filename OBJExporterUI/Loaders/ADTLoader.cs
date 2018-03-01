@@ -12,9 +12,9 @@ namespace OBJExporterUI.Loaders
     {
         public static Terrain LoadADT(string filename, CacheStorage cache, int shaderProgram, bool loadModels = false)
         {
-            WoWFormatLib.Structs.ADT.ADT adt = new WoWFormatLib.Structs.ADT.ADT();
+            var adt = new WoWFormatLib.Structs.ADT.ADT();
 
-            Terrain result = new Terrain();
+            var result = new Terrain();
 
             //Load ADT from file
             if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(filename))
@@ -28,13 +28,13 @@ namespace OBJExporterUI.Loaders
                 throw new Exception("ADT " + filename + " does not exist!");
             }
 
-            float TileSize = 1600.0f / 3.0f; //533.333
-            float ChunkSize = TileSize / 16.0f; //33.333
-            float UnitSize = ChunkSize / 8.0f; //4.166666
-            float MapMidPoint = 32.0f / ChunkSize;
+            var TileSize = 1600.0f / 3.0f; //533.333
+            var ChunkSize = TileSize / 16.0f; //33.333
+            var UnitSize = ChunkSize / 8.0f; //4.166666
+            var MapMidPoint = 32.0f / ChunkSize;
 
-            List<Vertex> verticelist = new List<Vertex>();
-            List<Int32> indicelist = new List<Int32>();
+            var verticelist = new List<Vertex>();
+            var indicelist = new List<int>();
 
             result.vao = GL.GenVertexArray();
             GL.BindVertexArray(result.vao);
@@ -42,11 +42,11 @@ namespace OBJExporterUI.Loaders
             result.vertexBuffer = GL.GenBuffer();
             result.indiceBuffer = GL.GenBuffer();
 
-            List<Material> materials = new List<Material>();
+            var materials = new List<Material>();
 
-            for (int ti = 0; ti < adt.textures.filenames.Count(); ti++)
+            for (var ti = 0; ti < adt.textures.filenames.Count(); ti++)
             {
-                Material material = new Material();
+                var material = new Material();
                 material.filename = adt.textures.filenames[ti];
                 material.textureID = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
 
@@ -87,23 +87,23 @@ namespace OBJExporterUI.Loaders
             var initialChunkY = adt.chunks[0].header.position.Y;
             var initialChunkX = adt.chunks[0].header.position.X;
 
-            List<RenderBatch> renderBatches = new List<RenderBatch>();
+            var renderBatches = new List<RenderBatch>();
 
             for (uint c = 0; c < adt.chunks.Count(); c++)
             {
                 var chunk = adt.chunks[c];
 
-                int off = verticelist.Count();
+                var off = verticelist.Count();
 
-                RenderBatch batch = new RenderBatch();
+                var batch = new RenderBatch();
 
                 batch.groupID = c;
 
                 for (int i = 0, idx = 0; i < 17; i++)
                 {
-                    for (int j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
+                    for (var j = 0; j < (((i % 2) != 0) ? 8 : 9); j++)
                     {
-                        Vertex v = new Vertex();
+                        var v = new Vertex();
                         v.Normal = new Vector3(chunk.normals.normal_0[idx], chunk.normals.normal_1[idx], chunk.normals.normal_2[idx]);
                         if (chunk.vertexShading.red != null)
                         {
@@ -129,10 +129,10 @@ namespace OBJExporterUI.Loaders
                 batch.firstFace = (uint)indicelist.Count();
                 for (var j = 9; j < 145; j++)
                 {
-                    indicelist.AddRange(new Int32[] { off + j + 8, off + j - 9, off + j });
-                    indicelist.AddRange(new Int32[] { off + j - 9, off + j - 8, off + j });
-                    indicelist.AddRange(new Int32[] { off + j - 8, off + j + 9, off + j });
-                    indicelist.AddRange(new Int32[] { off + j + 9, off + j + 8, off + j });
+                    indicelist.AddRange(new int[] { off + j + 8, off + j - 9, off + j });
+                    indicelist.AddRange(new int[] { off + j - 9, off + j - 8, off + j });
+                    indicelist.AddRange(new int[] { off + j - 8, off + j + 9, off + j });
+                    indicelist.AddRange(new int[] { off + j + 9, off + j + 8, off + j });
                     if ((j + 1) % (9 + 8) == 0) j += 9;
                 }
                 batch.numFaces = (uint)(indicelist.Count()) - batch.firstFace;
@@ -145,7 +145,7 @@ namespace OBJExporterUI.Loaders
                 batch.heightScales = new Vector4();
                 batch.heightOffsets = new Vector4();
 
-                for (int li = 0; li < adt.texChunks[c].layers.Count(); li++)
+                for (var li = 0; li < adt.texChunks[c].layers.Count(); li++)
                 {
                     if(adt.texChunks[c].alphaLayer != null){
                         alphalayermats.Add(BLPLoader.GenerateAlphaTexture(adt.texChunks[c].alphaLayer[li].layer));
@@ -167,8 +167,8 @@ namespace OBJExporterUI.Loaders
                 batch.scales = layerscales.ToArray();
                 batch.heightMaterialIDs = layerheights.ToArray();
 
-                int[] indices = indicelist.ToArray();
-                Vertex[] vertices = verticelist.ToArray();
+                var indices = indicelist.ToArray();
+                var vertices = verticelist.ToArray();
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, result.vertexBuffer);
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Count() * 12 * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
