@@ -40,8 +40,9 @@ Packages/*
 ADTdiff
 AreaAssignments
 BLPBatchConverter
-CascBot
+CASCBot
 CASCDump
+CASCBuilder
 EncodingDump
 DBCtest
 ListFileGenerator
@@ -53,6 +54,7 @@ SubMeshDump
 UltraDiffer3000
 WoWJsonDumper
 WoWOpenGL_SH
+WoWOpenGL
 
 # Don't include cached data files
 WoWOpenGL/Data/*
