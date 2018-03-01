@@ -25,8 +25,7 @@ namespace OBJExporterUI.Exporters.OBJ
             exportworker.ReportProgress(5, "Reading WMO..");
 
             var outdir = ConfigurationManager.AppSettings["outdir"];
-            WMOReader reader = new WMOReader();
-            reader.LoadWMO(file);
+            var wmo = new WMOReader().LoadWMO(file);
 
             System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
@@ -36,18 +35,18 @@ namespace OBJExporterUI.Exporters.OBJ
 
             uint totalVertices = 0;
 
-            var groups = new Structs.WMOGroup[reader.wmofile.group.Count()];
+            var groups = new Structs.WMOGroup[wmo.group.Count()];
 
-            for (var g = 0; g < reader.wmofile.group.Count(); g++)
+            for (var g = 0; g < wmo.group.Count(); g++)
             {
                 Console.WriteLine("Loading group #" + g);
-                if (reader.wmofile.group[g].mogp.vertices == null)
+                if (wmo.group[g].mogp.vertices == null)
                 { Console.WriteLine("Group has no vertices!"); continue; }
-                for (var i = 0; i < reader.wmofile.groupNames.Count(); i++)
+                for (var i = 0; i < wmo.groupNames.Count(); i++)
                 {
-                    if (reader.wmofile.group[g].mogp.nameOffset == reader.wmofile.groupNames[i].offset)
+                    if (wmo.group[g].mogp.nameOffset == wmo.groupNames[i].offset)
                     {
-                        groups[g].name = reader.wmofile.groupNames[i].name.Replace(" ", "_");
+                        groups[g].name = wmo.groupNames[i].name.Replace(" ", "_");
                     }
                 }
 
@@ -55,21 +54,21 @@ namespace OBJExporterUI.Exporters.OBJ
                 { Console.WriteLine("Group is antiportal"); continue; }
 
                 groups[g].verticeOffset = totalVertices;
-                groups[g].vertices = new Structs.Vertex[reader.wmofile.group[g].mogp.vertices.Count()];
+                groups[g].vertices = new Structs.Vertex[wmo.group[g].mogp.vertices.Count()];
 
-                for (var i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < wmo.group[g].mogp.vertices.Count(); i++)
                 {
-                    groups[g].vertices[i].Position = new Vector3(reader.wmofile.group[g].mogp.vertices[i].vector.X * -1, reader.wmofile.group[g].mogp.vertices[i].vector.Z, reader.wmofile.group[g].mogp.vertices[i].vector.Y);
-                    groups[g].vertices[i].Normal = new Vector3(reader.wmofile.group[g].mogp.normals[i].normal.X, reader.wmofile.group[g].mogp.normals[i].normal.Z, reader.wmofile.group[g].mogp.normals[i].normal.Y);
-                    groups[g].vertices[i].TexCoord = new Vector2(reader.wmofile.group[g].mogp.textureCoords[0][i].X, reader.wmofile.group[g].mogp.textureCoords[0][i].Y);
+                    groups[g].vertices[i].Position = new Vector3(wmo.group[g].mogp.vertices[i].vector.X * -1, wmo.group[g].mogp.vertices[i].vector.Z, wmo.group[g].mogp.vertices[i].vector.Y);
+                    groups[g].vertices[i].Normal = new Vector3(wmo.group[g].mogp.normals[i].normal.X, wmo.group[g].mogp.normals[i].normal.Z, wmo.group[g].mogp.normals[i].normal.Y);
+                    groups[g].vertices[i].TexCoord = new Vector2(wmo.group[g].mogp.textureCoords[0][i].X, wmo.group[g].mogp.textureCoords[0][i].Y);
                     totalVertices++;
                 }
 
                 var indicelist = new List<uint>();
 
-                for (var i = 0; i < reader.wmofile.group[g].mogp.indices.Count(); i++)
+                for (var i = 0; i < wmo.group[g].mogp.indices.Count(); i++)
                 {
-                    indicelist.Add(reader.wmofile.group[g].mogp.indices[i].indice);
+                    indicelist.Add(wmo.group[g].mogp.indices[i].indice);
                 }
 
                 groups[g].indices = indicelist.ToArray();
@@ -99,9 +98,9 @@ namespace OBJExporterUI.Exporters.OBJ
 
             doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationW;RotationX;RotationY;RotationZ;ScaleFactor;DoodadSet");
 
-            for (var i = 0; i < reader.wmofile.doodadSets.Count(); i++)
+            for (var i = 0; i < wmo.doodadSets.Count(); i++)
             {
-                var doodadSet = reader.wmofile.doodadSets[i];
+                var doodadSet = wmo.doodadSets[i];
 
                 var currentDoodadSetName = doodadSet.setName.Replace("Set_", "").Replace("SET_", "").Replace("$DefaultGlobal", "Default");
 
@@ -119,9 +118,9 @@ namespace OBJExporterUI.Exporters.OBJ
 
                 for (var j = doodadSet.firstInstanceIndex; j < (doodadSet.firstInstanceIndex + doodadSet.numDoodads); j++)
                 {
-                    foreach (var doodadNameEntry in reader.wmofile.doodadNames)
+                    foreach (var doodadNameEntry in wmo.doodadNames)
                     {
-                        var doodadDefinition = reader.wmofile.doodadDefinitions[j];
+                        var doodadDefinition = wmo.doodadDefinitions[j];
 
                         if (doodadNameEntry.startOffset == doodadDefinition.offset)
                         {
@@ -165,24 +164,24 @@ namespace OBJExporterUI.Exporters.OBJ
             var mtlsb = new StringBuilder();
             var textureID = 0;
 
-            if (reader.wmofile.materials == null)
+            if (wmo.materials == null)
             {
                 Console.WriteLine("Materials empty");
                 return;
             }
 
-            var materials = new Structs.Material[reader.wmofile.materials.Count()];
-            for (var i = 0; i < reader.wmofile.materials.Count(); i++)
+            var materials = new Structs.Material[wmo.materials.Count()];
+            for (var i = 0; i < wmo.materials.Count(); i++)
             {
-                for (var ti = 0; ti < reader.wmofile.textures.Count(); ti++)
+                for (var ti = 0; ti < wmo.textures.Count(); ti++)
                 {
-                    if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
+                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
                     {
-                        //materials[i].textureID = BLPLoader.LoadTexture(reader.wmofile.textures[ti].filename, cache);
+                        //materials[i].textureID = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
                         materials[i].textureID = textureID + i;
-                        materials[i].filename = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename);
+                        materials[i].filename = Path.GetFileNameWithoutExtension(wmo.textures[ti].filename);
 
-                        if (reader.wmofile.materials[i].blendMode == 0)
+                        if (wmo.materials[i].blendMode == 0)
                         {
                             materials[i].transparent = false;
                         }
@@ -195,7 +194,7 @@ namespace OBJExporterUI.Exporters.OBJ
                         {
                             var blpreader = new BLPReader();
 
-                            blpreader.LoadBLP(reader.wmofile.textures[ti].filename);
+                            blpreader.LoadBLP(wmo.textures[ti].filename);
 
                             try
                             {
@@ -251,22 +250,22 @@ namespace OBJExporterUI.Exporters.OBJ
 
             var numRenderbatches = 0;
             //Get total amount of render batches
-            for (var i = 0; i < reader.wmofile.group.Count(); i++)
+            for (var i = 0; i < wmo.group.Count(); i++)
             {
-                if (reader.wmofile.group[i].mogp.renderBatches == null)
+                if (wmo.group[i].mogp.renderBatches == null)
                 {
                     continue;
                 }
-                numRenderbatches = numRenderbatches + reader.wmofile.group[i].mogp.renderBatches.Count();
+                numRenderbatches = numRenderbatches + wmo.group[i].mogp.renderBatches.Count();
             }
 
 
             var rb = 0;
-            for (var g = 0; g < reader.wmofile.group.Count(); g++)
+            for (var g = 0; g < wmo.group.Count(); g++)
             {
                 groups[g].renderBatches = new Structs.RenderBatch[numRenderbatches];
 
-                var group = reader.wmofile.group[g];
+                var group = wmo.group[g];
                 if (group.mogp.renderBatches == null)
                 {
                     continue;
@@ -287,7 +286,7 @@ namespace OBJExporterUI.Exporters.OBJ
                     {
                         groups[g].renderBatches[rb].materialID = batch.materialID;
                     }
-                    groups[g].renderBatches[rb].blendType = reader.wmofile.materials[batch.materialID].blendMode;
+                    groups[g].renderBatches[rb].blendType = wmo.materials[batch.materialID].blendMode;
                     groups[g].renderBatches[rb].groupID = (uint)g;
                     rb++;
                 }

@@ -10,10 +10,10 @@ namespace WoWFormatLib.FileReaders
 {
     public class WMOReader
     {
-        public WMO wmofile;
+        private WMO wmofile;
         private byte lodLevel;
 
-        public void LoadWMO(int filedataid, byte lod = 0)
+        public WMO LoadWMO(int filedataid, byte lod = 0)
         {
             lodLevel = lod;
 
@@ -28,9 +28,11 @@ namespace WoWFormatLib.FileReaders
             {
                 throw new FileNotFoundException("File " + filedataid + " was not found");
             }
+
+            return wmofile;
         }
 
-        public void LoadWMO(string filename, byte lod = 0)
+        public WMO LoadWMO(string filename, byte lod = 0)
         {
             lodLevel = lod;
 
@@ -45,6 +47,8 @@ namespace WoWFormatLib.FileReaders
             {
                 throw new FileNotFoundException("File " + filename + " was not found");
             }
+
+            return wmofile;
         }
 
         /* PARENT */

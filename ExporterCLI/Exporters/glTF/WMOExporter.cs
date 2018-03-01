@@ -14,14 +14,14 @@ namespace ExporterCLI.Exporters.glTF
         {
             Console.WriteLine("WMO glTF Exporter: Loading file {0}...", file);
 
-            var reader = new WMOReader();
-            if(filedataid != 0)
+            var wmo = new WoWFormatLib.Structs.WMO.WMO();
+            if (filedataid != 0)
             {
-                reader.LoadWMO(filedataid);
+                wmo = new WMOReader().LoadWMO(filedataid);
             }
             else
             {
-                reader.LoadWMO(file);
+                wmo = new WMOReader().LoadWMO(filedataid);
             }
 
             file = file.Replace("\\", "/");
@@ -49,7 +49,7 @@ namespace ExporterCLI.Exporters.glTF
                 }
             };
 
-            var groups = new Structs.WMOGroup[reader.wmofile.group.Count()];
+            var groups = new Structs.WMOGroup[wmo.group.Count()];
             FileStream stream;
 
             if (destinationOverride == null)
@@ -67,19 +67,22 @@ namespace ExporterCLI.Exporters.glTF
             var accessorInfo = new List<Accessor>();
             var meshes = new List<Mesh>();
 
-            for (var g = 0; g < reader.wmofile.group.Count(); g++)
+            for (var g = 0; g < wmo.group.Count(); g++)
             {
-                if (reader.wmofile.group[g].mogp.vertices == null) { Console.WriteLine("Group has no vertices!");  continue; }
-                if (reader.wmofile.group[g].mogp.renderBatches == null) { Console.WriteLine("Group has no renderbatches!"); continue; }
-                for (var i = 0; i < reader.wmofile.groupNames.Count(); i++)
+                if (wmo.group[g].mogp.vertices == null)
+                { Console.WriteLine("Group has no vertices!"); continue; }
+                if (wmo.group[g].mogp.renderBatches == null)
+                { Console.WriteLine("Group has no renderbatches!"); continue; }
+                for (var i = 0; i < wmo.groupNames.Count(); i++)
                 {
-                    if (reader.wmofile.group[g].mogp.nameOffset == reader.wmofile.groupNames[i].offset)
+                    if (wmo.group[g].mogp.nameOffset == wmo.groupNames[i].offset)
                     {
-                        groups[g].name = reader.wmofile.groupNames[i].name.Replace(" ", "_");
+                        groups[g].name = wmo.groupNames[i].name.Replace(" ", "_");
                     }
                 }
 
-                if (groups[g].name == "antiportal") { Console.WriteLine("Group is antiportal"); continue; }
+                if (groups[g].name == "antiportal")
+                { Console.WriteLine("Group is antiportal"); continue; }
 
                 // Position bufferview
                 var vPosBuffer = new BufferView()
@@ -97,19 +100,25 @@ namespace ExporterCLI.Exporters.glTF
                 var maxPosY = float.MinValue;
                 var maxPosZ = float.MinValue;
 
-                for (var i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < wmo.group[g].mogp.vertices.Count(); i++)
                 {
-                    writer.Write(reader.wmofile.group[g].mogp.vertices[i].vector.X * -1);
-                    writer.Write(reader.wmofile.group[g].mogp.vertices[i].vector.Z);
-                    writer.Write(reader.wmofile.group[g].mogp.vertices[i].vector.Y);
+                    writer.Write(wmo.group[g].mogp.vertices[i].vector.X * -1);
+                    writer.Write(wmo.group[g].mogp.vertices[i].vector.Z);
+                    writer.Write(wmo.group[g].mogp.vertices[i].vector.Y);
 
-                    if (reader.wmofile.group[g].mogp.vertices[i].vector.X * -1 < minPosX) minPosX = reader.wmofile.group[g].mogp.vertices[i].vector.X * -1;
-                    if (reader.wmofile.group[g].mogp.vertices[i].vector.Z < minPosY) minPosY = reader.wmofile.group[g].mogp.vertices[i].vector.Z;
-                    if (reader.wmofile.group[g].mogp.vertices[i].vector.Y < minPosZ) minPosZ = reader.wmofile.group[g].mogp.vertices[i].vector.Y;
+                    if (wmo.group[g].mogp.vertices[i].vector.X * -1 < minPosX)
+                        minPosX = wmo.group[g].mogp.vertices[i].vector.X * -1;
+                    if (wmo.group[g].mogp.vertices[i].vector.Z < minPosY)
+                        minPosY = wmo.group[g].mogp.vertices[i].vector.Z;
+                    if (wmo.group[g].mogp.vertices[i].vector.Y < minPosZ)
+                        minPosZ = wmo.group[g].mogp.vertices[i].vector.Y;
 
-                    if (reader.wmofile.group[g].mogp.vertices[i].vector.X * -1 > maxPosX) maxPosX = reader.wmofile.group[g].mogp.vertices[i].vector.X * -1;
-                    if (reader.wmofile.group[g].mogp.vertices[i].vector.Z > maxPosY) maxPosY = reader.wmofile.group[g].mogp.vertices[i].vector.Z;
-                    if (reader.wmofile.group[g].mogp.vertices[i].vector.Y > maxPosZ) maxPosZ = reader.wmofile.group[g].mogp.vertices[i].vector.Y;
+                    if (wmo.group[g].mogp.vertices[i].vector.X * -1 > maxPosX)
+                        maxPosX = wmo.group[g].mogp.vertices[i].vector.X * -1;
+                    if (wmo.group[g].mogp.vertices[i].vector.Z > maxPosY)
+                        maxPosY = wmo.group[g].mogp.vertices[i].vector.Z;
+                    if (wmo.group[g].mogp.vertices[i].vector.Y > maxPosZ)
+                        maxPosZ = wmo.group[g].mogp.vertices[i].vector.Y;
                 }
 
                 vPosBuffer.byteLength = (uint)writer.BaseStream.Position - vPosBuffer.byteOffset;
@@ -122,10 +131,10 @@ namespace ExporterCLI.Exporters.glTF
                     bufferView = bufferViews.Count(),
                     byteOffset = 0,
                     componentType = 5126,
-                    count = (uint)reader.wmofile.group[g].mogp.vertices.Count(),
+                    count = (uint)wmo.group[g].mogp.vertices.Count(),
                     type = "VEC3",
                     min = new float[] { minPosX, minPosY, minPosZ },
-                    max = new float[] { maxPosX, maxPosY, maxPosZ}
+                    max = new float[] { maxPosX, maxPosY, maxPosZ }
                 });
 
                 bufferViews.Add(vPosBuffer);
@@ -138,11 +147,11 @@ namespace ExporterCLI.Exporters.glTF
                     target = 34962
                 };
 
-                for (var i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < wmo.group[g].mogp.vertices.Count(); i++)
                 {
-                    writer.Write(reader.wmofile.group[g].mogp.normals[i].normal.X);
-                    writer.Write(reader.wmofile.group[g].mogp.normals[i].normal.Z);
-                    writer.Write(reader.wmofile.group[g].mogp.normals[i].normal.Y);
+                    writer.Write(wmo.group[g].mogp.normals[i].normal.X);
+                    writer.Write(wmo.group[g].mogp.normals[i].normal.Z);
+                    writer.Write(wmo.group[g].mogp.normals[i].normal.Y);
                 }
 
                 normalBuffer.byteLength = (uint)writer.BaseStream.Position - normalBuffer.byteOffset;
@@ -155,7 +164,7 @@ namespace ExporterCLI.Exporters.glTF
                     bufferView = bufferViews.Count(),
                     byteOffset = 0,
                     componentType = 5126,
-                    count = (uint)reader.wmofile.group[g].mogp.vertices.Count(),
+                    count = (uint)wmo.group[g].mogp.vertices.Count(),
                     type = "VEC3"
                 });
 
@@ -169,10 +178,10 @@ namespace ExporterCLI.Exporters.glTF
                     target = 34962
                 };
 
-                for (var i = 0; i < reader.wmofile.group[g].mogp.vertices.Count(); i++)
+                for (var i = 0; i < wmo.group[g].mogp.vertices.Count(); i++)
                 {
-                    writer.Write(reader.wmofile.group[g].mogp.textureCoords[0][i].X);
-                    writer.Write(reader.wmofile.group[g].mogp.textureCoords[0][i].Y);
+                    writer.Write(wmo.group[g].mogp.textureCoords[0][i].X);
+                    writer.Write(wmo.group[g].mogp.textureCoords[0][i].Y);
                 }
 
                 texCoordBuffer.byteLength = (uint)writer.BaseStream.Position - texCoordBuffer.byteOffset;
@@ -185,7 +194,7 @@ namespace ExporterCLI.Exporters.glTF
                     bufferView = bufferViews.Count(),
                     byteOffset = 0,
                     componentType = 5126,
-                    count = (uint)reader.wmofile.group[g].mogp.vertices.Count(),
+                    count = (uint)wmo.group[g].mogp.vertices.Count(),
                     type = "VEC2"
                 });
 
@@ -193,9 +202,9 @@ namespace ExporterCLI.Exporters.glTF
 
                 var indexBufferPos = bufferViews.Count();
 
-                for (var i = 0; i < reader.wmofile.group[g].mogp.renderBatches.Count(); i++)
+                for (var i = 0; i < wmo.group[g].mogp.renderBatches.Count(); i++)
                 {
-                    var batch = reader.wmofile.group[g].mogp.renderBatches[i];
+                    var batch = wmo.group[g].mogp.renderBatches[i];
 
                     accessorInfo.Add(new Accessor()
                     {
@@ -240,16 +249,16 @@ namespace ExporterCLI.Exporters.glTF
                     target = 34963
                 };
 
-                for (var i = 0; i < reader.wmofile.group[g].mogp.indices.Count(); i++)
+                for (var i = 0; i < wmo.group[g].mogp.indices.Count(); i++)
                 {
-                    writer.Write(reader.wmofile.group[g].mogp.indices[i].indice);
+                    writer.Write(wmo.group[g].mogp.indices[i].indice);
                 }
 
                 indiceBuffer.byteLength = (uint)writer.BaseStream.Position - indiceBuffer.byteOffset;
 
                 bufferViews.Add(indiceBuffer);
 
-                if((indiceBuffer.byteOffset + indiceBuffer.byteLength) % 4 != 0)
+                if ((indiceBuffer.byteOffset + indiceBuffer.byteLength) % 4 != 0)
                 {
                     writer.Write((short)0);
                 }
@@ -265,9 +274,10 @@ namespace ExporterCLI.Exporters.glTF
             writer.Close();
             writer.Dispose();
 
-            if (reader.wmofile.materials == null) { Console.WriteLine("WMO glTF exporter: Materials empty"); return; }
+            if (wmo.materials == null)
+            { Console.WriteLine("WMO glTF exporter: Materials empty"); return; }
 
-            var materialCount = reader.wmofile.materials.Count();
+            var materialCount = wmo.materials.Count();
 
             glTF.images = new Image[materialCount];
             glTF.textures = new Texture[materialCount];
@@ -275,11 +285,11 @@ namespace ExporterCLI.Exporters.glTF
 
             for (var i = 0; i < materialCount; i++)
             {
-                for (var ti = 0; ti < reader.wmofile.textures.Count(); ti++)
+                for (var ti = 0; ti < wmo.textures.Count(); ti++)
                 {
-                    if (reader.wmofile.textures[ti].startOffset == reader.wmofile.materials[i].texture1)
+                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
                     {
-                        var textureFilename = Path.GetFileNameWithoutExtension(reader.wmofile.textures[ti].filename.Replace("\\", "/")).ToLower();
+                        var textureFilename = Path.GetFileNameWithoutExtension(wmo.textures[ti].filename.Replace("\\", "/")).ToLower();
                         Console.WriteLine(textureFilename);
                         glTF.images[i].uri = textureFilename + ".png";
 
@@ -293,7 +303,7 @@ namespace ExporterCLI.Exporters.glTF
                         glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
                         glTF.materials[i].doubleSided = true;
 
-                        switch (reader.wmofile.materials[i].blendMode)
+                        switch (wmo.materials[i].blendMode)
                         {
                             case 0:
                                 glTF.materials[i].alphaMode = "OPAQUE";
@@ -315,7 +325,7 @@ namespace ExporterCLI.Exporters.glTF
 
                         var saveLocation = "";
 
-                        if(destinationOverride == null)
+                        if (destinationOverride == null)
                         {
                             saveLocation = Path.Combine(outdir, textureFilename + ".blp");
                         }
@@ -326,7 +336,7 @@ namespace ExporterCLI.Exporters.glTF
 
                         if (!File.Exists(Path.GetFileNameWithoutExtension(saveLocation) + "png")) // Check if already exported & converted version exists
                         {
-                            using (var cascFile = CASC.cascHandler.OpenFile(reader.wmofile.textures[ti].filename))
+                            using (var cascFile = CASC.cascHandler.OpenFile(wmo.textures[ti].filename))
                             using (var cascStream = new MemoryStream())
                             {
                                 cascFile.CopyTo(cascStream);
@@ -349,7 +359,7 @@ namespace ExporterCLI.Exporters.glTF
 
             glTF.nodes = new Node[meshes.Count()];
             var meshIDs = new List<int>();
-            for(var i = 0; i < meshes.Count(); i++)
+            for (var i = 0; i < meshes.Count(); i++)
             {
                 glTF.nodes[i].name = meshes[i].name;
                 glTF.nodes[i].mesh = i;
@@ -363,11 +373,11 @@ namespace ExporterCLI.Exporters.glTF
             glTF.scene = 0;
 
             var currentDoodadSetName = "";
-            for (var i = 0; i < reader.wmofile.doodadDefinitions.Count(); i++)
+            for (var i = 0; i < wmo.doodadDefinitions.Count(); i++)
             {
-                var doodadDefinition = reader.wmofile.doodadDefinitions[i];
+                var doodadDefinition = wmo.doodadDefinitions[i];
 
-                foreach (var doodadSet in reader.wmofile.doodadSets)
+                foreach (var doodadSet in wmo.doodadSets)
                 {
                     if (doodadSet.firstInstanceIndex == i)
                     {
@@ -376,7 +386,7 @@ namespace ExporterCLI.Exporters.glTF
                     }
                 }
 
-                foreach (var doodadNameEntry in reader.wmofile.doodadNames)
+                foreach (var doodadNameEntry in wmo.doodadNames)
                 {
                     if (doodadNameEntry.startOffset == doodadDefinition.offset)
                     {
@@ -388,7 +398,7 @@ namespace ExporterCLI.Exporters.glTF
                             }
                             else
                             {
-                               //M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
+                                //M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
                             }
                         }
                     }
