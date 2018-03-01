@@ -119,7 +119,7 @@ namespace WoWFormatLib.FileReaders
 
             var groupFiles = new WMOGroupFile[wmofile.header.nGroups];
 
-            if((lodLevel + 1) > wmofile.header.nLod)
+            if(wmofile.header.nLod != 0 && (lodLevel + 1) > wmofile.header.nLod)
             {
                 throw new Exception("Requested LOD (" + lodLevel + ") exceeds the max LOD for this WMO (" + (wmofile.header.nLod - 1) + ")");
             }
