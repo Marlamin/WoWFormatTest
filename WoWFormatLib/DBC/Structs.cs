@@ -1,4 +1,4 @@
-﻿using DBFilesClient.NET;
+﻿using DBFilesClient2.NET.Attributes;
 
 namespace WoWFormatLib.DBC
 {
@@ -79,27 +79,31 @@ namespace WoWFormatLib.DBC
 
     public sealed class MapEntry
     {
-        public string Directory;
-        public string MapName;
-        public string DescriptionHorde;
-        public string DescriptionAlliance;
-        public string PvpObjective;
-        public string PvpDescription;
-        public uint[] Flags;
-        public float MinimapIconScale;
-        public float[] CorpseXY;
-        public short AreaTableID;
-        public short LoadingScreenID;
-        public short CorpseMapID;
-        public short TimeOfDayOverride;
-        public short ParentMapID;
-        public short CosmeticParentMapID;
-        public short WindSettingsID;
-        public byte InstanceType;
-        public byte MapType;
-        public byte ExpansionID;
-        public byte MaxPlayers;
-        public byte TimeOffset;
+        [Index]
+        public int ID { get; set; }
+        public string Directory { get; set; }
+        public string Name { get; set; }
+        public string HordeDescription { get; set; }
+        public string AllianceDescription { get; set; }
+        public string PvpObjective { get; set; }
+        public string PvpDescription { get; set; }
+        [StoragePresence(StoragePresence.Include, SizeConst = 2)]
+        public int[] Flags { get; set; }
+        public float MinimapIconScale { get; set; }
+        [StoragePresence(StoragePresence.Include, SizeConst = 2)]
+        public float[] CorpseCoordinates { get; set; }
+        public ushort AreaTableID { get; set; }
+        public short LoadingScreenID { get; set; }
+        public short CorpseMapID { get; set; }
+        public short TimeOfDayOverride { get; set; }
+        public short ParentMapID { get; set; }
+        public short CosmeticParentMapID { get; set; }
+        public short WindSettingsID { get; set; }
+        public byte InstanceType { get; set; }
+        public byte MapType { get; set; }
+        public byte ExpansionID { get; set; }
+        public byte MaxPlayers { get; set; }
+        public byte TimeOffset { get; set; }
     }
 
     public sealed class ModelFileDataEntry

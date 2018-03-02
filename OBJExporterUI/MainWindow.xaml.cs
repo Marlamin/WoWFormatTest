@@ -902,7 +902,7 @@ namespace OBJExporterUI
             try
             {
                 CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2").ExtractToFile("DBFilesClient", "Map.db2");
-                var mapsData = new DBFilesClient.NET.Storage<MapEntry>(@"DBFilesClient/Map.db2");
+                var mapsData = new DBFilesClient2.NET.Storage<int, MapEntry>(@"DBFilesClient/Map.db2", DBFilesClient2.NET.StorageOptions.Default);
 
                 foreach (var mapEntry in mapsData)
                 {
@@ -924,12 +924,13 @@ namespace OBJExporterUI
                         }
                         else
                         {
-                            mapItem.Name = mapEntry.Value.MapName;
-                            mapItem.Type = "UNKNOWN";
-                            mapItem.Image = "pack://application:,,,/Resources/wow7.png";
+                            mapItem.Name = mapEntry.Value.Name;
+                            mapItem.Type = "Unknown";
+                            mapItem.Image = "pack://application:,,,/Resources/wow" + (mapEntry.Value.ExpansionID + 1) +".png";
+                            
                         }
 
-                        if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.Directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.MapName.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                        if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.Directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.Name.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
                         {
                             mapListBox.Items.Add(mapItem);
                         }
