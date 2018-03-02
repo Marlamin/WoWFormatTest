@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CASCLib;
-using System.IO;
-using WoWFormatLib.DBC;
 
 namespace WoWFormatLib.Utils
 {
@@ -23,7 +18,7 @@ namespace WoWFormatLib.Utils
             
             if (basedir == null)
             {
-                CASCConfig config = CASCConfig.LoadOnlineStorageConfig(program, "us", true);
+                var config = CASCConfig.LoadOnlineStorageConfig(program, "us", true);
 
                 Console.WriteLine("Initializing CASC from web with program " + program + " and build " + config.BuildName);
                 cascHandler = CASCHandler.OpenStorage(config, worker);

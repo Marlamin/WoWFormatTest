@@ -64,6 +64,7 @@
     <Compile Include="Structs\BLS.struct.cs" />
     <Compile Include="Structs\M2.struct.cs" />
     <Compile Include="Structs\SKIN.struct.cs" />
+    <Compile Include="Structs\TEX.struct.cs" />
     <Compile Include="Structs\WDL.struct.cs" />
     <Compile Include="Structs\WDT.struct.cs" />
     <Compile Include="Structs\WMO.struct.cs" />
