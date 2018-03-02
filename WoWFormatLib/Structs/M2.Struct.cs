@@ -3,6 +3,24 @@ using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.Structs.M2
 {
+    public enum M2Chunks
+    {
+        MD21 = 'M' << 0 | 'D' << 8 | '2' << 16 | '1' << 24,
+        MD20 = 'M' << 0 | 'D' << 8 | '2' << 16 | '0' << 24,
+        AFID = 'A' << 0 | 'F' << 8 | 'I' << 16 | 'D' << 24,
+        BFID = 'B' << 0 | 'F' << 8 | 'I' << 16 | 'D' << 24,
+        SFID = 'S' << 0 | 'F' << 8 | 'I' << 16 | 'D' << 24,
+        PFID = 'P' << 0 | 'F' << 8 | 'I' << 16 | 'D' << 24,
+        SKID = 'S' << 0 | 'K' << 8 | 'I' << 16 | 'D' << 24,
+        TXAC = 'T' << 0 | 'X' << 8 | 'A' << 16 | 'C' << 24,
+        EXPT = 'E' << 0 | 'X' << 8 | 'P' << 16 | 'T' << 24,
+        EXP2 = 'E' << 0 | 'X' << 8 | 'P' << 16 | '2' << 24,
+        PABC = 'P' << 0 | 'A' << 8 | 'B' << 16 | 'C' << 24,
+        PADC = 'P' << 0 | 'A' << 8 | 'D' << 16 | 'C' << 24,
+        PEDC = 'P' << 0 | 'E' << 8 | 'D' << 16 | 'C' << 24,
+        PSBC = 'P' << 0 | 'S' << 8 | 'B' << 16 | 'C' << 24,
+    }
+
     public struct M2Model
     {
         public uint version;

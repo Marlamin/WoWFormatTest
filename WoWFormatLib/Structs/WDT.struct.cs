@@ -1,14 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WoWFormatLib.Structs.WDT
 {
+    public enum WDTChunks
+    {
+        MVER = 'M' << 24 | 'V' << 16 | 'E' << 8 | 'R' << 0,
+        MAIN = 'M' << 24 | 'A' << 16 | 'I' << 8 | 'N' << 0,
+        MWMO = 'M' << 24 | 'W' << 16 | 'M' << 8 | 'O' << 0,
+        MPHD = 'M' << 24 | 'P' << 16 | 'H' << 8 | 'D' << 0,
+        MPLT = 'M' << 24 | 'P' << 16 | 'L' << 8 | 'T' << 0,
+        MODF = 'M' << 24 | 'O' << 16 | 'D' << 8 | 'F' << 0,
+    }
+
     public struct WDT
     {
-        // public MWMO mwno; //WMO filenames (zero terminated)
         public MPHD mphd;
     }
 

@@ -61,59 +61,59 @@ namespace WoWFormatLib.FileReaders
                 {
                     wmo.Position = position;
 
-                    var chunkName = bin.ReadUInt32();
+                    var chunkName = (WMOChunks)bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
 
                     position = wmo.Position + chunkSize;
 
                     switch (chunkName)
                     {
-                        case 0x4D564552:
+                        case WMOChunks.MVER:
                             wmofile.version = bin.Read<MVER>();
                             if (wmofile.version.version != 17)
                             {
                                 throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ") (" + filedataid + ")");
                             }
                             break;
-                        case 0x4D4F4844:
+                        case WMOChunks.MOHD:
                             wmofile.header = bin.Read<MOHD>();
                             break;
-                        case 0x4D4F5458:
+                        case WMOChunks.MOTX:
                             wmofile.textures = ReadMOTXChunk(chunkSize, bin);
                             break;
-                        case 0x4D4F4D54:
+                        case WMOChunks.MOMT:
                             wmofile.materials = ReadMOMTChunk(chunkSize, bin);
                             break;
-                        case 0x4D4F474E:
+                        case WMOChunks.MOGN:
                             wmofile.groupNames = ReadMOGNChunk(chunkSize, bin);
                             break;
-                        case 0x4D4F4749:
+                        case WMOChunks.MOGI:
                             wmofile.groupInfo = ReadMOGIChunk(chunkSize, bin);
                             break;
-                        case 0x4D4F4453:
+                        case WMOChunks.MODS:
                             wmofile.doodadSets = ReadMODSChunk(chunkSize, bin);
                             break;
-                        case 0x4D4F444E:
+                        case WMOChunks.MODN:
                             wmofile.doodadNames = ReadMODNChunk(chunkSize, bin);
                             break;
-                        case 0x4D4F4444:
+                        case WMOChunks.MODD:
                             wmofile.doodadDefinitions = ReadMODDChunk(chunkSize, bin);
                             break;
-                        case 0x4D4F5342:
+                        case WMOChunks.MOSB:
                             wmofile.skybox = ReadMOSBChunk(chunkSize, bin);
                             break;
-                        case 0x47464944:
+                        case WMOChunks.GFID:
                             wmofile.groupFileDataIDs = ReadGFIDChunk(chunkSize, bin);
                             break;
-                        case 0x4D4F5056: // MOPV Portal Vertices
-                        case 0x4D4F5052: // MOPR Portal References
-                        case 0x4D4F5054: // MOPT Portal Information
-                        case 0x4D4F5656: // MOVV Visible block vertices
-                        case 0x4D4F5642: // MOVB Visible block list
-                        case 0x4D4F4C54: // MOLT Lighting Information
-                        case 0x4D464F47: // MFOG Fog Information
-                        case 0x4D435650: // MCVP Convex Volume Planes
-                        case 0x4D4F5556: // MOUV Animated texture UVs
+                        case WMOChunks.MOPV: // MOPV Portal Vertices
+                        case WMOChunks.MOPR: // MOPR Portal References
+                        case WMOChunks.MOPT: // MOPT Portal Information
+                        case WMOChunks.MOVV: // MOVV Visible block vertices
+                        case WMOChunks.MOVB: // MOVB Visible block list
+                        case WMOChunks.MOLT: // MOLT Lighting Information
+                        case WMOChunks.MFOG: // MFOG Fog Information
+                        case WMOChunks.MCVP: // MCVP Convex Volume Planes
+                        case WMOChunks.MOUV: // MOUV Animated texture UVs
                             break;
                         default:
                             throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName.ToString("X"), position.ToString(), filedataid));
@@ -144,7 +144,7 @@ namespace WoWFormatLib.FileReaders
                     groupFileDataID = wmofile.groupFileDataIDs[i + (wmofile.header.nGroups * 1)];
                 }
 
-                if (lodLevel > 1 && groupFileDataID == 0) // if lod is 1 or higher check if lod1 available, fall back to lod0
+                if (lodLevel >= 1 && groupFileDataID == 0) // if lod is 1 or higher check if lod1 available, fall back to lod0
                 {
                     groupFileDataID = wmofile.groupFileDataIDs[i];
                 }
@@ -345,20 +345,20 @@ namespace WoWFormatLib.FileReaders
                 while (position < wmo.Length)
                 {
                     wmo.Position = position;
-                    var chunkName = bin.ReadUInt32();
+                    var chunkName = (WMOChunks)bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
                     position = wmo.Position + chunkSize;
 
                     switch (chunkName)
                     {
-                        case 0x4D564552:
+                        case WMOChunks.MVER:
                             groupFile.version = bin.Read<MVER>();
                             if (wmofile.version.version != 17)
                             {
                                 throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
                             }
                             continue;
-                        case 0x4D4F4750:
+                        case WMOChunks.MOGP:
                             groupFile.mogp = ReadMOGPChunk(chunkSize, bin);
                             continue;
                         default:
@@ -409,44 +409,44 @@ namespace WoWFormatLib.FileReaders
                 {
                     stream.Position = position;
 
-                    var subChunkName = subbin.ReadUInt32();
+                    var subChunkName = (WMOChunks)subbin.ReadUInt32();
                     var subChunkSize = subbin.ReadUInt32();
 
                     position = stream.Position + subChunkSize;
 
                     switch (subChunkName)
                     {
-                        case 0x4D4F5649: // MOVI Vertex indices for triangles
+                        case WMOChunks.MOVI: // MOVI Vertex indices for triangles
                             mogp.indices = ReadMOVIChunk(subChunkSize, subbin);
                             break;
-                        case 0x4D4F5654: // MOVT Vertices chunk
+                        case WMOChunks.MOVT: // MOVT Vertices chunk
                             mogp.vertices = ReadMOVTChunk(subChunkSize, subbin);
                             break;
-                        case 0x4D4F5456: // MOTV Texture coordinates
+                        case WMOChunks.MOTV: // MOTV Texture coordinates
                             mogp.textureCoords[MOTVi++] = ReadMOTVChunk(subChunkSize, subbin);
                             break;
-                        case 0x4D4F4E52: // MONR Normals
+                        case WMOChunks.MONR: // MONR Normals
                             mogp.normals = ReadMONRChunk(subChunkSize, subbin);
                             break;
-                        case 0x4D4F4241: // MOBA Render batches
+                        case WMOChunks.MOBA: // MOBA Render batches
                             mogp.renderBatches = ReadMOBAChunk(subChunkSize, subbin);
                             break;
-                        case 0x4D4F5059: // MOPY Material info for triangles, two bytes per triangle.
+                        case WMOChunks.MOPY: // MOPY Material info for triangles, two bytes per triangle.
                             mogp.materialInfo = ReadMOPYChunk(subChunkSize, subbin);
                             break;
-                        case 0x4D4F4253: // MOBS Unk
-                        case 0x4D4F4452: // MODR Doodad references
-                        case 0x4D4F424E: // MOBN Array of t_BSP_NODE
-                        case 0x4D4F4252: // MOBR Face indices
-                        case 0x4D4F4C52: // MOLR Light references
-                        case 0x4D4F4356: // MOCV Vertex colors
-                        case 0x4D44414C: // MDAL Unk (new in WoD)
-                        case 0x4D4C4951: // MLIQ Liquids
-                        case 0x4D4F5441: // MOTA Tangent Array
-                        case 0x4D4F504C: // MOPL Terrain Cutting PLanes
-                        case 0x4D4F4C50: // MOLP Points Lights
-                        case 0x4D4F4C53: // MOLS Spot Lights
-                        case 0x4D4F5042: // MOPB Prepass Batches
+                        case WMOChunks.MOBS: // MOBS Unk
+                        case WMOChunks.MODR: // MODR Doodad references
+                        case WMOChunks.MOBN: // MOBN Array of t_BSP_NODE
+                        case WMOChunks.MOBR: // MOBR Face indices
+                        case WMOChunks.MOLR: // MOLR Light references
+                        case WMOChunks.MOCV: // MOCV Vertex colors
+                        case WMOChunks.MDAL: // MDAL Unk (new in WoD)
+                        case WMOChunks.MLIQ: // MLIQ Liquids
+                        case WMOChunks.MOTA: // MOTA Tangent Array
+                        case WMOChunks.MOPL: // MOPL Terrain Cutting PLanes
+                        case WMOChunks.MOLP: // MOLP Points Lights
+                        case WMOChunks.MOLS: // MOLS Spot Lights
+                        case WMOChunks.MOPB: // MOPB Prepass Batches
                             continue;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName.ToString("X"), position.ToString()));

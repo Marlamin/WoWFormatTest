@@ -20,43 +20,43 @@ namespace WoWFormatLib.FileReaders
                 {
                     adt.Position = position;
 
-                    var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                    var chunkName = (ADTChunks)bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
 
                     position = adt.Position + chunkSize;
 
                     switch (chunkName)
                     {
-                        case "MVER":
+                        case ADTChunks.MVER:
                             break;
-                        case "MLHD": // Header
+                        case ADTChunks.MLHD: // Header
                             break;
-                        case "MLVH": // Vertex Heights
+                        case ADTChunks.MLVH: // Vertex Heights
                             lodadt.heights = ReadMLVHChunk(chunkSize, bin);
                             break;
-                        case "MLVI": // Vertex Indices
+                        case ADTChunks.MLVI: // Vertex Indices
                             lodadt.indices = ReadMLVIChunk(chunkSize, bin);
                             break;
-                        case "MLLL": // LOD Levels
+                        case ADTChunks.MLLL: // LOD Levels
                             lodadt.lodLevels = ReadMLLLChunk(chunkSize, bin);
                             break;
-                        case "MLND": // Quad tree stuff (?)
+                        case ADTChunks.MLND: // Quad tree stuff (?)
                             lodadt.quadTree = ReadMLNDChunk(chunkSize, bin);
                             break;
-                        case "MLSI": // "Skirt" indices (?)
+                        case ADTChunks.MLSI: // "Skirt" indices (?)
                             lodadt.skirtIndices = ReadMLSIChunk(chunkSize, bin);
                             break;
                         /* Model.blob */
-                        case "MBMH":
-                        case "MBBB":
-                        case "MBMI":
-                        case "MBNV":
-                        case "MBMB":
+                        case ADTChunks.MBMH:
+                        case ADTChunks.MBBB:
+                        case ADTChunks.MBMI:
+                        case ADTChunks.MBNV:
+                        case ADTChunks.MBMB:
                         /* Liquids */
-                        case "MLLD":
-                        case "MLLN":
-                        case "MLLI":
-                        case "MLLV":
+                        case ADTChunks.MLLD:
+                        case ADTChunks.MLLN:
+                        case ADTChunks.MLLI:
+                        case ADTChunks.MLLV:
                             break;
                         default:
                             throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position, filename));

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
+using WoWFormatLib.Structs.ANIM;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -22,16 +22,16 @@ namespace WoWFormatLib.FileReaders
                 {
                     bin.BaseStream.Position = position;
 
-                    var chunkName = new string(bin.ReadChars(4).ToArray());
+                    var chunkName = (ANIMChunks)bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
 
                     position = bin.BaseStream.Position + chunkSize;
 
                     switch (chunkName)
                     {
-                        case "AFM2":
-                        case "AFSA":
-                        case "AFSB":
+                        case ANIMChunks.AFM2:
+                        case ANIMChunks.AFSA:
+                        case ANIMChunks.AFSB:
                             break;
                         default:
                             throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position, fileDataID));

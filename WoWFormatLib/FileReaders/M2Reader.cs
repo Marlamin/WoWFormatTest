@@ -38,61 +38,61 @@ namespace WoWFormatLib.FileReaders
             {
                 m2.Position = position;
 
-                var chunkName = new string(bin.ReadChars(4));
+                var chunkName = (M2Chunks)bin.ReadUInt32();
                 var chunkSize = bin.ReadUInt32();
 
                 position = m2.Position + chunkSize;
 
                 switch (chunkName)
                 {
-                    case "MD21":
+                    case M2Chunks.MD21:
                         using (Stream m2stream = new MemoryStream(bin.ReadBytes((int)chunkSize)))
                         {
                             ParseYeOldeM2Struct(m2stream);
                         }
                         break;
-                    case "AFID": // Animation file IDs
+                    case M2Chunks.AFID: // Animation file IDs
                         var afids = new AFID[chunkSize / 16];
-                        for(int a = 0; a < chunkSize / 16; a++)
+                        for (var a = 0; a < chunkSize / 16; a++)
                         {
-                            afids[a].animID = (short)bin.ReadUInt16();
-                            afids[a].subAnimID = (short)bin.ReadUInt16();
+                            afids[a].animID = bin.ReadInt16();
+                            afids[a].subAnimID = bin.ReadInt16();
                             afids[a].fileDataID = bin.ReadUInt32();
                         }
                         model.animFileData = afids;
                         break;
-                    case "BFID": // Bone file IDs
+                    case M2Chunks.BFID: // Bone file IDs
                         var bfids = new int[chunkSize / 4];
-                        for (int b = 0; b < chunkSize / 4; b++)
+                        for (var b = 0; b < chunkSize / 4; b++)
                         {
-                            bfids[b] = (int)bin.ReadUInt32();
+                            bfids[b] = bin.ReadInt32();
                         }
                         break;
-                    case "SFID": // Skin file IDs
+                    case M2Chunks.SFID: // Skin file IDs
                         var sfids = new int[model.nViews];
-                        for(int s = 0; s < model.nViews; s++)
+                        for (var s = 0; s < model.nViews; s++)
                         {
-                            sfids[s] = (int)bin.ReadUInt32();
+                            sfids[s] = bin.ReadInt32();
                         }
                         model.skinFileDataIDs = sfids;
                         break;
-                    case "PFID": // Phys file ID
-                        model.physFileID = (int)bin.ReadUInt32();
+                    case M2Chunks.PFID: // Phys file ID
+                        model.physFileID = bin.ReadInt32();
                         break;
-                    case "SKID": // Skel file DI
-                        model.skelFileID = (int)bin.ReadUInt32();
+                    case M2Chunks.SKID: // Skel file DI
+                        model.skelFileID = bin.ReadInt32();
                         break;
-                    case "TXAC":
-                    case "EXPT": // Extended Particles
-                    case "EXP2": // Extended Particles 2
-                    case "PABC":
-                    case "PADC":
-                    case "PEDC":
-                    case "PSBC":
+                    case M2Chunks.TXAC:
+                    case M2Chunks.EXPT: // Extended Particles
+                    case M2Chunks.EXP2: // Extended Particles 2
+                    case M2Chunks.PABC:
+                    case M2Chunks.PADC:
+                    case M2Chunks.PEDC:
+                    case M2Chunks.PSBC:
                         break;
                     default:
 #if DEBUG
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
+                        throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
 #else
                         CASCLib.Logger.WriteLine(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
                         break;
@@ -108,8 +108,8 @@ namespace WoWFormatLib.FileReaders
         public void ParseYeOldeM2Struct(Stream m2stream)
         {
             var bin = new BinaryReader(m2stream);
-            var header = new string(bin.ReadChars(4));
-            if(header != "MD20")
+            var header = (M2Chunks)bin.ReadUInt32();
+            if(header != M2Chunks.MD20)
             {
                 throw new Exception("Invalid M2 file!");
             }

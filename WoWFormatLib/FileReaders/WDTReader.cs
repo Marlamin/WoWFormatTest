@@ -98,27 +98,27 @@ namespace WoWFormatLib.FileReaders
             {
                 wdt.Position = position;
 
-                var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                var chunkName = (WDTChunks)bin.ReadUInt32();
                 var chunkSize = bin.ReadUInt32();
 
                 position = wdt.Position + chunkSize;
 
                 switch (chunkName)
                 {
-                    case "MVER":
+                    case WDTChunks.MVER:
                         ReadMVERChunk(bin);
                         break;
-                    case "MAIN":
+                    case WDTChunks.MAIN:
                         ReadMAINChunk(bin, chunkSize, filename);
                         break;
-                    case "MWMO":
+                    case WDTChunks.MWMO:
                         ReadMWMOChunk(bin);
                         break;
-                    case "MPHD":
+                    case WDTChunks.MPHD:
                         wdtfile.mphd = ReadMPHDChunk(bin);
                         break;
-                    case "MPLT":
-                    case "MODF":
+                    case WDTChunks.MPLT:
+                    case WDTChunks.MODF:
                         continue;
                     default:
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));

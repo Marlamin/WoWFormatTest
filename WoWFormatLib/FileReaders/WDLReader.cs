@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using WoWFormatLib.Structs.WDL;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -62,23 +63,26 @@ namespace WoWFormatLib.FileReaders
             {
                 wdl.Position = position;
 
-                var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                var chunkName = (WDLChunks)bin.ReadUInt32();
                 var chunkSize = bin.ReadUInt32();
 
                 position = wdl.Position + chunkSize;
 
                 switch (chunkName)
                 {
-                    case "MVER": ReadMVERChunk(bin);
+                    case WDLChunks.MVER:
+                        ReadMVERChunk(bin);
                         continue;
-                    case "MWMO": ReadMWMOChunk(bin, chunkSize);
+                    case WDLChunks.MWMO:
+                        ReadMWMOChunk(bin, chunkSize);
                         continue;
-                    case "MWID":
-                    case "MODF":
-                    case "MAOF": //contains MARE and MAHO subchunks
-                    case "MARE":
-                    case "MAOC": //New in WoD
-                    case "MAHO": continue;
+                    case WDLChunks.MWID:
+                    case WDLChunks.MODF:
+                    case WDLChunks.MAOF: //contains MARE and MAHO subchunks
+                    case WDLChunks.MARE:
+                    case WDLChunks.MAOC: //New in WoD
+                    case WDLChunks.MAHO:
+                        continue;
                     default:
                         throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                 }

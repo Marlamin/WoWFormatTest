@@ -53,14 +53,14 @@ namespace WoWFormatLib.FileReaders
                 {
                     adt.Position = position;
 
-                    var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                    var chunkName = (ADTChunks)bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
 
                     position = adt.Position + chunkSize;
 
                     switch (chunkName)
                     {
-                        case "MVER":
+                        case ADTChunks.MVER:
                             var version = bin.ReadUInt32();
                             if (version != 18)
                             {
@@ -71,22 +71,22 @@ namespace WoWFormatLib.FileReaders
                                 adtfile.version = version;
                             }
                             break;
-                        case "MCNK":
+                        case ADTChunks.MCNK:
                             adtfile.chunks[MCNKi] = ReadMCNKChunk(chunkSize, bin);
                             MCNKi++;
                             break;
-                        case "MHDR":
+                        case ADTChunks.MHDR:
                             adtfile.header = bin.Read<MHDR>();
                             break;
-                        case "MH2O":
+                        case ADTChunks.MH2O:
                             adtfile.mh2o = ReadMH20SubChunk(chunkSize, bin);
                             break;
-                        case "MFBO":
+                        case ADTChunks.MFBO:
                         //model.blob stuff
-                        case "MBMH":
-                        case "MBBB":
-                        case "MBMI":
-                        case "MBNV":
+                        case ADTChunks.MBMH:
+                        case ADTChunks.MBBB:
+                        case ADTChunks.MBMI:
+                        case ADTChunks.MBNV:
                             break;
                         default:
                             throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position, filename));
@@ -122,30 +122,30 @@ namespace WoWFormatLib.FileReaders
                 {
                     subbin.BaseStream.Position = subpos;
 
-                    var subChunkName = new string(subbin.ReadChars(4).Reverse().ToArray());
+                    var subChunkName = (ADTChunks)subbin.ReadUInt32();
                     var subChunkSize = subbin.ReadUInt32();
 
                     subpos = stream.Position + subChunkSize;
 
                     switch (subChunkName)
                     {
-                        case "MCVT":
+                        case ADTChunks.MCVT:
                             mapchunk.vertices = ReadMCVTSubChunk(subbin);
                             break;
-                        case "MCCV":
+                        case ADTChunks.MCCV:
                             mapchunk.vertexShading = ReadMCCVSubChunk(subbin);
                             break;
-                        case "MCNR":
+                        case ADTChunks.MCNR:
                             mapchunk.normals = ReadMCNRSubChunk(subbin);
                             break;
-                        case "MCSE":
+                        case ADTChunks.MCSE:
                             mapchunk.soundEmitters = ReadMCSESubChunk(subChunkSize, subbin);
                             break;
-                        case "MCBB":
+                        case ADTChunks.MCBB:
                             mapchunk.blendBatches = ReadMCBBSubChunk(subChunkSize, subbin);
                             break;
-                        case "MCLQ":
-                        case "MCLV":
+                        case ADTChunks.MCLQ:
+                        case ADTChunks.MCLV:
                             continue;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, subpos.ToString()));
@@ -250,34 +250,34 @@ namespace WoWFormatLib.FileReaders
                 {
                     adtObjStream.Position = position;
 
-                    var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                    var chunkName = (ADTChunks)bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
                     position = adtObjStream.Position + chunkSize;
 
                     switch (chunkName)
                     {
-                        case "MVER":
+                        case ADTChunks.MVER:
                             if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); }
                             break;
-                        case "MMDX":
+                        case ADTChunks.MMDX:
                             adtfile.objects.m2Names = ReadMMDXChunk(chunkSize, bin);
                             break;
-                        case "MMID":
+                        case ADTChunks.MMID:
                             adtfile.objects.m2NameOffsets = ReadMMIDChunk(chunkSize, bin);
                             break;
-                        case "MWMO":
+                        case ADTChunks.MWMO:
                             adtfile.objects.wmoNames = ReadMWMOChunk(chunkSize, bin);
                             break;
-                        case "MWID":
+                        case ADTChunks.MWID:
                             adtfile.objects.wmoNameOffsets = ReadMWIDChunk(chunkSize, bin);
                             break;
-                        case "MDDF":
+                        case ADTChunks.MDDF:
                             adtfile.objects.models = ReadMDDFChunk(chunkSize, bin);
                             break;
-                        case "MODF":
+                        case ADTChunks.MODF:
                             adtfile.objects.worldModels = ReadMODFChunk(chunkSize, bin);
                             break;
-                        case "MCNK":
+                        case ADTChunks.MCNK:
                             // TODO
                             break;
                         default:
@@ -422,26 +422,27 @@ namespace WoWFormatLib.FileReaders
                 while (position < adtTexStream.Length)
                 {
                     adtTexStream.Position = position;
-                    var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                    var chunkName = (ADTChunks)bin.ReadUInt32();
                     var chunkSize = bin.ReadUInt32();
 
                     position = adtTexStream.Position + chunkSize;
                     switch (chunkName)
                     {
-                        case "MVER":
-                            if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); }
+                        case ADTChunks.MVER:
+                            if (bin.ReadUInt32() != 18)
+                            { throw new Exception("Unsupported ADT version!"); }
                             break;
-                        case "MTEX":
+                        case ADTChunks.MTEX:
                             adtfile.textures = ReadMTEXChunk(chunkSize, bin);
                             break;
-                        case "MCNK":
+                        case ADTChunks.MCNK:
                             adtfile.texChunks[MCNKi] = ReadTexMCNKChunk(chunkSize, bin);
                             MCNKi++;
                             break;
-                        case "MTXP":
+                        case ADTChunks.MTXP:
                             adtfile.texParams = ReadMTXPChunk(adtfile.textures.filenames.Length, bin);
                             break;
-                        case "MAMP":
+                        case ADTChunks.MAMP:
                             break;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position));
@@ -461,21 +462,21 @@ namespace WoWFormatLib.FileReaders
                 while (subpos < stream.Length)
                 {
                     subbin.BaseStream.Position = subpos;
-                    var subChunkName = new string(subbin.ReadChars(4).Reverse().ToArray());
+                    var subChunkName = (ADTChunks)subbin.ReadUInt32();
                     var subChunkSize = subbin.ReadUInt32();
 
                     subpos = stream.Position + subChunkSize;
 
                     switch (subChunkName)
                     {
-                        case "MCLY":
+                        case ADTChunks.MCLY:
                             mapchunk.layers = ReadMCLYSubChunk(subChunkSize, subbin);
                             break;
-                        case "MCAL":
+                        case ADTChunks.MCAL:
                             mapchunk.alphaLayer = ReadMCALSubChunk(subChunkSize, subbin, mapchunk);
                             break;
-                        case "MCSH":
-                        case "MCMT":
+                        case ADTChunks.MCSH:
+                        case ADTChunks.MCMT:
                             break;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName, subpos.ToString()));

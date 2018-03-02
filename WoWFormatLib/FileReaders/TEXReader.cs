@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using WoWFormatLib.Structs.TEX;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -12,7 +13,7 @@ namespace WoWFormatLib.FileReaders
         {
             if (CASC.cascHandler.FileExists(filename))
             {
-                using (Stream tex = CASC.cascHandler.OpenFile(filename))
+                using (var tex = CASC.cascHandler.OpenFile(filename))
                 {
                     ReadTEX(filename, tex);
                 }
@@ -26,21 +27,24 @@ namespace WoWFormatLib.FileReaders
             {
                 tex.Position = position;
 
-                var chunkName = new string(bin.ReadChars(4).Reverse().ToArray());
+                var chunkName = (TEXChunks)bin.ReadUInt32();
                 var chunkSize = bin.ReadUInt32();
 
                 position = tex.Position + chunkSize;
 
                 switch (chunkName)
                 {
-                    case "TXVR": ReadTXVRChunk(bin);
+                    case TEXChunks.TXVR:
+                        ReadTXVRChunk(bin);
+                        break;
+                    case TEXChunks.TXFN:
+                        ReadTXFNChunk(bin, chunkSize);
+                        break;
+                    case TEXChunks.TXBT:
+                    case TEXChunks.TXMD:
                         continue;
-                    case "TXFN": ReadTXFNChunk(bin, chunkSize);
-                        continue;
-                    case "TXBT":
-                    case "TXMD": continue;
                     default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
+                        throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                 }
             }
         }
