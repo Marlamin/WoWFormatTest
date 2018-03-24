@@ -34,9 +34,10 @@ namespace WoWFormatLib.FileReaders
 
                     shaderFile.version = bin.ReadUInt32();
 
-                    if(shaderFile.version != 0x10004)
+                    if(shaderFile.version != 0x10006)
                     {
-                        throw new Exception("Unsupported shader version: " + shaderFile.version);
+                        Console.WriteLine("Unsupported shader version: " + shaderFile.version.ToString("X") + ", skipping..");
+                        return shaderFile;
                     }
 
                     shaderFile.permutationCount = bin.ReadUInt32();
@@ -102,6 +103,7 @@ namespace WoWFormatLib.FileReaders
                         var magic = new string(bin.ReadChars(4));
                         if(magic != "3SLG")
                         {
+                            Console.WriteLine("Skipping " + magic);
                             break; 
                         }
                         bin.BaseStream.Position -= 4;

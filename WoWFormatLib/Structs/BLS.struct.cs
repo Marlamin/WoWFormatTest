@@ -35,9 +35,6 @@ namespace WoWFormatLib.Structs.BLS
         public uint flags2;
         public uint unk0;
         public uint unk1;
-        public uint unk2;
-        public uint unk3;
-        public uint unk4;
         public uint length;
     }
 
