@@ -48,7 +48,7 @@ void main()
 		, layer_weights.w * (texture(pt_height3, tc3).a * pc_heightScale[3] + pc_heightOffset[3])
 	);
 
-	vec4 layer_pct_max = vec4(max(max(layer_pct.x, layer_pct.y), max(layer_pct.y, layer_pct.z)));                              
+	vec4 layer_pct_max = vec4(max(max(layer_pct.x, layer_pct.y), max(layer_pct.z, layer_pct.w)));                              
 	layer_pct = layer_pct * (vec4(1.0) - clamp(layer_pct_max - layer_pct, 0, 1));
 	layer_pct = layer_pct / vec4(dot(vec4(1.0), layer_pct));
 
