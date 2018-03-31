@@ -585,7 +585,7 @@ namespace WoWFormatLib.FileReaders
                     read_offset += in_offset;
                     if (out_offset != 4096) throw new Exception("we somehow overshoot. this should not be the case, except for broken adts");
                 }
-                else if (wdt.mphd.flags.HasFlag(Structs.WDT.mphdFlags.Flag_0x4) || wdt.mphd.flags.HasFlag(Structs.WDT.mphdFlags.Flag_0x80)) // Uncompressed (4096)
+                else if (wdt.mphd.flags.HasFlag(Structs.WDT.mphdFlags.adt_has_big_alpha) || wdt.mphd.flags.HasFlag(Structs.WDT.mphdFlags.adt_has_height_texturing)) // Uncompressed (4096)
                 {
                     //Console.WriteLine("Uncompressed (4096)");
                     mcal[layer].layer = bin.ReadBytes(4096);

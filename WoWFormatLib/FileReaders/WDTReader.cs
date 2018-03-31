@@ -48,8 +48,8 @@ namespace WoWFormatLib.FileReaders
                     var nobodycares = bin.ReadUInt32();
                     if (flags == 1)
                     {
-                        var adtfilename = filename.Replace(".WDT", "_" + y + "_" + x + ".adt");
-                        int[] xy = new int[] { y, x };
+                        var adtfilename = filename.Replace(".wdt", "_" + y + "_" + x + ".adt");
+                        var xy = new int[] { y, x };
                         tiles.Add(xy);
                     }
                 }
@@ -91,7 +91,7 @@ namespace WoWFormatLib.FileReaders
         }
         private void ReadWDT(string filename, Stream wdt)
         {
-            filename = Path.ChangeExtension(filename, "WDT");
+            filename = Path.ChangeExtension(filename, "wdt");
             var bin = new BinaryReader(wdt);
             long position = 0;
             while (position < wdt.Length)
@@ -121,7 +121,7 @@ namespace WoWFormatLib.FileReaders
                     case WDTChunks.MODF:
                         continue;
                     default:
-                        throw new Exception(String.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
+                        throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                 }
             }
         }
