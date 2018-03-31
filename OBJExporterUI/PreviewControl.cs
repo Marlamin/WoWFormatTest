@@ -130,8 +130,8 @@ namespace OBJExporterUI
         {
             if (!renderCanvas.Focused) return;
 
-            MouseState mouseState = Mouse.GetState();
-            KeyboardState keyboardState = Keyboard.GetState();
+            var mouseState = Mouse.GetState();
+            var keyboardState = Keyboard.GetState();
 
             ActiveCamera.processKeyboardInput(keyboardState);
 
@@ -172,7 +172,7 @@ namespace OBJExporterUI
 
                 GL.BindVertexArray(cache.doodadBatches[filename].vao);
 
-                for (int i = 0; i < cache.doodadBatches[filename].submeshes.Length; i++)
+                for (var i = 0; i < cache.doodadBatches[filename].submeshes.Length; i++)
                 {
                     switch (cache.doodadBatches[filename].submeshes[i].blendType)
                     {
@@ -208,7 +208,7 @@ namespace OBJExporterUI
 
                 var alphaRefLoc = GL.GetUniformLocation(wmoShaderProgram, "alphaRef");
 
-                for (int j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Length; j++)
+                for (var j = 0; j < cache.worldModelBatches[filename].wmoRenderBatch.Length; j++)
                 {
                     GL.BindVertexArray(cache.worldModelBatches[filename].groupBatches[cache.worldModelBatches[filename].wmoRenderBatch[j].groupID].vao);
 
@@ -251,12 +251,12 @@ namespace OBJExporterUI
                 {
                     GL.BindVertexArray(cache.terrain[filename].vao);
 
-                    for (int i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
+                    for (var i = 0; i < cache.terrain[filename].renderBatches.Length; i++)
                     {
                         GL.Uniform4(heightScaleLoc, cache.terrain[filename].renderBatches[i].heightScales);
                         GL.Uniform4(heightOffsetLoc, cache.terrain[filename].renderBatches[i].heightOffsets);
 
-                        for (int j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
+                        for (var j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
                         {
                             var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_layer" + j);
                             GL.Uniform1(textureLoc, j);
@@ -268,7 +268,7 @@ namespace OBJExporterUI
                             GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
                         }
 
-                        for (int j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
+                        for (var j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
                         {
                             var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_blend" + j);
                             GL.Uniform1(textureLoc, 3 + j);
@@ -277,7 +277,7 @@ namespace OBJExporterUI
                             GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
                         }
 
-                        for (int j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
+                        for (var j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
                         {
                             var textureLoc = GL.GetUniformLocation(adtShaderProgram, "pt_height" + j);
                             GL.Uniform1(textureLoc, 7 + j);
@@ -288,7 +288,7 @@ namespace OBJExporterUI
 
                         GL.DrawElements(PrimitiveType.Triangles, (int)cache.terrain[filename].renderBatches[i].numFaces, DrawElementsType.UnsignedInt, (int)cache.terrain[filename].renderBatches[i].firstFace * 4);
 
-                        for (int j = 0; j < 11; j++)
+                        for (var j = 0; j < 11; j++)
                         {
                             GL.ActiveTexture(TextureUnit.Texture0 + j);
                             GL.BindTexture(TextureTarget.Texture2D, 0);
