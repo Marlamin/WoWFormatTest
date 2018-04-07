@@ -15,8 +15,8 @@ namespace OBJExporterUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            FileVersionInfo warptensLibVersion = FileVersionInfo.GetVersionInfo(@"DBFilesClient.NET.dll");
-            VersionLabel.Content = "OBJ Exporter version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\nDBFilesClient.NET version: " + warptensLibVersion.FileVersion;
+            //FileVersionInfo warptensLibVersion = FileVersionInfo.GetVersionInfo(@"DBFilesClient.NET.dll");
+            VersionLabel.Content = "OBJ Exporter version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
         private void WebsiteButton_Click(object sender, RoutedEventArgs e)

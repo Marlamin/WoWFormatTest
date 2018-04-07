@@ -30,6 +30,15 @@ namespace OBJExporterUI
                 basedirLabel.Content = config.AppSettings.Settings["basedir"].Value;
                 outdirLabel.Content = config.AppSettings.Settings["outdir"].Value;
 
+                if(config.AppSettings.Settings["exportFormat"].Value == "glTF")
+                {
+                    glTFCheckbox.IsChecked = true;
+                }
+                else
+                {
+                    OBJCheckbox.IsChecked = true;
+                }
+
                 if (string.IsNullOrWhiteSpace(config.AppSettings.Settings["basedir"].Value))
                 {
                     onlineMode.IsChecked = true;
@@ -147,6 +156,21 @@ namespace OBJExporterUI
             }
         }
 
+        private void ExportMode_Checked(object sender, RoutedEventArgs e)
+        {
+            if (OBJLabel == null || glTFLabel == null){ return; }
+            if ((bool)OBJCheckbox.IsChecked)
+            {
+                glTFLabel.Visibility = Visibility.Hidden;
+                OBJLabel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                glTFLabel.Visibility = Visibility.Visible;
+                OBJLabel.Visibility = Visibility.Hidden;
+            }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
@@ -202,6 +226,15 @@ namespace OBJExporterUI
                 }
             }
 
+            if ((bool)OBJCheckbox.IsChecked)
+            {
+                config.AppSettings.Settings["exportFormat"].Value = "OBJ";
+            }
+            else
+            {
+                config.AppSettings.Settings["exportFormat"].Value = "glTF";
+            }
+
             if (!error)
             {
                 config.Save(ConfigurationSaveMode.Full);
@@ -214,6 +247,10 @@ namespace OBJExporterUI
                 {
                     Close();
                 }
+            }
+            else
+            {
+                MessageBox.Show("Not all settings are set! Did you forget to set an export location?", "Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

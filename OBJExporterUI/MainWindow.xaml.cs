@@ -85,6 +85,15 @@ namespace OBJExporterUI
             fileworker.RunWorkerCompleted += Fileworker_RunWorkerCompleted;
             fileworker.ProgressChanged += Fileworker_ProgressChanged;
             fileworker.WorkerReportsProgress = true;
+
+            if (ConfigurationManager.AppSettings["exportFormat"] == "glTF")
+            {
+                exportButton.Content = "Export model to glTF!";
+            }
+            else
+            {
+                exportButton.Content = "Export model to OBJ!";
+            }
         }
         private void Window_ContentRendered(object sender, EventArgs e)
         {
@@ -814,6 +823,15 @@ namespace OBJExporterUI
             cfgWindow.ShowDialog();
 
             ConfigurationManager.RefreshSection("appSettings");
+
+            if (ConfigurationManager.AppSettings["exportFormat"] == "glTF")
+            {
+                exportButton.Content = "Export model to glTF!";
+            }
+            else
+            {
+                exportButton.Content = "Export model to OBJ!";
+            }
         }
         private void MenuListfile_Click(object sender, RoutedEventArgs e)
         {
