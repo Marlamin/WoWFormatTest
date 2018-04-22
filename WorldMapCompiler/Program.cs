@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using SereniaBLPLib;
 using WoWFormatLib.Utils;
 
@@ -12,9 +13,11 @@ namespace WorldMapCompiler
     {
         private static void Main(string[] args)
         {
-            var saveExplored = true;
-            var saveUnexplored = true;
-            var saveLayers = true;
+            var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("settings.json", true, true).Build();
+
+            var saveExplored = bool.Parse(config["saveExploredMaps"]);
+            var saveUnexplored = bool.Parse(config["saveUnexploredMaps"]);
+            var saveLayers = bool.Parse(config["saveMapLayers"]);
 
             if (saveExplored && !Directory.Exists("explored"))
             {
@@ -31,7 +34,14 @@ namespace WorldMapCompiler
                 Directory.CreateDirectory("layers");
             }
 
-            CASC.InitCasc(null, "D:/World of Warcraft Beta", "wow_beta");
+            if(config["installDir"] != string.Empty && Directory.Exists(config["installDir"]))
+            {
+                CASC.InitCasc(null, config["installDir"], config["program"]);
+            }
+            else
+            {
+                CASC.InitCasc(null, null, config["program"]);
+            }
 
             using (var UIMapStream = CASC.cascHandler.OpenFile("DBFilesClient\\UIMap.db2"))
             using (var UIMapXArtStream = CASC.cascHandler.OpenFile("DBFilesClient\\UIMapXMapArt.db2"))
@@ -201,7 +211,6 @@ namespace WorldMapCompiler
                                                 var blp = new BlpFile(stream);
                                                 var posY = cur_y * 256 + offsetX;
                                                 var posX = cur_x * 256 + offsetY;
-                                                Console.WriteLine("Drawing FDID " + fdid + " at " + posY + "x" + posX);
 
                                                 if (saveLayers)
                                                 {
