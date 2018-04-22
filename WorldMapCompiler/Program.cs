@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using WoWFormatLib.SereniaBLPLib;
+using SereniaBLPLib;
 using WoWFormatLib.Utils;
 
 namespace WorldMapCompiler
@@ -12,9 +12,9 @@ namespace WorldMapCompiler
     {
         private static void Main(string[] args)
         {
-            var saveExplored = false;
+            var saveExplored = true;
             var saveUnexplored = true;
-            var saveLayers = false;
+            var saveLayers = true;
 
             if (saveExplored && !Directory.Exists("explored"))
             {
@@ -176,12 +176,12 @@ namespace WorldMapCompiler
                                     }
                                 }
 
-                                if(wmoTileDict.Count == 0)
+                                if (wmoTileDict.Count == 0)
                                 {
                                     continue;
                                 }
 
-                                
+
                                 var layerResX = (maxWMORows + 1) * 256;
                                 var layerResY = (maxWMOCols + 1) * 256;
 
@@ -215,7 +215,8 @@ namespace WorldMapCompiler
 
                                 if (saveLayers)
                                 {
-                                    if(!Directory.Exists("layers/" + CleanFileName(mapRow.Value.Id + " - " + mapName) + "/")){
+                                    if (!Directory.Exists("layers/" + CleanFileName(mapRow.Value.Id + " - " + mapName) + "/"))
+                                    {
                                         Directory.CreateDirectory("layers/" + CleanFileName(mapRow.Value.Id + " - " + mapName) + "/");
                                     }
                                     layerBitmap.Save("layers/" + CleanFileName(mapRow.Value.Id + " - " + mapName) + "/" + wmorow.Value.Id + ".png");
