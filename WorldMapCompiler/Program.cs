@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Common;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using SereniaBLPLib;
+using WoWFormatLib;
 using WoWFormatLib.Utils;
 
 namespace WorldMapCompiler
