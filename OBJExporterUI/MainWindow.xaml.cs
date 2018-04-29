@@ -921,40 +921,85 @@ namespace OBJExporterUI
             {
                 using(var mapStream = CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2"))
                 {
-                    var mapsData = new WDC2Reader(mapStream);
-                    foreach (var mapEntry in mapsData)
+                    if (CASC.cascHandler.Config.BuildName.Contains("8.0"))
                     {
-                        var mapID = (int)mapEntry.Key;
-                        var mapDirectory = mapEntry.Value.GetField<string>(0);
-                        var mapName = mapEntry.Value.GetField<string>(1);
-                        var mapExpansionID = mapEntry.Value.GetField<byte>(19);
+                        var mapsData = new WDC2Reader(mapStream);
 
-                        if (CASC.cascHandler.FileExists("World/Maps/" + mapDirectory + "/" + mapDirectory + ".wdt"))
+                        foreach (var mapEntry in mapsData)
                         {
-                            var mapItem = new MapListItem { Internal = mapDirectory };
+                            var mapID = (int)mapEntry.Key;
+                            var mapDirectory = mapEntry.Value.GetField<string>(0);
+                            var mapName = mapEntry.Value.GetField<string>(1);
+                            var mapExpansionID = mapEntry.Value.GetField<byte>(19);
 
-                            if (mapNames.ContainsKey(mapID))
+                            if (CASC.cascHandler.FileExists("World/Maps/" + mapDirectory + "/" + mapDirectory + ".wdt"))
                             {
-                                mapItem.Name = mapNames[mapID].Name;
-                                mapItem.Type = mapNames[mapID].Type;
-                                var expansionID = ExpansionNameToID(mapNames[mapID].Expansion);
-                                mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
+                                var mapItem = new MapListItem { Internal = mapDirectory };
 
-                                if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                                if (mapNames.ContainsKey(mapID))
                                 {
-                                    continue;
+                                    mapItem.Name = mapNames[mapID].Name;
+                                    mapItem.Type = mapNames[mapID].Type;
+                                    var expansionID = ExpansionNameToID(mapNames[mapID].Expansion);
+                                    mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
+
+                                    if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    mapItem.Name = mapName;
+                                    mapItem.Type = "Unknown";
+                                    mapItem.Image = "pack://application:,,,/Resources/wow" + (mapExpansionID + 1) + ".png";
+                                }
+
+                                if (string.IsNullOrEmpty(filterTextBox.Text) || (mapDirectory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapName.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                                {
+                                    mapListBox.Items.Add(mapItem);
                                 }
                             }
-                            else
-                            {
-                                mapItem.Name = mapName;
-                                mapItem.Type = "Unknown";
-                                mapItem.Image = "pack://application:,,,/Resources/wow" + (mapExpansionID + 1) + ".png";
-                            }
+                        }
+                    }
+                    else
+                    {
+                        var mapsData = new WDC1Reader(mapStream);
 
-                            if (string.IsNullOrEmpty(filterTextBox.Text) || (mapDirectory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapName.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                        foreach (var mapEntry in mapsData)
+                        {
+                            var mapID = (int)mapEntry.Key;
+                            var mapDirectory = mapEntry.Value.GetField<string>(0);
+                            var mapName = mapEntry.Value.GetField<string>(1);
+                            var mapExpansionID = mapEntry.Value.GetField<byte>(19);
+
+                            if (CASC.cascHandler.FileExists("World/Maps/" + mapDirectory + "/" + mapDirectory + ".wdt"))
                             {
-                                mapListBox.Items.Add(mapItem);
+                                var mapItem = new MapListItem { Internal = mapDirectory };
+
+                                if (mapNames.ContainsKey(mapID))
+                                {
+                                    mapItem.Name = mapNames[mapID].Name;
+                                    mapItem.Type = mapNames[mapID].Type;
+                                    var expansionID = ExpansionNameToID(mapNames[mapID].Expansion);
+                                    mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
+
+                                    if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    mapItem.Name = mapName;
+                                    mapItem.Type = "Unknown";
+                                    mapItem.Image = "pack://application:,,,/Resources/wow" + (mapExpansionID + 1) + ".png";
+                                }
+
+                                if (string.IsNullOrEmpty(filterTextBox.Text) || (mapDirectory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapName.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                                {
+                                    mapListBox.Items.Add(mapItem);
+                                }
                             }
                         }
                     }
