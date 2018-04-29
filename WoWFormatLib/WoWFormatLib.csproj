@@ -44,6 +44,8 @@
   <ItemGroup>
     <Compile Include="DBC\DBCHelper.cs" />
     <Compile Include="DBC\Structs.cs" />
+    <Compile Include="DBC\WDC1Reader.cs" />
+    <Compile Include="DBC\WDC2Reader.cs" />
     <Compile Include="FileReaders\ANIMReader.cs" />
     <Compile Include="FileReaders\ADTReader.cs" />
     <Compile Include="FileReaders\BLPReader.cs" />
