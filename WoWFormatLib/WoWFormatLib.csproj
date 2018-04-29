@@ -69,6 +69,7 @@
     <Compile Include="Structs\WDT.struct.cs" />
     <Compile Include="Structs\WMO.struct.cs" />
     <Compile Include="Utils\ABlock.cs" />
+    <Compile Include="Utils\BinaryReaderExtensions.cs" />
     <Compile Include="Utils\CASC.cs" />
     <Compile Include="Utils\RGBColor.cs" />
     <Compile Include="Utils\Quaternion.cs" />
