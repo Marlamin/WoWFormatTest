@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Drawing.Common;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
