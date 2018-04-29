@@ -331,7 +331,7 @@ namespace WoWFormatLib.FileReaders
 
         private string ReadMOSBChunk(uint size, BinaryReader bin)
         {
-            return bin.ReadStringNull();
+            return bin.ReadCString();
         }
 
         /* GROUP */

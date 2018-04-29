@@ -120,7 +120,7 @@ namespace WoWFormatLib.FileReaders
                             bin.BaseStream.Position = GLSL3start + header.codeOffset;
                         }
 
-                        shaderFile.shaderBlocks[i].shaderContent = bin.ReadStringNull();
+                        shaderFile.shaderBlocks[i].shaderContent = bin.ReadCString();
 
                         if(bin.BaseStream.Position != (GLSL3start + header.inputParamsOffset))
                         {
@@ -140,10 +140,10 @@ namespace WoWFormatLib.FileReaders
                             var prevPos = bin.BaseStream.Position;
 
                             bin.BaseStream.Position = GLSL3start + shaderFile.shaderBlocks[i].inputShaderInfo[j].glslParamNameOffset;
-                            shaderFile.shaderBlocks[i].inputShaderInfo[j].glslParamName = bin.ReadStringNull();
+                            shaderFile.shaderBlocks[i].inputShaderInfo[j].glslParamName = bin.ReadCString();
 
                             bin.BaseStream.Position = GLSL3start + shaderFile.shaderBlocks[i].inputShaderInfo[j].internalParamNameOffset;
-                            shaderFile.shaderBlocks[i].inputShaderInfo[j].internalParamName = bin.ReadStringNull();
+                            shaderFile.shaderBlocks[i].inputShaderInfo[j].internalParamName = bin.ReadCString();
 
                             bin.BaseStream.Position = prevPos;
                         }
@@ -166,10 +166,10 @@ namespace WoWFormatLib.FileReaders
                             var prevPos = bin.BaseStream.Position;
 
                             bin.BaseStream.Position = GLSL3start + shaderFile.shaderBlocks[i].outputShaderInfo[j].glslParamNameOffset;
-                            shaderFile.shaderBlocks[i].outputShaderInfo[j].glslParamName = bin.ReadStringNull();
+                            shaderFile.shaderBlocks[i].outputShaderInfo[j].glslParamName = bin.ReadCString();
 
                             bin.BaseStream.Position = GLSL3start + shaderFile.shaderBlocks[i].outputShaderInfo[j].internalParamNameOffset;
-                            shaderFile.shaderBlocks[i].outputShaderInfo[j].internalParamName = bin.ReadStringNull();
+                            shaderFile.shaderBlocks[i].outputShaderInfo[j].internalParamName = bin.ReadCString();
 
                             bin.BaseStream.Position = prevPos;
                         }
@@ -191,7 +191,7 @@ namespace WoWFormatLib.FileReaders
                             var prevPos = bin.BaseStream.Position;
 
                             bin.BaseStream.Position = GLSL3start + shaderFile.shaderBlocks[i].uniformBufferInfo[j].glslParamNameOffset;
-                            shaderFile.shaderBlocks[i].uniformBufferInfo[j].glslParamName = bin.ReadStringNull();
+                            shaderFile.shaderBlocks[i].uniformBufferInfo[j].glslParamName = bin.ReadCString();
 
                             bin.BaseStream.Position = prevPos;
                         }
@@ -214,7 +214,7 @@ namespace WoWFormatLib.FileReaders
                             var prevPos = bin.BaseStream.Position;
 
                             bin.BaseStream.Position = GLSL3start + shaderFile.shaderBlocks[i].sampleShaderInfo[j].glslParamNameOffset;
-                            shaderFile.shaderBlocks[i].sampleShaderInfo[j].glslParamName = bin.ReadStringNull();
+                            shaderFile.shaderBlocks[i].sampleShaderInfo[j].glslParamName = bin.ReadCString();
 
                             bin.BaseStream.Position = prevPos;
                         }
