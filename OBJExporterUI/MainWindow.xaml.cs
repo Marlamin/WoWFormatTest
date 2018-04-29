@@ -919,38 +919,43 @@ namespace OBJExporterUI
 
             try
             {
-                CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2").ExtractToFile("DBFilesClient", "Map.db2");
-                var mapsData = new DBFilesClient2.NET.Storage<int, MapEntry>(@"DBFilesClient/Map.db2", DBFilesClient2.NET.StorageOptions.Default);
-
-                foreach (var mapEntry in mapsData)
+                using(var mapStream = CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2"))
                 {
-                    if (CASC.cascHandler.FileExists("World/Maps/" + mapEntry.Value.Directory + "/" + mapEntry.Value.Directory + ".wdt"))
+                    var mapsData = new WDC2Reader(mapStream);
+                    foreach (var mapEntry in mapsData)
                     {
-                        var mapItem = new MapListItem { Internal = mapEntry.Value.Directory };
+                        var mapID = (int)mapEntry.Key;
+                        var mapDirectory = mapEntry.Value.GetField<string>(0);
+                        var mapName = mapEntry.Value.GetField<string>(1);
+                        var mapExpansionID = mapEntry.Value.GetField<byte>(19);
 
-                        if (mapNames.ContainsKey(mapEntry.Key))
+                        if (CASC.cascHandler.FileExists("World/Maps/" + mapDirectory + "/" + mapDirectory + ".wdt"))
                         {
-                            mapItem.Name = mapNames[mapEntry.Key].Name;
-                            mapItem.Type = mapNames[mapEntry.Key].Type;
-                            var expansionID = ExpansionNameToID(mapNames[mapEntry.Key].Expansion);
-                            mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
+                            var mapItem = new MapListItem { Internal = mapDirectory };
 
-                            if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                            if (mapNames.ContainsKey(mapID))
                             {
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            mapItem.Name = mapEntry.Value.Name;
-                            mapItem.Type = "Unknown";
-                            mapItem.Image = "pack://application:,,,/Resources/wow" + (mapEntry.Value.ExpansionID + 1) +".png";
-                            
-                        }
+                                mapItem.Name = mapNames[mapID].Name;
+                                mapItem.Type = mapNames[mapID].Type;
+                                var expansionID = ExpansionNameToID(mapNames[mapID].Expansion);
+                                mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
 
-                        if (string.IsNullOrEmpty(filterTextBox.Text) || (mapEntry.Value.Directory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapEntry.Value.Name.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
-                        {
-                            mapListBox.Items.Add(mapItem);
+                                if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                mapItem.Name = mapName;
+                                mapItem.Type = "Unknown";
+                                mapItem.Image = "pack://application:,,,/Resources/wow" + (mapExpansionID + 1) + ".png";
+                            }
+
+                            if (string.IsNullOrEmpty(filterTextBox.Text) || (mapDirectory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapName.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                            {
+                                mapListBox.Items.Add(mapItem);
+                            }
                         }
                     }
                 }

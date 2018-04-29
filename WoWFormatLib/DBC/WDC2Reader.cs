@@ -7,7 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace WoWFormatLib
+namespace WoWFormatLib.DBC
 {
     public class WDC2Row
     {

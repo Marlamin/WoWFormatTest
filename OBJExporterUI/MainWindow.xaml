@@ -96,6 +96,7 @@
                     <CheckBox Loaded="MapCheckBox_Click" Content="MoP" IsChecked="True" HorizontalAlignment="Left" Name="wow5" Margin="352,28,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
                     <CheckBox Loaded="MapCheckBox_Click" Content="WoD" IsChecked="True" HorizontalAlignment="Left" Name="wow6" Margin="352,48,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
                     <CheckBox Loaded="MapCheckBox_Click" Content="Legion" IsChecked="True" HorizontalAlignment="Left" Name="wow7" Margin="352,68,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
+                    <CheckBox Loaded="MapCheckBox_Click" Content="BfA" IsChecked="True" HorizontalAlignment="Left" Name="wow8" Margin="352,88,0,0" VerticalAlignment="Top" Click="MapCheckBox_Click" Grid.Column="0"/>
                     <!-- Row 1 -->
                     <ListView Grid.Row="1" Grid.Column="0" x:Name="mapListBox" SelectionMode="Single" SelectionChanged="MapListBox_SelectionChanged" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" ItemsSource="{Binding}" Grid.ColumnSpan="2" Margin="0,0,0,0"  >
                         <ListView.View>

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using CASCLib;
 
-namespace WoWFormatLib
+namespace WoWFormatLib.DBC
 {
     public class WDC1Row
     {
