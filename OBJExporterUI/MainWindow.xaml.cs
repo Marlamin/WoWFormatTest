@@ -927,7 +927,7 @@ namespace OBJExporterUI
 
                         foreach (var mapEntry in mapsData)
                         {
-                            var mapID = (int)mapEntry.Key;
+                            var mapID = mapEntry.Key;
                             var mapDirectory = mapEntry.Value.GetField<string>(0);
                             var mapName = mapEntry.Value.GetField<string>(1);
                             var mapExpansionID = mapEntry.Value.GetField<byte>(19);
@@ -968,7 +968,7 @@ namespace OBJExporterUI
 
                         foreach (var mapEntry in mapsData)
                         {
-                            var mapID = (int)mapEntry.Key;
+                            var mapID = mapEntry.Key;
                             var mapDirectory = mapEntry.Value.GetField<string>(0);
                             var mapName = mapEntry.Value.GetField<string>(1);
                             var mapExpansionID = mapEntry.Value.GetField<byte>(19);

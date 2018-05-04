@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace WoWFormatLib
+namespace WoWFormatLib.DBC
 {
     public class WDC2Row : IDB2Row
     {
