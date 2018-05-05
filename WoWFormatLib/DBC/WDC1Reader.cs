@@ -187,24 +187,20 @@ namespace WoWFormatLib.DBC
             using (var reader = new BinaryReader(stream, Encoding.UTF8))
             {
                 if (reader.BaseStream.Length < HeaderSize)
-                {
                     throw new InvalidDataException(String.Format("WDC1 file is corrupted!"));
-                }
 
                 uint magic = reader.ReadUInt32();
 
                 if (magic != WDC1FmtSig)
-                {
                     throw new InvalidDataException(String.Format("WDC1 file is corrupted!"));
-                }
 
                 RecordsCount = reader.ReadInt32();
                 FieldsCount = reader.ReadInt32();
                 RecordSize = reader.ReadInt32();
                 StringTableSize = reader.ReadInt32();
 
-                uint tableHash = reader.ReadUInt32();
-                uint layoutHash = reader.ReadUInt32();
+                TableHash = reader.ReadUInt32();
+                LayoutHash = reader.ReadUInt32();
                 MinIndex = reader.ReadInt32();
                 MaxIndex = reader.ReadInt32();
                 int locale = reader.ReadInt32();
