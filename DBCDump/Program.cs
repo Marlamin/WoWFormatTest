@@ -98,6 +98,43 @@ namespace DBCDump
 
             using (var writer = new CsvHelper.CsvWriter(new StreamWriter(File.OpenWrite(args[1]))))
             {
+                foreach (var definition in definitionToUse.definitions)
+                {
+                    if (definition.isNonInline && definition.isID)
+                    {
+                        writer.WriteField(definition.name);
+                    }
+                    else if (definition.isNonInline)
+                    {
+                        // Skip these for now
+                    }
+                    else
+                    {
+                        int length;
+                        if (definition.arrLength > 1)
+                        {
+                            length = definition.arrLength;
+                        }
+                        else
+                        {
+                            length = 1;
+                        }
+
+                        for (var i = 0; i < length; i++)
+                        {
+                            if(length > 1)
+                            {
+                                writer.WriteField(definition.name + "[" + i + "]");
+                            }
+                            else
+                            {
+                                writer.WriteField(definition.name);
+                            }
+                        }
+                    }
+                }
+                writer.NextRecord();
+
                 foreach (var row in reader)
                 {
                     var fieldPos = 0;
@@ -106,6 +143,8 @@ namespace DBCDump
                         if (definition.isNonInline && definition.isID)
                         {
                             writer.WriteField(row.Key);
+                        }else if(definition.isNonInline){
+                            // Skip these for now
                         }
                         else
                         {
