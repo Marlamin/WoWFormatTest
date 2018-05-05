@@ -43,6 +43,7 @@ namespace DBCDump
 
             var dbd = new DBDefinition();
             var dbdFound = false;
+
             foreach (var file in Directory.GetFiles("definitions/"))
             {
                 if (Path.GetFileNameWithoutExtension(file).ToLower() == Path.GetFileNameWithoutExtension(args[0]).ToLower())
@@ -55,7 +56,7 @@ namespace DBCDump
 
             if (!dbdFound)
             {
-                throw new Exception("Unable to find definitions file for " + Path.GetFileNameWithoutExtension(args[0]));
+                throw new Exception("Unable to find any definitions for " + Path.GetFileNameWithoutExtension(args[0]));
             }
 
             var definitionToUse = new VersionDefinitions();
@@ -108,46 +109,67 @@ namespace DBCDump
                         }
                         else
                         {
-                            switch (dbd.columnDefinitions[definition.name].type)
+                            int length;
+                            if(definition.arrLength > 1)
                             {
-                                case "uint":
-                                    switch (definition.size)
-                                    {
-                                        case 8:
-                                            writer.WriteField(row.Value.GetField<byte>(fieldPos));
-                                            break;
-                                        case 16:
-                                            writer.WriteField(row.Value.GetField<ushort>(fieldPos));
-                                            break;
-                                        case 32:
-                                            writer.WriteField(row.Value.GetField<uint>(fieldPos));
-                                            break;
-                                    }
-                                    break;
-                                case "int":
-                                    switch (definition.size)
-                                    {
-                                        case 8:
-                                            writer.WriteField(row.Value.GetField<sbyte>(fieldPos));
-                                            break;
-                                        case 16:
-                                            writer.WriteField(row.Value.GetField<short>(fieldPos));
-                                            break;
-                                        case 32:
-                                            writer.WriteField(row.Value.GetField<int>(fieldPos));
-                                            break;
-                                    }
-                                    break;
-                                case "locstring":
-                                case "string":
-                                    writer.WriteField(row.Value.GetField<string>(fieldPos));
-                                    break;
-                                case "float":
-                                    writer.WriteField(row.Value.GetField<float>(fieldPos));
-                                    break;
-                                default:
-                                    throw new Exception("Unhandled type: " + dbd.columnDefinitions[definition.name].type);
+                                length = definition.arrLength;
                             }
+                            else
+                            {
+                                length = 1;
+                            }
+
+                            for(var i = 0; i < length; i++)
+                            {
+                                var arrayPos = -1;
+
+                                if(length > 1)
+                                {
+                                    arrayPos = i;
+                                }
+
+                                switch (dbd.columnDefinitions[definition.name].type)
+                                {
+                                    case "uint":
+                                        switch (definition.size)
+                                        {
+                                            case 8:
+                                                writer.WriteField(row.Value.GetField<byte>(fieldPos, arrayPos));
+                                                break;
+                                            case 16:
+                                                writer.WriteField(row.Value.GetField<ushort>(fieldPos, arrayPos));
+                                                break;
+                                            case 32:
+                                                writer.WriteField(row.Value.GetField<uint>(fieldPos, arrayPos));
+                                                break;
+                                        }
+                                        break;
+                                    case "int":
+                                        switch (definition.size)
+                                        {
+                                            case 8:
+                                                writer.WriteField(row.Value.GetField<sbyte>(fieldPos, arrayPos));
+                                                break;
+                                            case 16:
+                                                writer.WriteField(row.Value.GetField<short>(fieldPos, arrayPos));
+                                                break;
+                                            case 32:
+                                                writer.WriteField(row.Value.GetField<int>(fieldPos, arrayPos));
+                                                break;
+                                        }
+                                        break;
+                                    case "locstring":
+                                    case "string":
+                                        writer.WriteField(row.Value.GetField<string>(fieldPos, arrayPos));
+                                        break;
+                                    case "float":
+                                        writer.WriteField(row.Value.GetField<float>(fieldPos, arrayPos));
+                                        break;
+                                    default:
+                                        throw new Exception("Unhandled type: " + dbd.columnDefinitions[definition.name].type);
+                                }
+                            }
+                            
                             fieldPos++;
                         }
                     }
