@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using WoWFormatLib.DBC;
 namespace DBCDump
 {
@@ -48,97 +51,77 @@ namespace DBCDump
                 }
             }
 
-            var writer = new CsvHelper.CsvWriter(new StreamWriter(File.OpenWrite(args[1])));
+            var layoutHash = reader.LayoutHash.ToString("X8").ToUpper();
 
             foreach (var versionDef in dbd.versionDefinitions)
             {
-                // Check field sizes
-                var fields = versionDef.definitions.Length;
-                foreach (var definition in versionDef.definitions)
+                if (versionDef.layoutHashes.Any(layoutHash.Contains))
                 {
-                    if (definition.arrLength > 0)
+                    using (var writer = new CsvHelper.CsvWriter(new StreamWriter(File.OpenWrite(args[1]))))
                     {
-                        fields += definition.arrLength;
-                        fields -= 1;
-                    }
-
-                    if (definition.isNonInline)
-                    {
-                        fields -= 1;
-                    }
-
-                    if (definition.isRelation)
-                    {
-                        fields -= 1;
-                    }
-                }
-
-                if(fields == reader.FieldsCount)
-                {
-                    // Field count matches, let's use this one I guess.... 
-                    foreach(var row in reader)
-                    {
-                        var fieldPos = 0;
-                        foreach(var definition in versionDef.definitions)
+                        foreach (var row in reader)
                         {
-                            if(definition.isNonInline && definition.isID)
+                            var fieldPos = 0;
+                            foreach (var definition in versionDef.definitions)
                             {
-                                writer.WriteField(row.Key);
-                            }
-                            else
-                            {
-                                //var type = Type.GetType(dbd.columnDefinitions[definition.name].type);
-                                //Console.WriteLine(row.Value.GetField<typeof(type)>(fieldPos));
-                                switch (dbd.columnDefinitions[definition.name].type)
+                                if (definition.isNonInline && definition.isID)
                                 {
-                                    case "uint":
-                                        switch (definition.size)
-                                        {
-                                            case 8:
-                                                writer.WriteField(row.Value.GetField<byte>(fieldPos));
-                                                break;
-                                            case 16:
-                                                writer.WriteField(row.Value.GetField<ushort>(fieldPos));
-                                                break;
-                                            case 32:
-                                                writer.WriteField(row.Value.GetField<uint>(fieldPos));
-                                                break;
-                                        }
-                                        break;
-                                    case "int":
-                                        switch (definition.size)
-                                        {
-                                            case 8:
-                                                writer.WriteField(row.Value.GetField<sbyte>(fieldPos));
-                                                break;
-                                            case 16:
-                                                writer.WriteField(row.Value.GetField<short>(fieldPos));
-                                                break;
-                                            case 32:
-                                                writer.WriteField(row.Value.GetField<int>(fieldPos));
-                                                break;
-                                        }
-                                        break;
-                                    case "locstring":
-                                    case "string":
-                                        writer.WriteField(row.Value.GetField<string>(fieldPos));
-                                        break;
-                                    case "float":
-                                        writer.WriteField(row.Value.GetField<float>(fieldPos));
-                                        break;
-                                    default:
-                                        throw new Exception("Unhandled type: " + dbd.columnDefinitions[definition.name].type);
+                                    writer.WriteField(row.Key);
                                 }
-                                fieldPos++;
+                                else
+                                {
+                                    switch (dbd.columnDefinitions[definition.name].type)
+                                    {
+                                        case "uint":
+                                            switch (definition.size)
+                                            {
+                                                case 8:
+                                                    writer.WriteField(row.Value.GetField<byte>(fieldPos));
+                                                    break;
+                                                case 16:
+                                                    writer.WriteField(row.Value.GetField<ushort>(fieldPos));
+                                                    break;
+                                                case 32:
+                                                    writer.WriteField(row.Value.GetField<uint>(fieldPos));
+                                                    break;
+                                            }
+                                            break;
+                                        case "int":
+                                            switch (definition.size)
+                                            {
+                                                case 8:
+                                                    writer.WriteField(row.Value.GetField<sbyte>(fieldPos));
+                                                    break;
+                                                case 16:
+                                                    writer.WriteField(row.Value.GetField<short>(fieldPos));
+                                                    break;
+                                                case 32:
+                                                    writer.WriteField(row.Value.GetField<int>(fieldPos));
+                                                    break;
+                                            }
+                                            break;
+                                        case "locstring":
+                                        case "string":
+                                            writer.WriteField(row.Value.GetField<string>(fieldPos));
+                                            break;
+                                        case "float":
+                                            writer.WriteField(row.Value.GetField<float>(fieldPos));
+                                            break;
+                                        default:
+                                            throw new Exception("Unhandled type: " + dbd.columnDefinitions[definition.name].type);
+                                    }
+                                    fieldPos++;
+                                }
                             }
+                            writer.NextRecord();
                         }
-                        writer.NextRecord();
+                        writer.Flush();
+                        return;
                     }
-                    writer.Flush();
-                    writer.Dispose();
-                    return;
                 }
             }
+
+            Console.WriteLine("Layouthash " + layoutHash + " not found in definitions file!");
         }
     }
 }
