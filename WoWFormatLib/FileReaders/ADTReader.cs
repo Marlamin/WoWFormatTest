@@ -277,6 +277,7 @@ namespace WoWFormatLib.FileReaders
                         case ADTChunks.MODF:
                             adtfile.objects.worldModels = ReadMODFChunk(chunkSize, bin);
                             break;
+                        case ADTChunks.MLMB:
                         case ADTChunks.MCNK:
                             // TODO
                             break;

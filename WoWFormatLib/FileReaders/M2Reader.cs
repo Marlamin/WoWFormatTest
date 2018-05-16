@@ -82,6 +82,14 @@ namespace WoWFormatLib.FileReaders
                     case M2Chunks.SKID: // Skel file DI
                         model.skelFileID = bin.ReadInt32();
                         break;
+                    case M2Chunks.TXID:
+                        var txids = new int[chunkSize / 4];
+                        for (var t = 0; t < chunkSize / 4; t++)
+                        {
+                            txids[t] = bin.ReadInt32();
+                        }
+                        model.textureFileDataIDs = txids;
+                        break;
                     case M2Chunks.TXAC:
                     case M2Chunks.EXPT: // Extended Particles
                     case M2Chunks.EXP2: // Extended Particles 2
@@ -89,6 +97,7 @@ namespace WoWFormatLib.FileReaders
                     case M2Chunks.PADC:
                     case M2Chunks.PEDC:
                     case M2Chunks.PSBC:
+                    case M2Chunks.LDV1:
                         break;
                     default:
 #if DEBUG
@@ -240,7 +249,7 @@ namespace WoWFormatLib.FileReaders
             for (var i = 0; i < nAnimations; i++)
             {
                 animations[i] = bin.Read<Animation>();
-                if (((uint)animations[i].flags & 0x130) == 0)
+                if (((uint)animations[i].flags & 0x130) == 0 && model.animFileData != null)
                 {
                     // Animation in other file
                     foreach (var afid in model.animFileData)

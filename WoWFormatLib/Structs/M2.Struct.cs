@@ -19,6 +19,8 @@ namespace WoWFormatLib.Structs.M2
         PADC = 'P' << 0 | 'A' << 8 | 'D' << 16 | 'C' << 24,
         PEDC = 'P' << 0 | 'E' << 8 | 'D' << 16 | 'C' << 24,
         PSBC = 'P' << 0 | 'S' << 8 | 'B' << 16 | 'C' << 24,
+        TXID = 'T' << 0 | 'X' << 8 | 'I' << 16 | 'D' << 24,
+        LDV1 = 'L' << 0 | 'D' << 8 | 'V' << 16 | '1' << 24,
     }
 
     public struct M2Model
@@ -32,6 +34,7 @@ namespace WoWFormatLib.Structs.M2
         public int[] skinFileDataIDs;
         public int[] lod_skinFileDataIDs;
         public AFID[] animFileData;
+        public int[] textureFileDataIDs;
 
         public string filename;
         public string name;

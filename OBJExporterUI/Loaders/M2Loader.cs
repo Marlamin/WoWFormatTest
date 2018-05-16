@@ -64,6 +64,12 @@ namespace OBJExporterUI.Loaders
                 return;
             }
 
+            if (model.skins == null)
+            {
+                CASCLib.Logger.WriteLine("Error during loading file: {0}, model has no skins", filename);
+                return;
+            }
+
             // Textures
             ddBatch.mats = new Renderer.Structs.Material[model.textures.Count()];
 

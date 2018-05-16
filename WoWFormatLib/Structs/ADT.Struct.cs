@@ -31,6 +31,7 @@ namespace WoWFormatLib.Structs.ADT
         MWID = 'M' << 24 | 'W' << 16 | 'I' << 8 | 'D' << 0,
         MDDF = 'M' << 24 | 'D' << 16 | 'D' << 8 | 'F' << 0,
         MODF = 'M' << 24 | 'O' << 16 | 'D' << 8 | 'F' << 0,
+        MLMB = 'M' << 24 | 'L' << 16 | 'M' << 8 | 'B' << 0,
 
         // TEX
         MTEX = 'M' << 24 | 'T' << 16 | 'E' << 8 | 'X' << 0,

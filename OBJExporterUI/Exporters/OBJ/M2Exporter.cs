@@ -140,6 +140,10 @@ namespace OBJExporterUI.Exporters.OBJ
                     case 0:
                         //Console.WriteLine("      Texture given in file!");
                         textureFileDataID = CASC.getFileDataIdByName(reader.model.textures[i].filename);
+                        if(textureFileDataID == 372993)
+                        {
+                            textureFileDataID = reader.model.textureFileDataIDs[i];
+                        }
                         break;
                     case 1:
                     case 2:
