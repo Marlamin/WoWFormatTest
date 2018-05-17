@@ -13,15 +13,7 @@ namespace WoWFormatLib.FileReaders
         {
             if (CASC.cascHandler.FileExists(filename))
             {
-                try
-                {
-                    LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
-                }
-                catch(Exception e)
-                {
-                    CASCLib.Logger.WriteLine("Error during reading file: {0}", e.Message);
-                    return;
-                }
+                LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
             }
             else
             {
@@ -31,7 +23,22 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadM2(int fileDataID)
         {
-            var m2 = CASC.cascHandler.OpenFile(fileDataID);
+#if DEBUG
+                LoadM2(CASC.cascHandler.OpenFile(fileDataID));
+#else
+                try
+                {
+                    LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
+                }
+                catch(Exception e)
+                {
+                    CASCLib.Logger.WriteLine("Error during reading file: {0}", e.Message);
+                    return;
+                }
+#endif
+        }
+
+        public void LoadM2(Stream m2) { 
             var bin = new BinaryReader(m2);
             long position = 0;
             while (position < m2.Length)
@@ -101,9 +108,9 @@ namespace WoWFormatLib.FileReaders
                         break;
                     default:
 #if DEBUG
-                        throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
+                        throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString()));
 #else
-                        CASCLib.Logger.WriteLine(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString(), "id: " + fileDataID));
+                        CASCLib.Logger.WriteLine(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString()));
                         break;
 #endif
                 }
@@ -488,10 +495,6 @@ namespace WoWFormatLib.FileReaders
                     if (!filename.Equals(""))
                     {
                         textures[i].filename = filename;
-                        if (!CASC.cascHandler.FileExists(filename))
-                        {
-                            Console.WriteLine("BLP file does not exist!!! {0}", filename);
-                        }
                     }
                     else
                     {
