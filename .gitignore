@@ -21,6 +21,7 @@
 [Dd]ebug/
 [Oo]bj/
 [Rr]elease/
+Properties/
 [Tt]humbs.db
 _ReSharper.*
 Ankh.NoLoad
@@ -45,14 +46,15 @@ CASCDump
 CASCBuilder
 EncodingDump
 DBCtest
+InstallDump
 ListFileGenerator
+MaxiMapCompiler
 OBJExporter
 OpenWoWEdit
 QuickFNChecker
 ShaderTest
 SubMeshDump
 UltraDiffer3000
-WoWJsonDumper
 WoWOpenGL_SH
 WoWOpenGL
 
