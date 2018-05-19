@@ -13,6 +13,14 @@ namespace WoWFormatLib.FileReaders
         private WMO wmofile;
         private byte lodLevel;
 
+        public WMO LoadWMO(Stream wmo, byte lod = 0)
+        {
+            lodLevel = lod;
+
+            ReadWMO(wmo);
+            return wmofile;
+        }
+
         public WMO LoadWMO(int filedataid, byte lod = 0)
         {
             lodLevel = lod;
@@ -21,7 +29,7 @@ namespace WoWFormatLib.FileReaders
             {
                 using (var wmoStream = CASC.cascHandler.OpenFile(filedataid))
                 {
-                    ReadWMO(filedataid, wmoStream);
+                    ReadWMO(wmoStream);
                 }
             }
             else
@@ -40,7 +48,7 @@ namespace WoWFormatLib.FileReaders
             {
                 using (var wmoStream = CASC.cascHandler.OpenFile(filename))
                 {
-                    ReadWMO(CASC.getFileDataIdByName(filename), wmoStream);
+                    ReadWMO(wmoStream);
                 }
             }
             else
@@ -52,7 +60,7 @@ namespace WoWFormatLib.FileReaders
         }
 
         /* PARENT */
-        private void ReadWMO(int filedataid, Stream wmo)
+        private void ReadWMO(Stream wmo)
         {
             using (var bin = new BinaryReader(wmo))
             {
@@ -72,7 +80,7 @@ namespace WoWFormatLib.FileReaders
                             wmofile.version = bin.Read<MVER>();
                             if (wmofile.version.version != 17)
                             {
-                                throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ") (" + filedataid + ")");
+                                throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
                             }
                             break;
                         case WMOChunks.MOHD:
@@ -116,7 +124,7 @@ namespace WoWFormatLib.FileReaders
                         case WMOChunks.MOUV: // MOUV Animated texture UVs
                             break;
                         default:
-                            throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName.ToString("X"), position.ToString(), filedataid));
+                            throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName.ToString("X"), position.ToString()));
                     }
                 }
             }
@@ -149,7 +157,7 @@ namespace WoWFormatLib.FileReaders
                     groupFileDataID = wmofile.groupFileDataIDs[i];
                 }
 
-                if (CASC.cascHandler.FileExists(groupFileDataID))
+                if (CASC.IsCASCInit && CASC.cascHandler.FileExists(groupFileDataID))
                 {
                     using (var wmoStream = CASC.cascHandler.OpenFile(groupFileDataID))
                     {

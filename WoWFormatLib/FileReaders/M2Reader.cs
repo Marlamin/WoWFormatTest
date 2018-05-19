@@ -28,7 +28,7 @@ namespace WoWFormatLib.FileReaders
 #else
                 try
                 {
-                    LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
+                    LoadM2(CASC.cascHandler.OpenFile(fileDataID));
                 }
                 catch(Exception e)
                 {
@@ -86,7 +86,7 @@ namespace WoWFormatLib.FileReaders
                     case M2Chunks.PFID: // Phys file ID
                         model.physFileID = bin.ReadInt32();
                         break;
-                    case M2Chunks.SKID: // Skel file DI
+                    case M2Chunks.SKID: // Skel file ID
                         model.skelFileID = bin.ReadInt32();
                         break;
                     case M2Chunks.TXID:
@@ -97,7 +97,7 @@ namespace WoWFormatLib.FileReaders
                         }
                         model.textureFileDataIDs = txids;
                         break;
-                    case M2Chunks.TXAC:
+                    case M2Chunks.TXAC: // Texture transforms (?)
                     case M2Chunks.EXPT: // Extended Particles
                     case M2Chunks.EXP2: // Extended Particles 2
                     case M2Chunks.PABC:
@@ -108,15 +108,18 @@ namespace WoWFormatLib.FileReaders
                         break;
                     default:
 #if DEBUG
-                        throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString()));
+                        throw new Exception(string.Format("M2: Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString()));
 #else
-                        CASCLib.Logger.WriteLine(String.Format("{2} Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString()));
+                        CASCLib.Logger.WriteLine(String.Format("M2: Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString()));
                         break;
 #endif
                 }
             }
 
-            model.skins = ReadSkins(model.skinFileDataIDs);
+            if(CASC.IsCASCInit)
+            {
+                model.skins = ReadSkins(model.skinFileDataIDs);
+            }
 
             return;
         }
