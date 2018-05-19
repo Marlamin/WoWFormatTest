@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using SereniaBLPLib;
 using WoWFormatLib;
+using WoWFormatLib.DBC;
 using WoWFormatLib.Utils;
 
 namespace WorldMapCompiler
@@ -66,9 +67,9 @@ namespace WorldMapCompiler
 
                     foreach (var mxaRow in UIMapXArtReader)
                     {
-                        var field0 = mxaRow.Value.GetField<uint>(0); // PhaseID
-                        var uiMapArtID = mxaRow.Value.GetField<uint>(1); // UIMapArtID
-                        var uiMapID = mxaRow.Value.GetField<uint>(2); // UIMapID
+                        var field0 = mxaRow.Value.GetField<uint>(1); // PhaseID
+                        var uiMapArtID = mxaRow.Value.GetField<uint>(0); // UIMapArtID
+                        var uiMapID = mxaRow.Value.GetField<int>(2); // UIMapID
 
                         if (field0 != 0)
                             continue; // Skip phase stuff for now
@@ -81,7 +82,7 @@ namespace WorldMapCompiler
 
                             foreach (var matRow in UIMapArtTileReader)
                             {
-                                if (matRow.Value.GetField<uint>(4) == uiMapArtID)
+                                if (matRow.Value.GetField<int>(4) == uiMapArtID)
                                 {
                                     var fdid = matRow.Value.GetField<int>(0);
                                     var rowIndex = matRow.Value.GetField<uint>(1);
@@ -156,7 +157,7 @@ namespace WorldMapCompiler
                                 {
                                     foreach (var wmotrow in WorldMapOverlayTileReader)
                                     {
-                                        var worldMapOverlayID = wmotrow.Value.GetField<uint>(4);
+                                        var worldMapOverlayID = wmotrow.Value.GetField<int>(4);
 
                                         // something wrong in/around this check
                                         if (worldMapOverlayID == wmorow.Value.Id)

@@ -1,7 +1,7 @@
 ﻿{
-    "installDir": "D:/World of Warcraft Beta", // Set this to your WoW installation directory, leave empty if you just want to use web
+    "installDir": "D:/WoWBeta/", // Set this to your WoW installation directory, leave empty if you just want to use web
     "program": "wow_beta", // Set this to wow for Retail, wowt for PTR or wow_beta for Alpha/Beta
     "saveExploredMaps": true, // Whether or not to save explored versions of maps
-    "saveUnexploredMaps": true, // Whether or not to save un-explored versions of maps
-    "saveMapLayers": true // Whether or not to save the individual exploration layers separately
+    "saveUnexploredMaps": false, // Whether or not to save un-explored versions of maps
+    "saveMapLayers": false // Whether or not to save the individual exploration layers separately
 }
