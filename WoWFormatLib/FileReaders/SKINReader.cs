@@ -64,25 +64,18 @@ namespace WoWFormatLib.FileReaders
             for (var i = 0; i < nSubmeshes; i++)
             {
                 submeshes[i].submeshID = bin.ReadUInt16();
-                submeshes[i].unk1 = bin.ReadUInt16();
+                submeshes[i].level = bin.ReadUInt16();
                 submeshes[i].startVertex = bin.ReadUInt16();
                 submeshes[i].nVertices = bin.ReadUInt16();
-                if (submeshes[i].unk1 == 1)
-                {
-                    submeshes[i].startTriangle = bin.ReadUInt32();
-                }
-                else
-                {
-                    submeshes[i].startTriangle = bin.ReadUInt16();
-                }
+                submeshes[i].startTriangle = bin.ReadUInt16() + (uint)(submeshes[i].level << 16);
                 submeshes[i].nTriangles = bin.ReadUInt16();
                 submeshes[i].nBones = bin.ReadUInt16();
                 submeshes[i].startBones = bin.ReadUInt16();
-                submeshes[i].unk2 = bin.ReadUInt16();
-                submeshes[i].rootBone = bin.ReadUInt16();
-                submeshes[i].centerMas = bin.Read<Vector3>();
-                submeshes[i].centerBoundingBox = bin.Read<Vector3>();
-                submeshes[i].radius = bin.ReadSingle();
+                submeshes[i].boneInfluences = bin.ReadUInt16();
+                submeshes[i].centerBoneIndex = bin.ReadUInt16();
+                submeshes[i].centerPosition = bin.Read<Vector3>();
+                submeshes[i].sortCenterPosition = bin.Read<Vector3>();
+                submeshes[i].sortRadius = bin.ReadSingle();
             }
             return submeshes;
         }

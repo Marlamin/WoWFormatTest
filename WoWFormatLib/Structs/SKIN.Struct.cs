@@ -37,18 +37,18 @@ namespace WoWFormatLib.Structs.SKIN
     public struct Submesh
     {
         public ushort submeshID;
-        public ushort unk1;
-        public ushort startVertex;
+        public ushort level;
+        public uint startVertex;
         public ushort nVertices;
         public uint startTriangle;
         public ushort nTriangles;
         public ushort nBones;
         public ushort startBones;
-        public ushort unk2;
-        public ushort rootBone;
-        public Vector3 centerMas;
-        public Vector3 centerBoundingBox;
-        public float radius;
+        public ushort boneInfluences;
+        public ushort centerBoneIndex;
+        public Vector3 centerPosition;
+        public Vector3 sortCenterPosition;
+        public float sortRadius;
     }
 
     public struct TextureUnit

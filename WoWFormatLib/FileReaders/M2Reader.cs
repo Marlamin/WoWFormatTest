@@ -491,19 +491,27 @@ namespace WoWFormatLib.FileReaders
                 {
                     var lenFilename = bin.ReadUInt32();
                     var ofsFilename = bin.ReadUInt32();
-                    var preFilenamePosition = bin.BaseStream.Position; // probably a better way to do all this
-                    bin.BaseStream.Position = ofsFilename;
-                    var filename = new string(bin.ReadChars(int.Parse(lenFilename.ToString())));
-                    filename = filename.Replace("\0", "");
-                    if (!filename.Equals(""))
+                    if(ofsFilename == 0)
                     {
-                        textures[i].filename = filename;
+                        // Referenced in TXID, no longer in file (rip listfiles)
+                        textures[i].filename = @"Test\QA_TEST_BLP_1.blp";
                     }
                     else
                     {
-                        textures[i].filename = @"Test\QA_TEST_BLP_1.blp";
+                        var preFilenamePosition = bin.BaseStream.Position; // probably a better way to do all this
+                        bin.BaseStream.Position = ofsFilename;
+                        var filename = new string(bin.ReadChars(int.Parse(lenFilename.ToString())));
+                        filename = filename.Replace("\0", "");
+                        if (!filename.Equals(""))
+                        {
+                            textures[i].filename = filename;
+                        }
+                        else
+                        {
+                            textures[i].filename = @"Test\QA_TEST_BLP_1.blp";
+                        }
+                        bin.BaseStream.Position = preFilenamePosition;
                     }
-                    bin.BaseStream.Position = preFilenamePosition;
                 }
                 else
                 {
