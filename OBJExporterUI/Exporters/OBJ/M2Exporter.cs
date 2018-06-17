@@ -131,9 +131,9 @@ namespace OBJExporterUI.Exporters.OBJ
             var textureID = 0;
             var materials = new Structs.Material[reader.model.textures.Count()];
 
-            for (int i = 0; i < reader.model.textures.Count(); i++)
+            for (var i = 0; i < reader.model.textures.Count(); i++)
             {
-                int textureFileDataID = 840426;
+                var textureFileDataID = 840426;
                 materials[i].flags = reader.model.textures[i].flags;
                 switch (reader.model.textures[i].type)
                 {

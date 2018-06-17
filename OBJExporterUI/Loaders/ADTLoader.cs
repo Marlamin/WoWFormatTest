@@ -150,7 +150,7 @@ namespace OBJExporterUI.Loaders
                     if(adt.texChunks[c].alphaLayer != null){
                         alphalayermats.Add(BLPLoader.GenerateAlphaTexture(adt.texChunks[c].alphaLayer[li].layer));
                     }
-                    layermats.Add((uint)cache.materials[adt.textures.filenames[adt.texChunks[c].layers[li].textureId].ToLower()]);
+                    layermats.Add((uint)cache.materials[WoWFormatLib.Utils.CASC.getFileDataIdByName(adt.textures.filenames[adt.texChunks[c].layers[li].textureId])]);
 
                     var curMat = materials.Where(material => material.filename == adt.textures.filenames[adt.texChunks[c].layers[li].textureId]).Single();
 

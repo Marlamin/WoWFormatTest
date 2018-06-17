@@ -9,7 +9,7 @@ namespace OBJExporterUI
     class CacheStorage
     {
         public Dictionary<string, WoWFormatLib.Structs.M2.M2Model> models = new Dictionary<string, WoWFormatLib.Structs.M2.M2Model>();
-        public Dictionary<string, int> materials = new Dictionary<string, int>();
+        public Dictionary<int, int> materials = new Dictionary<int, int>();
         public Dictionary<string, WoWFormatLib.Structs.WMO.WMO> worldModels = new Dictionary<string, WoWFormatLib.Structs.WMO.WMO>();
 
         public Dictionary<string, Renderer.Structs.DoodadBatch> doodadBatches = new Dictionary<string, Renderer.Structs.DoodadBatch>();

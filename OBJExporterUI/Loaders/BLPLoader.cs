@@ -9,18 +9,21 @@ namespace OBJExporterUI.Loaders
     {
         public static int LoadTexture(string filename, CacheStorage cache)
         {
+            return LoadTexture(CASC.getFileDataIdByName(filename), cache);
+        }
+
+        public static int LoadTexture(int filedataid, CacheStorage cache)
+        {
             GL.ActiveTexture(TextureUnit.Texture0);
 
-            filename = filename.ToLower();
-            
-            if (cache.materials.ContainsKey(filename))
+            if (cache.materials.ContainsKey(filedataid))
             {
-                return cache.materials[filename];
+                return cache.materials[filedataid];
             }
 
             int textureId = GL.GenTexture();
 
-            using (var blp = new BlpFile(CASC.cascHandler.OpenFile(filename)))
+            using (var blp = new BlpFile(CASC.cascHandler.OpenFile(filedataid)))
             {
                 switch (blp.encoding)
                 {
@@ -35,7 +38,7 @@ namespace OBJExporterUI.Loaders
                         }
 
                         GL.BindTexture(TextureTarget.Texture2D, textureId);
-                        cache.materials.Add(filename, textureId);
+                        cache.materials.Add(filedataid, textureId);
                         System.Drawing.Imaging.BitmapData bmp_data = bmp.LockBits(new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                         GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bmp_data.Width, bmp_data.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);

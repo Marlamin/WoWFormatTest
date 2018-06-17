@@ -491,7 +491,7 @@ namespace WoWFormatLib.FileReaders
                 {
                     var lenFilename = bin.ReadUInt32();
                     var ofsFilename = bin.ReadUInt32();
-                    if(ofsFilename == 0)
+                    if(ofsFilename < 10)
                     {
                         // Referenced in TXID, no longer in file (rip listfiles)
                         textures[i].filename = @"Test\QA_TEST_BLP_1.blp";

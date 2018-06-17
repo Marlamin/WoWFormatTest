@@ -75,54 +75,37 @@ namespace OBJExporterUI.Loaders
 
             for (var i = 0; i < model.textures.Count(); i++)
             {
-                var texturefilename = model.textures[i].filename;
+                var textureFileDataID = 372993;
                 ddBatch.mats[i].flags = model.textures[i].flags;
 
                 switch (model.textures[i].type)
                 {
                     case 0:
-                        // Console.WriteLine("      Texture given in file!");
-                        texturefilename = model.textures[i].filename;
-                        break;
-                    case 1:
-                       // string[] csfilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type, i);
-                       // if (csfilenames.Count() > 0)
-                       // {
-                       //     texturefilename = csfilenames[0];
-                      //  }
-                       // else
-                      //  {
-                      //      //Console.WriteLine("      No type 1 texture found, falling back to placeholder texture");
-                      //  }
-                        break;
-                    case 2:
-                        if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(System.IO.Path.ChangeExtension(filename, ".blp")))
+                        if(model.textureFileDataIDs != null && model.textureFileDataIDs.Length > 0)
                         {
-                            texturefilename = System.IO.Path.ChangeExtension(filename, ".blp");
+                            textureFileDataID = model.textureFileDataIDs[i];
                         }
                         else
                         {
-                            //Console.WriteLine("      Type 2 does not exist!");
-                            //needs lookup?
+                            textureFileDataID = WoWFormatLib.Utils.CASC.getFileDataIdByName(model.textures[i].filename);
                         }
                         break;
+                    case 1:
+                    case 2:
                     case 11:
-                      //  string[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(filename, (int)model.textures[i].type);
-                      //  for (int ti = 0; ti < cdifilenames.Count(); ti++)
-                      //  {
-                      //      if (WoWFormatLib.Utils.CASC.FileExists(filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp")))
-                      //      {
-                     //           texturefilename = filename.Replace(model.name + ".M2", cdifilenames[ti] + ".blp");
-                      //      }
-                      //  }
-                        break;
                     default:
-                        //Console.WriteLine("      Falling back to placeholder texture");
-                        texturefilename = "Dungeons\\Textures\\testing\\COLOR_13.blp";
+                        textureFileDataID = 372993;
                         break;
                 }
-                ddBatch.mats[i].textureID = BLPLoader.LoadTexture(texturefilename, cache);
-                ddBatch.mats[i].filename = texturefilename;
+
+                // Not set in TXID
+                if(textureFileDataID == 0)
+                {
+                    textureFileDataID = 372993;
+                }
+
+                ddBatch.mats[i].textureID = BLPLoader.LoadTexture(textureFileDataID, cache);
+                ddBatch.mats[i].filename = textureFileDataID.ToString();
             }
 
             // Submeshes
@@ -147,12 +130,14 @@ namespace OBJExporterUI.Loaders
                     if (model.skins[0].textureunit[tu].submeshIndex == i)
                     {
                         ddBatch.submeshes[i].blendType = model.renderflags[model.skins[0].textureunit[tu].renderFlags].blendingMode;
-                        if (!cache.materials.ContainsKey(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower()))
+                        var textureFileDataID = WoWFormatLib.Utils.CASC.getFileDataIdByName(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename);
+
+                        if (!cache.materials.ContainsKey(textureFileDataID))
                         {
-                            throw new Exception("MaterialCache does not have texture " + model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower());
+                            throw new Exception("MaterialCache does not have texture " + textureFileDataID);
                         }
 
-                        ddBatch.submeshes[i].material = (uint)cache.materials[model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename.ToLower()];
+                        ddBatch.submeshes[i].material = (uint)cache.materials[textureFileDataID];
                     }
                 }
             }
