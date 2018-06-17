@@ -130,7 +130,17 @@ namespace OBJExporterUI.Loaders
                     if (model.skins[0].textureunit[tu].submeshIndex == i)
                     {
                         ddBatch.submeshes[i].blendType = model.renderflags[model.skins[0].textureunit[tu].renderFlags].blendingMode;
-                        var textureFileDataID = WoWFormatLib.Utils.CASC.getFileDataIdByName(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename);
+
+                        var textureFileDataID = 372993;
+
+                        if (model.textureFileDataIDs != null && model.textureFileDataIDs.Length > 0)
+                        {
+                            textureFileDataID = model.textureFileDataIDs[model.texlookup[model.skins[0].textureunit[tu].texture].textureID];
+                        }
+                        else
+                        {
+                            textureFileDataID = WoWFormatLib.Utils.CASC.getFileDataIdByName(model.textures[model.texlookup[model.skins[0].textureunit[tu].texture].textureID].filename);
+                        }
 
                         if (!cache.materials.ContainsKey(textureFileDataID))
                         {
