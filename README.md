@@ -17,8 +17,10 @@ If you have World of Warcraft (7.3.5 or higher) fully installed you can use your
 Exports various WoW model formats to Wavefront .obj. Primary application.
 #### WoWFormatLib
 Does parsing of WoW's raw data files and returns them in a object that other applications can use. Handles CASC (WoW's filesystem), file parsing.
-#### MinimapCompiler
-Compiles minimaps. Not important, but still actively developed as I will need it for my other projects soon.
+#### MaxiMapCompiler
+Compiles minimaps. Can also upscale tiles to 512x512 if they are still 256x256.
+#### MaxiMapCutter
+Cuts compiled minimaps into Google Maps/Leaflet compatible tilesets.
 ### Test projects
 #### WoWFormatTest
 App used to test some formats with.
