@@ -67,11 +67,11 @@ namespace WorldMapCompiler
 
                     foreach (var mxaRow in UIMapXArtReader)
                     {
-                        var field0 = mxaRow.Value.GetField<uint>(1); // PhaseID
-                        var uiMapArtID = mxaRow.Value.GetField<uint>(0); // UIMapArtID
+                        var phaseID = mxaRow.Value.GetField<uint>(0); // PhaseID
+                        var uiMapArtID = mxaRow.Value.GetField<uint>(1); // UIMapArtID
                         var uiMapID = mxaRow.Value.GetField<int>(2); // UIMapID
 
-                        if (field0 != 0)
+                        if (phaseID != 0)
                             continue; // Skip phase stuff for now
 
                         if (uiMapID == mapRow.Value.Id)
@@ -82,12 +82,13 @@ namespace WorldMapCompiler
 
                             foreach (var matRow in UIMapArtTileReader)
                             {
-                                if (matRow.Value.GetField<int>(4) == uiMapArtID)
+                                var matUiMapArtID = matRow.Value.GetField<int>(4);
+                                if (matUiMapArtID == uiMapArtID)
                                 {
-                                    var fdid = matRow.Value.GetField<int>(0);
-                                    var rowIndex = matRow.Value.GetField<uint>(1);
-                                    var colIndex = matRow.Value.GetField<uint>(2);
-                                    var layerIndex = matRow.Value.GetField<uint>(3);
+                                    var fdid = matRow.Value.GetField<int>(3);
+                                    var rowIndex = matRow.Value.GetField<byte>(0);
+                                    var colIndex = matRow.Value.GetField<byte>(1);
+                                    var layerIndex = matRow.Value.GetField<byte>(2);
 
                                     // Skip other layers for now
                                     if (layerIndex != 0)
@@ -145,9 +146,9 @@ namespace WorldMapCompiler
 
                             foreach (var wmorow in WorldMapOverlayReader)
                             {
-                                var WMOUIMapArtID = wmorow.Value.GetField<uint>(3);
-                                var offsetX = wmorow.Value.GetField<int>(4);
-                                var offsetY = wmorow.Value.GetField<int>(5);
+                                var WMOUIMapArtID = wmorow.Value.GetField<uint>(0);
+                                var offsetX = wmorow.Value.GetField<short>(4);
+                                var offsetY = wmorow.Value.GetField<short>(5);
 
                                 uint maxWMORows = 0;
                                 uint maxWMOCols = 0;
@@ -162,10 +163,10 @@ namespace WorldMapCompiler
                                         // something wrong in/around this check
                                         if (worldMapOverlayID == wmorow.Value.Id)
                                         {
-                                            var fdid = wmotrow.Value.GetField<int>(0);
-                                            var rowIndex = wmotrow.Value.GetField<uint>(1);
-                                            var colIndex = wmotrow.Value.GetField<uint>(2);
-                                            var layerIndex = wmotrow.Value.GetField<uint>(3);
+                                            var fdid = wmotrow.Value.GetField<int>(3);
+                                            var rowIndex = wmotrow.Value.GetField<byte>(0);
+                                            var colIndex = wmotrow.Value.GetField<byte>(1);
+                                            var layerIndex = wmotrow.Value.GetField<byte>(2);
 
                                             // Skip other layers for now
                                             if (layerIndex != 0)
@@ -192,7 +193,6 @@ namespace WorldMapCompiler
                                 {
                                     continue;
                                 }
-
 
                                 var layerResX = (maxWMORows + 1) * 256;
                                 var layerResY = (maxWMOCols + 1) * 256;
