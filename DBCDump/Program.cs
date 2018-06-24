@@ -1,9 +1,13 @@
-﻿using System;
+﻿using CascStorageLib;
+using CascStorageLib.Attributes;
+using DBDefsLib;
+using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
-using WoWFormatLib.DBC;
-using static DBDefsLib.Structs;
-
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Text;
 namespace DBCDump
 {
     class Program
@@ -12,211 +16,225 @@ namespace DBCDump
         {
             if (args.Length != 2)
             {
-                Console.WriteLine("Not enough arguments! Require source and target.");
+                Console.WriteLine("Not enough arguments: inputdb2 outputcsv");
                 return;
             }
 
-            if (!File.Exists(args[0]))
+            var filename = args[0];
+            var outputcsv = args[1];
+
+            if (!File.Exists(filename))
             {
-                throw new FileNotFoundException("File " + args[0] + " could not be found!");
+                throw new Exception("Input DB2 file does not exist!");
             }
 
-            DB2Reader reader;
-
-            using (var stream = File.Open(args[0], FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var bin = new BinaryReader(stream))
+            if (!Directory.Exists(Path.GetDirectoryName(outputcsv)))
             {
-                var identifier = new string(bin.ReadChars(4));
-                stream.Position = 0;
-                switch (identifier)
-                {
-                    case "WDC2":
-                        reader = new WDC2Reader(stream);
-                        break;
-                    case "WDC1":
-                        reader = new WDC1Reader(stream);
-                        break;
-                    default:
-                        throw new Exception("DBC type " + identifier + " is not supported!");
-                }
+                Directory.CreateDirectory(Path.GetDirectoryName(outputcsv));
             }
 
-            var dbd = new DBDefinition();
-            var dbdFound = false;
+            var reader = new WDC2Reader(filename);
+
+            var defs = new Structs.DBDefinition();
 
             foreach (var file in Directory.GetFiles("definitions/"))
             {
-                if (Path.GetFileNameWithoutExtension(file).ToLower() == Path.GetFileNameWithoutExtension(args[0]).ToLower())
+                if (Path.GetFileNameWithoutExtension(file).ToLower() == Path.GetFileNameWithoutExtension(filename.ToLower()))
                 {
-                    var dbdef = new DBDefsLib.DBDReader();
-                    dbd = dbdef.Read(file);
-                    dbdFound = true;
+                    defs = new DBDReader().Read(file);
                 }
             }
 
-            if (!dbdFound)
-            {
-                throw new Exception("Unable to find any definitions for " + Path.GetFileNameWithoutExtension(args[0]));
-            }
+            var writer = new StreamWriter(outputcsv);
 
-            var definitionToUse = new VersionDefinitions();
-
-            var layoutHash = reader.LayoutHash.ToString("X8").ToUpper();
-            foreach (var versionDef in dbd.versionDefinitions)
+            foreach (var definition in defs.versionDefinitions)
             {
-                if (versionDef.layoutHashes.Any(layoutHash.Contains))
+                if (definition.layoutHashes.Contains(reader.LayoutHash.ToString("X8")))
                 {
-                    definitionToUse = versionDef;
-                }
-            }
+                    var aName = new AssemblyName("DynamicAssemblyExample");
+                    var ab = AssemblyBuilder.DefineDynamicAssembly(aName, AssemblyBuilderAccess.Run);
+                    var mb = ab.DefineDynamicModule(aName.Name);
+                    var tb = mb.DefineType(Path.GetFileNameWithoutExtension(filename) + "Struct", TypeAttributes.Public);
 
-            if(definitionToUse.Equals(new VersionDefinitions()))
-            {
-                Console.WriteLine("Layouthash " + layoutHash + " not found in definitions file, trying to find definition with matching field count..");
-                foreach (var versionDef in dbd.versionDefinitions)
-                {
-                    var fields = versionDef.definitions.Length;
-                    foreach (var definition in versionDef.definitions)
+                    foreach (var field in definition.definitions)
                     {
-                        if (definition.isNonInline)
+                        var fbNumber = tb.DefineField(field.name, DBDefTypeToType(defs.columnDefinitions[field.name].type, field.size, field.isSigned, field.arrLength), FieldAttributes.Public);
+                        if (field.isID)
                         {
-                            fields -= 1;
+                            var constructorParameters = new Type[] { };
+                            var constructorInfo = typeof(IndexAttribute).GetConstructor(constructorParameters);
+                            var displayNameAttributeBuilder = new CustomAttributeBuilder(constructorInfo, new object[] { });
+                            fbNumber.SetCustomAttribute(displayNameAttributeBuilder);
                         }
                     }
 
-                    if (fields == reader.FieldsCount)
-                    {
-                        definitionToUse = versionDef;
-                    }
-                }
-            }
+                    var type = tb.CreateType();
+                    var genericType = typeof(Storage<>).MakeGenericType(type);
+                    var storage = (IDictionary)Activator.CreateInstance(genericType, filename);
 
-            if (definitionToUse.Equals(new VersionDefinitions()))
-            {
-                throw new Exception("Unable to find/guess definition for " + Path.GetFileNameWithoutExtension(args[0]));
-            }
-
-            using (var writer = new CsvHelper.CsvWriter(new StreamWriter(File.OpenWrite(args[1]))))
-            {
-                foreach (var definition in definitionToUse.definitions)
-                {
-                    if (definition.isNonInline && definition.isID)
+                    if (storage.Values.Count == 0)
                     {
-                        writer.WriteField(definition.name);
+                        throw new Exception("No rows found!");
                     }
-                    else if (definition.isNonInline)
-                    {
-                        // Skip these for now
-                    }
-                    else
-                    {
-                        int length;
-                        if (definition.arrLength > 1)
-                        {
-                            length = definition.arrLength;
-                        }
-                        else
-                        {
-                            length = 1;
-                        }
 
-                        for (var i = 0; i < length; i++)
+                    var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic | BindingFlags.Instance);
+
+                    var headerWritten = false;
+
+                    foreach (var item in storage.Values)
+                    {
+                        // Write CSV header
+                        if (!headerWritten)
                         {
-                            if(length > 1)
+                            for (var j = 0; j < fields.Length; ++j)
                             {
-                                writer.WriteField(definition.name + "[" + i + "]");
+                                var field = fields[j];
+
+                                var isEndOfRecord = fields.Length - 1 == j;
+
+                                if (field.FieldType.IsArray)
+                                {
+                                    var a = (Array)field.GetValue(item);
+                                    for (var i = 0; i < a.Length; i++)
+                                    {
+                                        var isEndOfArray = a.Length - 1 == i;
+
+                                        writer.Write($"{field.Name}[{i}]");
+                                        if (!isEndOfArray)
+                                            writer.Write(",");
+                                    }
+                                }
+                                else
+                                {
+                                    writer.Write(field.Name);
+                                }
+
+                                if (!isEndOfRecord)
+                                    writer.Write(",");
+                            }
+                            headerWritten = true;
+                            writer.WriteLine();
+                        }
+
+                        for (var i = 0; i < fields.Length; ++i)
+                        {
+                            var field = fields[i];
+
+                            var isEndOfRecord = fields.Length - 1 == i;
+
+                            if (field.FieldType.IsArray)
+                            {
+                                var a = (Array)field.GetValue(item);
+
+                                for (var j = 0; j < a.Length; j++)
+                                {
+                                    var isEndOfArray = a.Length - 1 == j;
+                                    writer.Write(a.GetValue(j));
+
+                                    if (!isEndOfArray)
+                                        writer.Write(",");
+                                }
                             }
                             else
                             {
-                                writer.WriteField(definition.name);
+                                var value = field.GetValue(item);
+                                if (value.GetType() == typeof(string))
+                                    value = StringToCSVCell((string)value);
+
+                                writer.Write(value);
                             }
+
+                            if (!isEndOfRecord)
+                                writer.Write(",");
                         }
+
+                        writer.WriteLine();
                     }
+
+                    writer.Dispose();
+                    Environment.Exit(0);
                 }
-                writer.NextRecord();
-
-                foreach (var row in reader)
-                {
-                    var fieldPos = 0;
-                    foreach (var definition in definitionToUse.definitions)
-                    {
-                        if (definition.isNonInline && definition.isID)
-                        {
-                            writer.WriteField(row.Key);
-                        }else if(definition.isNonInline){
-                            // Skip these for now
-                        }
-                        else
-                        {
-                            int length;
-                            if(definition.arrLength > 1)
-                            {
-                                length = definition.arrLength;
-                            }
-                            else
-                            {
-                                length = 1;
-                            }
-
-                            for(var i = 0; i < length; i++)
-                            {
-                                var arrayPos = -1;
-
-                                if(length > 1)
-                                {
-                                    arrayPos = i;
-                                }
-
-                                switch (dbd.columnDefinitions[definition.name].type)
-                                {
-                                    case "uint":
-                                        switch (definition.size)
-                                        {
-                                            case 8:
-                                                writer.WriteField(row.Value.GetField<byte>(fieldPos, arrayPos));
-                                                break;
-                                            case 16:
-                                                writer.WriteField(row.Value.GetField<ushort>(fieldPos, arrayPos));
-                                                break;
-                                            case 32:
-                                                writer.WriteField(row.Value.GetField<uint>(fieldPos, arrayPos));
-                                                break;
-                                        }
-                                        break;
-                                    case "int":
-                                        switch (definition.size)
-                                        {
-                                            case 8:
-                                                writer.WriteField(row.Value.GetField<sbyte>(fieldPos, arrayPos));
-                                                break;
-                                            case 16:
-                                                writer.WriteField(row.Value.GetField<short>(fieldPos, arrayPos));
-                                                break;
-                                            case 32:
-                                                writer.WriteField(row.Value.GetField<int>(fieldPos, arrayPos));
-                                                break;
-                                        }
-                                        break;
-                                    case "locstring":
-                                    case "string":
-                                        writer.WriteField(row.Value.GetField<string>(fieldPos, arrayPos));
-                                        break;
-                                    case "float":
-                                        writer.WriteField(row.Value.GetField<float>(fieldPos, arrayPos));
-                                        break;
-                                    default:
-                                        throw new Exception("Unhandled type: " + dbd.columnDefinitions[definition.name].type);
-                                }
-                            }
-                            
-                            fieldPos++;
-                        }
-                    }
-                    writer.NextRecord();
-                }
-                writer.Flush();
-                return;
             }
+
+            throw new Exception("Unable to find layouthash " + reader.LayoutHash.ToString("X8") + "!");
+        }
+
+        public static string StringToCSVCell(string str)
+        {
+            var mustQuote = (str.Contains(",") || str.Contains("\"") || str.Contains("\r") || str.Contains("\n"));
+            if (mustQuote)
+            {
+                var sb = new StringBuilder();
+                sb.Append("\"");
+                foreach (var nextChar in str)
+                {
+                    sb.Append(nextChar);
+                    if (nextChar == '"')
+                        sb.Append("\"");
+                }
+                sb.Append("\"");
+                return sb.ToString();
+            }
+
+            return str;
+        }
+
+        private static Type DBDefTypeToType(string type, int size, bool signed, int arrLength)
+        {
+            if (arrLength == 0)
+            {
+                switch (type)
+                {
+                    case "int":
+                        switch (size)
+                        {
+                            case 8:
+                                return signed ? typeof(sbyte) : typeof(byte);
+                            case 16:
+                                return signed ? typeof(short) : typeof(ushort);
+                            case 32:
+                                return signed ? typeof(int) : typeof(uint);
+                            case 64:
+                                return signed ? typeof(long) : typeof(ulong); 
+                        }
+                        break;
+                    case "string":
+                    case "locstring":
+                        return typeof(string);
+                    case "float":
+                        return typeof(float);
+                    default:
+                        throw new Exception("oh lord jesus have mercy i don't know about type " + type);
+                }
+            }
+            else
+            {
+                switch (type)
+                {
+                    case "int":
+                        switch (size)
+                        {
+                            case 8:
+                                return signed ? typeof(sbyte[]) : typeof(byte[]);
+                            case 16:
+                                return signed ? typeof(short[]) : typeof(ushort[]);
+                            case 32:
+                                return signed ? typeof(int[]) : typeof(uint[]);
+                            case 64:
+                                return signed ? typeof(long[]) : typeof(ulong[]);
+                        }
+                        break;
+                    case "string":
+                    case "locstring":
+                        return typeof(string[]);
+                    case "float":
+                        return typeof(float[]);
+                    default:
+                        throw new Exception("oh lord jesus have mercy i don't know about type " + type);
+                }
+            }
+
+            return typeof(int);
         }
     }
 }
