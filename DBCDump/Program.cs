@@ -33,7 +33,7 @@ namespace DBCDump
                 Directory.CreateDirectory(Path.GetDirectoryName(outputcsv));
             }
 
-            var reader = new WDC2Reader(filename);
+            var reader = new WDC2Reader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read));
 
             var defs = new Structs.DBDefinition();
 

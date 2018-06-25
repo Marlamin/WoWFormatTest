@@ -6,14 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="7.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="CascStorageLib">
       <HintPath>..\..\..\..\GitHub\CascStorageLib\CascStorageLib\bin\Debug\CascStorageLib.dll</HintPath>
     </Reference>
