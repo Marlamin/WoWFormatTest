@@ -76,8 +76,8 @@ namespace WorldMapCompiler
 
                         if (uiMapID == mapRow.Value.Id)
                         {
-                            uint maxRows = uint.MinValue;
-                            uint maxCols = uint.MinValue;
+                            var maxRows = uint.MinValue;
+                            var maxCols = uint.MinValue;
                             var tileDict = new Dictionary<string, int>();
 
                             foreach (var matRow in UIMapArtTileReader)
@@ -146,7 +146,7 @@ namespace WorldMapCompiler
 
                             foreach (var wmorow in WorldMapOverlayReader)
                             {
-                                var WMOUIMapArtID = wmorow.Value.GetField<uint>(0);
+                                var WMOUIMapArtID = wmorow.Value.GetField<uint>(1);
                                 var offsetX = wmorow.Value.GetField<short>(4);
                                 var offsetY = wmorow.Value.GetField<short>(5);
 
