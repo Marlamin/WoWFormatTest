@@ -10,7 +10,7 @@ namespace WoWFormatLib.Utils
 
         private static bool fIsCASCInit = false;
         public static Dictionary<int, string> rootList;
-        public static void InitCasc(BackgroundWorkerEx worker = null, string basedir = null, string program = "wowt"){
+        public static void InitCasc(BackgroundWorkerEx worker = null, string basedir = null, string program = "wowt", LocaleFlags locale = LocaleFlags.enUS){
 
             CASCConfig.LoadFlags &= ~(LoadFlags.Download | LoadFlags.Install);
             CASCConfig.ValidateData = false;
@@ -29,7 +29,7 @@ namespace WoWFormatLib.Utils
                 cascHandler = CASCHandler.OpenLocalStorage(basedir, worker);
             }
             
-            cascHandler.Root.SetFlags(LocaleFlags.enUS, ContentFlags.None, false);
+            cascHandler.Root.SetFlags(locale, ContentFlags.None, false);
 
             fIsCASCInit = true;
         }
