@@ -1,6 +1,7 @@
 ﻿{
     "installDir": "D:/WoWBeta/", // Set this to your WoW installation directory, leave empty if you just want to use web
     "program": "wow_beta", // Set this to wow for Retail, wowt for PTR or wow_beta for Alpha/Beta
+    "locale": "enUS", // Set this to deDE, enUS, ruRU, zhCN or zhTW for what language names/map images should be
     "saveExploredMaps": true, // Whether or not to save explored versions of maps
     "saveUnexploredMaps": false, // Whether or not to save un-explored versions of maps
     "saveMapLayers": false // Whether or not to save the individual exploration layers separately

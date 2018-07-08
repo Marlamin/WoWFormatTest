@@ -36,13 +36,37 @@ namespace WorldMapCompiler
                 Directory.CreateDirectory("layers");
             }
 
-            if(config["installDir"] != string.Empty && Directory.Exists(config["installDir"]))
+            var locale = CASCLib.LocaleFlags.enUS;
+
+            if (config["locale"] != string.Empty)
             {
-                CASC.InitCasc(null, config["installDir"], config["program"]);
+                switch (config["locale"])
+                {
+                    case "deDE":
+                        locale = CASCLib.LocaleFlags.deDE;
+                        break;
+                    case "enUS":
+                        locale = CASCLib.LocaleFlags.enUS;
+                        break;
+                    case "ruRU":
+                        locale = CASCLib.LocaleFlags.ruRU;
+                        break;
+                    case "zhCN":
+                        locale = CASCLib.LocaleFlags.zhCN;
+                        break;
+                    case "zhTW":
+                        locale = CASCLib.LocaleFlags.zhTW;
+                        break;
+                }
+            }
+
+            if (config["installDir"] != string.Empty && Directory.Exists(config["installDir"]))
+            {
+                CASC.InitCasc(null, config["installDir"], config["program"], locale);
             }
             else
             {
-                CASC.InitCasc(null, null, config["program"]);
+                CASC.InitCasc(null, null, config["program"], locale);
             }
 
             using (var UIMapStream = CASC.cascHandler.OpenFile("DBFilesClient\\UIMap.db2"))
