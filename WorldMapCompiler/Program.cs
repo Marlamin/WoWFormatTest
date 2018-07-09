@@ -151,8 +151,15 @@ namespace WorldMapCompiler
                                     {
                                         using (var stream = CASC.cascHandler.OpenFile(fdid))
                                         {
-                                            var blp = new BlpFile(stream);
-                                            g.DrawImage(blp.GetBitmap(0), cur_y * 256, cur_x * 256, new Rectangle(0, 0, 256, 256), GraphicsUnit.Pixel);
+                                            try
+                                            {
+                                                var blp = new BlpFile(stream);
+                                                g.DrawImage(blp.GetBitmap(0), cur_y * 256, cur_x * 256, new Rectangle(0, 0, 256, 256), GraphicsUnit.Pixel);
+                                            }
+                                            catch(Exception e)
+                                            {
+                                                Console.WriteLine("An error occured opening BLP with filedataid " + fdid);
+                                            }
                                         }
                                     }
                                 }
@@ -234,15 +241,22 @@ namespace WorldMapCompiler
                                         {
                                             using (var stream = CASC.cascHandler.OpenFile(fdid))
                                             {
-                                                var blp = new BlpFile(stream);
-                                                var posY = cur_y * 256 + offsetX;
-                                                var posX = cur_x * 256 + offsetY;
-
-                                                if (saveLayers)
+                                                try
                                                 {
-                                                    layerGraphics.DrawImage(blp.GetBitmap(0), cur_y * 256, cur_x * 256, new Rectangle(0, 0, 256, 256), GraphicsUnit.Pixel);
+                                                    var blp = new BlpFile(stream);
+                                                    var posY = cur_y * 256 + offsetX;
+                                                    var posX = cur_x * 256 + offsetY;
+
+                                                    if (saveLayers)
+                                                    {
+                                                        layerGraphics.DrawImage(blp.GetBitmap(0), cur_y * 256, cur_x * 256, new Rectangle(0, 0, 256, 256), GraphicsUnit.Pixel);
+                                                    }
+                                                    g.DrawImage(blp.GetBitmap(0), posY, posX, new Rectangle(0, 0, 256, 256), GraphicsUnit.Pixel);
                                                 }
-                                                g.DrawImage(blp.GetBitmap(0), posY, posX, new Rectangle(0, 0, 256, 256), GraphicsUnit.Pixel);
+                                                catch (Exception e)
+                                                {
+                                                    Console.WriteLine("An error occured opening BLP with filedataid " + fdid);
+                                                }
                                             }
                                         }
                                     }
