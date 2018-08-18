@@ -81,7 +81,7 @@ namespace OBJExporterUI.Loaders
                 switch (model.textures[i].type)
                 {
                     case 0:
-                        if(model.textureFileDataIDs != null && model.textureFileDataIDs.Length > 0)
+                        if(model.textureFileDataIDs != null && model.textureFileDataIDs.Length > 0 && model.textureFileDataIDs[i] != 0)
                         {
                             textureFileDataID = model.textureFileDataIDs[i];
                         }
@@ -133,7 +133,7 @@ namespace OBJExporterUI.Loaders
 
                         var textureFileDataID = 372993;
 
-                        if (model.textureFileDataIDs != null && model.textureFileDataIDs.Length > 0)
+                        if (model.textureFileDataIDs != null && model.textureFileDataIDs.Length > 0 && model.textureFileDataIDs[model.texlookup[model.skins[0].textureunit[tu].texture].textureID] != 0)
                         {
                             textureFileDataID = model.textureFileDataIDs[model.texlookup[model.skins[0].textureunit[tu].texture].textureID];
                         }
