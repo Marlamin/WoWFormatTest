@@ -171,48 +171,54 @@ namespace OBJExporterUI.Exporters.OBJ
                 renderBatches.Add(batch);
             }
             ConfigurationManager.RefreshSection("appSettings");
-            Console.WriteLine(ConfigurationManager.AppSettings["exportEverything"]);
-            if(ConfigurationManager.AppSettings["exportEverything"] == "True")
+
+            if (ConfigurationManager.AppSettings["exportWMO"] == "True" || ConfigurationManager.AppSettings["exportM2"] == "True")
             {
                 var doodadSW = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + "_ModelPlacementInformation.csv"));
                 doodadSW.WriteLine("ModelFile;PositionX;PositionY;PositionZ;RotationX;RotationY;RotationZ;ScaleFactor;ModelId;Type");
 
-                exportworker.ReportProgress(25, "Exporting WMOs");
-
-                for (var mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
+                if (ConfigurationManager.AppSettings["exportWMO"] == "True")
                 {
-                    var wmo = reader.adtfile.objects.worldModels.entries[mi];
-                    
-                    var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
+                    exportworker.ReportProgress(25, "Exporting WMOs");
 
-                    if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                    for (var mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
                     {
-                        WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)), wmo.doodadSet);
-                    }
+                        var wmo = reader.adtfile.objects.worldModels.entries[mi];
 
-                    if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
-                    {
-                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";" + wmo.scale / 1024f + ";" + wmo.uniqueId + ";wmo");
-                    }
+                        var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
 
+                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                        {
+                            WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)), wmo.doodadSet);
+                        }
+
+                        if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                        {
+                            doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";" + wmo.scale / 1024f + ";" + wmo.uniqueId + ";wmo");
+                        }
+
+                    }
                 }
 
-                exportworker.ReportProgress(50, "Exporting M2s");
-
-                for (var mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
+                if (ConfigurationManager.AppSettings["exportM2"] == "True")
                 {
-                    var doodad = reader.adtfile.objects.models.entries[mi];
+                    exportworker.ReportProgress(50, "Exporting M2s");
 
-                    var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
-
-                    if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                    for (var mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
                     {
-                        M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
-                    }
+                        var doodad = reader.adtfile.objects.models.entries[mi];
 
-                    if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
-                    {
-                        doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId + ";m2");
+                        var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
+
+                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                        {
+                            M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        }
+
+                        if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                        {
+                            doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId + ";m2");
+                        }
                     }
                 }
 

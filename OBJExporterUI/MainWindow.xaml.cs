@@ -94,6 +94,24 @@ namespace OBJExporterUI
             {
                 exportButton.Content = "Export model to OBJ!";
             }
+
+            if (ConfigurationManager.AppSettings["exportWMO"] == "True")
+            {
+                exportWMO.IsChecked = true;
+            }
+            else
+            {
+                exportWMO.IsChecked = false;
+            }
+
+            if (ConfigurationManager.AppSettings["exportM2"] == "True")
+            {
+                exportM2.IsChecked = true;
+            }
+            else
+            {
+                exportM2.IsChecked = false;
+            }
         }
         private void Window_ContentRendered(object sender, EventArgs e)
         {
@@ -761,13 +779,6 @@ namespace OBJExporterUI
 
             previewControl.LoadModel(tileList);
         }
-
-        private void ExportCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["exportEverything"].Value = exportEverything.IsChecked.ToString();
-            config.Save(ConfigurationSaveMode.Full);
-        }
         private void TileViewerButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = (MapListItem)mapListBox.SelectedItem;
@@ -775,9 +786,7 @@ namespace OBJExporterUI
 
             var mw = new MapWindow(selectedItem.Internal);
             mw.Show();
-
         }
-      
         private void BakeSize_DropDownClosed(object sender, EventArgs e)
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
@@ -1047,12 +1056,10 @@ namespace OBJExporterUI
                     return 1;
             }
         }
-
         private void PreviewCheckbox_Checked(object sender, RoutedEventArgs e)
         {
             previewsEnabled = (bool) previewCheckbox.IsChecked;
         }
-
         private void RenderMinimapButton_Click(object sender, RoutedEventArgs e)
         {
             foreach (var item in tileListBox.SelectedItems)
@@ -1088,6 +1095,18 @@ namespace OBJExporterUI
                 config.AppSettings.Settings["bakeQuality"].Value = prevConfig;
                 config.Save(ConfigurationSaveMode.Full);
             }
+        }
+        private void ExportWMO_Click(object sender, RoutedEventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["exportWMO"].Value = exportWMO.IsChecked.ToString();
+            config.Save(ConfigurationSaveMode.Full);
+        }
+        private void ExportM2_Click(object sender, RoutedEventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["exportM2"].Value = exportM2.IsChecked.ToString();
+            config.Save(ConfigurationSaveMode.Full);
         }
     }
 }

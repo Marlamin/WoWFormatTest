@@ -398,33 +398,40 @@ namespace OBJExporterUI.Exporters.glTF
 
             ConfigurationManager.RefreshSection("appSettings");
 
-            if (ConfigurationManager.AppSettings["exportEverything"] == "True")
+            if (ConfigurationManager.AppSettings["exportWMO"] == "True" || ConfigurationManager.AppSettings["exportM2"] == "True")
             {
-                exportworker.ReportProgress(25, "Exporting WMOs");
-
-                for (var mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
+                if (ConfigurationManager.AppSettings["exportWMO"] == "True")
                 {
-                    var wmo = reader.adtfile.objects.worldModels.entries[mi];
+                    exportworker.ReportProgress(25, "Exporting WMOs");
 
-                    var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
-
-                    if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".gltf"))
+                    for (var mi = 0; mi < reader.adtfile.objects.worldModels.entries.Count(); mi++)
                     {
-                        WMOExporter.ExportWMO(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        var wmo = reader.adtfile.objects.worldModels.entries[mi];
+
+                        var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
+
+                        if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".gltf"))
+                        {
+                            WMOExporter.ExportWMO(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        }
                     }
+
                 }
 
-                exportworker.ReportProgress(50, "Exporting M2s");
-
-                for (var mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
+                if (ConfigurationManager.AppSettings["exportM2"] == "True")
                 {
-                    var doodad = reader.adtfile.objects.models.entries[mi];
+                    exportworker.ReportProgress(50, "Exporting M2s");
 
-                    var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
-
-                    if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".gltf"))
+                    for (var mi = 0; mi < reader.adtfile.objects.models.entries.Count(); mi++)
                     {
-                       M2Exporter.ExportM2(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        var doodad = reader.adtfile.objects.models.entries[mi];
+
+                        var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
+
+                        if (!File.Exists(Path.GetFileNameWithoutExtension(filename).ToLower() + ".gltf"))
+                        {
+                            M2Exporter.ExportM2(filename.ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        }
                     }
                 }
             }
