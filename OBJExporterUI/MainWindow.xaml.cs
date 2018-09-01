@@ -625,7 +625,11 @@ namespace OBJExporterUI
 
                 ConfigurationManager.RefreshSection("appSettings");
                 var outdir = ConfigurationManager.AppSettings["outdir"];
-                previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname.Replace(" ", "") + "_" + centerx + "_" + centery + ".png"));
+
+                if(((ComboBoxItem)bakeSize.SelectedItem).Name != "none")
+                {
+                    previewControl.BakeTexture(file.Replace("/", "\\"), Path.Combine(outdir, Path.GetDirectoryName(file), mapname.Replace(" ", "") + "_" + centerx + "_" + centery + ".png"));
+                }
             }
 
             exportworker.RunWorkerAsync(tileList);

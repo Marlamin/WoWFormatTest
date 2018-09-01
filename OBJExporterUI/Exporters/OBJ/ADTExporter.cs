@@ -157,7 +157,7 @@ namespace OBJExporterUI.Exporters.OBJ
                     }
                     batch.materialID = (uint)materials.Count();
                 }
-                else
+                else if(bakeQuality == "high")
                 {
                     materials.Add((int)c + 1, Path.GetFileNameWithoutExtension(file) + "_" + c);
                     batch.materialID = c + 1;
@@ -221,19 +221,22 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(75, "Exporting terrain textures..");
 
-            var mtlsw = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".mtl"));
-
-            //No idea how MTL files really work yet. Needs more investigation.
-            foreach (var material in materials)
+            if(bakeQuality != "none")
             {
-                mtlsw.WriteLine("newmtl " + material.Value.Replace(" ", ""));
-                mtlsw.WriteLine("Ka 1.000000 1.000000 1.000000");
-                mtlsw.WriteLine("Kd 0.640000 0.640000 0.640000");
-                mtlsw.WriteLine("map_Ka " + material.Value.Replace(" ", "") + ".png");
-                mtlsw.WriteLine("map_Kd " + material.Value.Replace(" ", "") + ".png");
-            }
+                var mtlsw = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".mtl"));
 
-            mtlsw.Close();
+                //No idea how MTL files really work yet. Needs more investigation.
+                foreach (var material in materials)
+                {
+                    mtlsw.WriteLine("newmtl " + material.Value.Replace(" ", ""));
+                    mtlsw.WriteLine("Ka 1.000000 1.000000 1.000000");
+                    mtlsw.WriteLine("Kd 0.640000 0.640000 0.640000");
+                    mtlsw.WriteLine("map_Ka " + material.Value.Replace(" ", "") + ".png");
+                    mtlsw.WriteLine("map_Kd " + material.Value.Replace(" ", "") + ".png");
+                }
+
+                mtlsw.Close();
+            }
 
             exportworker.ReportProgress(85, "Exporting terrain geometry..");
 
@@ -244,7 +247,11 @@ namespace OBJExporterUI.Exporters.OBJ
             var objsw = new StreamWriter(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".obj"));
 
             objsw.WriteLine("# Written by Marlamin's WoW OBJExporter. Original file: " + file);
-            objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".mtl");
+            if (bakeQuality != "none")
+            {
+                objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file).Replace(" ", "") + ".mtl");
+            }
+
             objsw.WriteLine("g " + adtname.Replace(" ", ""));
 
             foreach (var vertex in verticelist)
@@ -257,7 +264,7 @@ namespace OBJExporterUI.Exporters.OBJ
             foreach (var renderBatch in renderBatches)
             {
                 var i = renderBatch.firstFace;
-                if (materials.ContainsKey((int)renderBatch.materialID)) { objsw.WriteLine("usemtl " + materials[(int)renderBatch.materialID]); objsw.WriteLine("s 1"); }
+                if (bakeQuality != "none" && materials.ContainsKey((int)renderBatch.materialID)) { objsw.WriteLine("usemtl " + materials[(int)renderBatch.materialID]); objsw.WriteLine("s 1"); }
                 while (i < (renderBatch.firstFace + renderBatch.numFaces))
                 {
                     objsw.WriteLine("f " + (indices[i + 2] + 1) + "/" + (indices[i + 2] + 1) + "/" + (indices[i + 2] + 1) + " " + (indices[i + 1] + 1) + "/" + (indices[i + 1] + 1) + "/" + (indices[i + 1] + 1) + " " + (indices[i] + 1) + "/" + (indices[i] + 1) + "/" + (indices[i] + 1));

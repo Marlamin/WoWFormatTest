@@ -123,6 +123,7 @@
                     <CheckBox x:Name="exportEverything" Content="Export WMOs and M2s" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,170" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportCheckBox_Checked"/>
                     <Label Content="Terrain texture size:" HorizontalAlignment="Left" Margin="78,0,0,146" Grid.Row="2" VerticalAlignment="Bottom" Width="113" Height="24"/>
                     <ComboBox x:Name="bakeSize" SelectedIndex="1" Loaded="BakeSize_Loaded" DropDownClosed="BakeSize_DropDownClosed" HorizontalAlignment="Left" Margin="90,0,0,116" Grid.Row="2" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Width="117">
+                        <ComboBoxItem Name="none">None</ComboBoxItem>
                         <ComboBoxItem Name="low">4K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="medium">8K (one file)</ComboBoxItem>
                         <ComboBoxItem Name="high">16K (split files)</ComboBoxItem>
