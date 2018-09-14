@@ -33,7 +33,25 @@ namespace DBCDump
                 Directory.CreateDirectory(Path.GetDirectoryName(outputcsv));
             }
 
-            var reader = new WDC2Reader(File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read));
+            DB2Reader reader;
+
+            var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using (var bin = new BinaryReader(stream))
+            {
+                var identifier = new string(bin.ReadChars(4));
+                stream.Position = 0;
+                switch (identifier)
+                {
+                    case "WDC2":
+                        reader = new WDC2Reader(stream);
+                        break;
+                    case "WDC1":
+                        reader = new WDC1Reader(stream);
+                        break;
+                    default:
+                        throw new Exception("DBC type " + identifier + " is not supported!");
+                }
+            }
 
             var defs = new Structs.DBDefinition();
 
