@@ -33,9 +33,15 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CascStorageLib">
+      <HintPath>..\..\..\..\GitHub\CascStorageLib\CascStorageLib\bin\Debug\CascStorageLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.1\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,11 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DBC\DB2Reader.cs" />
     <Compile Include="DBC\DBCHelper.cs" />
     <Compile Include="DBC\Structs.cs" />
-    <Compile Include="DBC\WDC1Reader.cs" />
-    <Compile Include="DBC\WDC2Reader.cs" />
     <Compile Include="FileReaders\ANIMReader.cs" />
     <Compile Include="FileReaders\ADTReader.cs" />
     <Compile Include="FileReaders\BLPReader.cs" />
@@ -80,14 +83,17 @@
     <Compile Include="Utils\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CASCExplorer\CascLib\CascLib.csproj">
-      <Project>{e08e1e48-6585-4137-8405-661c62c10713}</Project>
-      <Name>CascLib</Name>
+    <ProjectReference Include="..\CASCExplorer\CascLibCore\CascLibCore.csproj">
+      <Project>{d22ff00e-1652-4dff-a117-473b0849ce06}</Project>
+      <Name>CascLibCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\DBFilesClient.NET\DBFilesClient2.NET\DBFilesClient2.NET.csproj">
       <Project>{8192cbf2-3a59-4a06-97ff-6a6f14cb0acf}</Project>
       <Name>DBFilesClient2.NET</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

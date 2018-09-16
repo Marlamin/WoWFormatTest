@@ -18,7 +18,7 @@ namespace WoWFormatLib.Utils
             
             if (basedir == null)
             {
-                var config = CASCConfig.LoadOnlineStorageConfig(program, "us", true);
+                var config = CASCConfig.LoadOnlineStorageConfig(program, "eu", true);
 
                 Console.WriteLine("Initializing CASC from web with program " + program + " and build " + config.BuildName);
                 cascHandler = CASCHandler.OpenStorage(config, worker);

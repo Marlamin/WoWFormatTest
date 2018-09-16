@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using CASCLib;
 
@@ -28,28 +29,30 @@ namespace WoWFormatLib
 
         public static T Read<T>(this BinaryReader reader) where T : struct
         {
-            byte[] result = reader.ReadBytes(FastStruct<T>.Size);
+            byte[] result = reader.ReadBytes(Unsafe.SizeOf<T>());
 
-            return FastStruct<T>.ArrayToStructure(result);
+            return Unsafe.ReadUnaligned<T>(ref result[0]);
         }
+
 
         public static T[] ReadArray<T>(this BinaryReader reader) where T : struct
         {
             int numBytes = (int)reader.ReadInt64();
 
-            byte[] result = reader.ReadBytes(numBytes);
+            byte[] source = reader.ReadBytes(numBytes);
 
             reader.BaseStream.Position += (0 - numBytes) & 0x07;
-            return FastStruct<T>.ReadArray(result);
+
+            return source.CopyTo<T>();
         }
 
         public static T[] ReadArray<T>(this BinaryReader reader, int size) where T : struct
         {
-            int numBytes = FastStruct<T>.Size * size;
+            int numBytes = Unsafe.SizeOf<T>() * size;
 
-            byte[] result = reader.ReadBytes(numBytes);
+            byte[] source = reader.ReadBytes(numBytes);
 
-            return FastStruct<T>.ReadArray(result);
+            return source.CopyTo<T>();
         }
 
         public static short ReadInt16BE(this BinaryReader reader)

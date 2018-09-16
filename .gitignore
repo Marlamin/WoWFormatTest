@@ -46,6 +46,8 @@ CASCDump
 CASCBuilder
 EncodingDump
 DBCtest
+HotfixReader
+HotfixUpdater
 InstallDump
 ListFileGenerator
 MaxiMapCompiler

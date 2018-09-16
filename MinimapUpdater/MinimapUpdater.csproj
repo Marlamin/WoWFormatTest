@@ -58,10 +58,6 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CASCExplorer\CascLib\CascLib.csproj">
-      <Project>{E08E1E48-6585-4137-8405-661C62C10713}</Project>
-      <Name>CascLib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj">
       <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>
       <Name>WoWFormatLib</Name>
