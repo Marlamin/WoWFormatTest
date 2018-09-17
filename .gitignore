@@ -63,3 +63,4 @@ WoWOpenGL
 # Don't include cached data files
 WoWOpenGL/Data/*
 ExporterCLI/cache
+*.db2

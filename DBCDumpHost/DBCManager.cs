@@ -1,42 +1,23 @@
-﻿using CascStorageLib;
-using CascStorageLib.Attributes;
-using DBDefsLib;
-using System;
-using System.Collections;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
-namespace DBCDump
+using System.Threading.Tasks;
+using CascStorageLib;
+using CascStorageLib.Attributes;
+using DBDefsLib;
+
+namespace DBCDumpHost
 {
-    class Program
+    public class DBCManager
     {
-        static void Main(string[] args)
+        public static Type CompileDefinition(string filename, string build)
         {
-            if (args.Length < 2)
-            {
-                Console.WriteLine("Not enough arguments: inputdb2 outputcsv (optional: build)");
-                return;
-            }
-
-            var filename = args[0];
-            var outputcsv = args[1];
-
             if (!File.Exists(filename))
             {
                 throw new Exception("Input DB2 file does not exist!");
-            }
-
-            if (!Directory.Exists(Path.GetDirectoryName(outputcsv)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(outputcsv));
-            }
-
-            var build = "";
-            if(args.Length == 3)
-            {
-                build = args[2];
             }
 
             DB2Reader reader;
@@ -66,10 +47,9 @@ namespace DBCDump
                 if (Path.GetFileNameWithoutExtension(file).ToLower() == Path.GetFileNameWithoutExtension(filename.ToLower()))
                 {
                     defs = new DBDReader().Read(file);
+                    break;
                 }
             }
-
-            var writer = new StreamWriter(outputcsv);
 
             Structs.VersionDefinitions? versionToUse;
 
@@ -106,110 +86,7 @@ namespace DBCDump
             }
 
             var type = tb.CreateType();
-            var genericType = typeof(Storage<>).MakeGenericType(type);
-            var storage = (IDictionary)Activator.CreateInstance(genericType, filename);
-
-            if (storage.Values.Count == 0)
-            {
-                throw new Exception("No rows found!");
-            }
-
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            var headerWritten = false;
-
-            foreach (var item in storage.Values)
-            {
-                // Write CSV header
-                if (!headerWritten)
-                {
-                    for (var j = 0; j < fields.Length; ++j)
-                    {
-                        var field = fields[j];
-
-                        var isEndOfRecord = fields.Length - 1 == j;
-
-                        if (field.FieldType.IsArray)
-                        {
-                            var a = (Array)field.GetValue(item);
-                            for (var i = 0; i < a.Length; i++)
-                            {
-                                var isEndOfArray = a.Length - 1 == i;
-
-                                writer.Write($"{field.Name}[{i}]");
-                                if (!isEndOfArray)
-                                    writer.Write(",");
-                            }
-                        }
-                        else
-                        {
-                            writer.Write(field.Name);
-                        }
-
-                        if (!isEndOfRecord)
-                            writer.Write(",");
-                    }
-                    headerWritten = true;
-                    writer.WriteLine();
-                }
-
-                for (var i = 0; i < fields.Length; ++i)
-                {
-                    var field = fields[i];
-
-                    var isEndOfRecord = fields.Length - 1 == i;
-
-                    if (field.FieldType.IsArray)
-                    {
-                        var a = (Array)field.GetValue(item);
-
-                        for (var j = 0; j < a.Length; j++)
-                        {
-                            var isEndOfArray = a.Length - 1 == j;
-                            writer.Write(a.GetValue(j));
-
-                            if (!isEndOfArray)
-                                writer.Write(",");
-                        }
-                    }
-                    else
-                    {
-                        var value = field.GetValue(item);
-                        if (value.GetType() == typeof(string))
-                            value = StringToCSVCell((string)value);
-
-                        writer.Write(value);
-                    }
-
-                    if (!isEndOfRecord)
-                        writer.Write(",");
-                }
-
-                writer.WriteLine();
-            }
-
-            writer.Dispose();
-            Environment.Exit(0);
-        }
-
-        public static string StringToCSVCell(string str)
-        {
-            var mustQuote = (str.Contains(",") || str.Contains("\"") || str.Contains("\r") || str.Contains("\n"));
-            if (mustQuote)
-            {
-                var sb = new StringBuilder();
-                sb.Append("\"");
-                foreach (var nextChar in str)
-                {
-                    sb.Append(nextChar);
-                    if (nextChar == '"')
-                        sb.Append("\"");
-                }
-                sb.Append("\"");
-                return sb.ToString();
-            }
-
-            return str;
+            return type;
         }
 
         private static Type DBDefTypeToType(string type, int size, bool signed, int arrLength)
@@ -228,7 +105,7 @@ namespace DBCDump
                             case 32:
                                 return signed ? typeof(int) : typeof(uint);
                             case 64:
-                                return signed ? typeof(long) : typeof(ulong); 
+                                return signed ? typeof(long) : typeof(ulong);
                         }
                         break;
                     case "string":
