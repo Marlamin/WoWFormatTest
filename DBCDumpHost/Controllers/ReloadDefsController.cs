@@ -15,7 +15,7 @@ namespace DBCDumpHost.Controllers
         [HttpGet]
         public string Get()
         {
-            DefinitionManager.LoadDefinitions("definitions");
+            DefinitionManager.LoadDefinitions();
             return "Reloaded " + DefinitionManager.definitionLookup.Count + " definitions!";
         }
     }
