@@ -51,9 +51,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CascStorageLib">
-      <HintPath>..\..\..\..\GitHub\CascStorageLib\CascStorageLib\bin\Debug\CascStorageLib.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -68,6 +65,7 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -234,6 +232,14 @@
     <ProjectReference Include="..\CASCExplorer\CascLibCore\CascLibCore.csproj">
       <Project>{d22ff00e-1652-4dff-a117-473b0849ce06}</Project>
       <Name>CascLibCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CascStorageLib\CascStorageLib\CascStorageLib.csproj">
+      <Project>{b7c4440c-ce8f-4ec1-9793-61958f2265df}</Project>
+      <Name>CascStorageLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WoWDBDefs\code\C#\DBDefsLib\DBDefsLib.csproj">
+      <Project>{2ae21733-b484-4988-94ae-bad4eb1c3c59}</Project>
+      <Name>DBDefsLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj">
       <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>

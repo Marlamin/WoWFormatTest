@@ -1,5 +1,4 @@
-﻿using DBFilesClient2.NET;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using WoWFormatLib.Utils;
 using CASCLib;
@@ -11,7 +10,9 @@ namespace WoWFormatLib.DBC
         public static uint[] getTexturesByModelFilename(int modelID, int flag, int texid = 0)
         {
             var results = new List<uint>();
-            
+
+            return results.ToArray();
+            /*
             switch (flag)
             {
                 case 1:
@@ -60,7 +61,7 @@ namespace WoWFormatLib.DBC
                     }
                     break;
             }
-           
+           */
             /*if (flag == 1)
             {
                 var instance = new Storage<CreatureDisplayInfoEntry>("CreatureDisplayInfoEntry.db2");

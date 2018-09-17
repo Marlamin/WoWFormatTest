@@ -5,3 +5,9 @@
 [submodule "DBFilesClient.NET"]
 	path = DBFilesClient.NET
 	url = https://github.com/Warpten/DBFilesClient.NET.git
+[submodule "CascStorageLib"]
+	path = CascStorageLib
+	url = https://github.com/Marlamin/CascStorageLib/
+[submodule "WoWDBDefs"]
+	path = WoWDBDefs
+	url = https://github.com/wowdev/WoWDBDefs/
