@@ -65,17 +65,17 @@ namespace DBCDumpHost
                 }
             }
 
-            var defs = new Structs.DBDefinition();
 
             var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("config.json", optional: false, reloadOnChange: true).Build();
-            foreach (var file in Directory.GetFiles(config.GetSection("config")["definitionsdir"]))
+
+            var cleanDBName = Path.GetFileNameWithoutExtension(filename).ToLower();
+
+            if (!definitionLookup.ContainsKey(cleanDBName))
             {
-                if (Path.GetFileNameWithoutExtension(file).ToLower() == Path.GetFileNameWithoutExtension(filename.ToLower()))
-                {
-                    defs = new DBDReader().Read(file);
-                    break;
-                }
+                throw new KeyNotFoundException("Definition for " + cleanDBName);
             }
+
+            var defs = definitionLookup[cleanDBName];
 
             Structs.VersionDefinitions? versionToUse;
 
