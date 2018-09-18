@@ -18,7 +18,7 @@ namespace DBCDumpHost.Controllers
         public struct HeaderResult
         {
             public List<string> headers;
-            public KeyValuePair<string, string>[] fks;
+            public Dictionary<string, string> fks;
         }
 
         // GET: api/DBC
@@ -63,18 +63,21 @@ namespace DBCDumpHost.Controllers
                 throw new Exception("No rows found!");
             }
 
+            if (!DefinitionManager.definitionLookup.ContainsKey(name))
+            {
+                throw new KeyNotFoundException("Definition for " + name);
+            }
+
             var definition = DefinitionManager.definitionLookup[name];
 
             var fields = rawType.GetFields();
             result.headers = new List<string>();
-            var fks = new Dictionary<string, string>();
+            result.fks = new Dictionary<string, string>();
             foreach(var item in storage.Values)
             {
                 for (var j = 0; j < fields.Length; ++j)
                 {
                     var field = fields[j];
-
-                    var isEndOfRecord = fields.Length - 1 == j;
 
                     if (field.FieldType.IsArray)
                     {
@@ -89,7 +92,7 @@ namespace DBCDumpHost.Controllers
                             {
                                 if(columnDef.Key == field.Name && columnDef.Value.foreignTable != null)
                                 {
-                                    fks.Add($"{field.Name}[{i}]", columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
+                                    result.fks.Add($"{field.Name}[{i}]", columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
                                 }
                             }
                         }
@@ -103,7 +106,7 @@ namespace DBCDumpHost.Controllers
                         {
                             if (columnDef.Key == field.Name && columnDef.Value.foreignTable != null)
                             {
-                                fks.Add(field.Name, columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
+                                result.fks.Add(field.Name, columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
                             }
                         }
                     }
@@ -112,7 +115,6 @@ namespace DBCDumpHost.Controllers
                 break;
             }
 
-            result.fks = fks.ToArray();
             return result;
         }
     }

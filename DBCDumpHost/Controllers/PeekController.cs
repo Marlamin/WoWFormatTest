@@ -11,9 +11,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace DBCDumpHost.Controllers
 {
-    [Route("api/data")]
+    [Route("api/peek")]
     [ApiController]
-    public class DataController : ControllerBase
+    public class PeekController : ControllerBase
     {
         public struct DataTablesResult
         {
@@ -23,21 +23,17 @@ namespace DBCDumpHost.Controllers
             public List<List<string>> data;
         }
 
-        // GET: data/
+        // GET: peek/
         [HttpGet]
         public string Get()
         {
             return "No DBC selected!";
         }
 
-        // GET: data/name
+        // GET: peek/name
         [HttpGet("{name}")]
-        public DataTablesResult Get(string name, string build, int draw, int start, int length)
+        public IActionResult Get(string name, string build, string bc, string col, int val)
         {
-            var result = new DataTablesResult();
-
-            result.draw = draw;
-
             if (string.IsNullOrEmpty(build))
             {
                 throw new Exception("No build given!");
@@ -66,50 +62,69 @@ namespace DBCDumpHost.Controllers
             {
                 throw new Exception("No rows found!");
             }
-
-            result.recordsTotal = storage.Values.Count;
-            result.recordsFiltered = storage.Values.Count;
-
             var fields = rawType.GetFields();
 
-            result.data = new List<List<string>>();
+            var result = "<h4>Viewing record " + val + " in file " + dbc + "</h4><table class=\"table\">";
 
             var offset = 0;
+            var recordFound = false;
+            var page = 1;
             foreach (var item in storage.Values)
             {
+                if (recordFound)
+                    continue;
+
                 offset++;
-                if (start > offset)
-                    continue;
-
-                if (offset > (start + length))
-                    continue;
-
-                var rowList = new List<string>();
+                if(offset == 25)
+                {
+                    page++;
+                    offset = 0;
+                }
 
                 for (var i = 0; i < fields.Length; ++i)
                 {
                     var field = fields[i];
 
-                    if (field.FieldType.IsArray)
-                    {
-                        var a = (Array)field.GetValue(item);
+                    if (field.Name != col)
+                        continue;
 
-                        for (var j = 0; j < a.Length; j++)
-                        {
-                            var isEndOfArray = a.Length - 1 == j;
-                            rowList.Add(a.GetValue(j).ToString());
-                        }
-                    }
-                    else
+                    // Don't think FKs to arrays are possible, so only check regular value
+                    if (field.GetValue(item).ToString() == val.ToString())
                     {
-                        rowList.Add(field.GetValue(item).ToString());
+                        for (var j = 0; j < fields.Length; ++j)
+                        {
+                            var subfield = fields[j];
+
+                            if (subfield.FieldType.IsArray)
+                            {
+                                var a = (Array)subfield.GetValue(item);
+
+                                for (var k = 0; k < a.Length; k++)
+                                {
+                                    var isEndOfArray = a.Length - 1 == k;
+                                    result += "<tr><td>" + subfield.Name + "[" + k + "]</td><td>" + a.GetValue(k).ToString() + "</td></tr>";
+                                }
+                            }
+                            else
+                            {
+                                result += "<tr><td>" + subfield.Name + "</td><td>" + subfield.GetValue(item).ToString() + "</td></tr>";
+                            }
+                        }
+
+                        recordFound = true;
                     }
                 }
-
-                result.data.Add(rowList);
             }
 
-            return result;
+            result += "</table>";
+
+            result += "<a target=\"_BLANK\" href=\"/dbc.php?dbc=" + dbc + ".db2&bc=" + bc + "#page=" + page + "\" class=\"btn btn-primary\">Go to record</a>";
+
+            return new ContentResult()
+            {
+                Content = result,
+                ContentType = "text/html",
+            };
         }
     }
 }
