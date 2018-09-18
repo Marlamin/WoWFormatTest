@@ -35,7 +35,7 @@ namespace DBCDumpHost
             }
 
             definitionLookup = newDict;
-            Console.WriteLine("Done reloading " + definitionLookup.Count);
+            Console.Write("Loaded " + definitionLookup.Count + " definitions!");
         }
 
         public static Type CompileDefinition(string filename, string build)

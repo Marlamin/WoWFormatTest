@@ -34,6 +34,8 @@ namespace DBCDumpHost.Controllers
         [HttpGet("{name}")]
         public DataTablesResult Get(string name, string build, int draw, int start, int length)
         {
+            Console.WriteLine("Handling data " + start + "," + length + " for dbc " + name + " (" + build + ") for draw " + draw);
+
             var result = new DataTablesResult();
 
             result.draw = draw;

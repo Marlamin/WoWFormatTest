@@ -32,6 +32,8 @@ namespace DBCDumpHost.Controllers
         [HttpGet("{name}")]
         public HeaderResult Get(string name, string build)
         {
+            Console.WriteLine("Handling headers for " + name + " (" + build + ")");
+
             var result = new HeaderResult();
 
             if (string.IsNullOrEmpty(build))

@@ -34,6 +34,8 @@ namespace DBCDumpHost.Controllers
         [HttpGet("{name}")]
         public IActionResult Get(string name, string build, string bc, string col, int val)
         {
+            Console.WriteLine("Handling foreign key row for " + name + "::" + col + " (" + build + "/" + bc + ") value " + val);
+
             if (string.IsNullOrEmpty(build))
             {
                 throw new Exception("No build given!");
