@@ -10,20 +10,18 @@ using CascStorageLib;
 
 namespace DBCDumpHost
 {
-    public class DefinitionManager
+    public static class DefinitionManager
     {
         public static Dictionary<string, Structs.DBDefinition> definitionLookup;
 
-        public DefinitionManager()
+        static DefinitionManager()
         {
             LoadDefinitions();
         }
 
         public static void LoadDefinitions()
         {
-            var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("config.json", optional: false, reloadOnChange: true).Build();
-            var definitionsDir = config.GetSection("config")["definitionsdir"];
-
+            var definitionsDir = SettingManager.definitionDir;
             Console.WriteLine("Reloading definitions from directory " + definitionsDir);
             var newDict = new Dictionary<string, Structs.DBDefinition>();
 
@@ -64,9 +62,6 @@ namespace DBCDumpHost
                         throw new Exception("DBC type " + identifier + " is not supported!");
                 }
             }
-
-
-            var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("config.json", optional: false, reloadOnChange: true).Build();
 
             var cleanDBName = Path.GetFileNameWithoutExtension(filename).ToLower();
 

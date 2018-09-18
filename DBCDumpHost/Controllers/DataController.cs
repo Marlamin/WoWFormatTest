@@ -44,10 +44,8 @@ namespace DBCDumpHost.Controllers
             {
                 throw new Exception("No build given!");
             }
-
-            var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("config.json", optional: false, reloadOnChange: true).Build();
-            var dbcdir = config.GetSection("config")["dbcdir"];
-            var filename = Path.Combine(dbcdir, build, "dbfilesclient", name + ".db2");
+            
+            var filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", name + ".db2");
 
             if (name.Contains("."))
             {
