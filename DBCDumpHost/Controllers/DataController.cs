@@ -34,7 +34,19 @@ namespace DBCDumpHost.Controllers
         [HttpGet("{name}")]
         public DataTablesResult Get(string name, string build, int draw, int start, int length)
         {
-            Console.WriteLine("Handling data " + start + "," + length + " for dbc " + name + " (" + build + ") for draw " + draw);
+            var searching = false;
+
+            if (string.IsNullOrWhiteSpace(Request.Query["search[value]"]))
+            {
+                Console.WriteLine("Handling data " + start + "," + length + " for dbc " + name + " (" + build + ") for draw " + draw);
+            }
+            else
+            {
+                searching = true;
+                Console.WriteLine("Handling data " + start + "," + length + " for dbc " + name + " (" + build + ") for draw " + draw + " with filter " + Request.Query["search[value]"]);
+            }
+
+            var searchValue = Request.Query["search[value]"];
 
             var result = new DataTablesResult();
 
@@ -68,23 +80,17 @@ namespace DBCDumpHost.Controllers
             }
 
             result.recordsTotal = storage.Values.Count;
-            result.recordsFiltered = storage.Values.Count;
+            
 
             var fields = rawType.GetFields();
 
             result.data = new List<List<string>>();
 
-            var offset = 0;
+            var resultCount = 0;
             foreach (var item in storage.Values)
             {
-                offset++;
-                if (start > offset)
-                    continue;
-
-                if (offset > (start + length))
-                    continue;
-
                 var rowList = new List<string>();
+                var matches = false;
 
                 for (var i = 0; i < fields.Length; ++i)
                 {
@@ -97,17 +103,53 @@ namespace DBCDumpHost.Controllers
                         for (var j = 0; j < a.Length; j++)
                         {
                             var isEndOfArray = a.Length - 1 == j;
-                            rowList.Add(a.GetValue(j).ToString());
+                            var val = a.GetValue(j).ToString();
+                            if (searching)
+                            {
+                                if (val.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase))
+                                    matches = true;
+                            }
+
+                            rowList.Add(val);
                         }
                     }
                     else
                     {
-                        rowList.Add(field.GetValue(item).ToString());
+                        var val = field.GetValue(item).ToString();
+                        if (searching)
+                        {
+                            if (val.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase))
+                                matches = true;
+                        }
+
+                        rowList.Add(val);
                     }
                 }
 
-                result.data.Add(rowList);
+                if (searching)
+                {
+                    if (matches)
+                    {
+                        resultCount++;
+                        result.data.Add(rowList);
+                    }
+                }
+                else
+                {
+                    resultCount++;
+                    result.data.Add(rowList);
+                }
             }
+
+            result.recordsFiltered = resultCount;
+
+            var takeLength = length;
+            if((start + length) > resultCount)
+            {
+                takeLength = resultCount - start;
+            }
+
+            result.data = result.data.GetRange(start, takeLength);
 
             return result;
         }
