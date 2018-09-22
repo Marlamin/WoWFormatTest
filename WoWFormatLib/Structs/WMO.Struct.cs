@@ -48,6 +48,8 @@ namespace WoWFormatLib.Structs.WMO
         MOLP = 'M' << 24 | 'O' << 16 | 'L' << 8 | 'P' << 0,
         MOLS = 'M' << 24 | 'O' << 16 | 'L' << 8 | 'S' << 0,
         MOPB = 'M' << 24 | 'O' << 16 | 'P' << 8 | 'B' << 0,
+        MLSP = 'M' << 24 | 'L' << 16 | 'S' << 8 | 'P' << 0,
+        MODI = 'M' << 24 | 'O' << 16 | 'D' << 8 | 'I' << 0,
     }
 
     public struct WMO
@@ -57,6 +59,7 @@ namespace WoWFormatLib.Structs.WMO
         public MOTX[] textures;
         public MOMT[] materials;
         public MODN[] doodadNames;
+        public uint[] doodadIds;
         public MODD[] doodadDefinitions;
         public MODS[] doodadSets;
         public MOGN[] groupNames;

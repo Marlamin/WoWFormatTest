@@ -21,7 +21,7 @@ namespace ExporterCLI.Exporters.glTF
             }
             else
             {
-                wmo = new WMOReader().LoadWMO(filedataid);
+                wmo = new WMOReader().LoadWMO(file);
             }
 
             file = file.Replace("\\", "/");
@@ -285,6 +285,8 @@ namespace ExporterCLI.Exporters.glTF
 
             for (var i = 0; i < materialCount; i++)
             {
+                if (wmo.textures == null)
+                    continue;
                 for (var ti = 0; ti < wmo.textures.Count(); ti++)
                 {
                     if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
@@ -386,19 +388,40 @@ namespace ExporterCLI.Exporters.glTF
                     }
                 }
 
-                foreach (var doodadNameEntry in wmo.doodadNames)
+                if(wmo.doodadIds != null)
                 {
-                    if (doodadNameEntry.startOffset == doodadDefinition.offset)
+                    var doodadFileDataID = wmo.doodadIds[doodadDefinition.offset];
+                    if (!File.Exists(doodadFileDataID + ".gltf"))
                     {
-                        if (!File.Exists(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".gltf"))
+                        if (destinationOverride == null)
                         {
-                            if (destinationOverride == null)
+                            //M2Exporter.ExportM2(doodadFileDataID, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                        }
+                        else
+                        {
+                            //M2Exporter.ExportM2(doodadFileDataID, null, destinationOverride);
+                        }
+                    }
+                }
+                else
+                {
+                    if(wmo.doodadNames != null)
+                    {
+                        foreach (var doodadNameEntry in wmo.doodadNames)
+                        {
+                            if (doodadNameEntry.startOffset == doodadDefinition.offset)
                             {
-                                //M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
-                            }
-                            else
-                            {
-                                //M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
+                                if (!File.Exists(Path.GetFileNameWithoutExtension(doodadNameEntry.filename).ToLower() + ".gltf"))
+                                {
+                                    if (destinationOverride == null)
+                                    {
+                                        //M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                                    }
+                                    else
+                                    {
+                                        //M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2").ToLower(), null, destinationOverride);
+                                    }
+                                }
                             }
                         }
                     }

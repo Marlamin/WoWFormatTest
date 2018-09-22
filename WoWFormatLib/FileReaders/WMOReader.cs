@@ -101,6 +101,9 @@ namespace WoWFormatLib.FileReaders
                         case WMOChunks.MODS:
                             wmofile.doodadSets = ReadMODSChunk(chunkSize, bin);
                             break;
+                        case WMOChunks.MODI:
+                            wmofile.doodadIds = ReadMODIChunk(chunkSize, bin);
+                            break;
                         case WMOChunks.MODN:
                             wmofile.doodadNames = ReadMODNChunk(chunkSize, bin);
                             break;
@@ -122,6 +125,7 @@ namespace WoWFormatLib.FileReaders
                         case WMOChunks.MFOG: // MFOG Fog Information
                         case WMOChunks.MCVP: // MCVP Convex Volume Planes
                         case WMOChunks.MOUV: // MOUV Animated texture UVs
+                        case WMOChunks.MLSP: // ?
                             break;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName.ToString("X"), position.ToString()));
@@ -320,6 +324,16 @@ namespace WoWFormatLib.FileReaders
             }
             return doodadNames;
         }
+        private uint[] ReadMODIChunk(uint size, BinaryReader bin)
+        {
+            var numIds = size / 4;
+            var fileDataIDs = new uint[numIds];
+            for(var i = 0; i < numIds; i++)
+            {
+                fileDataIDs[i] = bin.ReadUInt32();
+            }
+            return fileDataIDs;
+        }
         private MODD[] ReadMODDChunk(uint size, BinaryReader bin)
         {
             var numDoodads = size / 40;
@@ -455,6 +469,7 @@ namespace WoWFormatLib.FileReaders
                         case WMOChunks.MOLP: // MOLP Points Lights
                         case WMOChunks.MOLS: // MOLS Spot Lights
                         case WMOChunks.MOPB: // MOPB Prepass Batches
+                        case WMOChunks.MLSP: // ?
                             continue;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName.ToString("X"), position.ToString()));
