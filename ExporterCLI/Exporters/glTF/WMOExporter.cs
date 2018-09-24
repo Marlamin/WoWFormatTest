@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using WoWFormatLib.FileReaders;
-using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
+using WoWFormatLib.FileReaders;
 using WoWFormatLib.Utils;
 
 namespace ExporterCLI.Exporters.glTF
@@ -285,14 +285,93 @@ namespace ExporterCLI.Exporters.glTF
 
             for (var i = 0; i < materialCount; i++)
             {
-                if (wmo.textures == null)
-                    continue;
-                for (var ti = 0; ti < wmo.textures.Count(); ti++)
+                // Check if texture is a filedataid
+                if (wmo.textures == null && CASC.cascHandler.FileExists((int)wmo.materials[i].texture1))
                 {
-                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
+                    var saveLocation = "";
+
+                    if (destinationOverride == null)
                     {
+                        saveLocation = Path.Combine(outdir, wmo.materials[i].texture1.ToString() + ".blp");
+                    }
+                    else
+                    {
+                        saveLocation = Path.Combine(outdir, destinationOverride, wmo.materials[i].texture1.ToString() + ".blp");
+                    }
+
+                    if (!File.Exists(Path.GetFileNameWithoutExtension(saveLocation) + "png")) // Check if already exported & converted version exists
+                    {
+                        using (var cascFile = CASC.cascHandler.OpenFile((int)wmo.materials[i].texture1))
+                        using (var cascStream = new MemoryStream())
+                        {
+                            cascFile.CopyTo(cascStream);
+                            File.WriteAllBytes(saveLocation, cascStream.ToArray());
+                        }
+                    }
+
+                    glTF.images[i].uri = wmo.materials[i].texture1.ToString() + ".png";
+
+                    glTF.textures[i].sampler = 0;
+                    glTF.textures[i].source = i;
+
+                    glTF.materials[i].name = wmo.materials[i].texture1.ToString();
+                    glTF.materials[i].pbrMetallicRoughness = new PBRMetallicRoughness();
+                    glTF.materials[i].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
+                    glTF.materials[i].pbrMetallicRoughness.baseColorTexture.index = i;
+                    glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
+                    glTF.materials[i].doubleSided = true;
+
+                    switch (wmo.materials[i].blendMode)
+                    {
+                        case 0:
+                            glTF.materials[i].alphaMode = "OPAQUE";
+                            glTF.materials[i].alphaCutoff = 0.0f;
+                            break;
+                        case 1:
+                            glTF.materials[i].alphaMode = "MASK";
+                            glTF.materials[i].alphaCutoff = 0.90393700787f;
+                            break;
+                        case 2:
+                            glTF.materials[i].alphaMode = "MASK";
+                            glTF.materials[i].alphaCutoff = 0.5f;
+                            break;
+                        default:
+                            glTF.materials[i].alphaMode = "OPAQUE";
+                            glTF.materials[i].alphaCutoff = 0.0f;
+                            break;
+                    }
+                }
+                else
+                {
+                    if (wmo.textures == null)
+                        throw new Exception("WMO textures do not exist or are invalid filedataid!");
+
+                    for (var ti = 0; ti < wmo.textures.Count(); ti++)
+                    {
+                        var saveLocation = "";
                         var textureFilename = Path.GetFileNameWithoutExtension(wmo.textures[ti].filename.Replace("\\", "/")).ToLower();
+
+                        if (destinationOverride == null)
+                        {
+                            saveLocation = Path.Combine(outdir, textureFilename + ".blp");
+                        }
+                        else
+                        {
+                            saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".blp");
+                        }
+
+                        if (!File.Exists(Path.GetFileNameWithoutExtension(saveLocation) + "png")) // Check if already exported & converted version exists
+                        {
+                            using (var cascFile = CASC.cascHandler.OpenFile(wmo.textures[ti].filename))
+                            using (var cascStream = new MemoryStream())
+                            {
+                                cascFile.CopyTo(cascStream);
+                                File.WriteAllBytes(saveLocation, cascStream.ToArray());
+                            }
+                        }
+
                         Console.WriteLine(textureFilename);
+
                         glTF.images[i].uri = textureFilename + ".png";
 
                         glTF.textures[i].sampler = 0;
@@ -323,27 +402,6 @@ namespace ExporterCLI.Exporters.glTF
                                 glTF.materials[i].alphaMode = "OPAQUE";
                                 glTF.materials[i].alphaCutoff = 0.0f;
                                 break;
-                        }
-
-                        var saveLocation = "";
-
-                        if (destinationOverride == null)
-                        {
-                            saveLocation = Path.Combine(outdir, textureFilename + ".blp");
-                        }
-                        else
-                        {
-                            saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".blp");
-                        }
-
-                        if (!File.Exists(Path.GetFileNameWithoutExtension(saveLocation) + "png")) // Check if already exported & converted version exists
-                        {
-                            using (var cascFile = CASC.cascHandler.OpenFile(wmo.textures[ti].filename))
-                            using (var cascStream = new MemoryStream())
-                            {
-                                cascFile.CopyTo(cascStream);
-                                File.WriteAllBytes(saveLocation, cascStream.ToArray());
-                            }
                         }
                     }
                 }
@@ -388,7 +446,7 @@ namespace ExporterCLI.Exporters.glTF
                     }
                 }
 
-                if(wmo.doodadIds != null)
+                if (wmo.doodadIds != null)
                 {
                     var doodadFileDataID = wmo.doodadIds[doodadDefinition.offset];
                     if (!File.Exists(doodadFileDataID + ".gltf"))
@@ -405,7 +463,7 @@ namespace ExporterCLI.Exporters.glTF
                 }
                 else
                 {
-                    if(wmo.doodadNames != null)
+                    if (wmo.doodadNames != null)
                     {
                         foreach (var doodadNameEntry in wmo.doodadNames)
                         {

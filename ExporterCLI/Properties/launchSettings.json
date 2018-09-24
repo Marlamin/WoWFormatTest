@@ -2,7 +2,7 @@
   "profiles": {
     "ExporterCLI": {
       "commandName": "Project",
-      "commandLineArgs": "wow 1622533 . wmo"
+      "commandLineArgs": "wowt 2406304 . wmo"
     }
   }
 }

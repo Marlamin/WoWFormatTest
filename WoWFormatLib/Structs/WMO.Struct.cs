@@ -74,6 +74,22 @@ namespace WoWFormatLib.Structs.WMO
         public uint version;
     }
 
+    public enum MOHDFlags : short
+    {
+        Flag_0x1 = 0x1,
+        Flag_0x2 = 0x2,
+        Flag_0x4 = 0x4,
+        Flag_0x8 = 0x8,
+        Flag_0x10 = 0x10,
+        Flag_0x20 = 0x20,
+        Flag_0x40 = 0x40,
+        Flag_0x80 = 0x80,
+        Flag_0x100 = 0x100,
+        Flag_0x200 = 0x200,
+        Flag_0x400 = 0x400,
+        Flag_0x800 = 0x800
+    }
+
     public struct MOHD
     {
         public uint nMaterials;
@@ -87,7 +103,7 @@ namespace WoWFormatLib.Structs.WMO
         public uint areaTableID;
         public Vector3 boundingBox1;
         public Vector3 boundingBox2;
-        public short flags;
+        public MOHDFlags flags;
         public short nLod;
     }
 
@@ -124,15 +140,15 @@ namespace WoWFormatLib.Structs.WMO
 
     public struct MOMT
     {
-        public uint flags;
+        public MOMTFlags flags;
         public uint shader;
         public uint blendMode;
         public uint texture1;
         public uint color1;
-        public uint flags1;
+        public uint color1b;
         public uint texture2;
         public uint color2;
-        public uint flags2;
+        public uint groundType;
         public uint texture3;
         public uint color3;
         public uint flags3;
@@ -140,6 +156,36 @@ namespace WoWFormatLib.Structs.WMO
         public uint runtimeData1;
         public uint runtimeData2;
         public uint runtimeData3;
+    }
+
+
+    [Flags]
+    public enum MOMTFlags : uint
+    {
+        Flag_0x1 = 0x1,
+        Flag_0x2 = 0x2,
+        Flag_0x4 = 0x4,
+        Flag_0x8 = 0x8,
+        Flag_0x10 = 0x10,
+        Flag_0x20 = 0x20,
+        Flag_0x40 = 0x40,
+        Flag_0x80 = 0x80,
+        Flag_0x100 = 0x100,
+        Flag_0x200 = 0x200,
+        Flag_0x400 = 0x400,
+        Flag_0x800 = 0x800,
+        Flag_0x1000 = 0x1000,
+        Flag_0x2000 = 0x2000,
+        Flag_0x4000 = 0x4000,
+        Flag_0x8000 = 0x8000,
+        Flag_0x10000 = 0x10000,
+        Flag_0x20000 = 0x20000,
+        Flag_0x40000 = 0x40000,
+        Flag_0x80000 = 0x80000,
+        Flag_0x100000 = 0x100000,
+        Flag_0x200000 = 0x200000,
+        Flag_0x400000 = 0x400000,
+        Flag_0x800000 = 0x800000
     }
 
     //Group names
