@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using WoWFormatLib.FileReaders;
-using WoWFormatLib.Utils;
 
 namespace ExporterCLI.Exporters.glTF
 {
@@ -14,14 +13,16 @@ namespace ExporterCLI.Exporters.glTF
         {
             Console.WriteLine("WMO glTF Exporter: Loading file {0}...", file);
 
+            Console.WriteLine(filedataid);
             var wmo = new WoWFormatLib.Structs.WMO.WMO();
             if (filedataid != 0)
             {
-                wmo = new WMOReader().LoadWMO(filedataid);
+                wmo = new WMOReader().LoadWMO(CASC.OpenFile(filedataid));
             }
             else
             {
-                wmo = new WMOReader().LoadWMO(file);
+                throw new Exception("Unsupported WMO for exporting! Use FileDataID!");
+                //wmo = new WMOReader().LoadWMO(file);
             }
 
             file = file.Replace("\\", "/");
@@ -286,7 +287,7 @@ namespace ExporterCLI.Exporters.glTF
             for (var i = 0; i < materialCount; i++)
             {
                 // Check if texture is a filedataid
-                if (wmo.textures == null && CASC.cascHandler.FileExists((int)wmo.materials[i].texture1))
+                if (wmo.textures == null && CASC.FileExists((int)wmo.materials[i].texture1))
                 {
                     var saveLocation = "";
 
@@ -301,7 +302,7 @@ namespace ExporterCLI.Exporters.glTF
 
                     if (!File.Exists(Path.GetFileNameWithoutExtension(saveLocation) + "png")) // Check if already exported & converted version exists
                     {
-                        using (var cascFile = CASC.cascHandler.OpenFile((int)wmo.materials[i].texture1))
+                        using (var cascFile = CASC.OpenFile((int)wmo.materials[i].texture1))
                         using (var cascStream = new MemoryStream())
                         {
                             cascFile.CopyTo(cascStream);
@@ -360,9 +361,9 @@ namespace ExporterCLI.Exporters.glTF
                             saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".blp");
                         }
 
-                        if (!File.Exists(Path.GetFileNameWithoutExtension(saveLocation) + "png")) // Check if already exported & converted version exists
+                        if (!File.Exists(Path.ChangeExtension(saveLocation, ".blp")) && !File.Exists(Path.ChangeExtension(saveLocation, ".png"))) // Check if already exported & converted version exists
                         {
-                            using (var cascFile = CASC.cascHandler.OpenFile(wmo.textures[ti].filename))
+                            using (var cascFile = CASC.OpenFile(wmo.textures[ti].filename))
                             using (var cascStream = new MemoryStream())
                             {
                                 cascFile.CopyTo(cascStream);
