@@ -8,9 +8,9 @@ namespace WoWFormatLib.FileReaders
     public class SKINReader
     {
         public SKIN skin;
-        public void LoadSKIN(int fileDataID)
+        public void LoadSKIN(uint fileDataID)
         {
-            using (var bin = new BinaryReader(CASC.cascHandler.OpenFile(fileDataID)))
+            using (var bin = new BinaryReader(CASC.OpenFile(fileDataID)))
             {
                 var header = new string(bin.ReadChars(4));
                 if (header != "SKIN")

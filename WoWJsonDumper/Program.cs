@@ -34,6 +34,18 @@ namespace WoWJsonDumper
                     Console.WriteLine(JsonConvert.SerializeObject(adt, Formatting.Indented));
                 }
                 */
+                if (args[0] == "wmo")
+                {
+                    if (args.Length != 2)
+                        throw new Exception("Not enough arguments. Need mode, file");
+
+                    var reader = new WoWFormatLib.FileReaders.WMOReader();
+
+                    var wmo = reader.LoadWMO(File.OpenRead(args[1]));
+
+                    Console.WriteLine(JsonConvert.SerializeObject(wmo, Formatting.Indented));
+                }
+
                 if (args[0] == "m2")
                 {
                     if (args.Length != 2)

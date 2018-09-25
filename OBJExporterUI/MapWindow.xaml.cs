@@ -45,7 +45,7 @@ namespace OBJExporterUI
             WDTGrid.Children.Clear();
 
             var wdt = new WDTReader();
-            if (CASC.cascHandler.FileExists(System.IO.Path.Combine(@"world\maps\", map, map + ".wdt")))
+            if (CASC.FileExists(System.IO.Path.Combine(@"world\maps\", map, map + ".wdt")))
             {
                 Stopwatch _SW = new Stopwatch();
                 BackgroundWorker _BackgroundWorker = new BackgroundWorker();
@@ -145,7 +145,7 @@ namespace OBJExporterUI
             rect.HorizontalAlignment = HorizontalAlignment.Left;
             rect.MouseEnter += Rect_MouseEnter;
             rect.MouseLeave += Rect_MouseLeave;
-            if (CASC.cascHandler.FileExists(System.IO.Path.Combine(@"world\minimaps\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp")))
+            if (CASC.FileExists(System.IO.Path.Combine(@"world\minimaps\" + _SelectedMapName + "\\map" + x.ToString("D2") + "_" + y.ToString("D2") + ".blp")))
             {
                 rect.MouseLeftButtonDown += new MouseButtonEventHandler(Rectangle_Mousedown);
                 var xmargin = (x * rect.Width) - (min_x * rect.Width);

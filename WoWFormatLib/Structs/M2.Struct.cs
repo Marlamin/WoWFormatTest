@@ -27,14 +27,14 @@ namespace WoWFormatLib.Structs.M2
     {
         public uint version;
 
-        public int physFileID;
-        public int skelFileID;
+        public uint physFileID;
+        public uint skelFileID;
 
-        public int[] boneFileDataIDs;
-        public int[] skinFileDataIDs;
-        public int[] lod_skinFileDataIDs;
+        public uint[] boneFileDataIDs;
+        public uint[] skinFileDataIDs;
+        public uint[] lod_skinFileDataIDs;
         public AFID[] animFileData;
-        public int[] textureFileDataIDs;
+        public uint[] textureFileDataIDs;
 
         public string filename;
         public string name;

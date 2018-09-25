@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using WoWFormatLib.Utils;
 
 namespace ExporterCLI
 {
@@ -13,9 +14,9 @@ namespace ExporterCLI
                 return;
             }
             
-            CASC.InitCasc(args[0], args[1]);
+            CASC.InitCasc("localhost:5005", args[0], args[1]);
 
-            if (int.TryParse(args[2], out var fileDataID))
+            if (uint.TryParse(args[2], out var fileDataID))
             {
                 switch (args[4])
                 {
@@ -32,7 +33,6 @@ namespace ExporterCLI
                         Console.WriteLine("Unknown type: " + args[3]);
                         break;
                 }
-              
             }
             else
             {

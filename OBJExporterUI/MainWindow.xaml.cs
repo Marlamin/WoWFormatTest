@@ -154,7 +154,7 @@ namespace OBJExporterUI
                     {
                         exportButton.Content = "Crawl maptile for models";
 
-                        if (CASC.cascHandler.FileExists("world/maps/" + filterSplit[0] + "/" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt"))
+                        if (CASC.FileExists("world/maps/" + filterSplit[0] + "/" + filterSplit[0] + "_" + filterSplit[1] + "_" + filterSplit[2] + ".adt"))
                         {
                             exportButton.IsEnabled = true;
                         }
@@ -366,7 +366,7 @@ namespace OBJExporterUI
 
             foreach (var line in File.ReadAllLines("listfile.txt"))
             {
-                if (CASC.cascHandler.FileExists(line))
+                if (CASC.FileExists(line))
                 {
                     linelist.Add(line.ToLower());
                 }
@@ -450,7 +450,7 @@ namespace OBJExporterUI
 
             foreach (string selectedFile in selectedFiles)
             {
-                if (!CASC.cascHandler.FileExists(selectedFile)) {
+                if (!CASC.FileExists(selectedFile)) {
                     Logger.WriteLine("ExportWorker: File {0} does not exist, skipping export!", selectedFile);
                     continue;
                 }
@@ -668,7 +668,7 @@ namespace OBJExporterUI
 
                 var wdt = "world\\maps\\" + selectedItem.Internal + "\\" + selectedItem.Internal + ".wdt";
 
-                if (CASC.cascHandler.FileExists(wdt))
+                if (CASC.FileExists(wdt))
                 {
                     var reader = new WoWFormatLib.FileReaders.WDTReader();
                     reader.LoadWDT(wdt);
@@ -689,7 +689,7 @@ namespace OBJExporterUI
 
                 var minimapFile = "world\\minimaps\\" + selectedItem.Internal + "\\map" + file + ".blp";
 
-                if (!CASC.cascHandler.FileExists(minimapFile))
+                if (!CASC.FileExists(minimapFile))
                 {
                     minimapFile = @"interface\icons\inv_misc_questionmark.blp";
                 }
@@ -958,19 +958,21 @@ namespace OBJExporterUI
 
             try
             {
+                throw new NotImplementedException("DBC reading needs updating!");
+                /*
                 if (!File.Exists("definitions/Map.dbd"))
                 {
                     UpdateDefinition("Map");
                 }
 
-                var build = CASC.cascHandler.Config.BuildName;
+                var build = CASC.Config.BuildName;
 
                 var dbdreader = new DBDReader();
                 var defs = dbdreader.Read("definitions/Map.dbd");
 
                 DBDefsLib.Structs.VersionDefinitions? versionToUse;
 
-                var reader = new WDC2Reader(CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2"));
+                var reader = new WDC2Reader(CASC.OpenFile(@"DBFilesClient/Map.db2"));
 
                 if (!Utils.GetVersionDefinitionByLayoutHash(defs, reader.LayoutHash.ToString("X8"), out versionToUse))
                 {
@@ -986,8 +988,8 @@ namespace OBJExporterUI
                         throw new Exception("No valid definition found for this layouthash and was not able to search by build!");
                     }
                 }
+                */
 
-                throw new NotImplementedException("DBC reading needs updating!");
                 /*using(var mapStream = CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2"))
                 {
                     var mapsData = new WDC2Reader(mapStream);
@@ -1035,7 +1037,7 @@ namespace OBJExporterUI
                 Console.WriteLine("An error occured during DBC reading.. falling back to CSV!" + ex.Message);
                 foreach (var map in mapNames)
                 {
-                    if (CASC.cascHandler.FileExists("World/Maps/" + map.Value.Internal + "/" + map.Value.Internal + ".wdt"))
+                    if (CASC.FileExists("World/Maps/" + map.Value.Internal + "/" + map.Value.Internal + ".wdt"))
                     {
                         mapListBox.Items.Add(new MapListItem { Name = map.Value.Name, Internal = map.Value.Internal, Type = map.Value.Type, Image = "pack://application:,,,/Resources/wow" + ExpansionNameToID(map.Value.Expansion) + ".png" });
                     }

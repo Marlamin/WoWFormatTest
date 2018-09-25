@@ -27,7 +27,7 @@ namespace OBJExporterUI.Loaders
             else
             {
                 //Load WMO from file
-                if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(filename))
+                if (WoWFormatLib.Utils.CASC.FileExists(filename))
                 {
                     var wmofile = new WMOReader().LoadWMO(filename);
                     cache.worldModels.Add(filename, wmofile);

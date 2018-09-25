@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using WoWFormatLib.FileReaders;
+using WoWFormatLib.Utils;
 
 namespace ExporterCLI.Exporters.glTF
 {
     public class WMOExporter
     {
-        public static void ExportWMO(string file, string destinationOverride = null, string outdir = "", int filedataid = 0)
+        public static void ExportWMO(string file, string destinationOverride = null, string outdir = "", uint filedataid = 0)
         {
             Console.WriteLine("WMO glTF Exporter: Loading file {0}...", file);
 
@@ -71,9 +72,15 @@ namespace ExporterCLI.Exporters.glTF
             for (var g = 0; g < wmo.group.Count(); g++)
             {
                 if (wmo.group[g].mogp.vertices == null)
-                { Console.WriteLine("Group has no vertices!"); continue; }
+                {
+                    Console.WriteLine("Group has no vertices!");
+                    continue;
+                }
                 if (wmo.group[g].mogp.renderBatches == null)
-                { Console.WriteLine("Group has no renderbatches!"); continue; }
+                {
+                    Console.WriteLine("Group has no renderbatches!");
+                    continue;
+                }
                 for (var i = 0; i < wmo.groupNames.Count(); i++)
                 {
                     if (wmo.group[g].mogp.nameOffset == wmo.groupNames[i].offset)
@@ -287,7 +294,7 @@ namespace ExporterCLI.Exporters.glTF
             for (var i = 0; i < materialCount; i++)
             {
                 // Check if texture is a filedataid
-                if (wmo.textures == null && CASC.FileExists((int)wmo.materials[i].texture1))
+                if (wmo.textures == null && CASC.FileExists(wmo.materials[i].texture1))
                 {
                     var saveLocation = "";
 
@@ -302,7 +309,7 @@ namespace ExporterCLI.Exporters.glTF
 
                     if (!File.Exists(Path.GetFileNameWithoutExtension(saveLocation) + "png")) // Check if already exported & converted version exists
                     {
-                        using (var cascFile = CASC.OpenFile((int)wmo.materials[i].texture1))
+                        using (var cascFile = CASC.OpenFile(wmo.materials[i].texture1))
                         using (var cascStream = new MemoryStream())
                         {
                             cascFile.CopyTo(cascStream);
@@ -349,60 +356,63 @@ namespace ExporterCLI.Exporters.glTF
 
                     for (var ti = 0; ti < wmo.textures.Count(); ti++)
                     {
-                        var saveLocation = "";
-                        var textureFilename = Path.GetFileNameWithoutExtension(wmo.textures[ti].filename.Replace("\\", "/")).ToLower();
+                        if(wmo.textures[ti].startOffset == wmo.materials[i].texture1)
+                        {
+                            var saveLocation = "";
+                            var textureFilename = Path.GetFileNameWithoutExtension(wmo.textures[ti].filename.Replace("\\", "/")).ToLower();
 
-                        if (destinationOverride == null)
-                        {
-                            saveLocation = Path.Combine(outdir, textureFilename + ".blp");
-                        }
-                        else
-                        {
-                            saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".blp");
-                        }
-
-                        if (!File.Exists(Path.ChangeExtension(saveLocation, ".blp")) && !File.Exists(Path.ChangeExtension(saveLocation, ".png"))) // Check if already exported & converted version exists
-                        {
-                            using (var cascFile = CASC.OpenFile(wmo.textures[ti].filename))
-                            using (var cascStream = new MemoryStream())
+                            if (destinationOverride == null)
                             {
-                                cascFile.CopyTo(cascStream);
-                                File.WriteAllBytes(saveLocation, cascStream.ToArray());
+                                saveLocation = Path.Combine(outdir, textureFilename + ".blp");
                             }
-                        }
+                            else
+                            {
+                                saveLocation = Path.Combine(outdir, destinationOverride, textureFilename + ".blp");
+                            }
 
-                        Console.WriteLine(textureFilename);
+                            if (!File.Exists(Path.ChangeExtension(saveLocation, ".blp")) && !File.Exists(Path.ChangeExtension(saveLocation, ".png"))) // Check if already exported & converted version exists
+                            {
+                                using (var cascFile = CASC.OpenFile(wmo.textures[ti].filename))
+                                using (var cascStream = new MemoryStream())
+                                {
+                                    cascFile.CopyTo(cascStream);
+                                    File.WriteAllBytes(saveLocation, cascStream.ToArray());
+                                }
+                            }
 
-                        glTF.images[i].uri = textureFilename + ".png";
+                            Console.WriteLine(textureFilename);
 
-                        glTF.textures[i].sampler = 0;
-                        glTF.textures[i].source = i;
+                            glTF.images[i].uri = textureFilename + ".png";
 
-                        glTF.materials[i].name = textureFilename;
-                        glTF.materials[i].pbrMetallicRoughness = new PBRMetallicRoughness();
-                        glTF.materials[i].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
-                        glTF.materials[i].pbrMetallicRoughness.baseColorTexture.index = i;
-                        glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
-                        glTF.materials[i].doubleSided = true;
+                            glTF.textures[i].sampler = 0;
+                            glTF.textures[i].source = i;
 
-                        switch (wmo.materials[i].blendMode)
-                        {
-                            case 0:
-                                glTF.materials[i].alphaMode = "OPAQUE";
-                                glTF.materials[i].alphaCutoff = 0.0f;
-                                break;
-                            case 1:
-                                glTF.materials[i].alphaMode = "MASK";
-                                glTF.materials[i].alphaCutoff = 0.90393700787f;
-                                break;
-                            case 2:
-                                glTF.materials[i].alphaMode = "MASK";
-                                glTF.materials[i].alphaCutoff = 0.5f;
-                                break;
-                            default:
-                                glTF.materials[i].alphaMode = "OPAQUE";
-                                glTF.materials[i].alphaCutoff = 0.0f;
-                                break;
+                            glTF.materials[i].name = textureFilename;
+                            glTF.materials[i].pbrMetallicRoughness = new PBRMetallicRoughness();
+                            glTF.materials[i].pbrMetallicRoughness.baseColorTexture = new TextureIndex();
+                            glTF.materials[i].pbrMetallicRoughness.baseColorTexture.index = i;
+                            glTF.materials[i].pbrMetallicRoughness.metallicFactor = 0.0f;
+                            glTF.materials[i].doubleSided = true;
+
+                            switch (wmo.materials[i].blendMode)
+                            {
+                                case 0:
+                                    glTF.materials[i].alphaMode = "OPAQUE";
+                                    glTF.materials[i].alphaCutoff = 0.0f;
+                                    break;
+                                case 1:
+                                    glTF.materials[i].alphaMode = "MASK";
+                                    glTF.materials[i].alphaCutoff = 0.90393700787f;
+                                    break;
+                                case 2:
+                                    glTF.materials[i].alphaMode = "MASK";
+                                    glTF.materials[i].alphaCutoff = 0.5f;
+                                    break;
+                                default:
+                                    glTF.materials[i].alphaMode = "OPAQUE";
+                                    glTF.materials[i].alphaCutoff = 0.0f;
+                                    break;
+                            }
                         }
                     }
                 }

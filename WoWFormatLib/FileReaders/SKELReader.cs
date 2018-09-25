@@ -7,9 +7,9 @@ namespace WoWFormatLib.FileReaders
 {
     public class SKELReader
     {
-        public void LoadSKEL(int fileDataID)
+        public void LoadSKEL(uint fileDataID)
         {
-            using (var bin = new BinaryReader(CASC.cascHandler.OpenFile(fileDataID)))
+            using (var bin = new BinaryReader(CASC.OpenFile(fileDataID)))
             {
                 var header = new string(bin.ReadChars(4));
               

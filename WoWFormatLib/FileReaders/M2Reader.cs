@@ -11,7 +11,7 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadM2(string filename)
         {
-            if (CASC.cascHandler.FileExists(filename))
+            if (CASC.FileExists(filename))
             {
                 LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
             }
@@ -21,14 +21,14 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void LoadM2(int fileDataID)
+        public void LoadM2(uint fileDataID)
         {
 #if DEBUG
-                LoadM2(CASC.cascHandler.OpenFile(fileDataID));
+                LoadM2(CASC.OpenFile(fileDataID));
 #else
                 try
                 {
-                    LoadM2(CASC.cascHandler.OpenFile(fileDataID));
+                    LoadM2(CASC.OpenFile(fileDataID));
                 }
                 catch(Exception e)
                 {
@@ -69,31 +69,31 @@ namespace WoWFormatLib.FileReaders
                         model.animFileData = afids;
                         break;
                     case M2Chunks.BFID: // Bone file IDs
-                        var bfids = new int[chunkSize / 4];
+                        var bfids = new uint[chunkSize / 4];
                         for (var b = 0; b < chunkSize / 4; b++)
                         {
-                            bfids[b] = bin.ReadInt32();
+                            bfids[b] = bin.ReadUInt32();
                         }
                         break;
                     case M2Chunks.SFID: // Skin file IDs
-                        var sfids = new int[model.nViews];
+                        var sfids = new uint[model.nViews];
                         for (var s = 0; s < model.nViews; s++)
                         {
-                            sfids[s] = bin.ReadInt32();
+                            sfids[s] = bin.ReadUInt32();
                         }
                         model.skinFileDataIDs = sfids;
                         break;
                     case M2Chunks.PFID: // Phys file ID
-                        model.physFileID = bin.ReadInt32();
+                        model.physFileID = bin.ReadUInt32();
                         break;
                     case M2Chunks.SKID: // Skel file ID
-                        model.skelFileID = bin.ReadInt32();
+                        model.skelFileID = bin.ReadUInt32();
                         break;
                     case M2Chunks.TXID:
-                        var txids = new int[chunkSize / 4];
+                        var txids = new uint[chunkSize / 4];
                         for (var t = 0; t < chunkSize / 4; t++)
                         {
-                            txids[t] = bin.ReadInt32();
+                            txids[t] = bin.ReadUInt32();
                         }
                         model.textureFileDataIDs = txids;
                         break;
@@ -447,7 +447,7 @@ namespace WoWFormatLib.FileReaders
             }
             return sequences;
         }
-        private Structs.SKIN.SKIN[] ReadSkins(int[] skinFileDataIDs)
+        private Structs.SKIN.SKIN[] ReadSkins(uint[] skinFileDataIDs)
         {
             var skins = new Structs.SKIN.SKIN[skinFileDataIDs.Length];
             for (var i = 0; i < skinFileDataIDs.Length; i++)

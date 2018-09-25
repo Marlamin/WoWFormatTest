@@ -12,7 +12,7 @@ namespace ExporterCLI.Exporters.glTF
 {
     class M2Exporter
     {
-        public static void ExportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null, string outdir = "", int filedataid = 0)
+        public static void ExportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null, string outdir = "", uint filedataid = 0)
         {
             if (exportworker == null)
             {
@@ -354,7 +354,7 @@ namespace ExporterCLI.Exporters.glTF
 
             for (var i = 0; i < reader.model.textures.Count(); i++)
             {
-                var textureFileDataID = 840426;
+                uint textureFileDataID = 903224;
                 materials[i].flags = reader.model.textures[i].flags;
                 switch (reader.model.textures[i].type)
                 {
@@ -369,6 +369,11 @@ namespace ExporterCLI.Exporters.glTF
                         break;
                 }
 
+                // Check if texture is a replacable texture, return test texture for now
+                if(textureFileDataID == 0)
+                {
+                    textureFileDataID = 903224;
+                }
                 materials[i].textureID = textureID + i;
 
                 materials[i].filename = textureFileDataID.ToString();

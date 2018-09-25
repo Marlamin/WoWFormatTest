@@ -20,11 +20,11 @@ namespace WoWFormatLib.FileReaders
             return LoadBLS(CASC.getFileDataIdByName(filename));
         }
 
-        public BLS LoadBLS(int fileDataID)
+        public BLS LoadBLS(uint fileDataID)
         {
-            if (CASC.cascHandler.FileExists(fileDataID))
+            if (CASC.FileExists(fileDataID))
             {
-                using (var bin = new BinaryReader(CASC.cascHandler.OpenFile(fileDataID)))
+                using (var bin = new BinaryReader(CASC.OpenFile(fileDataID)))
                 {
                     var identifier = new string(bin.ReadChars(4).Reverse().ToArray());
                     if(identifier != "GXSH")

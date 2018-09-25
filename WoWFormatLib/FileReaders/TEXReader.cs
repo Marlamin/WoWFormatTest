@@ -9,11 +9,10 @@ namespace WoWFormatLib.FileReaders
 {
     public class TEXReader
     {
-        public void LoadTEX(string filename)
-        {
-            if (CASC.cascHandler.FileExists(filename))
+        public void LoadTEX(string filename) { 
+            if (CASC.FileExists(filename))
             {
-                using (var tex = CASC.cascHandler.OpenFile(filename))
+                using (var tex = CASC.OpenFile(filename))
                 {
                     ReadTEX(filename, tex);
                 }

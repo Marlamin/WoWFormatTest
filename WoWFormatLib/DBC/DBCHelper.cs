@@ -7,7 +7,7 @@ namespace WoWFormatLib.DBC
 {
     public class DBCHelper
     {
-        public static uint[] getTexturesByModelFilename(int modelID, int flag, int texid = 0)
+        public static uint[] getTexturesByModelFilename(uint modelID, int flag, int texid = 0)
         {
             var results = new List<uint>();
 

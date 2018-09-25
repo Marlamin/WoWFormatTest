@@ -12,9 +12,9 @@ namespace WoWFormatLib.FileReaders
             LoadAnim(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "anim")));
         }
 
-        public void LoadAnim(int fileDataID)
+        public void LoadAnim(uint fileDataID)
         {
-            using (var bin = new BinaryReader(CASC.cascHandler.OpenFile(fileDataID)))
+            using (var bin = new BinaryReader(CASC.OpenFile(fileDataID)))
             {
                 long position = 0;
 

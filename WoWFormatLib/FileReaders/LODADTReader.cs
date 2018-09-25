@@ -11,7 +11,7 @@ namespace WoWFormatLib.FileReaders
         public LODADT lodadt;
         public void LoadLODADT(string filename)
         {
-            using (var adt = CASC.cascHandler.OpenFile(filename))
+            using (var adt = CASC.OpenFile(filename))
             using (var bin = new BinaryReader(adt))
             {
                 long position = 0;

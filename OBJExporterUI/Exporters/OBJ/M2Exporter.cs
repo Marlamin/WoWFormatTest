@@ -30,7 +30,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
             exportworker.ReportProgress(15, "Reading M2..");
 
-            if (!CASC.cascHandler.FileExists(fileDataID)) { throw new Exception("404 M2 not found!"); }
+            if (!CASC.FileExists(fileDataID)) { throw new Exception("404 M2 not found!"); }
 
             reader.LoadM2(fileDataID);
 
@@ -133,7 +133,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
             for (var i = 0; i < reader.model.textures.Count(); i++)
             {
-                var textureFileDataID = 840426;
+                uint textureFileDataID = 840426;
                 materials[i].flags = reader.model.textures[i].flags;
                 switch (reader.model.textures[i].type)
                 {
@@ -151,7 +151,7 @@ namespace OBJExporterUI.Exporters.OBJ
                         uint[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
                         for (int ti = 0; ti < cdifilenames.Count(); ti++)
                         {
-                            textureFileDataID = (int)cdifilenames[0];
+                            textureFileDataID = cdifilenames[0];
                         }
                         break;
                     default:

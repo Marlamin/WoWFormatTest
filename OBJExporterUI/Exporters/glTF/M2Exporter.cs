@@ -352,7 +352,7 @@ namespace OBJExporterUI.Exporters.glTF
 
             for (var i = 0; i < reader.model.textures.Count(); i++)
             {
-                var textureFileDataID = 840426;
+                uint textureFileDataID = 840426;
                 materials[i].flags = reader.model.textures[i].flags;
                 switch (reader.model.textures[i].type)
                 {
@@ -366,7 +366,7 @@ namespace OBJExporterUI.Exporters.glTF
                         var cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
                         for (var ti = 0; ti < cdifilenames.Count(); ti++)
                         {
-                            textureFileDataID = (int)cdifilenames[0];
+                            textureFileDataID = cdifilenames[0];
                         }
                         break;
                     default:

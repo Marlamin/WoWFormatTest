@@ -17,7 +17,7 @@ namespace OBJExporterUI.Loaders
             var result = new Terrain();
 
             //Load ADT from file
-            if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(filename))
+            if (WoWFormatLib.Utils.CASC.FileExists(filename))
             {
                 var adtreader = new ADTReader();
                 adtreader.LoadADT(filename);
@@ -59,7 +59,7 @@ namespace OBJExporterUI.Loaders
                         material.heightOffset = adt.texParams[ti].offset;
 
                         var heightName = adt.textures.filenames[ti].Replace(".blp", "_h.blp");
-                        if (!WoWFormatLib.Utils.CASC.cascHandler.FileExists(heightName))
+                        if (!WoWFormatLib.Utils.CASC.FileExists(heightName))
                         {
                             Console.WriteLine("Height texture: " + heightName + " does not exist! Falling back to original texture (hack)..");
                             material.heightTexture = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);

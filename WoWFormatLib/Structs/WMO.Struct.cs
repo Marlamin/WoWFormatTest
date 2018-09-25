@@ -65,7 +65,7 @@ namespace WoWFormatLib.Structs.WMO
         public MOGN[] groupNames;
         public MOGI[] groupInfo;
         public WMOGroupFile[] group;
-        public int[] groupFileDataIDs;
+        public uint[] groupFileDataIDs;
         public string  skybox;
     }
 

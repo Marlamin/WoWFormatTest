@@ -18,9 +18,9 @@ namespace WoWFormatLib.FileReaders
             return bitmapstream;
         }
 
-        public void LoadBLP(int fileDataID)
+        public void LoadBLP(uint fileDataID)
         {
-            using (var blp = new BlpFile(CASC.cascHandler.OpenFile(fileDataID)))
+            using (var blp = new BlpFile(CASC.OpenFile(fileDataID)))
             {
                 bmp = blp.GetBitmap(0);
             }
@@ -28,7 +28,7 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadBLP(string filename)
         {
-            using (var blp = new BlpFile(CASC.cascHandler.OpenFile(filename)))
+            using (var blp = new BlpFile(CASC.OpenFile(filename)))
             {
                 bmp = blp.GetBitmap(0);
             }

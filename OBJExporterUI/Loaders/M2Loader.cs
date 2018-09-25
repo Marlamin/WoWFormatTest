@@ -30,7 +30,7 @@ namespace OBJExporterUI.Loaders
             }
             else
             {
-                if (WoWFormatLib.Utils.CASC.cascHandler.FileExists(filename))
+                if (WoWFormatLib.Utils.CASC.FileExists(filename))
                 {
                     var modelreader = new M2Reader();
                     modelreader.LoadM2(filename);
@@ -75,7 +75,7 @@ namespace OBJExporterUI.Loaders
 
             for (var i = 0; i < model.textures.Count(); i++)
             {
-                var textureFileDataID = 372993;
+                uint textureFileDataID = 372993;
                 ddBatch.mats[i].flags = model.textures[i].flags;
 
                 switch (model.textures[i].type)
@@ -131,7 +131,7 @@ namespace OBJExporterUI.Loaders
                     {
                         ddBatch.submeshes[i].blendType = model.renderflags[model.skins[0].textureunit[tu].renderFlags].blendingMode;
 
-                        var textureFileDataID = 372993;
+                        uint textureFileDataID = 372993;
 
                         if (model.textureFileDataIDs != null && model.textureFileDataIDs.Length > 0 && model.textureFileDataIDs[model.texlookup[model.skins[0].textureunit[tu].texture].textureID] != 0)
                         {

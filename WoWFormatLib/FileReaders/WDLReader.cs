@@ -11,9 +11,9 @@ namespace WoWFormatLib.FileReaders
     {
         public void LoadWDL(string filename)
         {
-            if (CASC.cascHandler.FileExists(filename))
+            if (CASC.FileExists(filename))
             {
-                using (Stream tex = CASC.cascHandler.OpenFile(filename))
+                using (Stream tex = CASC.OpenFile(filename))
                 {
                     ReadWDL(filename, tex);
                 }
@@ -42,7 +42,7 @@ namespace WoWFormatLib.FileReaders
                 {
                     if (str.Length > 1)
                     {
-                        if (!CASC.cascHandler.FileExists(str.ToString()))
+                        if (!CASC.FileExists(str.ToString()))
                         {
                             Console.WriteLine("WMO file does not exist!!! {0}", str.ToString());
                         }

@@ -21,13 +21,13 @@ namespace WoWFormatLib.FileReaders
             return wmofile;
         }
 
-        public WMO LoadWMO(int filedataid, byte lod = 0)
+        public WMO LoadWMO(uint filedataid, byte lod = 0)
         {
             lodLevel = lod;
 
-            if (CASC.cascHandler.FileExists(filedataid))
+            if (CASC.FileExists(filedataid))
             {
-                using (var wmoStream = CASC.cascHandler.OpenFile(filedataid))
+                using (var wmoStream = CASC.OpenFile(filedataid))
                 {
                     ReadWMO(wmoStream);
                 }
@@ -44,9 +44,9 @@ namespace WoWFormatLib.FileReaders
         {
             lodLevel = lod;
 
-            if (CASC.cascHandler.FileExists(filename))
+            if (CASC.FileExists(filename))
             {
-                using (var wmoStream = CASC.cascHandler.OpenFile(filename))
+                using (var wmoStream = CASC.OpenFile(filename))
                 {
                     ReadWMO(wmoStream);
                 }
@@ -161,25 +161,29 @@ namespace WoWFormatLib.FileReaders
                     groupFileDataID = wmofile.groupFileDataIDs[i];
                 }
 
-                if (CASC.IsCASCInit && CASC.cascHandler.FileExists(groupFileDataID))
+                if (CASC.IsCASCInit && CASC.FileExists(groupFileDataID))
                 {
-                    using (var wmoStream = CASC.cascHandler.OpenFile(groupFileDataID))
+                    using (var wmoStream = CASC.OpenFile(groupFileDataID))
                     {
                         groupFiles[i] = ReadWMOGroupFile(groupFileDataID, wmoStream);
                     }
+                }
+                else
+                {
+                    Console.WriteLine("CASC is reporting " + groupFileDataID + " does not exist! This shouldn't happen.");
                 }
             }
 
             wmofile.group = groupFiles;
         }
 
-        private int[] ReadGFIDChunk(uint size, BinaryReader bin)
+        private uint[] ReadGFIDChunk(uint size, BinaryReader bin)
         {
             var count = size / 4;
-            var gfids = new int[count];
+            var gfids = new uint[count];
             for (var i = 0; i < count; i++)
             {
-                gfids[i] = bin.ReadInt32();
+                gfids[i] = bin.ReadUInt32();
             }
             return gfids;
         }
@@ -357,7 +361,7 @@ namespace WoWFormatLib.FileReaders
         }
 
         /* GROUP */
-        private WMOGroupFile ReadWMOGroupFile(int filedataid, Stream wmo)
+        private WMOGroupFile ReadWMOGroupFile(uint filedataid, Stream wmo)
         {
             var groupFile = new WMOGroupFile();
 

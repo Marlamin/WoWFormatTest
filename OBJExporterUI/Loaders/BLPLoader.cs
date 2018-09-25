@@ -12,7 +12,7 @@ namespace OBJExporterUI.Loaders
             return LoadTexture(CASC.getFileDataIdByName(filename), cache);
         }
 
-        public static int LoadTexture(int filedataid, CacheStorage cache)
+        public static int LoadTexture(uint filedataid, CacheStorage cache)
         {
             GL.ActiveTexture(TextureUnit.Texture0);
 
@@ -23,7 +23,7 @@ namespace OBJExporterUI.Loaders
 
             int textureId = GL.GenTexture();
 
-            using (var blp = new BlpFile(CASC.cascHandler.OpenFile(filedataid)))
+            using (var blp = new BlpFile(CASC.OpenFile(filedataid)))
             {
                 switch (blp.encoding)
                 {
