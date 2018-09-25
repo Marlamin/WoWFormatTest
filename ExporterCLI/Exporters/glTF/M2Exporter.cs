@@ -12,7 +12,7 @@ namespace ExporterCLI.Exporters.glTF
 {
     class M2Exporter
     {
-        public static void ExportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null, string outdir = "")
+        public static void ExportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null, string outdir = "", int filedataid = 0)
         {
             if (exportworker == null)
             {
@@ -25,7 +25,14 @@ namespace ExporterCLI.Exporters.glTF
             exportworker.ReportProgress(5, "Reading M2..");
 
             var reader = new M2Reader();
-            reader.LoadM2(file);
+            if(filedataid != 0)
+            {
+                reader.LoadM2(filedataid);
+            }
+            else
+            {
+                reader.LoadM2(file);
+            }
 
             var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
@@ -46,8 +53,6 @@ namespace ExporterCLI.Exporters.glTF
                 Console.WriteLine("M2 glTF Exporter: File {0} has no vertices, skipping export!", file);
                 return;
             }
-
-
 
             exportworker.ReportProgress(25, "Generating glTF..");
 
@@ -354,6 +359,8 @@ namespace ExporterCLI.Exporters.glTF
                 switch (reader.model.textures[i].type)
                 {
                     case 0:
+                        textureFileDataID = reader.model.textureFileDataIDs[i];
+                        break;
                     case 1:
                     case 2:
                     case 11:
@@ -379,24 +386,24 @@ namespace ExporterCLI.Exporters.glTF
                 glTF.textures[i].sampler = 0;
                 glTF.textures[i].source = i;
 
-                //var blpreader = new BLPReader();
-                //blpreader.LoadBLP(textureFileDataID);
-                
-                //try
-                //{
-                //    if (destinationOverride == null)
-                //    {
-                //        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), glTF.images[i].uri));
-                //    }
-                //    else
-                //    {
-                //        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, glTF.images[i].uri));
-                //    }
-                //}
-                //catch (Exception e)
-                //{
-                //    Console.WriteLine(e.Message);
-                //}
+                var blpreader = new BLPReader();
+                blpreader.LoadBLP(textureFileDataID);
+
+                try
+                {
+                    if (destinationOverride == null)
+                    {
+                        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), glTF.images[i].uri));
+                    }
+                    else
+                    {
+                        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, glTF.images[i].uri));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
 
             exportworker.ReportProgress(85, "Writing files..");
