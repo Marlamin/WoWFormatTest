@@ -472,7 +472,7 @@ namespace OBJExporterUI
                 {
                     if (exportFormat == "OBJ")
                     {
-                        Exporters.OBJ.M2Exporter.exportM2(selectedFile, exportworker);
+                        Exporters.OBJ.M2Exporter.ExportM2(selectedFile, exportworker);
                     }
                     else if (exportFormat == "glTF")
                     {

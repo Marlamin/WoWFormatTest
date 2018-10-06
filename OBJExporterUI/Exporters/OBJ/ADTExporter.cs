@@ -212,7 +212,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
                         if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
                         {
-                            M2Exporter.exportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                            M2Exporter.ExportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                         }
 
                         if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))

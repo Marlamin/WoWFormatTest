@@ -41,6 +41,7 @@ namespace OBJExporterUI.Loaders
 
             if(wmo.group.Count() == 0)
             {
+                CASCLib.Logger.WriteLine("WMO has no groups: ", filename);
                 throw new Exception("Broken WMO! Report to developer (mail marlamin@marlamin.com) with this filename: " + filename);
             }
 
@@ -128,21 +129,41 @@ namespace OBJExporterUI.Loaders
                 wmobatch.mats[i].texture2 = wmo.materials[i].texture2;
                 wmobatch.mats[i].texture3 = wmo.materials[i].texture3;
 
-                for (var ti = 0; ti < wmo.textures.Count(); ti++)
+                if (wmo.textures == null)
                 {
-                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
+                    if (WoWFormatLib.Utils.CASC.FileExists(wmo.materials[i].texture1))
                     {
-                        wmobatch.mats[i].textureID1 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
+                        wmobatch.mats[i].textureID1 = BLPLoader.LoadTexture(wmo.materials[i].texture1, cache);
                     }
 
-                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture2)
+                    if (WoWFormatLib.Utils.CASC.FileExists(wmo.materials[i].texture2))
                     {
-                        wmobatch.mats[i].textureID2 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
+                        wmobatch.mats[i].textureID2 = BLPLoader.LoadTexture(wmo.materials[i].texture2, cache);
                     }
 
-                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture3)
+                    if (WoWFormatLib.Utils.CASC.FileExists(wmo.materials[i].texture3))
                     {
-                        wmobatch.mats[i].textureID3 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
+                        wmobatch.mats[i].textureID3 = BLPLoader.LoadTexture(wmo.materials[i].texture3, cache);
+                    }
+                }
+                else
+                {
+                    for (var ti = 0; ti < wmo.textures.Count(); ti++)
+                    {
+                        if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
+                        {
+                            wmobatch.mats[i].textureID1 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
+                        }
+
+                        if (wmo.textures[ti].startOffset == wmo.materials[i].texture2)
+                        {
+                            wmobatch.mats[i].textureID2 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
+                        }
+
+                        if (wmo.textures[ti].startOffset == wmo.materials[i].texture3)
+                        {
+                            wmobatch.mats[i].textureID3 = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
+                        }
                     }
                 }
             }
@@ -151,14 +172,21 @@ namespace OBJExporterUI.Loaders
 
             for(var i = 0; i < wmo.doodadDefinitions.Count(); i++)
             {
-                for(var j = 0; j < wmo.doodadNames.Count(); j++)
+                if(wmo.doodadNames != null)
                 {
-                    if (wmo.doodadDefinitions[i].offset == wmo.doodadNames[j].startOffset)
+                    for (var j = 0; j < wmo.doodadNames.Count(); j++)
                     {
-                        wmobatch.doodads[i].filename = wmo.doodadNames[j].filename;
-                        //M2Loader.LoadM2(wmobatch.doodads[i].filename, cache);
+                        if (wmo.doodadDefinitions[i].offset == wmo.doodadNames[j].startOffset)
+                        {
+                            wmobatch.doodads[i].filename = wmo.doodadNames[j].filename;
+                        }
                     }
                 }
+                else
+                {
+                    wmobatch.doodads[i].filedataid = wmo.doodadDefinitions[i].offset;
+                }
+
                 wmobatch.doodads[i].flags = wmo.doodadDefinitions[i].flags;
                 wmobatch.doodads[i].position = new Vector3(wmo.doodadDefinitions[i].position.X, wmo.doodadDefinitions[i].position.Y, wmo.doodadDefinitions[i].position.Z);
                 wmobatch.doodads[i].rotation = new Quaternion(wmo.doodadDefinitions[i].rotation.X, wmo.doodadDefinitions[i].rotation.Y, wmo.doodadDefinitions[i].rotation.Z, wmo.doodadDefinitions[i].rotation.W);

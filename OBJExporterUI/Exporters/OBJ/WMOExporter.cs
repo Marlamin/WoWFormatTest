@@ -123,13 +123,12 @@ namespace OBJExporterUI.Exporters.OBJ
                     if(wmo.doodadIds != null)
                     {
                         var doodadFileDataID = wmo.doodadIds[doodadDefinition.offset];
-                        CASCLib.Logger.WriteLine("Unable to export M2 doodad because M2 Exporter does not yet support FileDataID only exports! Sorry!");
-                        /*
+                        
                         if (destinationOverride == null)
                         {
                             if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), doodadFileDataID + ".obj")))
                             {
-                                M2Exporter.exportM2(doodadFileDataID, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                                M2Exporter.ExportM2(doodadFileDataID, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                             }
 
                             if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), doodadFileDataID + ".obj")))
@@ -139,17 +138,16 @@ namespace OBJExporterUI.Exporters.OBJ
                         }
                         else
                         {
-                            if (!File.Exists(Path.Combine(destinationOverride, Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
+                            if (!File.Exists(Path.Combine(destinationOverride, doodadFileDataID + ".obj")))
                             {
-                                M2Exporter.exportM2(doodadFileDataID, null, destinationOverride);
+                                M2Exporter.ExportM2(doodadFileDataID, null, destinationOverride);
                             }
 
-                            if (File.Exists(Path.Combine(destinationOverride, Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
+                            if (File.Exists(Path.Combine(destinationOverride, doodadFileDataID + ".obj")))
                             {
                                 doodadSW.WriteLine(doodadFileDataID + ".obj;" + doodadDefinition.position.X.ToString("F09") + ";" + doodadDefinition.position.Y.ToString("F09") + ";" + doodadDefinition.position.Z.ToString("F09") + ";" + doodadDefinition.rotation.W.ToString("F15") + ";" + doodadDefinition.rotation.X.ToString("F15") + ";" + doodadDefinition.rotation.Y.ToString("F15") + ";" + doodadDefinition.rotation.Z.ToString("F15") + ";" + doodadDefinition.scale + ";" + currentDoodadSetName);
                             }
                         }
-                        */
                     }
                     else
                     {
@@ -163,7 +161,7 @@ namespace OBJExporterUI.Exporters.OBJ
                                 {
                                     if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
                                     {
-                                        M2Exporter.exportM2(doodadFileName, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                                        M2Exporter.ExportM2(doodadFileName, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
                                     }
 
                                     if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
@@ -175,7 +173,7 @@ namespace OBJExporterUI.Exporters.OBJ
                                 {
                                     if (!File.Exists(Path.Combine(destinationOverride, Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
                                     {
-                                        M2Exporter.exportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2"), null, destinationOverride);
+                                        M2Exporter.ExportM2(doodadNameEntry.filename.Replace(".MDX", ".M2").Replace(".MDL", ".M2"), null, destinationOverride);
                                     }
 
                                     if (File.Exists(Path.Combine(destinationOverride, Path.GetFileName(doodadFileName.ToLower()).Replace(".m2", ".obj"))))
@@ -207,47 +205,88 @@ namespace OBJExporterUI.Exporters.OBJ
             var materials = new Structs.Material[wmo.materials.Count()];
             for (var i = 0; i < wmo.materials.Count(); i++)
             {
-                for (var ti = 0; ti < wmo.textures.Count(); ti++)
+                if(wmo.textures == null)
                 {
-                    if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
+                    materials[i].textureID = textureID + i;
+                    materials[i].filename = wmo.materials[i].texture1.ToString();
+
+                    if (wmo.materials[i].blendMode == 0)
                     {
-                        //materials[i].textureID = BLPLoader.LoadTexture(wmo.textures[ti].filename, cache);
-                        materials[i].textureID = textureID + i;
-                        materials[i].filename = Path.GetFileNameWithoutExtension(wmo.textures[ti].filename);
+                        materials[i].transparent = false;
+                    }
+                    else
+                    {
+                        materials[i].transparent = true;
+                    }
 
-                        if (wmo.materials[i].blendMode == 0)
+                    if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png")))
+                    {
+                        var blpreader = new BLPReader();
+
+                        blpreader.LoadBLP(wmo.materials[i].texture1);
+
+                        try
                         {
-                            materials[i].transparent = false;
-                        }
-                        else
-                        {
-                            materials[i].transparent = true;
-                        }
-
-                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png")))
-                        {
-                            var blpreader = new BLPReader();
-
-                            blpreader.LoadBLP(wmo.textures[ti].filename);
-
-                            try
+                            if (destinationOverride == null)
                             {
-                                if (destinationOverride == null)
-                                {
-                                    blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
-                                }
-                                else
-                                {
-                                    blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
-                                }
+                                blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
                             }
-                            catch (Exception e)
+                            else
                             {
-                                Console.WriteLine(e.Message);
+                                blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
                             }
                         }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                    }
 
-                        textureID++;
+                    textureID++;
+                }
+                else
+                {
+                    for (var ti = 0; ti < wmo.textures.Count(); ti++)
+                    {
+                        if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
+                        {
+                            materials[i].textureID = textureID + i;
+                            materials[i].filename = Path.GetFileNameWithoutExtension(wmo.textures[ti].filename);
+
+                            if (wmo.materials[i].blendMode == 0)
+                            {
+                                materials[i].transparent = false;
+                            }
+                            else
+                            {
+                                materials[i].transparent = true;
+                            }
+
+                            if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png")))
+                            {
+                                var blpreader = new BLPReader();
+
+                                blpreader.LoadBLP(wmo.textures[ti].filename);
+
+                                try
+                                {
+                                    if (destinationOverride == null)
+                                    {
+                                        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png"));
+                                    }
+                                    else
+                                    {
+                                        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e.Message);
+                                }
+                            }
+
+                            textureID++;
+                        }
                     }
                 }
             }

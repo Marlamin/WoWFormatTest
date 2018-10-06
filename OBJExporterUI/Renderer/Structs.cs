@@ -103,6 +103,7 @@ namespace OBJExporterUI.Renderer
         public struct WMODoodad
         {
             public string filename;
+            public uint filedataid;
             public short flags;
             public Vector3 position;
             public Quaternion rotation;

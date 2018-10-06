@@ -12,19 +12,25 @@ namespace OBJExporterUI.Exporters.OBJ
 {
     class M2Exporter
     {
-        public static void exportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
+        public static void ExportM2(string file, BackgroundWorker exportworker = null, string destinationOverride = null)
+        {
+            ExportM2(CASC.getFileDataIdByName(file), exportworker, destinationOverride, file);
+        }
+
+        public static void ExportM2(uint fileDataID, BackgroundWorker exportworker = null, string destinationOverride = null, string filename = "")
         {
             if (exportworker == null)
             {
-                exportworker = new BackgroundWorker();
-                exportworker.WorkerReportsProgress = true;
+                exportworker = new BackgroundWorker
+                {
+                    WorkerReportsProgress = true
+                };
             }
 
-            System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
-            var fileDataID = CASC.getFileDataIdByName(file);
             var outdir = ConfigurationManager.AppSettings["outdir"];
             var reader = new M2Reader();
 
@@ -40,9 +46,9 @@ namespace OBJExporterUI.Exporters.OBJ
                 return;
             }
 
-            Structs.Vertex[] vertices = new Structs.Vertex[reader.model.vertices.Count()];
+            var vertices = new Structs.Vertex[reader.model.vertices.Count()];
 
-            for (int i = 0; i < reader.model.vertices.Count(); i++)
+            for (var i = 0; i < reader.model.vertices.Count(); i++)
             {
                 vertices[i].Position = new OpenTK.Vector3(reader.model.vertices[i].position.X, reader.model.vertices[i].position.Z, reader.model.vertices[i].position.Y * -1);
                 vertices[i].Normal = new OpenTK.Vector3(reader.model.vertices[i].normal.X, reader.model.vertices[i].normal.Z, reader.model.vertices[i].normal.Y);
@@ -53,21 +59,47 @@ namespace OBJExporterUI.Exporters.OBJ
 
             if(destinationOverride == null)
             {
-                // Create output directory
-                if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
+                if (!string.IsNullOrEmpty(filename))
                 {
-                    Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file)));
-                }
+                    if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(filename))))
+                    {
+                        Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(filename)));
+                    }
 
-                objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".obj")));
+                    objsw = new StreamWriter(Path.Combine(outdir, filename.Replace(".m2", ".obj")));
+                }
+                else
+                {
+                    if (!Directory.Exists(outdir))
+                    {
+                        Directory.CreateDirectory(outdir);
+                    }
+
+                    objsw = new StreamWriter(Path.Combine(outdir, fileDataID + ".obj"));
+                }
             }
             else
             {
-                objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".obj")));
+                if (!string.IsNullOrEmpty(filename))
+                {
+                    objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(filename.ToLower()).Replace(".m2", ".obj")));
+                }
+                else
+                {
+                    objsw = new StreamWriter(Path.Combine(outdir, destinationOverride, fileDataID + ".obj"));
+                }
             }
 
-            objsw.WriteLine("# Written by Marlamin's WoW Exporter. Original file: " + file);
-            objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(file) + ".mtl");
+            if (!string.IsNullOrEmpty(filename))
+            {
+                objsw.WriteLine("# Written by Marlamin's WoW Exporter. Original file: " + filename);
+                objsw.WriteLine("mtllib " + Path.GetFileNameWithoutExtension(filename) + ".mtl");
+            }
+            else
+            {
+                objsw.WriteLine("# Written by Marlamin's WoW Exporter. Original fileDataID: " + fileDataID);
+                objsw.WriteLine("mtllib " + fileDataID + ".mtl");
+            }
 
             foreach (var vertex in vertices)
             {
@@ -76,8 +108,8 @@ namespace OBJExporterUI.Exporters.OBJ
                 objsw.WriteLine("vn " + vertex.Normal.X.ToString("F12") + " " + vertex.Normal.Y.ToString("F12") + " " + vertex.Normal.Z.ToString("F12"));
             }
 
-            List<uint> indicelist = new List<uint>();
-            for (int i = 0; i < reader.model.skins[0].triangles.Count(); i++)
+            var indicelist = new List<uint>();
+            for (var i = 0; i < reader.model.skins[0].triangles.Count(); i++)
             {
                 var t = reader.model.skins[0].triangles[i];
                 indicelist.Add(t.pt1);
@@ -89,9 +121,9 @@ namespace OBJExporterUI.Exporters.OBJ
             exportworker.ReportProgress(35, "Writing files..");
 
             var renderbatches = new Structs.RenderBatch[reader.model.skins[0].submeshes.Count()];
-            for (int i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
+            for (var i = 0; i < reader.model.skins[0].submeshes.Count(); i++)
             {
-                if (file.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
+                if (!string.IsNullOrEmpty(filename) && filename.StartsWith("character", StringComparison.CurrentCultureIgnoreCase))
                 {
                     if (reader.model.skins[0].submeshes[i].submeshID != 0)
                     {
@@ -105,7 +137,7 @@ namespace OBJExporterUI.Exporters.OBJ
                 renderbatches[i].firstFace = reader.model.skins[0].submeshes[i].startTriangle;
                 renderbatches[i].numFaces = reader.model.skins[0].submeshes[i].nTriangles;
                 renderbatches[i].groupID = (uint)i;
-                for (int tu = 0; tu < reader.model.skins[0].textureunit.Count(); tu++)
+                for (var tu = 0; tu < reader.model.skins[0].textureunit.Count(); tu++)
                 {
                     if (reader.model.skins[0].textureunit[tu].submeshIndex == i)
                     {
@@ -121,11 +153,25 @@ namespace OBJExporterUI.Exporters.OBJ
 
             if (destinationOverride == null)
             {
-                mtlsb = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".mtl")));
+                if (!string.IsNullOrEmpty(filename))
+                {
+                    mtlsb = new StreamWriter(Path.Combine(outdir, filename.Replace(".m2", ".mtl")));
+                }
+                else
+                {
+                    mtlsb = new StreamWriter(Path.Combine(outdir, fileDataID + ".mtl"));
+                }
             }
             else
             {
-                mtlsb = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(file.ToLower()).Replace(".m2", ".mtl")));
+                if (!string.IsNullOrEmpty(filename))
+                {
+                    mtlsb = new StreamWriter(Path.Combine(outdir, destinationOverride, Path.GetFileName(filename.ToLower()).Replace(".m2", ".mtl")));
+                }
+                else
+                {
+                    mtlsb = new StreamWriter(Path.Combine(outdir, destinationOverride, fileDataID + ".mtl"));
+                }
             }
 
             var textureID = 0;
@@ -148,8 +194,8 @@ namespace OBJExporterUI.Exporters.OBJ
                     case 1:
                     case 2:
                     case 11:
-                        uint[] cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
-                        for (int ti = 0; ti < cdifilenames.Count(); ti++)
+                        var cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
+                        for (var ti = 0; ti < cdifilenames.Count(); ti++)
                         {
                             textureFileDataID = cdifilenames[0];
                         }
@@ -170,7 +216,14 @@ namespace OBJExporterUI.Exporters.OBJ
                 {
                     if (destinationOverride == null)
                     {
-                        blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(file), "tex_" + materials[i].filename + ".png"));
+                        if (!string.IsNullOrEmpty(filename))
+                        {
+                            blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(filename), "tex_" + materials[i].filename + ".png"));
+                        }
+                        else
+                        {
+                            blpreader.bmp.Save(Path.Combine(outdir, "tex_" + materials[i].filename + ".png"));
+                        }
                     }
                     else
                     {
@@ -195,12 +248,27 @@ namespace OBJExporterUI.Exporters.OBJ
 
             mtlsb.Close();
 
-            objsw.WriteLine("g " + Path.GetFileNameWithoutExtension(file));
+            if (!string.IsNullOrEmpty(filename))
+            {
+                objsw.WriteLine("g " + Path.GetFileNameWithoutExtension(filename));
+            }
+            else
+            {
+                objsw.WriteLine("g " + fileDataID);
+            }
 
             foreach (var renderbatch in renderbatches)
             {
                 var i = renderbatch.firstFace;
-                objsw.WriteLine("o " + Path.GetFileNameWithoutExtension(file) + renderbatch.groupID);
+                if (!string.IsNullOrEmpty(filename))
+                {
+                    objsw.WriteLine("o " + Path.GetFileNameWithoutExtension(filename) + renderbatch.groupID);
+                }
+                else
+                {
+                    objsw.WriteLine("g " + fileDataID.ToString() + renderbatch.groupID.ToString());
+                }
+
                 objsw.WriteLine("usemtl tex_" + materials[renderbatch.materialID].filename);
                 objsw.WriteLine("s 1");
                 while (i < (renderbatch.firstFace + renderbatch.numFaces))
@@ -217,11 +285,18 @@ namespace OBJExporterUI.Exporters.OBJ
             {
                 exportworker.ReportProgress(90, "Exporting collision..");
 
-                objsw = new StreamWriter(Path.Combine(outdir, file.Replace(".m2", ".phys.obj")));
+                if (!string.IsNullOrEmpty(filename))
+                {
+                    objsw = new StreamWriter(Path.Combine(outdir, Path.GetFileName(filename.ToLower()).Replace(".m2", ".phys.obj")));
+                }
+                else
+                {
+                    objsw = new StreamWriter(Path.Combine(outdir, fileDataID + ".phys.obj"));
+                }
 
-                objsw.WriteLine("# Written by Marlamin's WoW Exporter. Original file: " + file);
+                objsw.WriteLine("# Written by Marlamin's WoW Exporter. Original file id: " + fileDataID);
 
-                for (int i = 0; i < reader.model.boundingvertices.Count(); i++)
+                for (var i = 0; i < reader.model.boundingvertices.Count(); i++)
                 {
                     objsw.WriteLine("v " +
                          reader.model.boundingvertices[i].vertex.X + " " +
@@ -229,7 +304,7 @@ namespace OBJExporterUI.Exporters.OBJ
                         -reader.model.boundingvertices[i].vertex.Y);
                 }
 
-                for (int i = 0; i < reader.model.boundingtriangles.Count(); i++)
+                for (var i = 0; i < reader.model.boundingtriangles.Count(); i++)
                 {
                     var t = reader.model.boundingtriangles[i];
                     objsw.WriteLine("f " + (t.index_0 + 1) + " " + (t.index_1 + 1) + " " + (t.index_2 + 1));
