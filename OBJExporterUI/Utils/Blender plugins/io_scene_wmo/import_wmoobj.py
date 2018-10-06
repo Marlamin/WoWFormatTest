@@ -43,6 +43,21 @@ def load(context,
 
         bpy.ops.import_scene.obj(filepath=filepath)
 
+        # Duplicate material removal script by Kruithne
+        # Merge all duplicate materials
+        for obj in bpy.context.scene.objects:
+            if obj.type == 'MESH':
+                i = 0
+                for mat_slot in obj.material_slots:
+                    mat = mat_slot.material
+                    obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
+                    i += 1
+
+        # Cleanup unused materials
+        for img in bpy.data.images:
+            if not img.users:
+                bpy.data.images.remove(img)
+
         # Select the imported WMO
         obj_objects = bpy.context.selected_objects[:]
 
@@ -83,6 +98,21 @@ def load(context,
                     # Set scale
                     if row['ScaleFactor']:
                         obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
+
+        # Duplicate material removal script by Kruithne
+        # Merge all duplicate materials
+        for obj in bpy.context.scene.objects:
+            if obj.type == 'MESH':
+                i = 0
+                for mat_slot in obj.material_slots:
+                    mat = mat_slot.material
+                    obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
+                    i += 1
+
+        # Cleanup unused materials
+        for img in bpy.data.images:
+            if not img.users:
+                bpy.data.images.remove(img)
 
         progress.leave_substeps("Finished importing: %r" % filepath)
 

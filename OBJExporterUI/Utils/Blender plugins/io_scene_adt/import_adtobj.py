@@ -126,46 +126,76 @@ def load(context,
                             wmonewpath = os.path.join(wmodoodad_path, wmorow['ModelFile'])
                             # Import the doodad
                             if(os.path.exists(wmonewpath)):
-	                            bpy.ops.import_scene.obj(filepath=wmonewpath)
-	                            # Select the imported doodad
-	                            wmoobj_objects = bpy.context.selected_objects[:]
-	                            for wmoobj in wmoobj_objects:
-	                                # Prepend name
-	                                wmoobj.name = "(" + wmorow['DoodadSet'] + ") " + wmoobj.name
-	                                # Set parent
-	                                wmoobj.parent = parent
-	                                # Set position
-	                                wmoobj.location = (float(wmorow['PositionX']) * -1, float(wmorow['PositionY']) * -1, float(wmorow['PositionZ']))
-	                                # Set rotation
-	                                rotQuat = Quaternion((float(wmorow['RotationW']), float(wmorow['RotationX']), float(wmorow['RotationY']), float(wmorow['RotationZ'])))
-	                                rotEul = rotQuat.to_euler()
-	                                rotEul.x += radians(90);
-	                                rotEul.z += radians(180);
-	                                wmoobj.rotation_euler = rotEul
-	                                # Set scale
-	                                if wmorow['ScaleFactor']:
-	                                    wmoobj.scale = (float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']))
+                                bpy.ops.import_scene.obj(filepath=wmonewpath)
+                                # Select the imported doodad
+                                wmoobj_objects = bpy.context.selected_objects[:]
+                                for wmoobj in wmoobj_objects:
+                                    # Prepend name
+                                    wmoobj.name = "(" + wmorow['DoodadSet'] + ") " + wmoobj.name
+                                    # Set parent
+                                    wmoobj.parent = parent
+                                    # Set position
+                                    wmoobj.location = (float(wmorow['PositionX']) * -1, float(wmorow['PositionY']) * -1, float(wmorow['PositionZ']))
+                                    # Set rotation
+                                    rotQuat = Quaternion((float(wmorow['RotationW']), float(wmorow['RotationX']), float(wmorow['RotationY']), float(wmorow['RotationZ'])))
+                                    rotEul = rotQuat.to_euler()
+                                    rotEul.x += radians(90);
+                                    rotEul.z += radians(180);
+                                    wmoobj.rotation_euler = rotEul
+                                    # Set scale
+                                    if wmorow['ScaleFactor']:
+                                        wmoobj.scale = (float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']), float(wmorow['ScaleFactor']))
+
+                                    # Duplicate material removal script by Kruithne
+                                    # Merge all duplicate materials
+                                    for obj in bpy.context.scene.objects:
+                                        if obj.type == 'MESH':
+                                            i = 0
+                                            for mat_slot in obj.material_slots:
+                                                mat = mat_slot.material
+                                                obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
+                                                i += 1
+
+                                    # Cleanup unused materials
+                                    for img in bpy.data.images:
+                                        if not img.users:
+                                            bpy.data.images.remove(img)
                 else:
                     print("m2")
                     if(os.path.exists(newpath)):
-	                    bpy.ops.import_scene.obj(filepath=newpath)
-	                    obj_objects = bpy.context.selected_objects[:]
-	                    for obj in obj_objects:
-	                        # Set parent
-	                        obj.parent = doodadparent
+                        bpy.ops.import_scene.obj(filepath=newpath)
+                        obj_objects = bpy.context.selected_objects[:]
+                        for obj in obj_objects:
+                            # Set parent
+                            obj.parent = doodadparent
 
-	                        # Set location
-	                        obj.location.x = (17066 - float(row['PositionX']))
-	                        obj.location.y = (17066 - float(row['PositionZ'])) * -1
-	                        obj.location.z = float(row['PositionY'])
-	                        obj.rotation_euler.x += radians(float(row['RotationZ']))
-	                        obj.rotation_euler.y += radians(float(row['RotationX']))
-	                        obj.rotation_euler.z = radians(90 + float(row['RotationY'])) # okay
+                            # Set location
+                            obj.location.x = (17066 - float(row['PositionX']))
+                            obj.location.y = (17066 - float(row['PositionZ'])) * -1
+                            obj.location.z = float(row['PositionY'])
+                            obj.rotation_euler.x += radians(float(row['RotationZ']))
+                            obj.rotation_euler.y += radians(float(row['RotationX']))
+                            obj.rotation_euler.z = radians(90 + float(row['RotationY'])) # okay
 
-	                        # Set scale
-	                        if row['ScaleFactor']:
-	                            obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
+                            # Set scale
+                            if row['ScaleFactor']:
+                                obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
 
+
+        # Duplicate material removal script by Kruithne
+        # Merge all duplicate materials
+        for obj in bpy.context.scene.objects:
+            if obj.type == 'MESH':
+                i = 0
+                for mat_slot in obj.material_slots:
+                    mat = mat_slot.material
+                    obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
+                    i += 1
+
+        # Cleanup unused materials
+        for img in bpy.data.images:
+            if not img.users:
+                bpy.data.images.remove(img)
         progress.leave_substeps("Finished importing: %r" % filepath)
 
     return {'FINISHED'}
