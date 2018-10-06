@@ -161,7 +161,6 @@ def load(context,
                                         if not img.users:
                                             bpy.data.images.remove(img)
                 else:
-                    print("m2")
                     if(os.path.exists(newpath)):
                         bpy.ops.import_scene.obj(filepath=newpath)
                         obj_objects = bpy.context.selected_objects[:]
@@ -182,6 +181,11 @@ def load(context,
                                 obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
 
 
+        # Set doodad and WMO parent to 0
+        wmoparent.location = (0, 0, 0)
+        doodadparent.location = (0, 0, 0)
+
+        print("Deduplicating and cleaning up materials!")
         # Duplicate material removal script by Kruithne
         # Merge all duplicate materials
         for obj in bpy.context.scene.objects:
