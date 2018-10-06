@@ -37,6 +37,8 @@ namespace WoWFormatLib.Structs.ADT
         MTEX = 'M' << 24 | 'T' << 16 | 'E' << 8 | 'X' << 0,
         MTXP = 'M' << 24 | 'T' << 16 | 'X' << 8 | 'P' << 0,
         MAMP = 'M' << 24 | 'A' << 16 | 'M' << 8 | 'P' << 0,
+        MDID = 'M' << 24 | 'D' << 16 | 'I' << 8 | 'D' << 0,
+        MHID = 'M' << 24 | 'H' << 16 | 'I' << 8 | 'D' << 0,
 
         // TEX MCNK
         MCLY = 'M' << 24 | 'C' << 16 | 'L' << 8 | 'Y' << 0,

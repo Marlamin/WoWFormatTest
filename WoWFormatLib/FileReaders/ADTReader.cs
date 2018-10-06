@@ -444,6 +444,8 @@ namespace WoWFormatLib.FileReaders
                             adtfile.texParams = ReadMTXPChunk(adtfile.textures.filenames.Length, bin);
                             break;
                         case ADTChunks.MAMP:
+                        case ADTChunks.MHID: // Height texture fileDataIDs
+                        case ADTChunks.MDID: // Diffuse texture fileDataIDs
                             break;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position));
