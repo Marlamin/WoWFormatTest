@@ -48,6 +48,9 @@ namespace DBCDump
                 stream.Position = 0;
                 switch (identifier)
                 {
+                    case "WDC3":
+                        reader = new WDC3Reader(stream);
+                        break;
                     case "WDC2":
                         reader = new WDC2Reader(stream);
                         break;
