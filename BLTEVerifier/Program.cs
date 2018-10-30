@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace BLTEVerifier
 {
@@ -17,12 +19,201 @@ namespace BLTEVerifier
             public char mode;
         }
 
-        static void Main(string[] args)
+        public class IndexEntry
         {
-            if (args.Count() != 1)
+            public int Index;
+            public int Offset;
+            public int Size;
+        }
+
+        public static unsafe IndexEntry GetIndexInfo(MD5Hash key)
+        {
+            ulong* ptr = (ulong*)&key;
+            ptr[1] &= 0xFF;
+
+            if (!LocalIndexData.TryGetValue(key, out IndexEntry result))
+                Console.WriteLine("LocalIndexHandler: missing index: {0}", key.ToHexString());
+
+            return result;
+        }
+
+        private static readonly MD5HashComparer comparer = new MD5HashComparer();
+        private static Dictionary<MD5Hash, IndexEntry> LocalIndexData = new Dictionary<MD5Hash, IndexEntry>(comparer);
+
+        static unsafe void Main(string[] args)
+        {
+            if (args.Count() < 1)
             {
-                throw new ArgumentOutOfRangeException("Program requires one argument: directory that it will need to verify all contents of");
+                throw new ArgumentOutOfRangeException("Program requires at least one argument: directory that it will need to verify all contents of and optionally a location of local indexes/archives");
             }
+
+            if(args.Count() > 1)
+            {
+                foreach (var file in Directory.GetFiles(args[1], "*.idx", SearchOption.AllDirectories))
+                {
+                    using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    using (var br = new BinaryReader(stream))
+                    {
+                        int h2Len = br.ReadInt32();
+                        int h2Check = br.ReadInt32();
+                        byte[] h2 = br.ReadBytes(h2Len);
+
+                        long padPos = (8 + h2Len + 0x0F) & 0xFFFFFFF0;
+                        stream.Position = padPos;
+
+                        int dataLen = br.ReadInt32();
+                        int dataCheck = br.ReadInt32();
+
+                        int numBlocks = dataLen / 18;
+
+                        for (int i = 0; i < numBlocks; i++)
+                        {
+                            var info = new IndexEntry();
+                            byte[] keyBytes = br.ReadBytes(9);
+                            Array.Resize(ref keyBytes, 16);
+
+                            MD5Hash key;
+
+                            fixed (byte* ptr = keyBytes)
+                                key = *(MD5Hash*)ptr;
+
+                            //Console.WriteLine(key.ToHexString());
+
+                            byte indexHigh = br.ReadByte();
+                            int indexLow = br.ReadInt32BE();
+
+                            info.Index = (indexHigh << 2 | (byte)((indexLow & 0xC0000000) >> 30));
+                            info.Offset = (indexLow & 0x3FFFFFFF);
+                            info.Size = br.ReadInt32();
+
+                            if (!LocalIndexData.ContainsKey(key)) // use first key
+                                LocalIndexData.Add(key, info);
+                        }
+
+                        padPos = (dataLen + 0x0FFF) & 0xFFFFF000;
+                        stream.Position = padPos;
+
+                        stream.Position += numBlocks * 18;
+                    }
+                }
+            }
+
+            Console.WriteLine("Reading all archives on disk..");
+            var archiveList = new List<MD5Hash>();
+
+            foreach (var file in Directory.GetFiles(Path.Combine(args[0], "tpr", "wow", "data"), "*.index", SearchOption.AllDirectories))
+            {
+                var indexName = Path.GetFileNameWithoutExtension(file);
+                using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var bin = new BinaryReader(stream))
+                {
+                    bin.BaseStream.Position = bin.BaseStream.Length - 16;
+                    // 0 = loose file index, 4 = archive index, 6 = group archive index
+                    if (bin.ReadChar() == 4)
+                    {
+                        if (!File.Exists(Path.Combine(args[0], "tpr", "wow", "patch", "" + indexName[0] + indexName[1], "" + indexName[2] + indexName[3], indexName + ".index")))
+                        {
+                            if (File.Exists(Path.Combine(args[0], "tpr", "wow", "data", "" + indexName[0] + indexName[1], "" + indexName[2] + indexName[3], indexName)))
+                            {
+                                archiveList.Add(Path.GetFileNameWithoutExtension(file).ToByteArray().ToMD5());
+                            }
+                        }
+                    }
+                }
+            }
+
+            //18125-18179 missing
+            var missingArchiveList = new List<MD5Hash>
+            {
+                "5BEBD82DD19DEFD0A0BB2B97C178A59F".ToByteArray().ToMD5(),
+                "5E430F0C8A3F77B2E6F62F4BA74E1147".ToByteArray().ToMD5(),
+                "6F75F753E8CF156FD5B7381F9A63C210".ToByteArray().ToMD5(),
+                "9A8618C3393299DA9BDAD3649A0B7E5D".ToByteArray().ToMD5(),
+                "9F02F9518B4844B85D957A6371C98656".ToByteArray().ToMD5(),
+                "F9B96A5557541391ED3770B85B06D5A8".ToByteArray().ToMD5()
+            };
+
+            Console.WriteLine("Checking all archives for files for missing archives..");
+
+            Parallel.ForEach(archiveList.ToArray(), (archive, state, i) =>
+            {
+                var indexName = archive.ToHexString().ToLower();
+
+                var indexContent = File.ReadAllBytes(Path.Combine(args[0], "tpr", "wow", "data", "" + indexName[0] + indexName[1], "" + indexName[2] + indexName[3], indexName + ".index"));
+
+                var foundCount = 0;
+                var totalCount = 0;
+                
+                using (var indexBin = new BinaryReader(new MemoryStream(indexContent)))
+                {
+                    var indexEntries = indexContent.Length / 4096;
+
+                    FileStream stream;
+                    var archiveBin = new BinaryReader(new MemoryStream());
+
+                    if (!missingArchiveList.Contains(archive))
+                    {
+                        stream = new FileStream(Path.Combine(args[0], "tpr", "wow", "data", "" + indexName[0] + indexName[1], "" + indexName[2] + indexName[3], indexName), FileMode.Open, FileAccess.Read, FileShare.Read);
+                        archiveBin = new BinaryReader(stream);
+                    }
+
+                    for (var b = 0; b < indexEntries; b++)
+                    {
+                        for (var bi = 0; bi < 170; bi++)
+                        {
+                            var headerHash = indexBin.Read<MD5Hash>();
+                            var size = indexBin.ReadUInt32(true);
+                            var offset = indexBin.ReadUInt32(true);
+
+                            if (headerHash.ToHexString() == "00000000000000000000000000000000")
+                                continue;
+
+                            if (!missingArchiveList.Contains(archive))
+                            {
+                                if (offset > archiveBin.BaseStream.Length)
+                                {
+                                    Console.WriteLine("[" + indexName + "] Unable to read hash " + headerHash.ToHexString() + ", offset " + offset + " is after end of stream " + archiveBin.BaseStream.Length + "!");
+                                }
+                                else if ((offset + size) > archiveBin.BaseStream.Length)
+                                {
+                                    Console.WriteLine("[" + indexName + "] Unable to read hash " + headerHash.ToHexString() + ", offset " + offset + "+" + size + " goes on beyond end of stream " + archiveBin.BaseStream.Length + "!");
+                                }
+                                else
+                                {
+                                    archiveBin.BaseStream.Position = offset;
+                                    if(archiveBin.ReadUInt64() == 0)
+                                    {
+                                        Console.WriteLine("[" + indexName + "] Unable to read hash " + headerHash.ToHexString() + ", offset " + offset + "+" + size + ", it starts with all 0s!");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var indexEntry = GetIndexInfo(headerHash);
+                                if (indexEntry != null)
+                                {
+                                    foundCount++;
+                                    Console.WriteLine("[" + indexName + "] Unable to read hash " + headerHash.ToHexString() + ", offset " + offset + " size " + size + " since archive does not exist but file exists in local archives in archive " + indexEntry.Index + " at offset " + indexEntry.Offset + " with size " + indexEntry.Size + "!");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("[" + indexName + "] Unable to read hash " + headerHash.ToHexString() + ", offset " + offset + " archive does not exist!");
+                                }
+                                totalCount++;
+                            }
+                        }
+                        indexBin.ReadBytes(16);
+                    }
+
+                    if (missingArchiveList.Contains(archive))
+                    {
+                        Console.WriteLine("Found " + foundCount + " of " + totalCount + " files for archive " + indexName + " in local archives!");
+                    }
+                }
+            });
+
+            Environment.Exit(0);
+            //GetIndexes(Path.Combine(CDN.cacheDir, "tpr", "wow"), archiveList.ToArray());
 
             Console.WriteLine("Listing directory..");
 
@@ -35,7 +226,7 @@ namespace BLTEVerifier
             }
             else
             {
-                files = Directory.GetFiles(args[0], "*", SearchOption.AllDirectories);
+                files = Directory.GetFiles(Path.Combine(args[0], "tpr", "wow"), "*", SearchOption.AllDirectories);
             }
 
             foreach (var file in files)
