@@ -51,6 +51,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CASCExplorer\CascLibCore\CascLibCore.csproj">
+      <Project>{D22FF00E-1652-4DFF-A117-473B0849CE06}</Project>
+      <Name>CascLibCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj">
       <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>
       <Name>WoWFormatLib</Name>

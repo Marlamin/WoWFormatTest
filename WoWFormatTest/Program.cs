@@ -12,7 +12,7 @@ namespace WoWFormatLib
     {
         private static void Main(string[] args)
         {
-            CASC.InitCasc(null, null, "wowt");
+            CASC.InitCasc(null, null, "wowt", CASCLib.LocaleFlags.enUS);
 
             if (!File.Exists("listfile.txt"))
             {
@@ -21,12 +21,27 @@ namespace WoWFormatLib
 
             foreach (var line in File.ReadAllLines("listfile.txt"))
             {
-                var cleaned = line.Replace("/", "\\");
-                if (CASC.cascHandler.FileExists(cleaned) && cleaned.EndsWith(".adt", StringComparison.CurrentCultureIgnoreCase) && !cleaned.Contains("_obj") && !cleaned.Contains("_lod") && !cleaned.Contains("_tex"))
+                if (line.EndsWith(".wdt", StringComparison.CurrentCultureIgnoreCase) && !line.Contains("_mpv") && !line.Contains("_fogs") && !line.Contains("_occ") && !line.Contains("_lgt"))
                 {
-                    Console.WriteLine("Loading " + cleaned);
-                    var reader = new ADTReader();
-                    reader.LoadADT(cleaned, true);
+                    if (!CASC.FileExists(line))
+                        continue;
+
+                    var reader = new WDTReader();
+                    reader.LoadWDT(line);
+
+                    if(reader.wdtfile.filedataids == null)
+                    {
+                        Console.WriteLine(line + " does not have MAID chunk");
+                        continue;
+                    }
+
+                    foreach(var filedataids in reader.wdtfile.filedataids)
+                    {
+                        if (filedataids.rootADT != 0)
+                        {
+                            Console.WriteLine(line + " " + filedataids.rootADT);
+                        }
+                    }
                 }
             }
 

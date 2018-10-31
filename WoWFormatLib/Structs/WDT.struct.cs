@@ -10,11 +10,25 @@ namespace WoWFormatLib.Structs.WDT
         MPHD = 'M' << 24 | 'P' << 16 | 'H' << 8 | 'D' << 0,
         MPLT = 'M' << 24 | 'P' << 16 | 'L' << 8 | 'T' << 0,
         MODF = 'M' << 24 | 'O' << 16 | 'D' << 8 | 'F' << 0,
+        MAID = 'M' << 24 | 'A' << 16 | 'I' << 8 | 'D' << 0,
     }
 
     public struct WDT
     {
         public MPHD mphd;
+        public MapFileDataIDs[] filedataids;
+    }
+
+    public struct MapFileDataIDs
+    {
+        public uint rootADT;
+        public uint obj0ADT;
+        public uint obj1ADT;
+        public uint tex0ADT;
+        public uint lodADT;
+        public uint mapTexture;
+        public uint mapTextureN;
+        public uint unk;
     }
 
     public struct MPHD
@@ -44,9 +58,4 @@ namespace WoWFormatLib.Structs.WDT
         unk_0x4000                              = 0x4000,
         unk_0x8000                              = 0x8000
     }
-
-    //  public struct MWMO
-    //  {
-    //
-    //  }
 }

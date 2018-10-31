@@ -89,6 +89,16 @@ namespace WoWFormatLib.FileReaders
             };
             return mphd;
         }
+        private MapFileDataIDs[] ReadMAIDChunk(BinaryReader bin)
+        {
+            var count = 64 * 64;
+            var filedataids = new MapFileDataIDs[count];
+            for(var i = 0; i < count; i++)
+            {
+                filedataids[i] = bin.Read<MapFileDataIDs>();
+            }
+            return filedataids;
+        }
         private void ReadWDT(string filename, Stream wdt)
         {
             filename = Path.ChangeExtension(filename, "wdt");
@@ -119,7 +129,10 @@ namespace WoWFormatLib.FileReaders
                         break;
                     case WDTChunks.MPLT:
                     case WDTChunks.MODF:
-                        continue;
+                        break;
+                    case WDTChunks.MAID:
+                        wdtfile.filedataids = ReadMAIDChunk(bin);
+                        break;
                     default:
                         throw new Exception(string.Format("{2} Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString(), filename));
                 }
