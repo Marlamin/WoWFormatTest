@@ -441,11 +441,15 @@ namespace WoWFormatLib.FileReaders
                             MCNKi++;
                             break;
                         case ADTChunks.MTXP:
-                            adtfile.texParams = ReadMTXPChunk(adtfile.textures.filenames.Length, bin);
+                            adtfile.texParams = ReadMTXPChunk(chunkSize, bin);
+                            break;
+                        case ADTChunks.MHID: // Height texture fileDataIDs
+                            adtfile.heightTextureFileDataIDs = ReadFileDataIDChunk(chunkSize, bin);
+                            break;
+                        case ADTChunks.MDID: // Diffuse texture fileDataIDs
+                            adtfile.diffuseTextureFileDataIDs = ReadFileDataIDChunk(chunkSize, bin);
                             break;
                         case ADTChunks.MAMP:
-                        case ADTChunks.MHID: // Height texture fileDataIDs
-                        case ADTChunks.MDID: // Diffuse texture fileDataIDs
                             break;
                         default:
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position));
@@ -518,8 +522,10 @@ namespace WoWFormatLib.FileReaders
             txchunk.filenames = blpFiles.ToArray();
             return txchunk;
         }
-        private MTXP[] ReadMTXPChunk(int count, BinaryReader bin)
+        private MTXP[] ReadMTXPChunk(uint size, BinaryReader bin)
         {
+            var count = size / 16;
+
             var txparams = new MTXP[count];
 
             for(var i = 0; i < count; i++)
@@ -626,6 +632,17 @@ namespace WoWFormatLib.FileReaders
             }
 
             return mclychunks;
+        }
+
+        private uint[] ReadFileDataIDChunk(uint size, BinaryReader bin)
+        {
+            var count = size / 4;
+            var filedataids = new uint[count];
+            for(var i = 0; i < count; i++)
+            {
+                filedataids[i] = bin.ReadUInt32();
+            }
+            return filedataids;
         }
     }
 }

@@ -70,6 +70,8 @@ namespace WoWFormatLib.Structs.ADT
         public TexMCNK[] texChunks;
         public MH2O mh2o;
         public Obj objects;
+        public uint[] diffuseTextureFileDataIDs;
+        public uint[] heightTextureFileDataIDs;
     }
 
     public enum MHDRFlags{
