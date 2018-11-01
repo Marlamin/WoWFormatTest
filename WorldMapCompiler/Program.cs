@@ -69,11 +69,11 @@ namespace WorldMapCompiler
                 CASC.InitCasc(null, null, config["program"], locale);
             }
 
-            using (var UIMapStream = CASC.cascHandler.OpenFile("DBFilesClient\\UIMap.db2"))
-            using (var UIMapXArtStream = CASC.cascHandler.OpenFile("DBFilesClient\\UIMapXMapArt.db2"))
-            using (var UIMapArtTileStream = CASC.cascHandler.OpenFile("DBFilesClient\\UIMapArtTile.db2"))
-            using (var WorldMapOverlayStream = CASC.cascHandler.OpenFile("DBFilesClient\\WorldMapOverlay.db2"))
-            using (var WorldMapOverlayTileStream = CASC.cascHandler.OpenFile("DBFilesClient\\WorldMapOverlayTile.db2"))
+            using (var UIMapStream = CASC.OpenFile("DBFilesClient\\UIMap.db2"))
+            using (var UIMapXArtStream = CASC.OpenFile("DBFilesClient\\UIMapXMapArt.db2"))
+            using (var UIMapArtTileStream = CASC.OpenFile("DBFilesClient\\UIMapArtTile.db2"))
+            using (var WorldMapOverlayStream = CASC.OpenFile("DBFilesClient\\WorldMapOverlay.db2"))
+            using (var WorldMapOverlayTileStream = CASC.OpenFile("DBFilesClient\\WorldMapOverlayTile.db2"))
             {
                 var UIMapReader = new WDC2Reader(UIMapStream);
                 var UIMapXArtReader = new WDC2Reader(UIMapXArtStream);
@@ -147,9 +147,9 @@ namespace WorldMapCompiler
                                 {
                                     var fdid = tileDict[cur_x + "," + cur_y];
 
-                                    if (CASC.cascHandler.FileExists(fdid))
+                                    if (CASC.FileExists(fdid))
                                     {
-                                        using (var stream = CASC.cascHandler.OpenFile(fdid))
+                                        using (var stream = CASC.OpenFile(fdid))
                                         {
                                             try
                                             {
@@ -237,9 +237,9 @@ namespace WorldMapCompiler
                                     {
                                         var fdid = wmoTileDict[cur_x + "," + cur_y];
 
-                                        if (CASC.cascHandler.FileExists(fdid))
+                                        if (CASC.FileExists(fdid))
                                         {
-                                            using (var stream = CASC.cascHandler.OpenFile(fdid))
+                                            using (var stream = CASC.OpenFile(fdid))
                                             {
                                                 try
                                                 {
