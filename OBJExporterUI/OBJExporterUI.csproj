@@ -51,6 +51,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MapControl.WPF, Version=4.10.0.0, Culture=neutral, PublicKeyToken=f26fcf0059638459, processorArchitecture=MSIL">
+      <HintPath>..\packages\XAML.MapControl.4.10.0\lib\net462\MapControl.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="MimeKitLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
       <HintPath>..\packages\MimeKitLite.2.0.6\lib\net45\MimeKitLite.dll</HintPath>
@@ -96,6 +99,7 @@
     <Compile Include="Exporters\glTF\M2Exporter.cs" />
     <Compile Include="Exporters\glTF\WMOExporter.cs" />
     <Compile Include="Loaders\ADTLoader.cs" />
+    <Compile Include="Map\WoWMapTileLoader.cs" />
     <Compile Include="Renderer\CacheStorage.cs" />
     <Compile Include="Exporters\OBJ\ADTExporter.cs" />
     <Compile Include="Exporters\OBJ\M2Exporter.cs" />

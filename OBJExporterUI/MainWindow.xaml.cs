@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using DBDefsLib;
 using WoWFormatLib.Utils;
 using CASCLib;
 using System.Drawing.Imaging;
@@ -15,7 +14,7 @@ using System.Net;
 using System.IO.Compression;
 using Microsoft.VisualBasic.FileIO;
 using System.Windows.Media;
-using CascStorageLib;
+using MapControl;
 
 namespace OBJExporterUI
 {
@@ -512,6 +511,33 @@ namespace OBJExporterUI
                     {
                         Console.WriteLine(blpException.Message);
                     }
+                }
+            }
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(e.Source == tabs)
+            {
+                if (MapsTab.IsSelected)
+                {
+                    map.MapLayer = new MapTileLayer(new WoWMapTileLoader())
+                    {
+                        SourceName = "WoW",
+                        Description = "© Blizzard",
+                        TileSource = new TileSource { UriFormat = "https://newmaps.marlam.in/tiles/test/1/4f0cb33901ab6b06b7c9708c07315a58/z{z}x{x}y{y}.png" },
+                        MinZoomLevel = 3,
+                        MaxZoomLevel = 8
+                    };
+
+                    map.Center = new Location(71, 129);
+                    map.Visibility = Visibility.Visible;
+                    wfHost.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    map.Visibility = Visibility.Collapsed;
+                    wfHost.Visibility = Visibility.Visible;
                 }
             }
         }
@@ -1121,6 +1147,62 @@ namespace OBJExporterUI
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.AppSettings.Settings["exportM2"].Value = exportM2.IsChecked.ToString();
             config.Save(ConfigurationSaveMode.Full);
+        }
+
+        /* Minimap stuff */
+        private void MapMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                //map.ZoomMap(e.GetPosition(map), Math.Floor(map.ZoomLevel + 1.5));
+                //map.ZoomToBounds(new BoundingBox(53, 7, 54, 9));
+                map.TargetCenter = map.ViewportPointToLocation(e.GetPosition(map));
+            }
+        }
+
+        private void MapMouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                //map.ZoomMap(e.GetPosition(map), Math.Ceiling(map.ZoomLevel - 1.5));
+            }
+        }
+
+        private void MapMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            var location = map.ViewportPointToLocation(e.GetPosition(map));
+            var latitude = (int)Math.Round(location.Latitude * 60000d);
+            var longitude = (int)Math.Round(Location.NormalizeLongitude(location.Longitude) * 60000d);
+            var latHemisphere = 'N';
+            var lonHemisphere = 'E';
+
+            if (latitude < 0)
+            {
+                latitude = -latitude;
+                latHemisphere = 'S';
+            }
+
+            if (longitude < 0)
+            {
+                longitude = -longitude;
+                lonHemisphere = 'W';
+            }
+
+            Console.WriteLine("Lat: " + latitude + ", long " + longitude);
+            Console.WriteLine(string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                "{0}  {1:00} {2:00.000}\n{3} {4:000} {5:00.000}",
+                latHemisphere, latitude / 60000, (latitude % 60000) / 1000d,
+                lonHemisphere, longitude / 60000, (longitude % 60000) / 1000d));
+        }
+
+        private void MapMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            //mouseLocation.Text = string.Empty;
+        }
+
+        private void MapManipulationInertiaStarting(object sender, System.Windows.Input.ManipulationInertiaStartingEventArgs e)
+        {
+            e.TranslationBehavior.DesiredDeceleration = 0.001;
         }
     }
 }

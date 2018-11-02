@@ -4,12 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:opentk="clr-namespace:OpenTK;assembly=OpenTK.GLControl"
+        xmlns:map="clr-namespace:MapControl;assembly=MapControl.WPF"
         mc:Ignorable="d"
         ResizeMode="CanResize"
         Icon="Resources/icon32.png"
         ContentRendered="Window_ContentRendered"
         KeyboardNavigation.DirectionalNavigation="None"
         Title="OBJ Exporter" MinHeight="650" Height="650" MinWidth="615" Width="1230">
+    <Window.Resources>
+        <map:WebMercatorProjection x:Key="WebMercatorProjection"/>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="600" />
@@ -40,7 +44,7 @@
         <Image Grid.Column="0" x:Name="loadingImage" Source="Resources/icon.png" Margin="0,0,0,0" Width="100" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <TextBox Grid.Column="0" x:Name="filterTextBox" Visibility="Hidden" HorizontalAlignment="Stretch" Height="23" Margin="234,55,0,0" TextWrapping="Wrap" ToolTip="Type something here to filter.." VerticalAlignment="Top" TextChanged="FilterBox_TextChanged" Panel.ZIndex="2"/>
         <Label Grid.Column="0" Content="Filter" Name="filterTextLabel" Visibility="Hidden" HorizontalAlignment="Stretch" Margin="198,55,366,0" VerticalAlignment="Top" Height="23" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Center"/>
-        <TabControl Grid.Column="0" x:Name="tabs" Margin="0,60,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto" Visibility="Hidden" KeyboardNavigation.DirectionalNavigation="None">
+        <TabControl SelectionChanged="TabControl_SelectionChanged" Grid.Column="0" x:Name="tabs" Margin="0,60,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto" Visibility="Hidden" KeyboardNavigation.DirectionalNavigation="None">
             <TabItem x:Name="ModelsTab" Header="Models">
                 <Grid>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
@@ -137,9 +141,25 @@
             </TabItem>
         </TabControl>
         <Grid Grid.Column="1" Background="Black" KeyboardNavigation.DirectionalNavigation="None">
+            <map:Map Visibility="Collapsed" x:Name="map" ZoomLevel="3" MaxZoomLevel="10"
+                 Center="{Binding MapCenter}"
+                 MapLayer="{Binding CurrentMapLayer}"
+                 MapProjection="{StaticResource WebMercatorProjection}"
+                 MouseLeftButtonDown="MapMouseLeftButtonDown"
+                 MouseRightButtonDown="MapMouseRightButtonDown"
+                 MouseMove="MapMouseMove" 
+                 MouseLeave="MapMouseLeave"
+                 Width="Auto"
+                 Height="Auto"
+                Background="#001D28"
+                 ManipulationInertiaStarting="MapManipulationInertiaStarting">
+                <map:MapGraticule x:Name="mapGraticule" Opacity="0.6"/>
+                <map:MapScale HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+            </map:Map>
             <WindowsFormsHost x:Name="wfHost" Width="Auto" Height="Auto" Margin="0" KeyboardNavigation.DirectionalNavigation="None">
                 <opentk:GLControl x:Name="renderCanvas" />
             </WindowsFormsHost>
         </Grid>
     </Grid>
+
 </Window>
