@@ -9,11 +9,11 @@ namespace WoWFormatLib.FileReaders
     {
         public M2Model model;
 
-        public void LoadM2(string filename)
+        public void LoadM2(string filename, bool loadSkins = true)
         {
             if (CASC.FileExists(filename))
             {
-                LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")));
+                LoadM2(CASC.getFileDataIdByName(Path.ChangeExtension(filename, "M2")), loadSkins);
             }
             else
             {
@@ -21,10 +21,10 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void LoadM2(uint fileDataID)
+        public void LoadM2(uint fileDataID, bool loadSkins = true)
         {
 #if DEBUG
-                LoadM2(CASC.OpenFile(fileDataID));
+                LoadM2(CASC.OpenFile(fileDataID), loadSkins);
 #else
                 try
                 {
@@ -38,7 +38,7 @@ namespace WoWFormatLib.FileReaders
 #endif
         }
 
-        public void LoadM2(Stream m2) { 
+        public void LoadM2(Stream m2, bool loadSkins = true) { 
             var bin = new BinaryReader(m2);
             long position = 0;
             while (position < m2.Length)
@@ -66,7 +66,7 @@ namespace WoWFormatLib.FileReaders
                             afids[a].subAnimID = bin.ReadInt16();
                             afids[a].fileDataID = bin.ReadUInt32();
                         }
-                        model.animFileData = afids;
+                        model.animFileDataIDs = afids;
                         break;
                     case M2Chunks.BFID: // Bone file IDs
                         var bfids = new uint[chunkSize / 4];
@@ -89,13 +89,29 @@ namespace WoWFormatLib.FileReaders
                     case M2Chunks.SKID: // Skel file ID
                         model.skelFileID = bin.ReadUInt32();
                         break;
-                    case M2Chunks.TXID:
+                    case M2Chunks.TXID: // Texture file IDs
                         var txids = new uint[chunkSize / 4];
                         for (var t = 0; t < chunkSize / 4; t++)
                         {
                             txids[t] = bin.ReadUInt32();
                         }
                         model.textureFileDataIDs = txids;
+                        break;
+                    case M2Chunks.RPID: // Recursive particle file IDs
+                        var rpids = new uint[chunkSize / 4];
+                        for (var t = 0; t < chunkSize / 4; t++)
+                        {
+                            rpids[t] = bin.ReadUInt32();
+                        }
+                        model.recursiveParticleModelFileIDs = rpids;
+                        break;
+                    case M2Chunks.GPID: // Geometry particle file IDs
+                        var gpids = new uint[chunkSize / 4];
+                        for (var t = 0; t < chunkSize / 4; t++)
+                        {
+                            gpids[t] = bin.ReadUInt32();
+                        }
+                        model.geometryParticleModelFileIDs = gpids;
                         break;
                     case M2Chunks.TXAC: // Texture transforms (?)
                     case M2Chunks.EXPT: // Extended Particles
@@ -108,7 +124,7 @@ namespace WoWFormatLib.FileReaders
                         break;
                     default:
 #if DEBUG
-                        throw new Exception(string.Format("M2: Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString()));
+                        throw new Exception(string.Format("M2: Found unknown header at offset {1} \"{0}\"", chunkName.ToString("X"), position.ToString()));
 #else
                         CASCLib.Logger.WriteLine(String.Format("M2: Found unknown header at offset {1} \"{0}\"", chunkName, position.ToString()));
                         break;
@@ -116,7 +132,7 @@ namespace WoWFormatLib.FileReaders
                 }
             }
 
-            if(CASC.IsCASCInit)
+            if(loadSkins && CASC.IsCASCInit)
             {
                 model.skins = ReadSkins(model.skinFileDataIDs);
             }
@@ -259,10 +275,10 @@ namespace WoWFormatLib.FileReaders
             for (var i = 0; i < nAnimations; i++)
             {
                 animations[i] = bin.Read<Animation>();
-                if (((uint)animations[i].flags & 0x130) == 0 && model.animFileData != null)
+                if (((uint)animations[i].flags & 0x130) == 0 && model.animFileDataIDs != null)
                 {
                     // Animation in other file
-                    foreach (var afid in model.animFileData)
+                    foreach (var afid in model.animFileDataIDs)
                     {
                         if (animations[i].animationID == afid.animID && animations[i].subAnimationID == animations[i].subAnimationID)
                         {

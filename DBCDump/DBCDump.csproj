@@ -6,8 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CascStorageLib\CascStorageLib\CascStorageLib.csproj" />
     <ProjectReference Include="..\WoWDBDefs\code\C#\DBDefsLib\DBDefsLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CascStorageLib">
+      <HintPath>..\CascStorageLib\CascStorageLib\bin\Debug\CascStorageLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

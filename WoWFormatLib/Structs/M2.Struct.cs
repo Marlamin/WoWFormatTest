@@ -21,6 +21,8 @@ namespace WoWFormatLib.Structs.M2
         PSBC = 'P' << 0 | 'S' << 8 | 'B' << 16 | 'C' << 24,
         TXID = 'T' << 0 | 'X' << 8 | 'I' << 16 | 'D' << 24,
         LDV1 = 'L' << 0 | 'D' << 8 | 'V' << 16 | '1' << 24,
+        GPID = 'G' << 0 | 'P' << 8 | 'I' << 16 | 'D' << 24,
+        RPID = 'R' << 0 | 'P' << 8 | 'I' << 16 | 'D' << 24,
     }
 
     public struct M2Model
@@ -33,8 +35,10 @@ namespace WoWFormatLib.Structs.M2
         public uint[] boneFileDataIDs;
         public uint[] skinFileDataIDs;
         public uint[] lod_skinFileDataIDs;
-        public AFID[] animFileData;
+        public AFID[] animFileDataIDs;
         public uint[] textureFileDataIDs;
+        public uint[] recursiveParticleModelFileIDs;
+        public uint[] geometryParticleModelFileIDs;
 
         public string filename;
         public string name;
