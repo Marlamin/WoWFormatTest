@@ -80,7 +80,6 @@ namespace DBCDumpHost.Controllers
             }
 
             result.recordsTotal = storage.Values.Count;
-            
 
             var fields = rawType.GetFields();
 
