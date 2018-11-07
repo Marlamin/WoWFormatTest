@@ -22,21 +22,13 @@ namespace DBCDumpHost.Controllers
             return "No filedataid given!";
         }
 
-        public IDictionary LoadDBC(string name, string build)
-        {
-            var filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", name + ".db2");
-            var rawType = DefinitionManager.CompileDefinition(filename, build);
-            var type = typeof(Storage<>).MakeGenericType(rawType);
-            return (IDictionary)Activator.CreateInstance(type, filename);
-        }
-
         // GET: data/name
         [HttpGet("{filedataid}")]
         public uint[] Get(int filedataid, string build)
         {
-            var modelFileData = LoadDBC("modelfiledata", build);
-            var itemDisplayInfo = LoadDBC("itemdisplayinfo", build);
-            var textureFileData = LoadDBC("texturefiledata", build);
+            var modelFileData = DBCManager.LoadDBC("modelfiledata", build, true);
+            var itemDisplayInfo = DBCManager.LoadDBC("itemdisplayinfo", build, true);
+            var textureFileData = DBCManager.LoadDBC("texturefiledata", build, true);
 
             var returnList = new List<uint>();
 
