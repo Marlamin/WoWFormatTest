@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CascStorageLib;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace DBCDumpHost.Controllers
 {
@@ -41,23 +34,21 @@ namespace DBCDumpHost.Controllers
                 throw new Exception("No build given!");
             }
 
-            var filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", name + ".db2");
-
             if (name.Contains("."))
             {
                 throw new Exception("Invalid DBC name!");
             }
 
-            var storage = DBCManager.LoadDBC(filename, build);
+            var storage = DBCManager.LoadDBC(name, build);
 
             if (storage.Values.Count == 0)
             {
                 throw new Exception("No rows found!");
             }
 
-            var fields = DefinitionManager.definitionCache[(filename, build)].GetFields();
+            var fields = DefinitionManager.definitionCache[(name, build)].GetFields();
 
-            var result = "<h4>Viewing record " + val + " in file " + Path.GetFileNameWithoutExtension(name) + "</h4><table class=\"table\">";
+            var result = "<h4>Viewing record " + val + " in file " + name + "</h4><table class=\"table\">";
 
             var offset = 0;
             var recordFound = false;
@@ -111,7 +102,7 @@ namespace DBCDumpHost.Controllers
 
             result += "</table>";
 
-            result += "<a target=\"_BLANK\" href=\"/dbc.php?dbc=" + Path.GetFileNameWithoutExtension(name) + ".db2&bc=" + bc + "#page=" + page + "\" class=\"btn btn-primary\">Go to record</a>";
+            result += "<a target=\"_BLANK\" href=\"/dbc.php?dbc=" + name + ".db2&bc=" + bc + "#page=" + page + "\" class=\"btn btn-primary\">Go to record</a>";
 
             return new ContentResult()
             {

@@ -46,12 +46,19 @@ namespace DBCDumpHost
 
         public static Type CompileDefinition(string filename, string build, bool force = false)
         {
-            if (!force && definitionCache.TryGetValue((filename, build), out var knownType))
+            var cleanDBName = Path.GetFileNameWithoutExtension(filename).ToLower();
+
+            if (!force && definitionCache.TryGetValue((cleanDBName, build), out var knownType))
                 return knownType;
 
             if (!File.Exists(filename))
             {
                 throw new Exception("Input DB2 file does not exist!");
+            }
+
+            if (!definitionLookup.ContainsKey(cleanDBName))
+            {
+                throw new KeyNotFoundException("Definition for " + cleanDBName);
             }
 
             DB2Reader reader;
@@ -75,13 +82,6 @@ namespace DBCDumpHost
                     default:
                         throw new Exception("DBC type " + identifier + " is not supported!");
                 }
-            }
-
-            var cleanDBName = Path.GetFileNameWithoutExtension(filename).ToLower();
-
-            if (!definitionLookup.ContainsKey(cleanDBName))
-            {
-                throw new KeyNotFoundException("Definition for " + cleanDBName);
             }
 
             var defs = definitionLookup[cleanDBName];
@@ -118,7 +118,7 @@ namespace DBCDumpHost
             }
 
             var type = tb.CreateType();
-            definitionCache[(filename, build)] = type;
+            definitionCache[(cleanDBName, build)] = type;
             return type;
         }
 

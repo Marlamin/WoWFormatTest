@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CascStorageLib;
-using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace DBCDumpHost.Controllers
 {
@@ -24,13 +16,13 @@ namespace DBCDumpHost.Controllers
 
         // GET: data/name
         [HttpGet("{filedataid}")]
-        public uint[] Get(int filedataid, string build)
+        public Dictionary<uint, List<uint>> Get(int filedataid, string build)
         {
             var modelFileData = DBCManager.LoadDBC("modelfiledata", build, true);
             var itemDisplayInfo = DBCManager.LoadDBC("itemdisplayinfo", build, true);
             var textureFileData = DBCManager.LoadDBC("texturefiledata", build, true);
 
-            var returnList = new List<uint>();
+            var returnList = new Dictionary<uint, List<uint>>();
 
             if (modelFileData.Contains(filedataid))
             {
@@ -38,22 +30,25 @@ namespace DBCDumpHost.Controllers
 
                 foreach (dynamic idiEntry in itemDisplayInfo.Values)
                 {
-                    if (idiEntry.ModelResourcesID[0] != mfdEntry.ModelResourcesID)
+                    var textureFileDataList = new List<uint>();
+                    if (idiEntry.ModelResourcesID[0] != mfdEntry.ModelResourcesID && idiEntry.ModelResourcesID[1] != mfdEntry.ModelResourcesID)
                     {
                         continue;
                     }
 
                     foreach (dynamic tfdEntry in textureFileData.Values)
                     {
-                        if (tfdEntry.MaterialResourcesID == idiEntry.ModelMaterialResourcesID[0])
+                        if (tfdEntry.MaterialResourcesID == idiEntry.ModelMaterialResourcesID[0] || tfdEntry.MaterialResourcesID == idiEntry.ModelMaterialResourcesID[1])
                         {
-                            returnList.Add((uint)tfdEntry.FileDataID);
+                            textureFileDataList.Add((uint)tfdEntry.FileDataID);
                         }
                     }
+
+                    returnList.Add((uint)idiEntry.ID, textureFileDataList);
                 }
             }
 
-            return returnList.ToArray();
+            return returnList;
         }
     }
 }

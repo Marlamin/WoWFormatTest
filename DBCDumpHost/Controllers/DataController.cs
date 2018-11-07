@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CascStorageLib;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace DBCDumpHost.Controllers
 {
@@ -57,15 +50,12 @@ namespace DBCDumpHost.Controllers
                 throw new Exception("No build given!");
             }
             
-            var filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", name + ".db2");
-
             if (name.Contains("."))
             {
                 throw new Exception("Invalid DBC name!");
             }
 
-
-            var storage = DBCManager.LoadDBC(filename, build);
+            var storage = DBCManager.LoadDBC(name, build);
 
             if (storage.Values.Count == 0)
             {
@@ -74,7 +64,7 @@ namespace DBCDumpHost.Controllers
 
             result.recordsTotal = storage.Values.Count;
 
-            var fields = DefinitionManager.definitionCache[(filename, build)].GetFields();
+            var fields = DefinitionManager.definitionCache[(name, build)].GetFields();
 
             result.data = new List<List<string>>();
 

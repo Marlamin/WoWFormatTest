@@ -24,7 +24,7 @@ namespace DBCDumpHost
                      return cachedStore;
             }
 
-            var filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", Path.GetFileNameWithoutExtension(name) + ".db2");
+            var filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", name + ".db2");
 
             if (!File.Exists(filename))
             {
