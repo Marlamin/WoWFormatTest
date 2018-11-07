@@ -2,55 +2,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using CascStorageLib;
 
 namespace DBCDumpHost
 {
     public class DBCManager
     {
-        // GetDictionary should return 
-        public Dictionary<int, object> GetDictionary(string name, string build)
+        private static Dictionary<(string, string), IDictionary> _dbcCache = new Dictionary<(string, string), IDictionary>();
+
+        public static IDictionary LoadDBC(string name, string build/*, bool fromCache = false*/)
         {
-            throw new NotImplementedException();
+            // TODO: Given the state of your shit keep it to false so you don't keep fucking your RAM sideways
+            // This is a thing to consider when your memory issues are solved, with a timeout that releases it
+            // (meaning concurrency, slim mutexes are better for that type of stuff than ConcurrentDictionary)
+            // My assumption is that you end up calling this everywhere and if you load your entire DBC
+            // for every page browsed, thats a big oops in response time.
+            // -- Warpten.
+            // if (fromCache)
+            // {
+            //     if (_dbcCache.TryGetValue((name, build), out var cachedStore))
+            //         return cachedStore;
+            // }
 
-            var dbc = Path.GetFileNameWithoutExtension(name);
-            var rawType = DefinitionManager.CompileDefinition(name, build);
+            var filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", Path.GetFileNameWithoutExtension(name) + ".db2");
+
+            if (!File.Exists(filename))
+            {
+                throw new FileNotFoundException("DBC not found on disk: " + filename);
+            }
+
+            var rawType = DefinitionManager.CompileDefinition(filename, build);
             var type = typeof(Storage<>).MakeGenericType(rawType);
-            var storage = (IDictionary)Activator.CreateInstance(type, name);
+            var instance = (IDictionary)Activator.CreateInstance(type, filename);
 
-            if (storage.Values.Count == 0)
-            {
-                throw new Exception("No rows found!");
-            }
+            // _dbcCache[(name, build)] = instance;
 
-            var fields = rawType.GetFields();
-
-            foreach (var item in storage.Values)
-            {
-                var rowList = new List<string>();
-
-                for (var i = 0; i < fields.Length; ++i)
-                {
-                    var field = fields[i];
-
-                    if (field.FieldType.IsArray)
-                    {
-                        var a = (Array)field.GetValue(item);
-
-                        for (var j = 0; j < a.Length; j++)
-                        {
-                            var isEndOfArray = a.Length - 1 == j;
-                            rowList.Add(a.GetValue(j).ToString());
-                        }
-                    }
-                    else
-                    {
-                        rowList.Add(field.GetValue(item).ToString());
-                    }
-                }
-            }
+            return instance;
         }
     }
 }

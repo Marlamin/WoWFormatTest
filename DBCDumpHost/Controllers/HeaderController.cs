@@ -48,15 +48,7 @@ namespace DBCDumpHost.Controllers
                 throw new Exception("Invalid DBC name!");
             }
 
-            if (!System.IO.File.Exists(filename))
-            {
-                throw new FileNotFoundException("DBC not found on disk!");
-            }
-
-            var dbc = Path.GetFileNameWithoutExtension(name);
-            var rawType = DefinitionManager.CompileDefinition(filename, build);
-            var type = typeof(Storage<>).MakeGenericType(rawType);
-            var storage = (IDictionary)Activator.CreateInstance(type, filename);
+            var storage = DBCManager.LoadDBC(filename, build);
 
             if (storage.Values.Count == 0)
             {
@@ -70,7 +62,8 @@ namespace DBCDumpHost.Controllers
 
             var definition = DefinitionManager.definitionLookup[name];
 
-            var fields = rawType.GetFields();
+            var fields = DefinitionManager.definitionCache[(filename, build)].GetFields();
+
             result.headers = new List<string>();
             result.fks = new Dictionary<string, string>();
             foreach(var item in storage.Values)

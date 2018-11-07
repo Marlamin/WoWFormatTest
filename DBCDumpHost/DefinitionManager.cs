@@ -13,9 +13,17 @@ namespace DBCDumpHost
     public static class DefinitionManager
     {
         public static Dictionary<string, Structs.DBDefinition> definitionLookup;
+        public static Dictionary<(string, string), Type> definitionCache;
+        private static ModuleBuilder mb;
 
         static DefinitionManager()
         {
+            definitionCache = new Dictionary<(string, string), Type>();
+
+            var aName = new AssemblyName("DBDefinitions");
+            var ab = AssemblyBuilder.DefineDynamicAssembly(aName, AssemblyBuilderAccess.Run);
+            mb = ab.DefineDynamicModule(aName.Name);
+
             LoadDefinitions();
         }
 
@@ -36,8 +44,11 @@ namespace DBCDumpHost
             Console.Write("Loaded " + definitionLookup.Count + " definitions!");
         }
 
-        public static Type CompileDefinition(string filename, string build)
+        public static Type CompileDefinition(string filename, string build, bool force = false)
         {
+            if (!force && definitionCache.TryGetValue((filename, build), out var knownType))
+                return knownType;
+
             if (!File.Exists(filename))
             {
                 throw new Exception("Input DB2 file does not exist!");
@@ -45,7 +56,7 @@ namespace DBCDumpHost
 
             DB2Reader reader;
 
-            var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using (var stream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var bin = new BinaryReader(stream))
             {
                 var identifier = new string(bin.ReadChars(4));
@@ -91,11 +102,8 @@ namespace DBCDumpHost
                     throw new Exception("No valid definition found for this layouthash and was not able to search by build!");
                 }
             }
-
-            var aName = new AssemblyName("DynamicAssemblyExample");
-            var ab = AssemblyBuilder.DefineDynamicAssembly(aName, AssemblyBuilderAccess.Run);
-            var mb = ab.DefineDynamicModule(aName.Name);
-            var tb = mb.DefineType(Path.GetFileNameWithoutExtension(filename) + "Struct", TypeAttributes.Public);
+            
+            var tb = mb.DefineType(Path.GetFileNameWithoutExtension(filename) + Path.GetRandomFileName().Replace(".", "") + "Struct", TypeAttributes.Public);
 
             foreach (var field in versionToUse.Value.definitions)
             {
@@ -110,6 +118,7 @@ namespace DBCDumpHost
             }
 
             var type = tb.CreateType();
+            definitionCache[(filename, build)] = type;
             return type;
         }
 

@@ -22,7 +22,7 @@ namespace DBCDumpHost.Controllers
             return "No filedataid given!";
         }
 
-        public dynamic LoadDBC(string name, string build)
+        public IDictionary LoadDBC(string name, string build)
         {
             var filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", name + ".db2");
             var rawType = DefinitionManager.CompileDefinition(filename, build);
@@ -32,7 +32,7 @@ namespace DBCDumpHost.Controllers
 
         // GET: data/name
         [HttpGet("{filedataid}")]
-        public uint[] Get(uint filedataid, string build)
+        public uint[] Get(int filedataid, string build)
         {
             var modelFileData = LoadDBC("modelfiledata", build);
             var itemDisplayInfo = LoadDBC("itemdisplayinfo", build);
@@ -40,23 +40,20 @@ namespace DBCDumpHost.Controllers
 
             var returnList = new List<uint>();
 
-            foreach (var mfdEntry in modelFileData.Values)
+            if (modelFileData.Contains(filedataid))
             {
-                if (mfdEntry.FileDataID != filedataid)
-                {
-                    continue;
-                }
+                dynamic mfdEntry = modelFileData[filedataid];
 
-                foreach (var idiEntry in itemDisplayInfo.Values)
+                foreach (dynamic idiEntry in itemDisplayInfo.Values)
                 {
                     if (idiEntry.ModelResourcesID[0] != mfdEntry.ModelResourcesID)
                     {
                         continue;
                     }
 
-                    foreach(var tfdEntry in textureFileData.Values)
+                    foreach (dynamic tfdEntry in textureFileData.Values)
                     {
-                        if(tfdEntry.MaterialResourcesID == idiEntry.ModelMaterialResourcesID[0])
+                        if (tfdEntry.MaterialResourcesID == idiEntry.ModelMaterialResourcesID[0])
                         {
                             returnList.Add((uint)tfdEntry.FileDataID);
                         }

@@ -48,23 +48,16 @@ namespace DBCDumpHost.Controllers
                 throw new Exception("Invalid DBC name!");
             }
 
-            if (!System.IO.File.Exists(filename))
-            {
-                throw new FileNotFoundException("DBC not found on disk!");
-            }
-
-            var dbc = Path.GetFileNameWithoutExtension(name);
-            var rawType = DefinitionManager.CompileDefinition(filename, build);
-            var type = typeof(Storage<>).MakeGenericType(rawType);
-            var storage = (IDictionary)Activator.CreateInstance(type, filename);
+            var storage = DBCManager.LoadDBC(filename, build);
 
             if (storage.Values.Count == 0)
             {
                 throw new Exception("No rows found!");
             }
-            var fields = rawType.GetFields();
 
-            var result = "<h4>Viewing record " + val + " in file " + dbc + "</h4><table class=\"table\">";
+            var fields = DefinitionManager.definitionCache[(filename, build)].GetFields();
+
+            var result = "<h4>Viewing record " + val + " in file " + Path.GetFileNameWithoutExtension(name) + "</h4><table class=\"table\">";
 
             var offset = 0;
             var recordFound = false;
@@ -118,7 +111,7 @@ namespace DBCDumpHost.Controllers
 
             result += "</table>";
 
-            result += "<a target=\"_BLANK\" href=\"/dbc.php?dbc=" + dbc + ".db2&bc=" + bc + "#page=" + page + "\" class=\"btn btn-primary\">Go to record</a>";
+            result += "<a target=\"_BLANK\" href=\"/dbc.php?dbc=" + Path.GetFileNameWithoutExtension(name) + ".db2&bc=" + bc + "#page=" + page + "\" class=\"btn btn-primary\">Go to record</a>";
 
             return new ContentResult()
             {
