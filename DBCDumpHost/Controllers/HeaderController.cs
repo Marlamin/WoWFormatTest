@@ -29,16 +29,6 @@ namespace DBCDumpHost.Controllers
 
             var result = new HeaderResult();
 
-            if (string.IsNullOrEmpty(build))
-            {
-                throw new Exception("No build given!");
-            }
-
-            if (name.Contains("."))
-            {
-                throw new Exception("Invalid DBC name!");
-            }
-
             var storage = DBCManager.LoadDBC(name, build);
 
             if (storage.Values.Count == 0)

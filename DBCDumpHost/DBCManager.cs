@@ -12,6 +12,16 @@ namespace DBCDumpHost
 
         public static IDictionary LoadDBC(string name, string build, bool fromCache = false)
         {
+            if (name.Contains("."))
+            {
+                throw new Exception("Invalid DBC name!");
+            }
+
+            if (string.IsNullOrEmpty(build))
+            {
+                throw new Exception("No build given!");
+            }
+
             // TODO: Given the state of your shit keep it to false so you don't keep fucking your RAM sideways
             // This is a thing to consider when your memory issues are solved, with a timeout that releases it
             // (meaning concurrency, slim mutexes are better for that type of stuff than ConcurrentDictionary)

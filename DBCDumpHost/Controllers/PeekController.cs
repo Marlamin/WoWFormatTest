@@ -8,12 +8,10 @@ namespace DBCDumpHost.Controllers
     [ApiController]
     public class PeekController : ControllerBase
     {
-        public struct DataTablesResult
+        public struct PeekResult
         {
-            public int draw;
-            public int recordsFiltered;
-            public int recordsTotal;
-            public List<List<string>> data;
+            public List<(string, string)> values;
+            public int offset;
         }
 
         // GET: peek/
@@ -25,19 +23,9 @@ namespace DBCDumpHost.Controllers
 
         // GET: peek/name
         [HttpGet("{name}")]
-        public IActionResult Get(string name, string build, string bc, string col, int val)
+        public PeekResult Get(string name, string build, string bc, string col, int val)
         {
             Console.WriteLine("Handling foreign key row for " + name + "::" + col + " (" + build + "/" + bc + ") value " + val);
-
-            if (string.IsNullOrEmpty(build))
-            {
-                throw new Exception("No build given!");
-            }
-
-            if (name.Contains("."))
-            {
-                throw new Exception("Invalid DBC name!");
-            }
 
             var storage = DBCManager.LoadDBC(name, build);
 
@@ -48,22 +36,17 @@ namespace DBCDumpHost.Controllers
 
             var fields = DefinitionManager.definitionCache[(name, build)].GetFields();
 
-            var result = "<h4>Viewing record " + val + " in file " + name + "</h4><table class=\"table\">";
+            var result = new PeekResult();
+            result.values = new List<(string, string)>();
 
             var offset = 0;
             var recordFound = false;
-            var page = 1;
             foreach (var item in storage.Values)
             {
                 if (recordFound)
                     continue;
 
                 offset++;
-                if(offset == 25)
-                {
-                    page++;
-                    offset = 0;
-                }
 
                 for (var i = 0; i < fields.Length; ++i)
                 {
@@ -86,12 +69,12 @@ namespace DBCDumpHost.Controllers
                                 for (var k = 0; k < a.Length; k++)
                                 {
                                     var isEndOfArray = a.Length - 1 == k;
-                                    result += "<tr><td>" + subfield.Name + "[" + k + "]</td><td>" + a.GetValue(k).ToString() + "</td></tr>";
+                                    result.values.Add((subfield.Name + "[" + k + "]", a.GetValue(k).ToString()));
                                 }
                             }
                             else
                             {
-                                result += "<tr><td>" + subfield.Name + "</td><td>" + subfield.GetValue(item).ToString() + "</td></tr>";
+                                result.values.Add((subfield.Name, subfield.GetValue(item).ToString()));
                             }
                         }
 
@@ -100,15 +83,9 @@ namespace DBCDumpHost.Controllers
                 }
             }
 
-            result += "</table>";
+            result.offset = offset;
 
-            result += "<a target=\"_BLANK\" href=\"/dbc.php?dbc=" + name + ".db2&bc=" + bc + "#page=" + page + "\" class=\"btn btn-primary\">Go to record</a>";
-
-            return new ContentResult()
-            {
-                Content = result,
-                ContentType = "text/html",
-            };
+            return result;
         }
     }
 }
