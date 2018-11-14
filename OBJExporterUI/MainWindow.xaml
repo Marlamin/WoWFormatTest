@@ -4,16 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:opentk="clr-namespace:OpenTK;assembly=OpenTK.GLControl"
-        xmlns:map="clr-namespace:MapControl;assembly=MapControl.WPF"
         mc:Ignorable="d"
         ResizeMode="CanResize"
         Icon="Resources/icon32.png"
         ContentRendered="Window_ContentRendered"
         KeyboardNavigation.DirectionalNavigation="None"
         Title="OBJ Exporter" MinHeight="650" Height="650" MinWidth="615" Width="1230">
-    <Window.Resources>
-        <map:WebMercatorProjection x:Key="WebMercatorProjection"/>
-    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="600" />
@@ -122,8 +118,6 @@
                     </ListView>
                     <!-- Row 2 -->
                     <ListBox x:Name="tileListBox" SelectionMode="Extended" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="2" SelectionChanged="TileListBox_SelectionChanged" Height="209" Width="75" Margin="3,0,0,34" VerticalContentAlignment="Bottom"/>
-                    <Button x:Name="tileViewerButton" Click="TileViewerButton_Click" Content="View map" Margin="83,0,387.4,220" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
-                    <Button x:Name="mapViewerButton" Click="MapViewerButton_Click" Content="View tile in 3D" Margin="83,0,387.4,195" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom"/>
                     <CheckBox x:Name="exportWMO" Content="Export WMOs (Larger models like buildings or cities)" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,170" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportWMO_Click"/>
                     <CheckBox x:Name="exportM2" Content="Export M2s (Smaller models like trees and fences)" IsChecked="True" HorizontalAlignment="Left" Margin="83,0,0,150" Grid.Row="2" HorizontalContentAlignment="Center" Height="20" VerticalAlignment="Bottom" Click="ExportM2_Click"/>
                     <Label Content="Terrain texture size:" HorizontalAlignment="Left" Margin="78,0,0,126" Grid.Row="2" VerticalAlignment="Bottom" Width="113" Height="24"/>
@@ -141,25 +135,9 @@
             </TabItem>
         </TabControl>
         <Grid Grid.Column="1" Background="Black" KeyboardNavigation.DirectionalNavigation="None">
-            <map:Map Visibility="Collapsed" x:Name="map" ZoomLevel="3" MaxZoomLevel="10"
-                 Center="{Binding MapCenter}"
-                 MapLayer="{Binding CurrentMapLayer}"
-                 MapProjection="{StaticResource WebMercatorProjection}"
-                 MouseLeftButtonDown="MapMouseLeftButtonDown"
-                 MouseRightButtonDown="MapMouseRightButtonDown"
-                 MouseMove="MapMouseMove" 
-                 MouseLeave="MapMouseLeave"
-                 Width="Auto"
-                 Height="Auto"
-                Background="#001D28"
-                 ManipulationInertiaStarting="MapManipulationInertiaStarting">
-                <map:MapGraticule x:Name="mapGraticule" Opacity="0.6"/>
-                <map:MapScale HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-            </map:Map>
-            <WindowsFormsHost x:Name="wfHost" Width="Auto" Height="Auto" Margin="0" KeyboardNavigation.DirectionalNavigation="None">
+            <WindowsFormsHost Visibility="Collapsed" x:Name="wfHost" Width="Auto" Height="Auto" Margin="0" KeyboardNavigation.DirectionalNavigation="None">
                 <opentk:GLControl x:Name="renderCanvas" />
             </WindowsFormsHost>
         </Grid>
     </Grid>
-
 </Window>

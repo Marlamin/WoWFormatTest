@@ -14,7 +14,6 @@ using System.Net;
 using System.IO.Compression;
 using Microsoft.VisualBasic.FileIO;
 using System.Windows.Media;
-using MapControl;
 
 namespace OBJExporterUI
 {
@@ -121,7 +120,7 @@ namespace OBJExporterUI
         /* Generic UI */
         private void PreviewButton_Click(object sender, RoutedEventArgs e)
         {
-            previewControl.LoadModel((string)modelListBox.SelectedItem);
+            //previewControl.LoadModel((string)modelListBox.SelectedItem);
         }
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -326,7 +325,7 @@ namespace OBJExporterUI
             textureListBox.DataContext = textures;
 
             Logger.WriteLine("Worker: Startup complete!");
-            previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
+            //previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
             //var file = "world/maps/troll raid/troll raid_23_33.adt";
            /// Exporters.glTF.ADTExporter.exportADT(file);
@@ -521,23 +520,15 @@ namespace OBJExporterUI
             {
                 if (MapsTab.IsSelected)
                 {
-                    map.MapLayer = new MapTileLayer(new WoWMapTileLoader())
-                    {
-                        SourceName = "WoW",
-                        Description = "© Blizzard",
-                        TileSource = new TileSource { UriFormat = "https://newmaps.marlam.in/tiles/test/1/4f0cb33901ab6b06b7c9708c07315a58/z{z}x{x}y{y}.png" },
-                        MinZoomLevel = 3,
-                        MaxZoomLevel = 8
-                    };
 
-                    map.Center = new Location(71, 129);
-                    map.Visibility = Visibility.Visible;
-                    wfHost.Visibility = Visibility.Collapsed;
                 }
-                else
+                else if (ModelsTab.IsSelected)
                 {
-                    map.Visibility = Visibility.Collapsed;
-                    wfHost.Visibility = Visibility.Visible;
+
+                }
+                else if (TexturesTab.IsSelected)
+                {
+
                 }
             }
         }
@@ -547,7 +538,7 @@ namespace OBJExporterUI
         {
             if (previewsEnabled && modelListBox.SelectedItems.Count == 1)
             {
-                previewControl.LoadModel((string)modelListBox.SelectedItem);
+                //previewControl.LoadModel((string)modelListBox.SelectedItem);
             }
         }
         private void ModelCheckBoxChanged(object sender, RoutedEventArgs e)
@@ -809,15 +800,15 @@ namespace OBJExporterUI
                 tileList.Add(adtFile);
             }
 
-            previewControl.LoadModel(tileList);
+            //previewControl.LoadModel(tileList);
         }
         private void TileViewerButton_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = (MapListItem)mapListBox.SelectedItem;
             if (selectedItem == null) return;
 
-            var mw = new MapWindow(selectedItem.Internal);
-            mw.Show();
+            //var mw = new MapWindow(selectedItem.Internal);
+            //mw.Show();
         }
         private void BakeSize_DropDownClosed(object sender, EventArgs e)
         {
@@ -1147,62 +1138,6 @@ namespace OBJExporterUI
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             config.AppSettings.Settings["exportM2"].Value = exportM2.IsChecked.ToString();
             config.Save(ConfigurationSaveMode.Full);
-        }
-
-        /* Minimap stuff */
-        private void MapMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                //map.ZoomMap(e.GetPosition(map), Math.Floor(map.ZoomLevel + 1.5));
-                //map.ZoomToBounds(new BoundingBox(53, 7, 54, 9));
-                map.TargetCenter = map.ViewportPointToLocation(e.GetPosition(map));
-            }
-        }
-
-        private void MapMouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                //map.ZoomMap(e.GetPosition(map), Math.Ceiling(map.ZoomLevel - 1.5));
-            }
-        }
-
-        private void MapMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            var location = map.ViewportPointToLocation(e.GetPosition(map));
-            var latitude = (int)Math.Round(location.Latitude * 60000d);
-            var longitude = (int)Math.Round(Location.NormalizeLongitude(location.Longitude) * 60000d);
-            var latHemisphere = 'N';
-            var lonHemisphere = 'E';
-
-            if (latitude < 0)
-            {
-                latitude = -latitude;
-                latHemisphere = 'S';
-            }
-
-            if (longitude < 0)
-            {
-                longitude = -longitude;
-                lonHemisphere = 'W';
-            }
-
-            Console.WriteLine("Lat: " + latitude + ", long " + longitude);
-            Console.WriteLine(string.Format(System.Globalization.CultureInfo.InvariantCulture,
-                "{0}  {1:00} {2:00.000}\n{3} {4:000} {5:00.000}",
-                latHemisphere, latitude / 60000, (latitude % 60000) / 1000d,
-                lonHemisphere, longitude / 60000, (longitude % 60000) / 1000d));
-        }
-
-        private void MapMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            //mouseLocation.Text = string.Empty;
-        }
-
-        private void MapManipulationInertiaStarting(object sender, System.Windows.Input.ManipulationInertiaStartingEventArgs e)
-        {
-            e.TranslationBehavior.DesiredDeceleration = 0.001;
         }
     }
 }
