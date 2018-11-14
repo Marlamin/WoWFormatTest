@@ -83,6 +83,9 @@ namespace WoWFormatLib.FileReaders
                                 throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
                             }
                             break;
+                        case WMOChunks.MOGP:
+                            Console.WriteLine("Trying to parse group WMO as root WMO, skipping!");
+                            return;
                         case WMOChunks.MOHD:
                             wmofile.header = bin.Read<MOHD>();
                             break;
