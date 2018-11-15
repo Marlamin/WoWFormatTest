@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace DBCDumpHost.Controllers
 {
     [Route("api/itemtexture")]
+    [Route("api/texture")]
     [ApiController]
-    public class ItemTextureController : ControllerBase
+    public class TextureController : ControllerBase
     {
         // GET: data/
         [HttpGet]
@@ -21,6 +22,8 @@ namespace DBCDumpHost.Controllers
             var modelFileData = DBCManager.LoadDBC("modelfiledata", build, true);
             var itemDisplayInfo = DBCManager.LoadDBC("itemdisplayinfo", build, true);
             var textureFileData = DBCManager.LoadDBC("texturefiledata", build, true);
+            var creatureModelData = DBCManager.LoadDBC("creaturemodeldata", build, true);
+            var creatureDisplayInfo = DBCManager.LoadDBC("creaturedisplayinfo", build, true);
 
             var returnList = new Dictionary<uint, List<uint>>();
 
@@ -30,11 +33,12 @@ namespace DBCDumpHost.Controllers
 
                 foreach (dynamic idiEntry in itemDisplayInfo.Values)
                 {
-                    var textureFileDataList = new List<uint>();
                     if (idiEntry.ModelResourcesID[0] != mfdEntry.ModelResourcesID && idiEntry.ModelResourcesID[1] != mfdEntry.ModelResourcesID)
                     {
                         continue;
                     }
+
+                    var textureFileDataList = new List<uint>();
 
                     foreach (dynamic tfdEntry in textureFileData.Values)
                     {
@@ -45,6 +49,27 @@ namespace DBCDumpHost.Controllers
                     }
 
                     returnList.Add((uint)idiEntry.ID, textureFileDataList);
+                }
+
+                foreach (dynamic cmdEntry in creatureModelData.Values)
+                {
+                    if (cmdEntry.FileDataID != filedataid)
+                    {
+                        continue;
+                    }
+
+                    foreach (dynamic cdiEntry in creatureDisplayInfo.Values)
+                    {
+                        if (cdiEntry.ModelID != cmdEntry.ID)
+                        {
+                            continue;
+                        }
+
+                        //returnList.Add((uint)cdiEntry.ID, new List<uint> { (uint)cdiEntry.TextureVariationFileDataID[0], (uint)cdiEntry.TextureVariationFileDataID[1], (uint)cdiEntry.TextureVariationFileDataID[2] });
+                        returnList.Add((uint)cdiEntry.ID, new List<uint> { (uint)cdiEntry.TextureVariationFileDataID[0] });
+                    }
+
+                    break;
                 }
             }
 
