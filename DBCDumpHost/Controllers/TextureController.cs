@@ -65,8 +65,7 @@ namespace DBCDumpHost.Controllers
                             continue;
                         }
 
-                        //returnList.Add((uint)cdiEntry.ID, new List<uint> { (uint)cdiEntry.TextureVariationFileDataID[0], (uint)cdiEntry.TextureVariationFileDataID[1], (uint)cdiEntry.TextureVariationFileDataID[2] });
-                        returnList.Add((uint)cdiEntry.ID, new List<uint> { (uint)cdiEntry.TextureVariationFileDataID[0] });
+                        returnList.Add((uint)cdiEntry.ID, new List<uint> { (uint)cdiEntry.TextureVariationFileDataID[0], (uint)cdiEntry.TextureVariationFileDataID[1], (uint)cdiEntry.TextureVariationFileDataID[2] });
                     }
 
                     break;
