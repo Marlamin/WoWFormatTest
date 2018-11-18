@@ -9,7 +9,7 @@
         Icon="Resources/icon32.png"
         ContentRendered="Window_ContentRendered"
         KeyboardNavigation.DirectionalNavigation="None"
-        Title="OBJ Exporter" MinHeight="650" Height="650" MinWidth="615" Width="1230">
+        Title="OBJ Exporter" MinHeight="650" Height="650" MinWidth="615" Width="615">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="600" />
@@ -45,7 +45,7 @@
                 <Grid>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="wmoCheckBox" Content="WMOs" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                     <CheckBox Checked="ModelCheckBoxChanged" Unchecked="ModelCheckBoxChanged" IsChecked="True" x:Name="m2CheckBox" Content="M2s" HorizontalAlignment="Left" Margin="71,10,0,0" VerticalAlignment="Top"/>
-                    <CheckBox Checked="PreviewCheckbox_Checked" Unchecked="PreviewCheckbox_Checked" IsChecked="True" x:Name="previewCheckbox" Content="Enable preview" HorizontalAlignment="Left" Margin="485,10,0,0" VerticalAlignment="Top"/>
+                    <!--<CheckBox Checked="PreviewCheckbox_Checked" Unchecked="PreviewCheckbox_Checked" IsChecked="True" x:Name="previewCheckbox" Content="Enable preview" HorizontalAlignment="Left" Margin="485,10,0,0" VerticalAlignment="Top"/>-->
                     <ListBox x:Name="modelListBox" SelectionMode="Extended" SelectionChanged="ModelListBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="10,30,10,40" VerticalAlignment="Stretch" ItemsSource="{Binding}"></ListBox>
                     <Button x:Name="exportButton" Height="25" Content="Export model to OBJ!" HorizontalAlignment="Stretch" Margin="10,0,10.4,10" VerticalAlignment="Bottom" Click="ExportButton_Click"/>
                 </Grid>
@@ -134,10 +134,10 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Grid Grid.Column="1" Background="Black" KeyboardNavigation.DirectionalNavigation="None">
+        <!--<Grid Grid.Column="1" Background="Black" KeyboardNavigation.DirectionalNavigation="None">
             <WindowsFormsHost Visibility="Collapsed" x:Name="wfHost" Width="Auto" Height="Auto" Margin="0" KeyboardNavigation.DirectionalNavigation="None">
                 <opentk:GLControl x:Name="renderCanvas" />
             </WindowsFormsHost>
-        </Grid>
+        </Grid>-->
     </Grid>
 </Window>

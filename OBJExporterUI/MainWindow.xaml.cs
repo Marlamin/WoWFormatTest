@@ -66,9 +66,9 @@ namespace OBJExporterUI
 
             Title = "Marlamin's WoW Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            previewControl = new PreviewControl(renderCanvas);
-            CompositionTarget.Rendering += previewControl.CompositionTarget_Rendering;
-            wfHost.Initialized += previewControl.WindowsFormsHost_Initialized;
+            //previewControl = new PreviewControl(renderCanvas);
+            //CompositionTarget.Rendering += previewControl.CompositionTarget_Rendering;
+            //wfHost.Initialized += previewControl.WindowsFormsHost_Initialized;
 
             exportworker.DoWork += Exportworker_DoWork;
             exportworker.RunWorkerCompleted += Exportworker_RunWorkerCompleted;
@@ -1089,7 +1089,8 @@ namespace OBJExporterUI
         }
         private void PreviewCheckbox_Checked(object sender, RoutedEventArgs e)
         {
-            previewsEnabled = (bool) previewCheckbox.IsChecked;
+            //previewsEnabled = (bool) previewCheckbox.IsChecked;
+            previewsEnabled = false;
         }
         private void RenderMinimapButton_Click(object sender, RoutedEventArgs e)
         {
