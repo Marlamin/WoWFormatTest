@@ -9,6 +9,7 @@ namespace WoWFormatLib.Utils
     {
         private static CASCHandler cascHandler;
         public static bool IsCASCInit = false;
+        public static string BuildName;
 
         // Talking to local API instead of handling CASC via CASCLib
         private static bool usingLocalAPI;
@@ -37,16 +38,16 @@ namespace WoWFormatLib.Utils
             
             if (basedir == null)
             {
-                var config = CASCConfig.LoadOnlineStorageConfig(program, "eu", true);
-
-                Console.WriteLine("Initializing CASC from web with program " + program + " and build " + config.BuildName);
-                cascHandler = CASCHandler.OpenStorage(config, worker);
+                Console.WriteLine("Initializing CASC from web for program " + program );
+                cascHandler = CASCHandler.OpenOnlineStorage(program, "eu", worker);
             }
             else
             {
                 Console.WriteLine("Initializing CASC from local disk with basedir " + basedir);
                 cascHandler = CASCHandler.OpenLocalStorage(basedir, worker);
             }
+
+            BuildName = cascHandler.Config.BuildName;
             
             cascHandler.Root.SetFlags(locale, ContentFlags.None, false);
 

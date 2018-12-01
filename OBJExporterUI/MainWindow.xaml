@@ -134,10 +134,10 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <!--<Grid Grid.Column="1" Background="Black" KeyboardNavigation.DirectionalNavigation="None">
-            <WindowsFormsHost Visibility="Collapsed" x:Name="wfHost" Width="Auto" Height="Auto" Margin="0" KeyboardNavigation.DirectionalNavigation="None">
+        <Grid Grid.Column="1" Background="Black" KeyboardNavigation.DirectionalNavigation="None">
+            <WindowsFormsHost Visibility="Visible" x:Name="wfHost" Width="Auto" Height="Auto" Margin="0" KeyboardNavigation.DirectionalNavigation="None">
                 <opentk:GLControl x:Name="renderCanvas" />
             </WindowsFormsHost>
-        </Grid>-->
+        </Grid>
     </Grid>
 </Window>

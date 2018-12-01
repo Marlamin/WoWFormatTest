@@ -14,6 +14,8 @@ using System.Net;
 using System.IO.Compression;
 using Microsoft.VisualBasic.FileIO;
 using System.Windows.Media;
+using DBDefsLib;
+using CascStorageLib;
 
 namespace OBJExporterUI
 {
@@ -66,9 +68,9 @@ namespace OBJExporterUI
 
             Title = "Marlamin's WoW Exporter " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            //previewControl = new PreviewControl(renderCanvas);
-            //CompositionTarget.Rendering += previewControl.CompositionTarget_Rendering;
-            //wfHost.Initialized += previewControl.WindowsFormsHost_Initialized;
+            previewControl = new PreviewControl(renderCanvas);
+            CompositionTarget.Rendering += previewControl.CompositionTarget_Rendering;
+            wfHost.Initialized += previewControl.WindowsFormsHost_Initialized;
 
             exportworker.DoWork += Exportworker_DoWork;
             exportworker.RunWorkerCompleted += Exportworker_RunWorkerCompleted;
@@ -325,7 +327,7 @@ namespace OBJExporterUI
             textureListBox.DataContext = textures;
 
             Logger.WriteLine("Worker: Startup complete!");
-            //previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
+            previewControl.LoadModel("world/arttest/boxtest/xyz.m2");
 #if DEBUG
             //var file = "world/maps/troll raid/troll raid_23_33.adt";
            /// Exporters.glTF.ADTExporter.exportADT(file);
@@ -358,6 +360,7 @@ namespace OBJExporterUI
             if (!File.Exists("definitions/Map.dbd"))
             {
                 worker.ReportProgress(30, "Downloading database definitions..");
+                UpdateDefinition("Map");
             }
 
             worker.ReportProgress(50, "Loading listfile from disk..");
@@ -975,79 +978,51 @@ namespace OBJExporterUI
 
             try
             {
-                throw new NotImplementedException("DBC reading needs updating!");
-                /*
                 if (!File.Exists("definitions/Map.dbd"))
                 {
                     UpdateDefinition("Map");
                 }
 
-                var build = CASC.Config.BuildName;
+                var build = CASC.BuildName;
 
-                var dbdreader = new DBDReader();
-                var defs = dbdreader.Read("definitions/Map.dbd");
+                var storage = DBCManager.LoadDBC("map", build, true);
 
-                DBDefsLib.Structs.VersionDefinitions? versionToUse;
-
-                var reader = new WDC2Reader(CASC.OpenFile(@"DBFilesClient/Map.db2"));
-
-                if (!Utils.GetVersionDefinitionByLayoutHash(defs, reader.LayoutHash.ToString("X8"), out versionToUse))
+                foreach (dynamic entry in storage.Values)
                 {
-                    if (!string.IsNullOrWhiteSpace(build))
+                    var mapID = entry.ID;
+                    var mapDirectory = entry.Directory;
+                    var mapName = entry.MapName_lang;
+                    var mapExpansionID = entry.ExpansionID;
+
+                    if (CASC.FileExists("World/Maps/" + mapDirectory + "/" + mapDirectory + ".wdt"))
                     {
-                        if (!Utils.GetVersionDefinitionByBuild(defs, new Build(build), out versionToUse))
+                        var mapItem = new MapListItem { Internal = mapDirectory };
+
+                        if (mapNames.ContainsKey(mapID))
                         {
-                            throw new Exception("No valid definition found for this layouthash or build!");
+                            mapItem.Name = mapNames[mapID].Name;
+                            mapItem.Type = mapNames[mapID].Type;
+                            var expansionID = ExpansionNameToID(mapNames[mapID].Expansion);
+                            mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
+
+                            if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
+                            {
+                                continue;
+                            }
                         }
-                    }
-                    else
-                    {
-                        throw new Exception("No valid definition found for this layouthash and was not able to search by build!");
+                        else
+                        {
+                            mapItem.Name = mapName;
+                            mapItem.Type = "Unknown";
+                            mapItem.Image = "pack://application:,,,/Resources/wow" + (mapExpansionID + 1) + ".png";
+                        }
+
+                        if (string.IsNullOrEmpty(filterTextBox.Text) || (mapDirectory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapName.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
+                        {
+                            mapListBox.Items.Add(mapItem);
+                        }
                     }
                 }
-                */
-
-                /*using(var mapStream = CASC.cascHandler.OpenFile(@"DBFilesClient/Map.db2"))
-                {
-                    var mapsData = new WDC2Reader(mapStream);
-
-                    foreach (var mapEntry in mapsData)
-                    {
-                        var mapID = mapEntry.Key;
-                        var mapDirectory = mapEntry.Value.GetField<string>(0);
-                        var mapName = mapEntry.Value.GetField<string>(1);
-                        var mapExpansionID = mapEntry.Value.GetField<byte>(19);
-
-                        if (CASC.cascHandler.FileExists("World/Maps/" + mapDirectory + "/" + mapDirectory + ".wdt"))
-                        {
-                            var mapItem = new MapListItem { Internal = mapDirectory };
-
-                            if (mapNames.ContainsKey(mapID))
-                            {
-                                mapItem.Name = mapNames[mapID].Name;
-                                mapItem.Type = mapNames[mapID].Type;
-                                var expansionID = ExpansionNameToID(mapNames[mapID].Expansion);
-                                mapItem.Image = "pack://application:,,,/Resources/wow" + expansionID + ".png";
-
-                                if (!mapFilters.Contains("wow" + expansionID) || !mapFilters.Contains(mapItem.Type))
-                                {
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                mapItem.Name = mapName;
-                                mapItem.Type = "Unknown";
-                                mapItem.Image = "pack://application:,,,/Resources/wow" + (mapExpansionID + 1) + ".png";
-                            }
-
-                            if (string.IsNullOrEmpty(filterTextBox.Text) || (mapDirectory.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1 || mapName.IndexOf(filterTextBox.Text, 0, StringComparison.CurrentCultureIgnoreCase) != -1))
-                            {
-                                mapListBox.Items.Add(mapItem);
-                            }
-                        }
-                    }
-                }*/
             }
             catch (Exception ex)
             {
