@@ -219,6 +219,10 @@ namespace OBJExporterUI.Exporters.OBJ
                         materials[i].transparent = true;
                     }
 
+                    materials[i].blendMode = wmo.materials[i].blendMode;
+                    materials[i].shaderID = wmo.materials[i].shader;
+                    materials[i].terrainType = wmo.materials[i].groundType;
+
                     if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), materials[i].filename + ".png")))
                     {
                         var blpreader = new BLPReader();
@@ -308,6 +312,9 @@ namespace OBJExporterUI.Exporters.OBJ
                 {
                     mtlsb.Append("map_d " + material.filename + ".png\n");
                 }
+                mtlsb.Append("blend " + material.blendMode + "\n");
+                mtlsb.Append("shader " + material.shaderID + "\n");
+                mtlsb.Append("terrain " + material.terrainType + "\n");
             }
 
             if (destinationOverride == null)
