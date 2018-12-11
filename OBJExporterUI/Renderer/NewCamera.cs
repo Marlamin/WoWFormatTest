@@ -109,6 +109,12 @@ namespace OBJExporterUI
                 Pos.Z -= 0.1f;
             }
 
+            if (state.IsKeyDown(Key.R))
+            {
+                Pos = new Vector3(11.0f, 0, 4.0f);
+                rotationAngle = 0.0f;
+            }
+
             if (state.IsKeyDown(Key.I))
             {
                 Console.WriteLine(Pos.ToString());
