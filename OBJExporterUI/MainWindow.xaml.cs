@@ -122,8 +122,9 @@ namespace OBJExporterUI
         /* Generic UI */
         private void PreviewButton_Click(object sender, RoutedEventArgs e)
         {
-            //previewControl.LoadModel((string)modelListBox.SelectedItem);
+            previewControl.LoadModel((string)modelListBox.SelectedItem);
         }
+
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var filtered = new List<string>();
@@ -541,7 +542,7 @@ namespace OBJExporterUI
         {
             if (previewsEnabled && modelListBox.SelectedItems.Count == 1)
             {
-                //previewControl.LoadModel((string)modelListBox.SelectedItem);
+                previewControl.LoadModel((string)modelListBox.SelectedItem);
             }
         }
         private void ModelCheckBoxChanged(object sender, RoutedEventArgs e)
@@ -1064,8 +1065,8 @@ namespace OBJExporterUI
         }
         private void PreviewCheckbox_Checked(object sender, RoutedEventArgs e)
         {
-            //previewsEnabled = (bool) previewCheckbox.IsChecked;
-            previewsEnabled = false;
+            previewsEnabled = (bool) previewCheckbox.IsChecked;
+            //previewsEnabled = false;
         }
         private void RenderMinimapButton_Click(object sender, RoutedEventArgs e)
         {
