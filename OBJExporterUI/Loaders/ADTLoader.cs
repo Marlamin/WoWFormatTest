@@ -44,45 +44,90 @@ namespace OBJExporterUI.Loaders
 
             var materials = new List<Material>();
 
-            for (var ti = 0; ti < adt.textures.filenames.Count(); ti++)
+            if(adt.textures.filenames == null)
             {
-                var material = new Material();
-                material.filename = adt.textures.filenames[ti];
-                material.textureID = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
-
-                if (adt.texParams != null && adt.texParams.Count() >= ti)
+                for (var ti = 0; ti < adt.diffuseTextureFileDataIDs.Count(); ti++)
                 {
-                    material.scale = (float)Math.Pow(2, (adt.texParams[ti].flags & 0xF0) >> 4);
-                    if(adt.texParams[ti].height != 0.0 || adt.texParams[ti].offset != 1.0)
-                    {
-                        material.heightScale = adt.texParams[ti].height;
-                        material.heightOffset = adt.texParams[ti].offset;
+                    var material = new Material();
+                    material.filename = adt.diffuseTextureFileDataIDs[ti].ToString();
+                    material.textureID = BLPLoader.LoadTexture(adt.diffuseTextureFileDataIDs[ti], cache);
 
-                        var heightName = adt.textures.filenames[ti].Replace(".blp", "_h.blp");
-                        if (!WoWFormatLib.Utils.CASC.FileExists(heightName))
+                    if (adt.texParams != null && adt.texParams.Count() >= ti)
+                    {
+                        material.scale = (float)Math.Pow(2, (adt.texParams[ti].flags & 0xF0) >> 4);
+                        if (adt.texParams[ti].height != 0.0 || adt.texParams[ti].offset != 1.0)
                         {
-                            Console.WriteLine("Height texture: " + heightName + " does not exist! Falling back to original texture (hack)..");
-                            material.heightTexture = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
+                            material.heightScale = adt.texParams[ti].height;
+                            material.heightOffset = adt.texParams[ti].offset;
+
+                            if (!WoWFormatLib.Utils.CASC.FileExists(adt.heightTextureFileDataIDs[ti]))
+                            {
+                                Console.WriteLine("Height texture: " + adt.heightTextureFileDataIDs[ti] + " does not exist! Falling back to original texture (hack)..");
+                                material.heightTexture = BLPLoader.LoadTexture(adt.diffuseTextureFileDataIDs[ti], cache);
+                            }
+                            else
+                            {
+                                material.heightTexture = BLPLoader.LoadTexture(adt.heightTextureFileDataIDs[ti], cache);
+                            }
                         }
                         else
                         {
-                            material.heightTexture = BLPLoader.LoadTexture(heightName, cache);
+                            material.heightScale = 0.0f;
+                            material.heightOffset = 1.0f;
                         }
                     }
                     else
                     {
                         material.heightScale = 0.0f;
                         material.heightOffset = 1.0f;
+                        material.scale = 1.0f;
                     }
+                    materials.Add(material);
                 }
-                else
-                {
-                    material.heightScale = 0.0f;
-                    material.heightOffset = 1.0f;
-                    material.scale = 1.0f;
-                }
-                materials.Add(material);
             }
+            else
+            {
+                for (var ti = 0; ti < adt.textures.filenames.Count(); ti++)
+                {
+                    var material = new Material();
+                    material.filename = adt.textures.filenames[ti];
+                    material.textureID = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
+
+                    if (adt.texParams != null && adt.texParams.Count() >= ti)
+                    {
+                        material.scale = (float)Math.Pow(2, (adt.texParams[ti].flags & 0xF0) >> 4);
+                        if (adt.texParams[ti].height != 0.0 || adt.texParams[ti].offset != 1.0)
+                        {
+                            material.heightScale = adt.texParams[ti].height;
+                            material.heightOffset = adt.texParams[ti].offset;
+
+                            var heightName = adt.textures.filenames[ti].Replace(".blp", "_h.blp");
+                            if (!WoWFormatLib.Utils.CASC.FileExists(heightName))
+                            {
+                                Console.WriteLine("Height texture: " + heightName + " does not exist! Falling back to original texture (hack)..");
+                                material.heightTexture = BLPLoader.LoadTexture(adt.textures.filenames[ti], cache);
+                            }
+                            else
+                            {
+                                material.heightTexture = BLPLoader.LoadTexture(heightName, cache);
+                            }
+                        }
+                        else
+                        {
+                            material.heightScale = 0.0f;
+                            material.heightOffset = 1.0f;
+                        }
+                    }
+                    else
+                    {
+                        material.heightScale = 0.0f;
+                        material.heightOffset = 1.0f;
+                        material.scale = 1.0f;
+                    }
+                    materials.Add(material);
+                }
+            }
+
 
             var initialChunkY = adt.chunks[0].header.position.Y;
             var initialChunkX = adt.chunks[0].header.position.X;
@@ -150,9 +195,10 @@ namespace OBJExporterUI.Loaders
                     if(adt.texChunks[c].alphaLayer != null){
                         alphalayermats.Add(BLPLoader.GenerateAlphaTexture(adt.texChunks[c].alphaLayer[li].layer));
                     }
-                    layermats.Add((uint)cache.materials[WoWFormatLib.Utils.CASC.getFileDataIdByName(adt.textures.filenames[adt.texChunks[c].layers[li].textureId])]);
 
-                    var curMat = materials.Where(material => material.filename == adt.textures.filenames[adt.texChunks[c].layers[li].textureId]).Single();
+                    layermats.Add((uint)cache.materials[adt.diffuseTextureFileDataIDs[adt.texChunks[c].layers[li].textureId]]);
+
+                    var curMat = materials.Where(material => material.filename == adt.diffuseTextureFileDataIDs[adt.texChunks[c].layers[li].textureId].ToString()).Single();
 
                     layerscales.Add(curMat.scale);
                     layerheights.Add(curMat.heightTexture);

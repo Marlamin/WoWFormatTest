@@ -185,18 +185,32 @@ namespace OBJExporterUI.Exporters.OBJ
                     {
                         var wmo = reader.adtfile.objects.worldModels.entries[mi];
 
-                        var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
-
-                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                        if (reader.adtfile.objects.wmoNames.filenames == null)
                         {
-                            WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)), wmo.doodadSet);
-                        }
+                            var filedataid = wmo.mwidEntry;
+                            if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), filedataid + ".obj")))
+                            {
+                                WMOExporter.exportWMO(filedataid, null, Path.Combine(outdir, Path.GetDirectoryName(file)), wmo.doodadSet);
+                            }
 
-                        if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                            if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), filedataid + ".obj")))
+                            {
+                                doodadSW.WriteLine(filedataid + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";" + wmo.scale / 1024f + ";" + wmo.uniqueId + ";wmo");
+                            }
+                        }
+                        else
                         {
-                            doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";" + wmo.scale / 1024f + ";" + wmo.uniqueId + ";wmo");
-                        }
+                            var filename = reader.adtfile.objects.wmoNames.filenames[wmo.mwidEntry];
+                            if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                            {
+                                WMOExporter.exportWMO(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)), wmo.doodadSet);
+                            }
 
+                            if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                            {
+                                doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + wmo.position.X + ";" + wmo.position.Y + ";" + wmo.position.Z + ";" + wmo.rotation.X + ";" + wmo.rotation.Y + ";" + wmo.rotation.Z + ";" + wmo.scale / 1024f + ";" + wmo.uniqueId + ";wmo");
+                            }
+                        }
                     }
                 }
 
@@ -208,17 +222,35 @@ namespace OBJExporterUI.Exporters.OBJ
                     {
                         var doodad = reader.adtfile.objects.models.entries[mi];
 
-                        var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
-
-                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                        if (reader.adtfile.objects.wmoNames.filenames == null)
                         {
-                            M2Exporter.ExportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
-                        }
+                            var filedataid = doodad.mmidEntry;
 
-                        if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
-                        {
-                            doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId + ";m2");
+                            if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), filedataid + ".obj")))
+                            {
+                                M2Exporter.ExportM2(filedataid, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                            }
+
+                            if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), filedataid + ".obj")))
+                            {
+                                doodadSW.WriteLine(filedataid + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId + ";m2");
+                            }
                         }
+                        else
+                        {
+                            var filename = reader.adtfile.objects.m2Names.filenames[doodad.mmidEntry];
+
+                            if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                            {
+                                M2Exporter.ExportM2(filename, null, Path.Combine(outdir, Path.GetDirectoryName(file)));
+                            }
+
+                            if (File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                            {
+                                doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId + ";m2");
+                            }
+                        }
+                            
                     }
                 }
 
