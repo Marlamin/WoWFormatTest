@@ -230,32 +230,37 @@ namespace OBJExporterUI
             var basedir = ConfigurationManager.AppSettings["basedir"];
             if (Directory.Exists(basedir))
             {
-                if (File.Exists(Path.Combine(basedir, ".build.info")))
+                cascworker.ReportProgress(0, "Loading WoW from disk..");
+                try
                 {
-                    cascworker.ReportProgress(0, "Loading WoW from disk..");
-                    try
-                    {
-                        CASC.InitCasc(cascworker, basedir, ConfigurationManager.AppSettings["program"]);
-                    }
-                    catch (Exception exception)
-                    {
-                        Logger.WriteLine("CASCWorker: Exception from {0} during CASC startup: {1}", exception.Source, exception.Message);
-                        var result = MessageBox.Show("A fatal error occured during loading your local WoW installation.\n\n"+exception.Message+"\n\nPlease try updating/repairing WoW through the Battle.net App. \n\nIf that doesn't work do the following: \n- Go to your WoW install directory\n- Go inside the data folder\n- Rename the 'indices' folder to 'indices_old'\n- Start WoW to regenerate indices\n- After WoW has started, quit WoW\n\nStill having issues?\nGo to marlam.in/obj and contact me for further help.", "Fatal error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        if(result == MessageBoxResult.OK)
-                        {
-                            Environment.Exit(1);
-                        }
-                    }
+                    CASC.InitCasc(cascworker, basedir, ConfigurationManager.AppSettings["program"]);
                 }
-                else
+                catch (Exception exception)
                 {
-                    throw new Exception("Unable to find World of Warcraft client!");
+                    Logger.WriteLine("CASCWorker: Exception from {0} during CASC startup: {1}", exception.Source, exception.Message);
+                    var result = MessageBox.Show("A fatal error occured during loading your local WoW installation.\n\n"+exception.Message+"\n\nPlease try updating/repairing WoW through the Battle.net App. \n\nIf that doesn't work do the following: \n- Go to your WoW install directory\n- Go inside the data folder\n- Rename the 'indices' folder to 'indices_old'\n- Start WoW to regenerate indices\n- After WoW has started, quit WoW\n\nStill having issues?\nGo to marlam.in/obj and contact me for further help.", "Fatal error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    if(result == MessageBoxResult.OK)
+                    {
+                        Environment.Exit(1);
+                    }
                 }
             }
             else
             {
                 cascworker.ReportProgress(0, "Loading WoW from web..");
-                CASC.InitCasc(cascworker, null, ConfigurationManager.AppSettings["program"]);
+                try
+                {
+                    CASC.InitCasc(cascworker, null, ConfigurationManager.AppSettings["program"]);
+                }
+                catch (Exception exception)
+                {
+                    Logger.WriteLine("CASCWorker: Exception from {0} during CASC startup: {1}", exception.Source, exception.Message);
+                    var result = MessageBox.Show("A fatal error occured during loading the online WoW installation.\n\n" + exception.Message + "\n\nGo to marlam.in/obj and contact me for further help.", "Fatal error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    if (result == MessageBoxResult.OK)
+                    {
+                        Environment.Exit(1);
+                    }
+                }
             }
         }
 
@@ -282,8 +287,6 @@ namespace OBJExporterUI
                 {
                     var wmo = new WoWFormatLib.FileReaders.WMOReader();
                     wmo.LoadWMO(filename);
-
-
                     // Loop through filenames from WMO
                 }
                 else if (filename.EndsWith(".adt"))

@@ -43,6 +43,7 @@ namespace WoWFormatLib.Utils
             }
             else
             {
+                basedir = basedir.Replace("_retail_", "").Replace("_ptr_", "");
                 Console.WriteLine("Initializing CASC from local disk with basedir " + basedir);
                 cascHandler = CASCHandler.OpenLocalStorage(basedir, worker);
             }
