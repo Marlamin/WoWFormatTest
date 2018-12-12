@@ -41,6 +41,7 @@ namespace OBJExporterUI
         private List<string> textures;
 
         private Dictionary<int, NiceMapEntry> mapNames = new Dictionary<int, NiceMapEntry>();
+        public static Dictionary<ulong, string> filenameLookup = new Dictionary<ulong, string>();
         private List<string> mapFilters = new List<string>();
 
         private static ListBox tileBox;
@@ -369,11 +370,13 @@ namespace OBJExporterUI
 
             worker.ReportProgress(50, "Loading listfile from disk..");
 
+            var hasher = new Jenkins96();
             foreach (var line in File.ReadAllLines("listfile.txt"))
             {
                 if (CASC.FileExists(line))
                 {
                     linelist.Add(line.ToLower());
+                    filenameLookup.Add(hasher.ComputeHash(line), line);
                 }
             }
 
@@ -461,62 +464,68 @@ namespace OBJExporterUI
                 }
 
                 Logger.WriteLine("ExportWorker: Exporting {0}..", selectedFile);
-
-                if (selectedFile.EndsWith(".wmo"))
+                try
                 {
-                    if(exportFormat == "OBJ")
+                    if (selectedFile.EndsWith(".wmo"))
                     {
-                        Exporters.OBJ.WMOExporter.exportWMO(selectedFile, exportworker);
-                    }
-                    else if(exportFormat == "glTF")
-                    {
-                        Exporters.glTF.WMOExporter.ExportWMO(selectedFile, exportworker);
-                    }
-                }
-                else if (selectedFile.EndsWith(".m2"))
-                {
-                    if (exportFormat == "OBJ")
-                    {
-                        Exporters.OBJ.M2Exporter.ExportM2(selectedFile, exportworker);
-                    }
-                    else if (exportFormat == "glTF")
-                    {
-                        Exporters.glTF.M2Exporter.ExportM2(selectedFile, exportworker);
-                    }
-                }
-                else if (selectedFile.EndsWith(".adt"))
-                {
-                    if (exportFormat == "OBJ")
-                    {
-                        Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
-                    }
-                    else if (exportFormat == "glTF")
-                    {
-                        Exporters.glTF.ADTExporter.ExportADT(selectedFile, exportworker);
-                    }
-                }
-                else if (selectedFile.EndsWith(".blp"))
-                {
-                    ConfigurationManager.RefreshSection("appSettings");
-                    var outdir = ConfigurationManager.AppSettings["outdir"];
-                    try
-                    {
-                        var blp = new WoWFormatLib.FileReaders.BLPReader();
-                        blp.LoadBLP(selectedFile);
-
-                        var bmp = blp.bmp;
-
-                        if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(selectedFile))))
+                        if (exportFormat == "OBJ")
                         {
-                            Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(selectedFile)));
+                            Exporters.OBJ.WMOExporter.exportWMO(selectedFile, exportworker);
                         }
-
-                        bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(selectedFile), Path.GetFileNameWithoutExtension(selectedFile)) + ".png");
+                        else if (exportFormat == "glTF")
+                        {
+                            Exporters.glTF.WMOExporter.ExportWMO(selectedFile, exportworker);
+                        }
                     }
-                    catch (Exception blpException)
+                    else if (selectedFile.EndsWith(".m2"))
                     {
-                        Console.WriteLine(blpException.Message);
+                        if (exportFormat == "OBJ")
+                        {
+                            Exporters.OBJ.M2Exporter.ExportM2(selectedFile, exportworker);
+                        }
+                        else if (exportFormat == "glTF")
+                        {
+                            Exporters.glTF.M2Exporter.ExportM2(selectedFile, exportworker);
+                        }
                     }
+                    else if (selectedFile.EndsWith(".adt"))
+                    {
+                        if (exportFormat == "OBJ")
+                        {
+                            Exporters.OBJ.ADTExporter.exportADT(selectedFile, exportworker);
+                        }
+                        else if (exportFormat == "glTF")
+                        {
+                            Exporters.glTF.ADTExporter.ExportADT(selectedFile, exportworker);
+                        }
+                    }
+                    else if (selectedFile.EndsWith(".blp"))
+                    {
+                        ConfigurationManager.RefreshSection("appSettings");
+                        var outdir = ConfigurationManager.AppSettings["outdir"];
+                        try
+                        {
+                            var blp = new WoWFormatLib.FileReaders.BLPReader();
+                            blp.LoadBLP(selectedFile);
+
+                            var bmp = blp.bmp;
+
+                            if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(selectedFile))))
+                            {
+                                Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(selectedFile)));
+                            }
+
+                            bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(selectedFile), Path.GetFileNameWithoutExtension(selectedFile)) + ".png");
+                        }
+                        catch (Exception blpException)
+                        {
+                            Console.WriteLine(blpException.Message);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine("ExportWorker: Exception occured in " + ex.Source + " " + ex.Message + " " + ex.StackTrace);
                 }
             }
         }

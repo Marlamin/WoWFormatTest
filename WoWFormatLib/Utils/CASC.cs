@@ -55,6 +55,12 @@ namespace WoWFormatLib.Utils
             IsCASCInit = true;
         }
 
+        public static ulong getHashByFileDataID(uint filedataid)
+        {
+            var wowRoot = cascHandler.Root as WowRootHandler;
+            return wowRoot.GetHashByFileDataId((int)filedataid);
+        }
+
         public static uint getFileDataIdByName(string filename)
         {
             if (usingLocalAPI)
