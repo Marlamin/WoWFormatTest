@@ -194,7 +194,7 @@ namespace OBJExporterUI.Exporters.OBJ
                     case 2:
                     case 11:
                     default:
-                        Console.WriteLine("      Falling back to placeholder texture");
+                        Console.WriteLine("Texture type " + reader.model.textures[i].type + " not supported, falling back to placeholder texture");
                         break;
                 }
 
@@ -233,7 +233,7 @@ namespace OBJExporterUI.Exporters.OBJ
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    CASCLib.Logger.WriteLine("Exception while saving BLP " + materials[i].filename + ": " + e.Message);
                 }
             }
 

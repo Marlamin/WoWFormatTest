@@ -53,6 +53,15 @@ namespace OBJExporterUI
                 ADTExportTab.IsEnabled = true;
                 WMOExportTab.IsEnabled = true;
                 M2ExportTab.IsEnabled = true;
+
+                if (string.IsNullOrWhiteSpace(config.AppSettings.Settings["textureMetadata"].Value) || config.AppSettings.Settings["textureMetadata"].Value == "False")
+                {
+                    textureMetadata.IsChecked = false;
+                }
+                else
+                {
+                    textureMetadata.IsChecked = true;
+                }
             }
             else
             {
@@ -233,6 +242,15 @@ namespace OBJExporterUI
             else
             {
                 config.AppSettings.Settings["exportFormat"].Value = "glTF";
+            }
+
+            if ((bool)textureMetadata.IsChecked)
+            {
+                config.AppSettings.Settings["textureMetadata"].Value = "True";
+            }
+            else
+            {
+                config.AppSettings.Settings["textureMetadata"].Value = "False";
             }
 
             if (!error)

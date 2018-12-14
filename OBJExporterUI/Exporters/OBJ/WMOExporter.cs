@@ -343,9 +343,13 @@ namespace OBJExporterUI.Exporters.OBJ
                 {
                     mtlsb.Append("map_d " + material.filename + ".png\n");
                 }
-                //mtlsb.Append("blend " + material.blendMode + "\n");
-                //mtlsb.Append("shader " + material.shaderID + "\n");
-                //mtlsb.Append("terrain " + material.terrainType + "\n");
+
+                if(ConfigurationManager.AppSettings["textureMetadata"] == "True")
+                {
+                    mtlsb.Append("blend " + material.blendMode + "\n");
+                    mtlsb.Append("shader " + material.shaderID + "\n");
+                    mtlsb.Append("terrain " + material.terrainType + "\n");
+                }
             }
 
             if (!string.IsNullOrEmpty(filename))
