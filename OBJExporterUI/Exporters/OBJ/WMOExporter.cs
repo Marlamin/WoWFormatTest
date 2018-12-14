@@ -243,83 +243,29 @@ namespace OBJExporterUI.Exporters.OBJ
 
             if (wmo.materials == null)
             {
-                Console.WriteLine("Materials empty");
+                CASCLib.Logger.WriteLine("Unable to find materials for WMO " + filedataid + ", not exporting!");
                 return;
             }
 
             var materials = new Structs.Material[wmo.materials.Count()];
+
             for (var i = 0; i < wmo.materials.Count(); i++)
             {
-                if(wmo.textures == null)
+                var blpreader = new BLPReader();
+
+                if (wmo.textures == null)
                 {
-                    materials[i].textureID = textureID + i;
-                    materials[i].filename = wmo.materials[i].texture1.ToString();
-
-                    if (wmo.materials[i].blendMode == 0)
+                    var lookup = WoWFormatLib.Utils.CASC.getHashByFileDataID(wmo.materials[i].texture1);
+                    if(MainWindow.filenameLookup.TryGetValue(lookup, out var textureFilename))
                     {
-                        materials[i].transparent = false;
+                        materials[i].filename = Path.GetFileNameWithoutExtension(textureFilename);
                     }
                     else
                     {
-                        materials[i].transparent = true;
+                        materials[i].filename = wmo.materials[i].texture1.ToString();
                     }
 
-                    materials[i].blendMode = wmo.materials[i].blendMode;
-                    materials[i].shaderID = wmo.materials[i].shader;
-                    materials[i].terrainType = wmo.materials[i].groundType;
-
-                    if (!string.IsNullOrEmpty(filename))
-                    {
-                        if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(filename), materials[i].filename + ".png")))
-                        {
-                            var blpreader = new BLPReader();
-
-                            blpreader.LoadBLP(wmo.materials[i].texture1);
-
-                            try
-                            {
-                                if (destinationOverride == null)
-                                {
-                                    blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(filename), materials[i].filename + ".png"));
-                                }
-                                else
-                                {
-                                    blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (!File.Exists(Path.Combine(outdir, materials[i].filename + ".png")))
-                        {
-                            var blpreader = new BLPReader();
-
-                            blpreader.LoadBLP(wmo.materials[i].texture1);
-
-                            try
-                            {
-                                if (destinationOverride == null)
-                                {
-                                    blpreader.bmp.Save(Path.Combine(outdir, materials[i].filename + ".png"));
-                                }
-                                else
-                                {
-                                    blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.Message);
-                            }
-                        }
-                    }
-
-                    textureID++;
+                    blpreader.LoadBLP(wmo.materials[i].texture1);
                 }
                 else
                 {
@@ -327,73 +273,58 @@ namespace OBJExporterUI.Exporters.OBJ
                     {
                         if (wmo.textures[ti].startOffset == wmo.materials[i].texture1)
                         {
-                            materials[i].textureID = textureID + i;
                             materials[i].filename = Path.GetFileNameWithoutExtension(wmo.textures[ti].filename);
-
-                            if (wmo.materials[i].blendMode == 0)
-                            {
-                                materials[i].transparent = false;
-                            }
-                            else
-                            {
-                                materials[i].transparent = true;
-                            }
-
-                            if(!string.IsNullOrEmpty(filename))
-                            {
-                                if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(filename), materials[i].filename + ".png")))
-                                {
-                                    var blpreader = new BLPReader();
-
-                                    blpreader.LoadBLP(wmo.textures[ti].filename);
-
-                                    try
-                                    {
-                                        if (destinationOverride == null)
-                                        {
-                                            blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(filename), materials[i].filename + ".png"));
-                                        }
-                                        else
-                                        {
-                                            blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Console.WriteLine(e.Message);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (!File.Exists(Path.Combine(outdir, materials[i].filename + ".png")))
-                                {
-                                    var blpreader = new BLPReader();
-
-                                    blpreader.LoadBLP(wmo.textures[ti].filename);
-
-                                    try
-                                    {
-                                        if (destinationOverride == null)
-                                        {
-                                            blpreader.bmp.Save(Path.Combine(outdir, materials[i].filename + ".png"));
-                                        }
-                                        else
-                                        {
-                                            blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, materials[i].filename.ToLower() + ".png"));
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Console.WriteLine(e.Message);
-                                    }
-                                }
-                            }
-
-                            textureID++;
+                            blpreader.LoadBLP(wmo.textures[ti].filename);
                         }
                     }
                 }
+
+                materials[i].textureID = textureID + i;
+
+                if (wmo.materials[i].blendMode == 0)
+                {
+                    materials[i].transparent = false;
+                }
+                else
+                {
+                    materials[i].transparent = true;
+                }
+
+                materials[i].blendMode = wmo.materials[i].blendMode;
+                materials[i].shaderID = wmo.materials[i].shader;
+                materials[i].terrainType = wmo.materials[i].groundType;
+
+                var saveLocation = "";
+
+                if (destinationOverride == null)
+                {
+                    if (!string.IsNullOrEmpty(filename))
+                    {
+                        saveLocation = Path.Combine(outdir, Path.GetDirectoryName(filename), materials[i].filename + ".png");
+                    }
+                    else
+                    {
+                        saveLocation = Path.Combine(outdir, materials[i].filename + ".png");
+                    }
+                }
+                else
+                {
+                    saveLocation = Path.Combine(outdir, destinationOverride, materials[i].filename + ".png");
+                }
+
+                if (!File.Exists(saveLocation))
+                {
+                    try
+                    {
+                        blpreader.bmp.Save(saveLocation);
+                    }
+                    catch (Exception e)
+                    {
+                        CASCLib.Logger.WriteLine("Exception while saving BLP " + materials[i].filename + ": " + e.Message);
+                    }
+                }
+
+                textureID++;
             }
 
             //No idea how MTL files really work yet. Needs more investigation.

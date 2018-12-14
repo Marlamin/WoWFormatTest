@@ -44,8 +44,9 @@ BLPBatchConverter
 CASCBot
 CASCDump
 CASCBuilder
-EncodingDump
 DBCtest
+EncodingDump
+FileLinker
 HotfixReader
 HotfixUpdater
 InstallDump
