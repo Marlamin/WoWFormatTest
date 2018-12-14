@@ -184,7 +184,6 @@ namespace OBJExporterUI.Exporters.OBJ
                 switch (reader.model.textures[i].type)
                 {
                     case 0:
-                        //Console.WriteLine("      Texture given in file!");
                         textureFileDataID = CASC.getFileDataIdByName(reader.model.textures[i].filename);
                         if(textureFileDataID == 372993)
                         {
@@ -194,41 +193,43 @@ namespace OBJExporterUI.Exporters.OBJ
                     case 1:
                     case 2:
                     case 11:
-                        var cdifilenames = WoWFormatLib.DBC.DBCHelper.getTexturesByModelFilename(fileDataID, (int)reader.model.textures[i].type);
-                        for (var ti = 0; ti < cdifilenames.Count(); ti++)
-                        {
-                            textureFileDataID = cdifilenames[0];
-                        }
-                        break;
                     default:
                         Console.WriteLine("      Falling back to placeholder texture");
                         break;
                 }
 
                 materials[i].textureID = textureID + i;
-                materials[i].filename = textureFileDataID.ToString();
 
-                var blpreader = new BLPReader();
-
-                blpreader.LoadBLP(textureFileDataID);
-
-                try
+                if(!MainWindow.filenameLookup.TryGetValue(CASC.getHashByFileDataID(textureFileDataID), out var textureFilename))
                 {
-                    if (destinationOverride == null)
+                    textureFilename = textureFileDataID.ToString();
+                }
+
+                materials[i].filename = Path.GetFileNameWithoutExtension(textureFilename);
+
+                var textureSaveLocation = "";
+
+                if (destinationOverride == null)
+                {
+                    if (!string.IsNullOrEmpty(filename))
                     {
-                        if (!string.IsNullOrEmpty(filename))
-                        {
-                            blpreader.bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(filename), "tex_" + materials[i].filename + ".png"));
-                        }
-                        else
-                        {
-                            blpreader.bmp.Save(Path.Combine(outdir, "tex_" + materials[i].filename + ".png"));
-                        }
+                        textureSaveLocation = Path.Combine(outdir, Path.GetDirectoryName(filename), materials[i].filename + ".png");
                     }
                     else
                     {
-                        blpreader.bmp.Save(Path.Combine(outdir, destinationOverride, "tex_" + materials[i].filename.ToLower() + ".png"));
+                        textureSaveLocation = Path.Combine(outdir, materials[i].filename + ".png");
                     }
+                }
+                else
+                {
+                    textureSaveLocation = Path.Combine(outdir, destinationOverride,  materials[i].filename + ".png");
+                }
+
+                try
+                {
+                    var blpreader = new BLPReader();
+                    blpreader.LoadBLP(textureFileDataID);
+                    blpreader.bmp.Save(textureSaveLocation);
                 }
                 catch (Exception e)
                 {
@@ -240,10 +241,10 @@ namespace OBJExporterUI.Exporters.OBJ
 
             foreach (var material in materials)
             {
-                mtlsb.WriteLine("newmtl " + "tex_" + material.filename);
+                mtlsb.WriteLine("newmtl " + material.filename);
                 mtlsb.WriteLine("illum 2");
-                mtlsb.WriteLine("map_Ka " + "tex_" + material.filename + ".png");
-                mtlsb.WriteLine("map_Kd " + "tex_" + material.filename + ".png");
+                mtlsb.WriteLine("map_Ka " + material.filename + ".png");
+                mtlsb.WriteLine("map_Kd " + material.filename + ".png");
             }
 
             mtlsb.Close();
@@ -269,7 +270,7 @@ namespace OBJExporterUI.Exporters.OBJ
                     objsw.WriteLine("g " + fileDataID.ToString() + renderbatch.groupID.ToString());
                 }
 
-                objsw.WriteLine("usemtl tex_" + materials[renderbatch.materialID].filename);
+                objsw.WriteLine("usemtl " + materials[renderbatch.materialID].filename);
                 objsw.WriteLine("s 1");
                 while (i < (renderbatch.firstFace + renderbatch.numFaces))
                 {
