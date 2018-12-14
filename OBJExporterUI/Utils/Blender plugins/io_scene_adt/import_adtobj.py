@@ -148,18 +148,18 @@ def load(context,
 
                                     # Duplicate material removal script by Kruithne
                                     # Merge all duplicate materials
-                                    for obj in bpy.context.scene.objects:
-                                        if obj.type == 'MESH':
-                                            i = 0
-                                            for mat_slot in obj.material_slots:
-                                                mat = mat_slot.material
-                                                obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
-                                                i += 1
+                                    # for obj in bpy.context.scene.objects:
+                                    #     if obj.type == 'MESH':
+                                    #         i = 0
+                                    #         for mat_slot in obj.material_slots:
+                                    #             mat = mat_slot.material
+                                    #             obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
+                                    #             i += 1
 
-                                    # Cleanup unused materials
-                                    for img in bpy.data.images:
-                                        if not img.users:
-                                            bpy.data.images.remove(img)
+                                    # # Cleanup unused materials
+                                    # for img in bpy.data.images:
+                                    #     if not img.users:
+                                    #         bpy.data.images.remove(img)
                 else:
                     if(os.path.exists(newpath)):
                         bpy.ops.import_scene.obj(filepath=newpath)
