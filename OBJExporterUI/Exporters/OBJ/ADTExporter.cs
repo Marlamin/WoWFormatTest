@@ -253,6 +253,73 @@ namespace OBJExporterUI.Exporters.OBJ
                             doodadSW.WriteLine(Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj;" + doodad.position.X + ";" + doodad.position.Y + ";" + doodad.position.Z + ";" + doodad.rotation.X + ";" + doodad.rotation.Y + ";" + doodad.rotation.Z + ";" + doodad.scale / 1024f + ";" + doodad.uniqueId + ";m2");
                         }
                     }
+
+                    exportworker.ReportProgress(65, "Exporting foliage");
+
+                    try
+                    {
+                        if (!File.Exists("definitions/GroundEffectTexture.dbd") || !File.Exists("definitions/GroundEffectDoodad.dbd"))
+                        {
+                            MainWindow.UpdateDefinition("GroundEffectTexture");
+                            MainWindow.UpdateDefinition("GroundEffectDoodad");
+                            DefinitionManager.LoadDefinitions();
+                        }
+
+                        var build = WoWFormatLib.Utils.CASC.BuildName;
+                        var groundEffectTextureDB = DBCManager.LoadDBC("GroundEffectTexture", build, true);
+                        var groundEffectDoodadDB = DBCManager.LoadDBC("GroundEffectDoodad", build, true);
+
+                        for (var c = 0; c < reader.adtfile.texChunks.Length; c++)
+                        {
+                            for (var l = 0; l < reader.adtfile.texChunks[c].layers.Length; l++)
+                            {
+                                var effectID = reader.adtfile.texChunks[c].layers[l].effectId;
+                                if (effectID == 0)
+                                    continue;
+
+                                if (!groundEffectTextureDB.Contains(effectID))
+                                {
+                                    Console.WriteLine("Could not find groundEffectTexture entry " + reader.adtfile.texChunks[c].layers[l].effectId);
+                                    continue;
+                                }
+
+                                dynamic textureEntry = groundEffectTextureDB[effectID];
+                                foreach (int doodad in textureEntry.DoodadID)
+                                {
+                                    if (!groundEffectDoodadDB.Contains(doodad))
+                                    {
+                                        Console.WriteLine("Could not find groundEffectDoodad entry " + doodad);
+                                        continue;
+                                    }
+
+                                    dynamic doodadEntry = groundEffectDoodadDB[doodad];
+
+                                    var filedataid = (uint)doodadEntry.ModelFileID;
+
+                                    var lookup = WoWFormatLib.Utils.CASC.getHashByFileDataID(filedataid);
+                                    MainWindow.filenameLookup.TryGetValue(lookup, out var filename);
+
+                                    if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), "foliage")))
+                                    {
+                                        Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(file), "foliage"));
+                                    }
+
+                                    if (!File.Exists(Path.Combine(outdir, Path.GetDirectoryName(file), "foliage", Path.GetFileNameWithoutExtension(filename).ToLower() + ".obj")))
+                                    {
+                                        M2Exporter.ExportM2(filedataid, null, Path.Combine(outdir, Path.GetDirectoryName(file), "foliage"), filename);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+#if DEBUG
+                        throw e;
+#else
+                        Logger.WriteLine("An error occured while exporting foliage: " + e.Message);
+#endif
+                    }
                 }
 
                 doodadSW.Close();

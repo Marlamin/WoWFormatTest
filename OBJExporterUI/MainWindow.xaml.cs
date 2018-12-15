@@ -919,19 +919,21 @@ namespace OBJExporterUI
         }
 
         /* Utilities */
-        private void UpdateDefinition(string name)
+        public static void UpdateDefinition(string name)
         {
             using (var client = new WebClient())
             using (var stream = new MemoryStream())
             {
                 client.Headers[HttpRequestHeader.AcceptEncoding] = "gzip";
-                var responseStream = new GZipStream(client.OpenRead("https://raw.githubusercontent.com/wowdev/WoWDBDefs/master/definitions/Map.dbd"), CompressionMode.Decompress);
+                var responseStream = new GZipStream(client.OpenRead("https://raw.githubusercontent.com/wowdev/WoWDBDefs/master/definitions/" + name + ".dbd"), CompressionMode.Decompress);
+
                 responseStream.CopyTo(stream);
                 if (!Directory.Exists("definitions"))
                 {
                     Directory.CreateDirectory("definitions");
                 }
-                File.WriteAllBytes("definitions/Map.dbd", stream.ToArray());
+
+                File.WriteAllBytes("definitions/" + name + ".dbd", stream.ToArray());
                 responseStream.Close();
                 responseStream.Dispose();
             }
