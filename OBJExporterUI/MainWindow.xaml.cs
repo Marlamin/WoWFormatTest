@@ -1006,6 +1006,7 @@ namespace OBJExporterUI
                     var mapDirectory = entry.Directory;
                     var mapName = entry.MapName_lang;
                     var mapExpansionID = entry.ExpansionID;
+                    var mapType = entry.MapType;
 
                     if (CASC.FileExists("World/Maps/" + mapDirectory + "/" + mapDirectory + ".wdt"))
                     {
@@ -1026,7 +1027,27 @@ namespace OBJExporterUI
                         else
                         {
                             mapItem.Name = mapName;
-                            mapItem.Type = "Unknown";
+                            switch ((int)mapType)
+                            {
+                                case 0:
+                                    mapItem.Type = "Normal";
+                                    break;
+                                case 1:
+                                    mapItem.Type = "Instance";
+                                    break;
+                                case 2:
+                                    mapItem.Type = "Raid";
+                                    break;
+                                case 3:
+                                    mapItem.Type = "PvP";
+                                    break;
+                                case 4:
+                                    mapItem.Type = "Arena";
+                                    break;
+                                default:
+                                    mapItem.Type = "Unknown (" + mapType + ")";
+                                    break;
+                            }
                             mapItem.Image = "pack://application:,,,/Resources/wow" + (mapExpansionID + 1) + ".png";
                         }
 
