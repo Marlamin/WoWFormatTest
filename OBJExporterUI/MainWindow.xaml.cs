@@ -370,13 +370,20 @@ namespace OBJExporterUI
 
             worker.ReportProgress(50, "Loading listfile from disk..");
 
+            var generateLookup = true;
+
+            if(filenameLookup.Count > 0)
+            {
+                generateLookup = false;
+            }
+
             var hasher = new Jenkins96();
             foreach (var line in File.ReadAllLines("listfile.txt"))
             {
                 if (CASC.FileExists(line))
                 {
                     linelist.Add(line.ToLower());
-                    filenameLookup.Add(hasher.ComputeHash(line), line);
+                    if(generateLookup) filenameLookup.Add(hasher.ComputeHash(line), line);
                 }
             }
 
