@@ -477,9 +477,14 @@ namespace WoWFormatLib.FileReaders
                         case WMOChunks.MOLS: // MOLS Spot Lights
                         case WMOChunks.MOPB: // MOPB Prepass Batches
                         case WMOChunks.MLSP: // ?
+                        case WMOChunks.MLSS: // ?
                             continue;
                         default:
+#if DEBUG
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName.ToString("X"), position.ToString()));
+#else
+                            CASCLib.Logger.WriteLine("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName.ToString("X"), position.ToString());
+#endif
                     }
                 }
             }

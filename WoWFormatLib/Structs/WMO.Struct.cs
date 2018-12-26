@@ -50,6 +50,7 @@ namespace WoWFormatLib.Structs.WMO
         MOPB = 'M' << 24 | 'O' << 16 | 'P' << 8 | 'B' << 0,
         MLSP = 'M' << 24 | 'L' << 16 | 'S' << 8 | 'P' << 0,
         MODI = 'M' << 24 | 'O' << 16 | 'D' << 8 | 'I' << 0,
+        MLSS = 'M' << 24 | 'L' << 16 | 'S' << 8 | 'S' << 0,
     }
 
     public struct WMO
