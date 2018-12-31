@@ -15,7 +15,7 @@ using System.IO.Compression;
 using Microsoft.VisualBasic.FileIO;
 using System.Windows.Media;
 using DBDefsLib;
-using CascStorageLib;
+using DB2FileReaderLib.NET;
 
 namespace OBJExporterUI
 {
