@@ -141,7 +141,7 @@ namespace OBJExporterUI.Exporters.OBJ
 
                 if (doodadSetExportID != ushort.MaxValue)
                 {
-                    if (i != doodadSetExportID)
+                    if (i != 0 && i != doodadSetExportID)
                     {
                         Console.WriteLine("Skipping doodadset with ID " + i + " (" + currentDoodadSetName + ") because export filter is set to " + doodadSetExportID);
                         continue;
