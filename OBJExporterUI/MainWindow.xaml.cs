@@ -961,14 +961,21 @@ namespace OBJExporterUI
         }
         private void UpdateMapList()
         {
-            using (var client = new WebClient())
-            using (var stream = new MemoryStream())
+            try
             {
-                var responseStream = client.OpenRead("https://docs.google.com/spreadsheets/d/1yYSHjWTX0l751QscolQpFNWjwdKLbD_rzviZ_XqTPfk/export?exportFormat=csv&gid=0");
-                responseStream.CopyTo(stream);
-                File.WriteAllBytes("mapnames.csv", stream.ToArray());
-                responseStream.Close();
-                responseStream.Dispose();
+                using (var client = new WebClient())
+                using (var stream = new MemoryStream())
+                {
+                    var responseStream = client.OpenRead("https://docs.google.com/spreadsheets/d/1yYSHjWTX0l751QscolQpFNWjwdKLbD_rzviZ_XqTPfk/export?exportFormat=csv&gid=0");
+                    responseStream.CopyTo(stream);
+                    File.WriteAllBytes("mapnames.csv", stream.ToArray());
+                    responseStream.Close();
+                    responseStream.Dispose();
+                }
+            }
+            catch(Exception e)
+            {
+                Logger.WriteLine("Unable to download map names csv: " + e.Message);
             }
         }
         private void UpdateMapListView()
