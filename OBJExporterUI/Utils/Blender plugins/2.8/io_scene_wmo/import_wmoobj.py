@@ -30,90 +30,83 @@ import string
 from bpy_extras.io_utils import unpack_list
 from bpy_extras.image_utils import load_image
 
-from progress_report import ProgressReport, ProgressReportSubstep
-
 def load(context,
          filepath
          ):
 
-    with ProgressReport(context.window_manager) as progress:
-        progress.enter_substeps(1, "Importing WMO OBJ %r..." % filepath)
+    csvpath = filepath.replace('.obj', '_ModelPlacementInformation.csv')
 
-        csvpath = filepath.replace('.obj', '_ModelPlacementInformation.csv')
+    bpy.ops.import_scene.obj(filepath=filepath)
 
-        bpy.ops.import_scene.obj(filepath=filepath)
+    # Duplicate material removal script by Kruithne
+    # Merge all duplicate materials
+    for obj in bpy.context.scene.objects:
+        if obj.type == 'MESH':
+            i = 0
+            for mat_slot in obj.material_slots:
+                mat = mat_slot.material
+                obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
+                i += 1
 
-        # Duplicate material removal script by Kruithne
-        # Merge all duplicate materials
-        for obj in bpy.context.scene.objects:
-            if obj.type == 'MESH':
-                i = 0
-                for mat_slot in obj.material_slots:
-                    mat = mat_slot.material
-                    obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
-                    i += 1
+    # Cleanup unused materials
+    for img in bpy.data.images:
+        if not img.users:
+            bpy.data.images.remove(img)
 
-        # Cleanup unused materials
-        for img in bpy.data.images:
-            if not img.users:
-                bpy.data.images.remove(img)
+    # Select the imported WMO
+    obj_objects = bpy.context.selected_objects[:]
 
-        # Select the imported WMO
-        obj_objects = bpy.context.selected_objects[:]
+    for obj in obj_objects:
+        obj.rotation_euler = [0, 0, 0]
+        obj.rotation_euler.x += radians(90)
+        obj.rotation_euler.z -= radians(90)
 
-        for obj in obj_objects:
-            obj.rotation_euler = [0, 0, 0]
-            obj.rotation_euler.x += radians(90)
-            obj.rotation_euler.z -= radians(90)
+    # Read doodad definitions file
+    with open(csvpath) as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        for row in reader:
+            doodad_path, doodad_filename = os.path.split(filepath)
+            newpath = os.path.join(doodad_path, row['ModelFile'])
 
-        # Read doodad definitions file
-        with open(csvpath) as csvfile:
-            reader = csv.DictReader(csvfile, delimiter=';')
-            for row in reader:
-                doodad_path, doodad_filename = os.path.split(filepath)
-                newpath = os.path.join(doodad_path, row['ModelFile'])
+            # Import the doodad
+            bpy.ops.import_scene.obj(filepath=newpath)
 
-                # Import the doodad
-                bpy.ops.import_scene.obj(filepath=newpath)
+            # Select the imported doodad
+            obj_objects = bpy.context.selected_objects[:]
+            for obj in obj_objects:
+                # Print object name
+                # print (obj.name)
 
-                # Select the imported doodad
-                obj_objects = bpy.context.selected_objects[:]
-                for obj in obj_objects:
-                    # Print object name
-                    # print (obj.name)
+                # Prepend name
+                obj.name = "(" + row['DoodadSet'] + ") " + obj.name
 
-                    # Prepend name
-                    obj.name = "(" + row['DoodadSet'] + ") " + obj.name
+                # Set position
+                obj.location = (float(row['PositionY']) * -1, float(row['PositionX']), float(row['PositionZ']))
 
-                    # Set position
-                    obj.location = (float(row['PositionY']) * -1, float(row['PositionX']), float(row['PositionZ']))
+                # Set rotation
+                rotQuat = Quaternion((float(row['RotationW']), float(row['RotationX']), float(row['RotationY']), float(row['RotationZ'])))
+                rotEul = rotQuat.to_euler()
+                rotEul.x += radians(90);
+                rotEul.z += radians(90);
+                obj.rotation_euler = rotEul
 
-                    # Set rotation
-                    rotQuat = Quaternion((float(row['RotationW']), float(row['RotationX']), float(row['RotationY']), float(row['RotationZ'])))
-                    rotEul = rotQuat.to_euler()
-                    rotEul.x += radians(90);
-                    rotEul.z += radians(90);
-                    obj.rotation_euler = rotEul
+                # Set scale
+                if row['ScaleFactor']:
+                    obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
 
-                    # Set scale
-                    if row['ScaleFactor']:
-                        obj.scale = (float(row['ScaleFactor']), float(row['ScaleFactor']), float(row['ScaleFactor']))
+    # Duplicate material removal script by Kruithne
+    # Merge all duplicate materials
+    for obj in bpy.context.scene.objects:
+        if obj.type == 'MESH':
+            i = 0
+            for mat_slot in obj.material_slots:
+                mat = mat_slot.material
+                obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
+                i += 1
 
-        # Duplicate material removal script by Kruithne
-        # Merge all duplicate materials
-        for obj in bpy.context.scene.objects:
-            if obj.type == 'MESH':
-                i = 0
-                for mat_slot in obj.material_slots:
-                    mat = mat_slot.material
-                    obj.material_slots[i].material = bpy.data.materials[mat.name.split('.')[0]]
-                    i += 1
-
-        # Cleanup unused materials
-        for img in bpy.data.images:
-            if not img.users:
-                bpy.data.images.remove(img)
-
-        progress.leave_substeps("Finished importing: %r" % filepath)
+    # Cleanup unused materials
+    for img in bpy.data.images:
+        if not img.users:
+            bpy.data.images.remove(img)
 
     return {'FINISHED'}
