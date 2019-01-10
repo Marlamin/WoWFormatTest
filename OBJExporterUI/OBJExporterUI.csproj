@@ -159,16 +159,28 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Resource Include="Resources\wow8.png" />
-    <Content Include="Utils\Blender plugins\io_scene_adt\import_adtobj.py">
+    <Content Include="Utils\Blender plugins\2.7\io_scene_adt\import_adtobj.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Utils\Blender plugins\io_scene_adt\__init__.py">
+    <Content Include="Utils\Blender plugins\2.7\io_scene_adt\__init__.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Utils\Blender plugins\io_scene_wmo\import_wmoobj.py">
+    <Content Include="Utils\Blender plugins\2.7\io_scene_wmo\import_wmoobj.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Utils\Blender plugins\io_scene_wmo\__init__.py">
+    <Content Include="Utils\Blender plugins\2.7\io_scene_wmo\__init__.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Blender plugins\2.8\io_scene_adt\import_adtobj.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Blender plugins\2.8\io_scene_adt\__init__.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Blender plugins\2.8\io_scene_wmo\import_wmoobj.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Blender plugins\2.8\io_scene_wmo\__init__.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Utils\Blender plugins\readme.txt">
