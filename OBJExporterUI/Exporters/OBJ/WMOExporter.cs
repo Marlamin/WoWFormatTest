@@ -337,7 +337,7 @@ namespace OBJExporterUI.Exporters.OBJ
                 mtlsb.Append("Ke 0.000000 0.000000 0.000000\n");
                 mtlsb.Append("Ni 1.000000\n");
                 mtlsb.Append("d 1.000000\n");
-                mtlsb.Append("illum 2\n");
+                mtlsb.Append("illum 1\n");
                 mtlsb.Append("map_Kd " + material.filename + ".png\n");
                 if (material.transparent)
                 {

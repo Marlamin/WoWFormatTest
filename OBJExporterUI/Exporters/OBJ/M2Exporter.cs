@@ -242,8 +242,8 @@ namespace OBJExporterUI.Exporters.OBJ
             foreach (var material in materials)
             {
                 mtlsb.WriteLine("newmtl " + material.filename);
-                mtlsb.WriteLine("illum 2");
-                mtlsb.WriteLine("map_Ka " + material.filename + ".png");
+                mtlsb.WriteLine("illum 1");
+                //mtlsb.WriteLine("map_Ka " + material.filename + ".png");
                 mtlsb.WriteLine("map_Kd " + material.filename + ".png");
             }
 
