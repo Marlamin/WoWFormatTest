@@ -213,7 +213,10 @@ namespace WoWFormatLib.SereniaBLPLib
                 {
                     // decompress the block
                     int targetRGBA_pos = 0;
-                    if (data.Length == sourceBlock_pos) continue;
+
+                    if (data.Length == sourceBlock_pos)
+                        continue;
+
                     Decompress(targetRGBA, data, sourceBlock_pos, flags);
 
                     // Write the decompressed pixels to the correct image locations

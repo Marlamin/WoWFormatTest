@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace WoWFormatLib.SereniaBLPLib
 {
@@ -39,9 +40,9 @@ namespace WoWFormatLib.SereniaBLPLib
         /// This will also work vice versa
         /// </summary>
         /// <param name="pixel"></param>
-        public static void convertToBGRA(byte[] pixel)
+        public static void ConvertToBGRA(byte[] pixel)
         {
-            byte tmp;
+            byte tmp = 0;
             for (int i = 0; i < pixel.Length; i += 4)
             {
                 tmp = pixel[i]; // store red
@@ -53,19 +54,19 @@ namespace WoWFormatLib.SereniaBLPLib
 
     public sealed class BlpFile : IDisposable
     {
-        //uint type; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
-        public byte encoding; // 1 = Uncompressed, 2 = DirectX Compressed
-        public byte alphaDepth; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
-        public byte alphaEncoding; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
-        public byte hasMipmaps; // If true (1), then there are Mipmaps
-        public int width; // X Resolution of the biggest Mipmap
-        public int height; // Y Resolution of the biggest Mipmap
+        private readonly uint formatVersion; // compression: 0 = JPEG Compression, 1 = Uncompressed or DirectX Compression
+        private readonly byte colorEncoding; // 1 = Uncompressed, 2 = DirectX Compressed
+        private readonly byte alphaDepth; // 0 = no alpha, 1 = 1 Bit, 4 = Bit (only DXT3), 8 = 8 Bit Alpha
+        private readonly byte alphaEncoding; // 0: DXT1 alpha (0 or 1 Bit alpha), 1 = DXT2/3 alpha (4 Bit), 7: DXT4/5 (interpolated alpha)
+        private readonly byte hasMipmaps; // If true (1), then there are Mipmaps
+        private readonly int width; // X Resolution of the biggest Mipmap
+        private readonly int height; // Y Resolution of the biggest Mipmap
 
-        public uint[] mipmapOffsets = new uint[16]; // Offset for every Mipmap level. If 0 = no more mitmap level
-        public uint[] mippmapSize = new uint[16]; // Size for every level
-        ARGBColor8[] paletteBGRA = new ARGBColor8[256]; // The color-palette for non-compressed pictures
+        private readonly uint[] mipmapOffsets = new uint[16]; // Offset for every Mipmap level. If 0 = no more mitmap level
+        private readonly uint[] mipMapSize = new uint[16]; // Size for every level
+        private readonly ARGBColor8[] paletteBGRA = new ARGBColor8[256]; // The color-palette for non-compressed pictures
 
-        Stream str; // Reference of the stream
+        private Stream str; // Reference of the stream
 
         /// <summary>
         /// Extracts the palettized Image-Data from the given Mipmap and returns a byte-Array in the 32Bit RGBA-Format
@@ -115,11 +116,11 @@ namespace WoWFormatLib.SereniaBLPLib
         /// </summary>
         /// <param name="mipmapLevel"></param>
         /// <returns></returns>
-        public byte[] GetPictureData(int mipmapLevel)
+        private byte[] GetPictureData(int mipmapLevel)
         {
             if (str != null)
             {
-                byte[] data = new byte[mippmapSize[mipmapLevel]];
+                byte[] data = new byte[mipMapSize[mipmapLevel]];
                 str.Position = mipmapOffsets[mipmapLevel];
                 str.Read(data, 0, data.Length);
                 return data;
@@ -143,61 +144,49 @@ namespace WoWFormatLib.SereniaBLPLib
         public BlpFile(Stream stream)
         {
             str = stream;
-            byte[] buffer = new byte[4];
-            // Well, have to fix this... looks weird o.O
-            str.Read(buffer, 0, 4);
 
-            // Checking for correct Magic-Code
-            if (BitConverter.ToUInt32(buffer, 0) != 0x32504c42)
-                throw new Exception("Invalid BLP Format");
-
-            // Reading type
-            str.Read(buffer, 0, 4);
-            uint type = BitConverter.ToUInt32(buffer, 0);
-            if (type != 1)
-                throw new Exception("Invalid BLP-Type! Should be 1 but " + type + " was found");
-
-            // Reading encoding, alphaBitDepth, alphaEncoding and hasMipmaps
-            str.Read(buffer, 0, 4);
-            encoding = buffer[0];
-            alphaDepth = buffer[1];
-            alphaEncoding = buffer[2];
-            hasMipmaps = buffer[3];
-
-            // Reading width
-            str.Read(buffer, 0, 4);
-            width = BitConverter.ToInt32(buffer, 0);
-
-            // Reading height
-            str.Read(buffer, 0, 4);
-            height = BitConverter.ToInt32(buffer, 0);
-
-            // Reading MipmapOffset Array
-            for (int i = 0; i < 16; i++)
+            using (BinaryReader br = new BinaryReader(stream, Encoding.ASCII, true))
             {
-                stream.Read(buffer, 0, 4);
-                mipmapOffsets[i] = BitConverter.ToUInt32(buffer, 0);
-            }
+                // Checking for correct Magic-Code
+                if (br.ReadUInt32() != 0x32504c42)
+                    throw new Exception("Invalid BLP Format");
 
-            // Reading MipmapSize Array
-            for (int i = 0; i < 16; i++)
-            {
-                str.Read(buffer, 0, 4);
-                mippmapSize[i] = BitConverter.ToUInt32(buffer, 0);
-            }
+                // Reading type
+                formatVersion = br.ReadUInt32();
 
-            // When encoding is 1, there is no image compression and we have to read a color palette
-            if (encoding == 1)
-            {
-                // Reading palette
-                for (int i = 0; i < 256; i++)
+                if (formatVersion != 1)
+                    throw new Exception("Invalid BLP-Type! Should be 1 but " + formatVersion + " was found");
+
+                // Reading encoding, alphaBitDepth, alphaEncoding and hasMipmaps
+                colorEncoding = br.ReadByte();
+                alphaDepth = br.ReadByte();
+                alphaEncoding = br.ReadByte();
+                hasMipmaps = br.ReadByte();
+
+                // Reading width and height
+                width = br.ReadInt32();
+                height = br.ReadInt32();
+
+                // Reading MipmapOffset Array
+                for (int i = 0; i < 16; i++)
+                    mipmapOffsets[i] = br.ReadUInt32();
+
+                // Reading MipmapSize Array
+                for (int i = 0; i < 16; i++)
+                    mipMapSize[i] = br.ReadUInt32();
+
+                // When encoding is 1, there is no image compression and we have to read a color palette
+                if (colorEncoding == 1)
                 {
-                    byte[] color = new byte[4];
-                    str.Read(color, 0, 4);
-                    paletteBGRA[i].blue = color[0];
-                    paletteBGRA[i].green = color[1];
-                    paletteBGRA[i].red = color[2];
-                    paletteBGRA[i].alpha = color[3];
+                    // Reading palette
+                    for (int i = 0; i < 256; i++)
+                    {
+                        int color = br.ReadInt32();
+                        paletteBGRA[i].blue = (byte)((color >> 0) & 0xFF);
+                        paletteBGRA[i].green = (byte)((color >> 8) & 0xFF);
+                        paletteBGRA[i].red = (byte)((color >> 16) & 0xFF);
+                        paletteBGRA[i].alpha = (byte)((color >> 24) & 0xFF);
+                    }
                 }
             }
         }
@@ -207,7 +196,7 @@ namespace WoWFormatLib.SereniaBLPLib
         /// </summary>
         private byte[] GetImageBytes(int w, int h, byte[] data)
         {
-            switch (encoding)
+            switch (colorEncoding)
             {
                 case 1:
                     return GetPictureUncompressedByteArray(w, h, data);
@@ -228,25 +217,42 @@ namespace WoWFormatLib.SereniaBLPLib
         /// <returns>The Bitmap</returns>
         public Bitmap GetBitmap(int mipmapLevel)
         {
-            if (mipmapLevel >= MipMapCount) mipmapLevel = MipMapCount - 1;
-            if (mipmapLevel < 0) mipmapLevel = 0;
+            byte[] pic = GetPixels(mipmapLevel, out int w, out int h, colorEncoding == 3 ? false : true);
 
-            int scale = (int)Math.Pow(2, mipmapLevel);
-            int w = width / scale;
-            int h = height / scale;
             Bitmap bmp = new Bitmap(w, h);
-
-            byte[] data = GetPictureData(mipmapLevel);
-            byte[] pic = GetImageBytes(w, h, data); // This bytearray stores the Pixel-Data
 
             // Faster bitmap Data copy
             BitmapData bmpdata = bmp.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-            // when we want to copy the pixeldata directly into the bitmap, we have to convert them into BGRA befor doing so
-            ARGBColor8.convertToBGRA(pic);
             Marshal.Copy(pic, 0, bmpdata.Scan0, pic.Length); // copy! :D
             bmp.UnlockBits(bmpdata);
 
             return bmp;
+        }
+
+        /// <summary>
+        /// Returns array of pixels in BGRA or RGBA order
+        /// </summary>
+        /// <param name="mipmapLevel"></param>
+        /// <returns></returns>
+        public byte[] GetPixels(int mipmapLevel, out int w, out int h, bool bgra = true)
+        {
+            if (mipmapLevel >= MipMapCount) mipmapLevel = MipMapCount - 1;
+            if (mipmapLevel < 0) mipmapLevel = 0;
+
+            int scale = (int)Math.Pow(2, mipmapLevel);
+            w = width / scale;
+            h = height / scale;
+
+            byte[] data = GetPictureData(mipmapLevel);
+            byte[] pic = GetImageBytes(w, h, data); // This bytearray stores the Pixel-Data
+
+            if (bgra)
+            {
+                // when we want to copy the pixeldata directly into the bitmap, we have to convert them into BGRA before doing so
+                ARGBColor8.ConvertToBGRA(pic);
+            }
+
+            return pic;
         }
 
         /// <summary>
@@ -262,8 +268,11 @@ namespace WoWFormatLib.SereniaBLPLib
         /// </summary>
         public void Close()
         {
-            str?.Close();
-            str = null;
+            if (str != null)
+            {
+                str.Close();
+                str = null;
+            }
         }
     }
 }
