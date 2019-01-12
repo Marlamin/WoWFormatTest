@@ -361,10 +361,20 @@ namespace OBJExporterUI
                 worker.ReportProgress(20, "Downloading listfile..");
                 UpdateListfile();
             }
+            else if(DateTime.Now.AddDays(-7) > File.GetLastWriteTime("listfile.txt"))
+            {
+                worker.ReportProgress(20, "Updating listfile..");
+                UpdateListfile();
+            }
 
             if (!File.Exists("definitions/Map.dbd"))
             {
                 worker.ReportProgress(30, "Downloading database definitions..");
+                UpdateDefinition("Map");
+            }
+            else if (DateTime.Now.AddDays(-7) > File.GetLastWriteTime("definitions/Map.dbd"))
+            {
+                worker.ReportProgress(30, "Updating database definitions..");
                 UpdateDefinition("Map");
             }
 
