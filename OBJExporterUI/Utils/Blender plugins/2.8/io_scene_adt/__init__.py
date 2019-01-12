@@ -21,8 +21,8 @@
 bl_info = {
     "name": "Import ADT OBJ files with doodads",
     "author": "Marlamin",
-    "version": (0, 1, 0),
-    "blender": (2, 77, 0),
+    "version": (0, 1, 1),
+    "blender": (2, 80, 0),
     "location": "File > Import-Export > ADT OBJ (.obj)",
     "description": "Import OBJ files exported by Machinima Studio or Marlamin's OBJ Exporter with WMOs and doodads",
     "warning": "",
@@ -47,15 +47,12 @@ from bpy.props import (
         )
 from bpy_extras.io_utils import (
         ImportHelper,
-        ExportHelper,
-        orientation_helper_factory,
-        path_reference_mode,
-        axis_conversion,
+        orientation_helper,
         )
 
-IOOBJOrientationHelper = orientation_helper_factory("IOOBJOrientationHelper", axis_forward='-Z', axis_up='Y')
+@orientation_helper(axis_forward='-Z', axis_up='Y')
 
-class ImportADTOBJ(bpy.types.Operator, ImportHelper, IOOBJOrientationHelper):
+class ImportADTOBJ(bpy.types.Operator, ImportHelper):
     """Load a Wavefront OBJ File with additional ADT metadata"""
     bl_idname = "import_scene.adtobj"
     bl_label = "Import ADTOBJ"
@@ -69,10 +66,6 @@ class ImportADTOBJ(bpy.types.Operator, ImportHelper, IOOBJOrientationHelper):
 
 
     def execute(self, context):
-
-        #file = open('example.csv')
-        #for line in file:
-        #    print(line)
         from . import import_adtobj
         return import_adtobj.load(context, self.filepath)
 
@@ -88,15 +81,15 @@ def menu_func_import(self, context):
 
 
 def register():
-    bpy.utils.register_module(__name__)
-
-    bpy.types.INFO_MT_file_import.append(menu_func_import)
+    from bpy.utils import register_class
+    register_class(ImportADTOBJ)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-
-    bpy.types.INFO_MT_file_import.remove(menu_func_import)
+    from bpy.utils import unregister_class
+    unregister_class(ImportADTOBJ)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
 
 if __name__ == "__main__":
     register()
