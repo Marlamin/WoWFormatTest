@@ -724,7 +724,7 @@ namespace OBJExporterUI
                     reader.LoadWDT(wdt);
                     for (var i = 0; i < reader.tiles.Count; i++)
                     {
-                        tileListBox.Items.Add(reader.tiles[i][0].ToString().PadLeft(2, '0') + "_" + reader.tiles[i][1].ToString().PadLeft(2, '0'));
+                        tileListBox.Items.Add(reader.tiles[i].Item1.ToString() + "_" + reader.tiles[i].Item2.ToString());
                     }
                 }
             }
@@ -737,7 +737,11 @@ namespace OBJExporterUI
 
                 var selectedItem = (MapListItem)mapListBox.SelectedItem;
 
-                var minimapFile = "world\\minimaps\\" + selectedItem.Internal + "\\map" + file + ".blp";
+                var splitTile = file.Split('_');
+
+                var fixedTileName = splitTile[0].PadLeft(2, '0') + "_" + splitTile[1].PadLeft(2, '0');
+
+                var minimapFile = "world\\minimaps\\" + selectedItem.Internal + "\\map" + fixedTileName + ".blp";
 
                 if (!CASC.FileExists(minimapFile))
                 {
