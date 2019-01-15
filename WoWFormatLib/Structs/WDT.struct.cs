@@ -28,7 +28,7 @@ namespace WoWFormatLib.Structs.WDT
         public uint lodADT;
         public uint mapTexture;
         public uint mapTextureN;
-        public uint unk;
+        public uint minimapTexture;
     }
 
     public struct MPHD
