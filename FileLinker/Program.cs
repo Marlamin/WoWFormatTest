@@ -179,6 +179,10 @@ namespace FileLinker
 
             var wmoids = new List<uint>();
 
+            var groupFixCMD = new MySqlCommand("UPDATE wow_rootfiles SET type = '_xxxwmo' WHERE id = @id LIMIT 1", dbConn);
+            groupFixCMD.Parameters.AddWithValue("@id", 0);
+            groupFixCMD.Prepare();
+
             using (var cmd = dbConn.CreateCommand())
             {
                 if (fullrun)
@@ -206,7 +210,18 @@ namespace FileLinker
                     try
                     {
                         var reader = new WMOReader();
-                        var wmo = reader.LoadWMO(wmoid);
+                        var wmo = new WoWFormatLib.Structs.WMO.WMO();
+                        try
+                        {
+                            wmo = reader.LoadWMO(wmoid);
+                        }
+                        catch (NotSupportedException e)
+                        {
+                            Console.WriteLine("[WMO] " + wmoid + " is a group WMO, fixing type and skipping..");
+                            groupFixCMD.Parameters[0].Value = wmoid;
+                            groupFixCMD.ExecuteNonQuery();
+                            continue;
+                        }
 
                         insertCmd.Parameters[0].Value = wmoid;
 
