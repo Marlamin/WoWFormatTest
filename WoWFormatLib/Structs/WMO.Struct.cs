@@ -26,6 +26,7 @@ namespace WoWFormatLib.Structs.WMO
         MFOG = 'M' << 24 | 'F' << 16 | 'O' << 8 | 'G' << 0,
         MCVP = 'M' << 24 | 'C' << 16 | 'V' << 8 | 'P' << 0,
         MOUV = 'M' << 24 | 'O' << 16 | 'U' << 8 | 'V' << 0,
+        MLSK = 'M' << 24 | 'L' << 16 | 'S' << 8 | 'K' << 0,
 
         // Group WMO
         MOGP = 'M' << 24 | 'O' << 16 | 'G' << 8 | 'P' << 0,
