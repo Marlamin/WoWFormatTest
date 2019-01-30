@@ -84,8 +84,7 @@ namespace WoWFormatLib.FileReaders
                             }
                             break;
                         case WMOChunks.MOGP:
-                            Console.WriteLine("Trying to parse group WMO as root WMO, skipping!");
-                            return;
+                            throw new NotSupportedException("Trying to parse group WMO as root WMO!");
                         case WMOChunks.MOHD:
                             wmofile.header = bin.Read<MOHD>();
                             break;
