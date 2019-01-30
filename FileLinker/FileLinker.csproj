@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CASCExplorer\CascLibCore\CascLibCore.csproj" />
+    <ProjectReference Include="..\WoWFormatTest\WoWFormatTest.csproj" />
+  </ItemGroup>
+
+</Project>
