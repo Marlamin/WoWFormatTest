@@ -41,6 +41,7 @@ namespace FileLinker
             insertCmd.Parameters.AddWithValue("@type", "");
             insertCmd.Prepare();
 
+            /*
             #region M2
             var m2ids = new List<uint>();
 
@@ -55,12 +56,15 @@ namespace FileLinker
                     Console.WriteLine("[M2] Generating list of files to process..");
                     cmd.CommandText = "SELECT id from wow_rootfiles WHERE type = 'm2' AND id NOT IN (SELECT parent FROM wow_rootfiles_links) ORDER BY id DESC";
                 }
+
                 var reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
                     m2ids.Add(uint.Parse(reader["id"].ToString()));
                 }
+
+                reader.Close();
             }
 
             foreach (var m2 in m2ids)
@@ -200,6 +204,8 @@ namespace FileLinker
                 {
                     wmoids.Add(uint.Parse(reader["id"].ToString()));
                 }
+
+                reader.Close();
             }
 
             foreach (var wmoid in wmoids)
@@ -277,9 +283,282 @@ namespace FileLinker
             #endregion
 
             #region WDT
+            var wdtids = new List<uint>();
+            using (var cmd = dbConn.CreateCommand())
+            {
+                if (fullrun)
+                {
+                    cmd.CommandText = "SELECT id, filename from wow_rootfiles WHERE type = 'wdt' ORDER BY id DESC";
+                }
+                else
+                {
+                    Console.WriteLine("[WDT] Generating list of files to process..");
+                    cmd.CommandText = "SELECT id, filename from wow_rootfiles WHERE type = 'wdt' AND id NOT IN (SELECT parent FROM wow_rootfiles_links) ORDER BY id DESC";
+                }
+                var reader = cmd.ExecuteReader();
 
+                while (reader.Read())
+                {
+                    var filename = (string)reader["filename"];
+                    if (filename.Contains("_mpv") || filename.Contains("_lgt") || filename.Contains("_occ") || filename.Contains("_fogs"))
+                        continue;
+                    wdtids.Add(uint.Parse(reader["id"].ToString()));
+                }
+
+                reader.Close();
+
+                foreach (var wdtid in wdtids)
+                {
+                    Console.WriteLine("[WDT] Loading " + wdtid);
+
+                    insertCmd.Parameters[0].Value = wdtid;
+
+                    var wdtreader = new WDTReader();
+                    wdtreader.LoadWDT(wdtid);
+
+                    foreach(var records in wdtreader.tileFiles)
+                    {
+                        if(records.Value.rootADT != 0)
+                        {
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = records.Value.rootADT;
+                                insertCmd.Parameters[2].Value = "root adt";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Root: " + e.Message);
+                            }
+                        }
+                        
+                        if(records.Value.tex0ADT != 0)
+                        {
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = records.Value.tex0ADT;
+                                insertCmd.Parameters[2].Value = "tex0 adt";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("TEX0: " + e.Message);
+                            }
+                        }
+                        
+                        if(records.Value.lodADT != 0)
+                        {
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = records.Value.lodADT;
+                                insertCmd.Parameters[2].Value = "lod adt";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("LOD: " + e.Message);
+                            }
+                        }
+
+                        if(records.Value.obj0ADT != 0)
+                        {
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = records.Value.obj0ADT;
+                                insertCmd.Parameters[2].Value = "obj0 adt";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("OBJ0: " + e.Message);
+                            }
+                        }
+                        
+                        if(records.Value.obj1ADT != 0)
+                        {
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = records.Value.obj1ADT;
+                                insertCmd.Parameters[2].Value = "obj1 adt";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("OBJ1: " + e.Message);
+                            }
+                        }
+                        
+                        if(records.Value.mapTexture != 0)
+                        {
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = records.Value.mapTexture;
+                                insertCmd.Parameters[2].Value = "map texture";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("MapT: " + e.Message);
+                            }
+                        }
+                        
+                        if(records.Value.mapTextureN != 0)
+                        {
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = records.Value.mapTextureN;
+                                insertCmd.Parameters[2].Value = "mapn texture";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("MapTN: " + e.Message);
+                            }
+                        }
+                        
+                        if(records.Value.minimapTexture != 0)
+                        {
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = records.Value.minimapTexture;
+                                insertCmd.Parameters[2].Value = "minimap texture";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Minimap: " + e.Message);
+                            }
+                        }
+                    }
+                }
+            }
             #endregion
+            */
 
+            #region ADT
+            var adtids = new Dictionary<uint, Dictionary<(byte, byte), uint>>();
+            var wdtmapping = new Dictionary<string, uint>();
+
+            using (var cmd = dbConn.CreateCommand())
+            {
+                if (fullrun)
+                {
+                    cmd.CommandText = " SELECT id, filename from wow_rootfiles WHERE filename LIKE '%adt' AND filename NOT LIKE '%_obj0.adt' AND filename NOT LIKE '%_obj1.adt' AND filename NOT LIKE '%_lod.adt' AND filename NOT LIKE '%tex0.adt' AND filename NOT LIKE '%tex1.adt' ORDER BY id DESC ";
+                }
+                else
+                {
+                    Console.WriteLine("[ADT] Generating list of files to process..");
+                    cmd.CommandText = " SELECT id, filename from wow_rootfiles WHERE filename LIKE '%adt' AND filename NOT LIKE '%_obj0.adt' AND filename NOT LIKE '%_obj1.adt' AND filename NOT LIKE '%_lod.adt' AND filename NOT LIKE '%tex0.adt' AND filename NOT LIKE '%tex1.adt' AND id NOT IN (SELECT parent FROM wow_rootfiles_links) ORDER BY id DESC";
+                }
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var filename = (string)reader["filename"];
+                    var mapname = filename.Replace("world/maps/", "").Substring(0, filename.Replace("world/maps/", "").IndexOf("/"));
+                    var exploded = Path.GetFileNameWithoutExtension(filename).Split('_');
+
+                    for(var i = 0; i < exploded.Length; i++)
+                    {
+                        //Console.WriteLine(i + ": " + exploded[i]);
+                    }
+
+                    byte tileX = 0;
+                    byte tileY = 0;
+
+                    if (!byte.TryParse(exploded[exploded.Length - 2], out tileX) || !byte.TryParse(exploded[exploded.Length - 1], out tileY))
+                    {
+                        throw new FormatException("An error occured converting coordinates from " + filename + " to bytes");
+                    }
+
+                    if (!wdtmapping.ContainsKey(mapname))
+                    {
+                        var wdtname = "world/maps/" + mapname + "/" + mapname + ".wdt";
+                        wdtmapping.Add(mapname, CASC.getFileDataIdByName(wdtname));
+                        if (wdtmapping[mapname] == 0)
+                        {
+                            // TODO: Support WDTs removed in current build
+                            Console.WriteLine("Unable to get filedataid for " + mapname + ", skipping...");
+                            wdtmapping.Remove(mapname);
+                            continue;
+                            /*
+                            var wdtconn = new MySqlConnection(File.ReadAllText("connectionstring.txt"));
+                            wdtconn.Open();
+                            using (var wdtcmd = wdtconn.CreateCommand())
+                            {
+                                wdtcmd.CommandText = "SELECT id from wow_rootfiles WHERE filename = '" + wdtname + "'";
+                                var wdtread = wdtcmd.ExecuteReader();
+                                while (wdtread.Read())
+                                {
+                                    wdtmapping[mapname] = uint.Parse(wdtread["id"].ToString());
+                                }
+                            }
+                            wdtconn.Close();*/
+                        }
+
+                        adtids.Add(wdtmapping[mapname], new Dictionary<(byte, byte), uint>());
+                    }
+
+                    var id = uint.Parse(reader["id"].ToString());
+
+                    if(id == 0)
+                    {
+                        Console.WriteLine("Root ADT " + tileX + ", " + tileY + " with ID 0 on WDT " + wdtmapping[mapname]);
+                        continue;
+                    }
+
+                    if (wdtmapping.ContainsKey(mapname))
+                    {
+                        adtids[wdtmapping[mapname]].Add((tileX, tileY), id);
+                    }
+                }
+
+                reader.Close();
+
+                foreach(var wdtid in adtids)
+                {
+                    foreach(var adtid in wdtid.Value)
+                    {
+                        var inserted = new List<uint>();
+                        Console.WriteLine("[ADT] Loading " + adtid.Key.Item1 + ", " + adtid.Key.Item2 + "(" + adtid.Value + ")");
+
+                        insertCmd.Parameters[0].Value = adtid.Value;
+
+                        var adtreader = new ADTReader();
+                        adtreader.LoadADT(wdtid.Key, adtid.Key.Item1, adtid.Key.Item2);
+
+                        if(adtreader.adtfile.objects.m2Names.filenames != null)
+                        {
+                            Console.WriteLine(adtid + " is still using old filenames, skipping!");
+                        }
+                        else
+                        {
+                            foreach (var worldmodel in adtreader.adtfile.objects.worldModels.entries)
+                            {
+                                if (inserted.Contains(worldmodel.mwidEntry))
+                                    continue;
+
+                                insertCmd.Parameters[1].Value = worldmodel.mwidEntry;
+                                insertCmd.Parameters[2].Value = "adt worldmodel";
+                                insertCmd.ExecuteNonQuery();
+                                inserted.Add(worldmodel.mwidEntry);
+                            }
+
+                            foreach (var doodad in adtreader.adtfile.objects.models.entries)
+                            {
+                                if (inserted.Contains(doodad.mmidEntry))
+                                    continue;
+
+                                insertCmd.Parameters[1].Value = doodad.mmidEntry;
+                                insertCmd.Parameters[2].Value = "adt doodad";
+                                insertCmd.ExecuteNonQuery();
+                                inserted.Add(doodad.mmidEntry);
+                            }
+                        }
+                    }
+                }
+            }
+            #endregion
         }
     }
 }
