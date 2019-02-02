@@ -59,8 +59,8 @@ namespace WoWFormatLib.FileReaders
                         }
                         break;
                     case M2Chunks.AFID: // Animation file IDs
-                        var afids = new AFID[chunkSize / 16];
-                        for (var a = 0; a < chunkSize / 16; a++)
+                        var afids = new AFID[chunkSize / 8];
+                        for (var a = 0; a < chunkSize / 8; a++)
                         {
                             afids[a].animID = bin.ReadInt16();
                             afids[a].subAnimID = bin.ReadInt16();
