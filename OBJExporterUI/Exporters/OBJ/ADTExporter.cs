@@ -80,11 +80,13 @@ namespace OBJExporterUI.Exporters.OBJ
                         if ((i % 2) != 0) v.Position.X -= 0.5f * UnitSize;
                         if(bakeQuality == "low" || bakeQuality == "medium")
                         {
-                            v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / TileSize, -(v.Position.Z - initialChunkY) / TileSize);
+                            // One texture per model
+                            v.TexCoord = new Vector2(-(v.Position.X - initialChunkY) / TileSize, -(v.Position.Z - initialChunkX) / TileSize);
                         }
                         else if(bakeQuality == "high")
                         {
-                            v.TexCoord = new Vector2(-(v.Position.X - initialChunkX) / ChunkSize, -(v.Position.Z - initialChunkY) / ChunkSize);
+                            // Multiple textures per model, one per chunk
+                            v.TexCoord = new Vector2(-(v.Position.X - initialChunkY) / ChunkSize, -(v.Position.Z - initialChunkX) / ChunkSize);
                         }
                         verticelist.Add(v);
                     }
