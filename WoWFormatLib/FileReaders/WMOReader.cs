@@ -485,8 +485,8 @@ namespace WoWFormatLib.FileReaders
                             throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName.ToString("X"), position.ToString()));
 #else
                             CASCLib.Logger.WriteLine("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", subChunkName.ToString("X"), position.ToString());
-#endif
                             break;
+#endif
                     }
                 }
             }

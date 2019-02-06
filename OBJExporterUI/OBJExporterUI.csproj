@@ -53,11 +53,15 @@
   <ItemGroup>
     <Reference Include="CascStorageLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\CascStorageLib\DB2FileReaderLib.NET\bin\Debug\CascStorageLib.dll</HintPath>
+      <HintPath>..\..\CascStorageLib\DB2FileReaderLib.NET\bin\Debug\CascStorageLib.dll</HintPath>
+    </Reference>
+    <Reference Include="DBDefsLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\WoWDBDefs\code\C#\DBDefsLib\bin\Debug\netstandard2.0\DBDefsLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="MimeKitLite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
-      <HintPath>..\packages\MimeKitLite.2.0.6\lib\net45\MimeKitLite.dll</HintPath>
+    <Reference Include="MimeKitLite, Version=2.1.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
+      <HintPath>..\packages\MimeKitLite.2.1.1\lib\net45\MimeKitLite.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -158,7 +162,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Resource Include="Resources\wow8.png" />
     <Content Include="Utils\Blender plugins\2.7\io_scene_adt\import_adtobj.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -183,6 +186,7 @@
     <Content Include="Utils\Blender plugins\2.8\io_scene_wmo\__init__.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\wow8.png" />
     <Content Include="Utils\Blender plugins\readme.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -249,10 +253,6 @@
     <ProjectReference Include="..\CASCExplorer\CascLibCore\CascLibCore.csproj">
       <Project>{d22ff00e-1652-4dff-a117-473b0849ce06}</Project>
       <Name>CascLibCore</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WoWDBDefs\code\C#\DBDefsLib\DBDefsLib.csproj">
-      <Project>{2ae21733-b484-4988-94ae-bad4eb1c3c59}</Project>
-      <Name>DBDefsLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj">
       <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>
