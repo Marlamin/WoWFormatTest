@@ -15,7 +15,8 @@ using System.IO.Compression;
 using Microsoft.VisualBasic.FileIO;
 using System.Windows.Media;
 using DBDefsLib;
-using DB2FileReaderLib.NET;
+using System.Drawing;
+
 
 namespace OBJExporterUI
 {
@@ -45,6 +46,7 @@ namespace OBJExporterUI
         private List<string> mapFilters = new List<string>();
 
         private static ListBox tileBox;
+        private static bool ignoreTextureAlpha;
 
         private PreviewControl previewControl;
 
@@ -532,7 +534,15 @@ namespace OBJExporterUI
                                 Directory.CreateDirectory(Path.Combine(outdir, Path.GetDirectoryName(selectedFile)));
                             }
 
-                            bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(selectedFile), Path.GetFileNameWithoutExtension(selectedFile)) + ".png");
+                            if (ignoreTextureAlpha)
+                            {
+                                bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.PixelFormat.Format32bppRgb).Save(Path.Combine(outdir, Path.GetDirectoryName(selectedFile), Path.GetFileNameWithoutExtension(selectedFile)) + ".png");
+                            }
+                            else
+                            {
+                                bmp.Save(Path.Combine(outdir, Path.GetDirectoryName(selectedFile), Path.GetFileNameWithoutExtension(selectedFile)) + ".png");
+                            }
+
                         }
                         catch (Exception blpException)
                         {
@@ -608,26 +618,35 @@ namespace OBJExporterUI
         private void TextureListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var file = (string)textureListBox.SelectedItem;
+
+            if (file == null)
+                return;
+
             try
             {
-                var blp = new WoWFormatLib.FileReaders.BLPReader();
-                blp.LoadBLP(file);
-
-                var bmp = blp.bmp;
-
                 using (var memory = new MemoryStream())
                 {
-                    bmp.Save(memory, ImageFormat.Png);
+                    var blp = new WoWFormatLib.FileReaders.BLPReader();
+                    blp.LoadBLP(file);
+
+                    var bmp = blp.bmp;
+
+                    if (ignoreTextureAlpha)
+                    {
+                        bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.PixelFormat.Format32bppRgb).Save(memory, ImageFormat.Bmp);
+                    }
+                    else
+                    {
+                        bmp.Save(memory, ImageFormat.Png);
+                    }
 
                     memory.Position = 0;
 
                     var bitmapImage = new BitmapImage();
-
                     bitmapImage.BeginInit();
                     bitmapImage.StreamSource = memory;
                     bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                     bitmapImage.EndInit();
-
                     blpImage.Source = bitmapImage;
                 }
             }
@@ -636,6 +655,23 @@ namespace OBJExporterUI
                 Console.WriteLine(blpException.Message);
             }
         }
+
+        private void IgnoreAlpha_Checked(object sender, RoutedEventArgs e)
+        {
+            if ((bool)ignoreAlpha.IsChecked)
+            {
+                ignoreTextureAlpha = true;
+            }
+            else
+            {
+                ignoreTextureAlpha = false;
+            }
+
+            var selected = textureListBox.SelectedIndex;
+            textureListBox.SelectedIndex = -1;
+            textureListBox.SelectedIndex = selected;
+        }
+
         private void ExportTextureButton_Click(object sender, RoutedEventArgs e)
         {
             progressBar.Value = 0;
@@ -1129,7 +1165,6 @@ namespace OBJExporterUI
         private void PreviewCheckbox_Checked(object sender, RoutedEventArgs e)
         {
             previewsEnabled = (bool) previewCheckbox.IsChecked;
-            //previewsEnabled = false;
         }
         private void RenderMinimapButton_Click(object sender, RoutedEventArgs e)
         {
