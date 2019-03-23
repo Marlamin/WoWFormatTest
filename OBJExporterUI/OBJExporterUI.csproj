@@ -51,13 +51,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CascStorageLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\CascStorageLib\DB2FileReaderLib.NET\bin\Debug\CascStorageLib.dll</HintPath>
-    </Reference>
-    <Reference Include="DBDefsLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\WoWDBDefs\code\C#\DBDefsLib\bin\Debug\netstandard2.0\DBDefsLib.dll</HintPath>
+    <Reference Include="CascStorageLib">
+      <HintPath>..\CascStorageLib\DB2FileReaderLib.NET\bin\Debug\CascStorageLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="MimeKitLite, Version=2.1.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
@@ -253,6 +248,10 @@
     <ProjectReference Include="..\CASCExplorer\CascLibCore\CascLibCore.csproj">
       <Project>{d22ff00e-1652-4dff-a117-473b0849ce06}</Project>
       <Name>CascLibCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WoWDBDefs\code\C#\DBDefsLib\DBDefsLib.csproj">
+      <Project>{2ae21733-b484-4988-94ae-bad4eb1c3c59}</Project>
+      <Name>DBDefsLib</Name>
     </ProjectReference>
     <ProjectReference Include="..\WoWFormatLib\WoWFormatLib.csproj">
       <Project>{5db0fb8f-0eaa-490a-aa7d-28ae010186a9}</Project>
