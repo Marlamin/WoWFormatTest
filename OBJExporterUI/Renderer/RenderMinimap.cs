@@ -5,6 +5,7 @@ using OBJExporterUI.Loaders;
 using System.Drawing;
 using System.Configuration;
 using System.IO;
+using CASCLib;
 
 namespace OBJExporterUI.Renderer
 {
@@ -44,16 +45,37 @@ namespace OBJExporterUI.Renderer
                 Directory.CreateDirectory(Path.GetDirectoryName(outName));
             }
 
-            GL.ClearColor(Color.Black);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            if (!splitFiles && File.Exists(outName))
+            {
+                return;
+            }
 
-            GL.UseProgram(bakeShaderProgram);
+            // Force terrain cache to empty after having 1 ADT cached and run GC
+            if(cache.terrain.Count > 1)
+            {
+                // Make sure to delete lingering alpha textures from GPU
+                foreach(var adt in cache.terrain)
+                {
+                    foreach(var batch in adt.Value.renderBatches)
+                    {
+                        GL.DeleteTextures(batch.alphaMaterialID.Length, batch.alphaMaterialID);
+                    }
+                }
+
+                cache.terrain = new System.Collections.Generic.Dictionary<string, Structs.Terrain>();
+                GC.Collect();
+            }
 
             if (!cache.terrain.ContainsKey(filename))
             {
                 ADTLoader.LoadADT(filename, cache, bakeShaderProgram, loadModels);
             }
 
+            GL.ClearColor(Color.Black);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.UseProgram(bakeShaderProgram);
+
+            // Look up uniforms beforehand instead of during drawing
             var firstPos = cache.terrain[filename].startPos.Position;
             var projectionMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "projection_matrix");
             var modelviewMatrixLocation = GL.GetUniformLocation(bakeShaderProgram, "modelview_matrix");
@@ -61,6 +83,24 @@ namespace OBJExporterUI.Renderer
             var doodadOffsLocation = GL.GetUniformLocation(bakeShaderProgram, "doodadOffs");
             var heightScaleLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightScale");
             var heightOffsetLoc = GL.GetUniformLocation(bakeShaderProgram, "pc_heightOffset");
+
+            var layerLocs = new int[4];
+            var scaleLocs = new int[4];
+            var heightLocs = new int[4];
+            var blendLocs = new int[4];
+
+            for (var i = 0; i < 4; i++)
+            {
+                layerLocs[i] = GL.GetUniformLocation(bakeShaderProgram, "pt_layer" + i);
+                scaleLocs[i] = GL.GetUniformLocation(bakeShaderProgram, "layer" + i + "scale");
+                heightLocs[i] = GL.GetUniformLocation(bakeShaderProgram, "pt_height" + i);
+
+                // There are only 3 blend samplers
+                if (i > 0)
+                {
+                    blendLocs[i] = GL.GetUniformLocation(bakeShaderProgram, "pt_blend" + i);
+                }
+            }
 
             if (splitFiles)
             {
@@ -92,8 +132,8 @@ namespace OBJExporterUI.Renderer
 
                     if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
                     {
-                        var fbError = GL.GetError().ToString();
-                        Console.WriteLine(fbError);
+                        var fberror = GL.GetError().ToString();
+                        Logger.WriteLine("Frame buffer initialization error: " + fberror);
                     }
 
                     var projectionMatrix = Matrix4.CreateOrthographic(ChunkSize, ChunkSize, -1500f, 1500f);
@@ -119,11 +159,8 @@ namespace OBJExporterUI.Renderer
 
                     for (var j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
                     {
-                        var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_layer" + j);
-                        GL.Uniform1(textureLoc, j);
-
-                        var scaleLoc = GL.GetUniformLocation(bakeShaderProgram, "layer" + j + "scale");
-                        GL.Uniform1(scaleLoc, cache.terrain[filename].renderBatches[i].scales[j]);
+                        GL.Uniform1(layerLocs[j], j);
+                        GL.Uniform1(scaleLocs[j], cache.terrain[filename].renderBatches[i].scales[j]);
 
                         GL.ActiveTexture(TextureUnit.Texture0 + j);
                         GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
@@ -131,8 +168,7 @@ namespace OBJExporterUI.Renderer
 
                     for (var j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
                     {
-                        var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_blend" + j);
-                        GL.Uniform1(textureLoc, 3 + j);
+                        GL.Uniform1(blendLocs[j], 3 + j);
 
                         GL.ActiveTexture(TextureUnit.Texture3 + j);
                         GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
@@ -140,8 +176,7 @@ namespace OBJExporterUI.Renderer
 
                     for (var j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
                     {
-                        var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_height" + j);
-                        GL.Uniform1(textureLoc, 7 + j);
+                        GL.Uniform1(heightLocs[j], 7 + j);
 
                         GL.ActiveTexture(TextureUnit.Texture7 + j);
                         GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].heightMaterialIDs[j]);
@@ -158,10 +193,10 @@ namespace OBJExporterUI.Renderer
                     var error = GL.GetError().ToString();
                     if (error != "NoError")
                     {
-                        Console.WriteLine(error);
+                        Logger.WriteLine("Drawing error: " + error);
                     }
 
-                    var bmp = new Bitmap(bakeSize, bakeSize);
+                    var bmp = new Bitmap(bakeSize, bakeSize, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
                     var data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
                     GL.ReadPixels(0, 0, bakeSize, bakeSize, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
                     bmp.UnlockBits(data);
@@ -171,6 +206,7 @@ namespace OBJExporterUI.Renderer
 
                     bmp.Dispose();
 
+                    GL.DeleteTexture(bakedTexture);
                     GL.DeleteFramebuffer(frameBuffer);
                 }
                 
@@ -199,8 +235,8 @@ namespace OBJExporterUI.Renderer
 
                 if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
                 {
-                    var error = GL.GetError().ToString();
-                    Console.WriteLine(error);
+                    var fberror = GL.GetError().ToString();
+                    Logger.WriteLine("Frame buffer initialization error: " + fberror);
                 }
 
                 var projectionMatrix = Matrix4.CreateOrthographic(TileSize, TileSize, -1500f, 1500f);
@@ -224,11 +260,8 @@ namespace OBJExporterUI.Renderer
 
                     for (var j = 0; j < cache.terrain[filename].renderBatches[i].materialID.Length; j++)
                     {
-                        var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_layer" + j);
-                        GL.Uniform1(textureLoc, j);
-
-                        var scaleLoc = GL.GetUniformLocation(bakeShaderProgram, "layer" + j + "scale");
-                        GL.Uniform1(scaleLoc, cache.terrain[filename].renderBatches[i].scales[j]);
+                        GL.Uniform1(layerLocs[j], j);
+                        GL.Uniform1(scaleLocs[j], cache.terrain[filename].renderBatches[i].scales[j]);
 
                         GL.ActiveTexture(TextureUnit.Texture0 + j);
                         GL.BindTexture(TextureTarget.Texture2D, (int)cache.terrain[filename].renderBatches[i].materialID[j]);
@@ -236,8 +269,7 @@ namespace OBJExporterUI.Renderer
 
                     for (var j = 1; j < cache.terrain[filename].renderBatches[i].alphaMaterialID.Length; j++)
                     {
-                        var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_blend" + j);
-                        GL.Uniform1(textureLoc, 3 + j);
+                        GL.Uniform1(blendLocs[j], 3 + j);
 
                         GL.ActiveTexture(TextureUnit.Texture3 + j);
                         GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].alphaMaterialID[j]);
@@ -245,8 +277,7 @@ namespace OBJExporterUI.Renderer
 
                     for (var j = 0; j < cache.terrain[filename].renderBatches[i].heightMaterialIDs.Length; j++)
                     {
-                        var textureLoc = GL.GetUniformLocation(bakeShaderProgram, "pt_height" + j);
-                        GL.Uniform1(textureLoc, 7 + j);
+                        GL.Uniform1(heightLocs[j], 7 + j);
 
                         GL.ActiveTexture(TextureUnit.Texture7 + j);
                         GL.BindTexture(TextureTarget.Texture2D, cache.terrain[filename].renderBatches[i].heightMaterialIDs[j]);
@@ -259,30 +290,38 @@ namespace OBJExporterUI.Renderer
                         GL.ActiveTexture(TextureUnit.Texture0 + j);
                         GL.BindTexture(TextureTarget.Texture2D, 0);
                     }
+                }
 
-                    var error = GL.GetError().ToString();
-                    if (error != "NoError")
+                var error = GL.GetError().ToString();
+                if (error != "NoError")
+                {
+                    Logger.WriteLine("Drawing error: " + error);
+                }
+
+                try
+                {
+                    using (var bmp = new Bitmap(bakeSize, bakeSize))
                     {
-                        Console.WriteLine(error);
+                        var data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                        GL.ReadPixels(0, 0, bakeSize, bakeSize, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
+                        bmp.UnlockBits(data);
+
+                        bmp.RotateFlip(RotateFlipType.Rotate270FlipX);
+                        bmp.Save(outName, System.Drawing.Imaging.ImageFormat.Png);
+
+                        bmp.Dispose();
                     }
                 }
-
-                foreach (var batch in cache.terrain[filename].worldModelBatches)
+                catch (Exception e)
                 {
+                    Logger.WriteLine("An error occured while baking minimap image " + Path.GetFileNameWithoutExtension(outName) + ": " + e.StackTrace);
                 }
-
-                var bmp = new Bitmap(bakeSize, bakeSize);
-                var data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                GL.ReadPixels(0, 0, bakeSize, bakeSize, PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
-                bmp.UnlockBits(data);
-
-                bmp.RotateFlip(RotateFlipType.Rotate270FlipX);
-                bmp.Save(outName, System.Drawing.Imaging.ImageFormat.Png);
-
-                bmp.Dispose();
-
-                GL.DeleteFramebuffer(frameBuffer);
-                GL.UseProgram(0);
+                finally
+                {
+                    GL.DeleteTexture(bakedTexture);
+                    GL.DeleteFramebuffer(frameBuffer);
+                    GL.UseProgram(0);
+                }
             }
         }
     }

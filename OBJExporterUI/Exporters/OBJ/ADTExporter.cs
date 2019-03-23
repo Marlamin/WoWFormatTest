@@ -30,9 +30,6 @@ namespace OBJExporterUI.Exporters.OBJ
             var ChunkSize = TileSize / 16.0f; //33.333
             var UnitSize = ChunkSize / 8.0f; //4.166666
 
-            var mapname = file.Replace("world/maps/", "").Substring(0, file.Replace("world/maps/", "").IndexOf("/"));
-            var coord = file.Replace("world/maps/" + mapname + "/" + mapname, "").Replace(".adt", "").Split('_');
-
             Logger.WriteLine("ADT OBJ Exporter: Starting export of {0}..", file);
 
             if (!Directory.Exists(Path.Combine(outdir, Path.GetDirectoryName(file))))
