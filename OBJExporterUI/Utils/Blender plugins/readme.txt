@@ -1,1 +1,0 @@
-Drop these in your Blender addon directory to add ADT/WMO OBJ import to the import menu. These plugins are very experimental and not as supported as the application itself.
