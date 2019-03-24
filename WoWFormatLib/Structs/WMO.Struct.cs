@@ -58,7 +58,7 @@ namespace WoWFormatLib.Structs.WMO
     public struct WMO
     {
         public MOHD header;
-        public MVER version;
+        public uint version;
         public MOTX[] textures;
         public MOMT[] materials;
         public MODN[] doodadNames;
@@ -70,11 +70,6 @@ namespace WoWFormatLib.Structs.WMO
         public WMOGroupFile[] group;
         public uint[] groupFileDataIDs;
         public string  skybox;
-    }
-
-    public struct MVER
-    {
-        public uint version;
     }
 
     public enum MOHDFlags : short
@@ -240,7 +235,7 @@ namespace WoWFormatLib.Structs.WMO
 
     public struct WMOGroupFile
     {
-        public MVER version;
+        public uint version;
         public MOGP mogp;
     }
     public struct MOGP

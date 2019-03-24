@@ -77,10 +77,10 @@ namespace WoWFormatLib.FileReaders
                     switch (chunkName)
                     {
                         case WMOChunks.MVER:
-                            wmofile.version = bin.Read<MVER>();
-                            if (wmofile.version.version != 17)
+                            wmofile.version = bin.ReadUInt32();
+                            if (wmofile.version != 17)
                             {
-                                throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
+                                throw new Exception("Unsupported WMO version! (" + wmofile.version + ")");
                             }
                             break;
                         case WMOChunks.MOGP:
@@ -380,10 +380,10 @@ namespace WoWFormatLib.FileReaders
                     switch (chunkName)
                     {
                         case WMOChunks.MVER:
-                            groupFile.version = bin.Read<MVER>();
-                            if (wmofile.version.version != 17)
+                            groupFile.version = bin.ReadUInt32();
+                            if (wmofile.version != 17)
                             {
-                                throw new Exception("Unsupported WMO version! (" + wmofile.version.version + ")");
+                                throw new Exception("Unsupported WMO version! (" + wmofile.version + ")");
                             }
                             continue;
                         case WMOChunks.MOGP:
