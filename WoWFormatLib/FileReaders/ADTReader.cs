@@ -50,6 +50,9 @@ namespace WoWFormatLib.FileReaders
 
         public void LoadADT(uint wdtFileDataID, byte tileX, byte tileY, bool loadSecondaryADTs = true)
         {
+            adtfile.x = tileX;
+            adtfile.y = tileY;
+
             m2Files = new List<string>();
             wmoFiles = new List<string>();
             blpFiles = new List<string>();

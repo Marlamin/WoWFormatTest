@@ -63,6 +63,8 @@ namespace WoWFormatLib.Structs.ADT
     public struct ADT
     {
         public uint version;
+        public byte x;
+        public byte y;
         public MHDR header;
         public MTEX textures;
         public MTXP[] texParams;
