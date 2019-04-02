@@ -1,9 +1,8 @@
-﻿using System;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
-using System.Drawing;
 using WoWFormatLib.SereniaBLPLib;
 using WoWFormatLib.Utils;
-using System.Drawing.Imaging;
 
 namespace WoWFormatLib.FileReaders
 {
@@ -34,11 +33,12 @@ namespace WoWFormatLib.FileReaders
             }
         }
 
-        public void LoadBLP(Stream file) { 
+        public void LoadBLP(Stream file)
+        {
             using (var blp = new BlpFile(file))
             {
                 bmp = blp.GetBitmap(0);
             }
-       }
+        }
     }
 }

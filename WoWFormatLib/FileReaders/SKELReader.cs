@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using WoWFormatLib.Structs.SKIN;
+﻿using System.IO;
 using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
@@ -12,7 +10,7 @@ namespace WoWFormatLib.FileReaders
             using (var bin = new BinaryReader(CASC.OpenFile(fileDataID)))
             {
                 var header = new string(bin.ReadChars(4));
-              
+
             }
         }
     }

@@ -24,7 +24,7 @@ namespace WoWFormatLib.FileReaders
         public void LoadM2(uint fileDataID, bool loadSkins = true)
         {
 #if DEBUG
-                LoadM2(CASC.OpenFile(fileDataID), loadSkins);
+            LoadM2(CASC.OpenFile(fileDataID), loadSkins);
 #else
                 try
                 {
@@ -38,7 +38,8 @@ namespace WoWFormatLib.FileReaders
 #endif
         }
 
-        public void LoadM2(Stream m2, bool loadSkins = true) { 
+        public void LoadM2(Stream m2, bool loadSkins = true)
+        {
             var bin = new BinaryReader(m2);
             long position = 0;
             while (position < m2.Length)
@@ -132,7 +133,7 @@ namespace WoWFormatLib.FileReaders
                 }
             }
 
-            if(loadSkins && CASC.IsCASCInit)
+            if (loadSkins && CASC.IsCASCInit)
             {
                 model.skins = ReadSkins(model.skinFileDataIDs);
             }
@@ -144,7 +145,7 @@ namespace WoWFormatLib.FileReaders
         {
             var bin = new BinaryReader(m2stream);
             var header = (M2Chunks)bin.ReadUInt32();
-            if(header != M2Chunks.MD20)
+            if (header != M2Chunks.MD20)
             {
                 throw new Exception("Invalid M2 file!");
             }
@@ -507,7 +508,7 @@ namespace WoWFormatLib.FileReaders
                 {
                     var lenFilename = bin.ReadUInt32();
                     var ofsFilename = bin.ReadUInt32();
-                    if(ofsFilename < 10)
+                    if (ofsFilename < 10)
                     {
                         // Referenced in TXID, no longer in file (rip listfiles)
                         textures[i].filename = @"Test\QA_TEST_BLP_1.blp";

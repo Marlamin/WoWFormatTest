@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using CascStorageLib;
+using DB2FileReaderLib.NET;
 
 namespace DBCDumpHost
 {

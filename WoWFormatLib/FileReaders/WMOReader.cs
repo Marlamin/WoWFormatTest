@@ -137,7 +137,7 @@ namespace WoWFormatLib.FileReaders
 
             var groupFiles = new WMOGroupFile[wmofile.header.nGroups];
 
-            if(wmofile.header.nLod != 0 && (lodLevel + 1) > wmofile.header.nLod)
+            if (wmofile.header.nLod != 0 && (lodLevel + 1) > wmofile.header.nLod)
             {
                 throw new Exception("Requested LOD (" + lodLevel + ") exceeds the max LOD for this WMO (" + (wmofile.header.nLod - 1) + ")");
             }
@@ -334,7 +334,7 @@ namespace WoWFormatLib.FileReaders
         {
             var numIds = size / 4;
             var fileDataIDs = new uint[numIds];
-            for(var i = 0; i < numIds; i++)
+            for (var i = 0; i < numIds; i++)
             {
                 fileDataIDs[i] = bin.ReadUInt32();
             }
@@ -394,7 +394,7 @@ namespace WoWFormatLib.FileReaders
                     }
                 }
             }
-            
+
             return groupFile;
         }
         private MOGP ReadMOGPChunk(uint size, BinaryReader bin)
@@ -490,7 +490,7 @@ namespace WoWFormatLib.FileReaders
                     }
                 }
             }
-            
+
             return mogp;
         }
         private MONR[] ReadMONRChunk(uint size, BinaryReader bin)

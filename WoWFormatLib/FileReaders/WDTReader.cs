@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using WoWFormatLib.Utils;
 using WoWFormatLib.Structs.WDT;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.FileReaders
 {
@@ -43,7 +43,7 @@ namespace WoWFormatLib.FileReaders
                     bin.ReadUInt32();
                     if (flags == 1)
                     {
-                        tiles.Add((y,x));
+                        tiles.Add((y, x));
                     }
                 }
             }
@@ -78,7 +78,7 @@ namespace WoWFormatLib.FileReaders
             return mphd;
         }
 
-        private  void ReadMAIDChunk(BinaryReader bin)
+        private void ReadMAIDChunk(BinaryReader bin)
         {
             for (byte x = 0; x < 64; x++)
             {

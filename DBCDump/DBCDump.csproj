@@ -6,13 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WoWDBDefs\code\C#\DBDefsLib\DBDefsLib.csproj" />
+    <PackageReference Include="DB2FileReaderLib.NET" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="CascStorageLib">
-      <HintPath>..\CascStorageLib\CascStorageLib\bin\Debug\CascStorageLib.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\WoWDBDefs\code\C#\DBDefsLib\DBDefsLib.csproj" />
   </ItemGroup>
 
 </Project>

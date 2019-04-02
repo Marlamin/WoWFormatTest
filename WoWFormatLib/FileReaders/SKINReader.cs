@@ -60,7 +60,7 @@ namespace WoWFormatLib.FileReaders
         {
             bin.BaseStream.Position = ofsSubmeshes;
             var submeshes = new Submesh[nSubmeshes];
-            
+
             for (var i = 0; i < nSubmeshes; i++)
             {
                 submeshes[i].submeshID = bin.ReadUInt16();

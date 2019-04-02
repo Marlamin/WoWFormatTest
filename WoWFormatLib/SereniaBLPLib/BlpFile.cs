@@ -136,7 +136,8 @@ namespace WoWFormatLib.SereniaBLPLib
             get
             {
                 int i = 0;
-                while (mipmapOffsets[i] != 0) i++;
+                while (mipmapOffsets[i] != 0)
+                    i++;
                 return i;
             }
         }
@@ -236,8 +237,10 @@ namespace WoWFormatLib.SereniaBLPLib
         /// <returns></returns>
         public byte[] GetPixels(int mipmapLevel, out int w, out int h, bool bgra = true)
         {
-            if (mipmapLevel >= MipMapCount) mipmapLevel = MipMapCount - 1;
-            if (mipmapLevel < 0) mipmapLevel = 0;
+            if (mipmapLevel >= MipMapCount)
+                mipmapLevel = MipMapCount - 1;
+            if (mipmapLevel < 0)
+                mipmapLevel = 0;
 
             int scale = (int)Math.Pow(2, mipmapLevel);
             w = width / scale;

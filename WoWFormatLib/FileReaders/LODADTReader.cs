@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using WoWFormatLib.Structs.ADT;
 using WoWFormatLib.Utils;
 

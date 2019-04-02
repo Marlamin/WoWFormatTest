@@ -30,15 +30,16 @@ namespace WoWFormatLib.Utils
         }
 
         // Handle via CASCLib
-        public static void InitCasc(BackgroundWorkerEx worker = null, string basedir = null, string program = "wowt", LocaleFlags locale = LocaleFlags.enUS){
+        public static void InitCasc(BackgroundWorkerEx worker = null, string basedir = null, string program = "wowt", LocaleFlags locale = LocaleFlags.enUS)
+        {
             usingLocalAPI = false;
             CASCConfig.LoadFlags &= ~(LoadFlags.Download | LoadFlags.Install);
             CASCConfig.ValidateData = false;
             CASCConfig.ThrowOnFileNotFound = false;
-            
+
             if (basedir == null)
             {
-                Console.WriteLine("Initializing CASC from web for program " + program );
+                Console.WriteLine("Initializing CASC from web for program " + program);
                 cascHandler = CASCHandler.OpenOnlineStorage(program, "eu", worker);
             }
             else
@@ -49,7 +50,7 @@ namespace WoWFormatLib.Utils
             }
 
             BuildName = cascHandler.Config.BuildName;
-            
+
             cascHandler.Root.SetFlags(locale, ContentFlags.None, false);
 
             IsCASCInit = true;
@@ -107,7 +108,7 @@ namespace WoWFormatLib.Utils
         {
             if (usingLocalAPI)
             {
-                if(Client.GetStringAsync("http://" + CASCToolHostURL + "/casc/root/exists?buildconfig=" + BuildConfig + "&cdnconfig=" + CDNConfig + "&filename=" + filename).Result == "true")
+                if (Client.GetStringAsync("http://" + CASCToolHostURL + "/casc/root/exists?buildconfig=" + BuildConfig + "&cdnconfig=" + CDNConfig + "&filename=" + filename).Result == "true")
                 {
                     return true;
                 }

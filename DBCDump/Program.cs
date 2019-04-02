@@ -1,5 +1,5 @@
-﻿using CascStorageLib;
-using CascStorageLib.Attributes;
+﻿using DB2FileReaderLib.NET;
+using DB2FileReaderLib.NET.Attributes;
 using DBDefsLib;
 using System;
 using System.Collections;

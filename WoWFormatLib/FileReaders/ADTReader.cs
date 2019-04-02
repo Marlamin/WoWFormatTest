@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using WoWFormatLib.Structs.ADT;
 using WoWFormatLib.Utils;
@@ -19,8 +18,6 @@ namespace WoWFormatLib.FileReaders
         /* ROOT */
         public void LoadADT(string filename, bool loadSecondaryADTs = true)
         {
-            uint wdtFileDataID = 0;
-            
             filename = Path.ChangeExtension(filename, ".adt");
 
             var mapname = filename.Replace("world\\maps\\", "").Substring(0, filename.Replace("world\\maps\\", "").IndexOf("\\"));
@@ -28,14 +25,12 @@ namespace WoWFormatLib.FileReaders
 
             var exploded = Path.GetFileNameWithoutExtension(filename).Split('_');
 
-            byte tileX = 0;
-            byte tileY = 0;
-
-            if(!byte.TryParse(exploded[exploded.Length - 2], out tileX) || !byte.TryParse(exploded[exploded.Length - 1], out tileY))
+            if (!byte.TryParse(exploded[exploded.Length - 2], out var tileX) || !byte.TryParse(exploded[exploded.Length - 1], out var tileY))
             {
                 throw new FormatException("An error occured converting coordinates from " + filename + " to bytes");
             }
 
+            uint wdtFileDataID;
             if (CASC.FileExists(wdtFileName))
             {
                 wdtFileDataID = CASC.getFileDataIdByName(wdtFileName);
@@ -57,9 +52,9 @@ namespace WoWFormatLib.FileReaders
             wmoFiles = new List<string>();
             blpFiles = new List<string>();
 
-            uint rootFileDataID = 0;
-            uint obj0FileDataID = 0;
-            uint tex0FileDataID = 0;
+            uint rootFileDataID;
+            uint tex0FileDataID;
+            uint obj0FileDataID;
 
             if (CASC.FileExists(wdtFileDataID))
             {
@@ -269,7 +264,7 @@ namespace WoWFormatLib.FileReaders
         {
             var chunk = new MH2O();
             chunk.headers = new MH2OHeader[256];
-            for(var i = 0; i < 256; i++)
+            for (var i = 0; i < 256; i++)
             {
                 chunk.headers[i].offsetInstances = bin.ReadUInt32();
                 chunk.headers[i].layerCount = bin.ReadUInt32();
@@ -297,7 +292,10 @@ namespace WoWFormatLib.FileReaders
                     switch (chunkName)
                     {
                         case ADTChunks.MVER:
-                            if (bin.ReadUInt32() != 18) { throw new Exception("Unsupported ADT version!"); }
+                            if (bin.ReadUInt32() != 18)
+                            {
+                                throw new Exception("Unsupported ADT version!");
+                            }
                             break;
                         case ADTChunks.MMDX:
                             adtfile.objects.m2Names = ReadMMDXChunk(chunkSize, bin);
@@ -417,7 +415,7 @@ namespace WoWFormatLib.FileReaders
         {
             var mddf = new MDDF();
 
-            var count = size / 36; 
+            var count = size / 36;
 
             mddf.entries = new MDDFEntry[count];
 
@@ -436,7 +434,7 @@ namespace WoWFormatLib.FileReaders
         {
             var modf = new MODF();
 
-            var count = size / 64; 
+            var count = size / 64;
 
             modf.entries = new MODFEntry[count];
             for (var i = 0; i < count; i++)
@@ -568,7 +566,7 @@ namespace WoWFormatLib.FileReaders
 
             var txparams = new MTXP[count];
 
-            for(var i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 txparams[i] = bin.Read<MTXP>();
             }
@@ -607,13 +605,15 @@ namespace WoWFormatLib.FileReaders
                     uint out_offset = 0;
                     while (out_offset < 4096)
                     {
-                        var info = bin.ReadByte(); ++in_offset;
+                        var info = bin.ReadByte();
+                        ++in_offset;
                         var mode = (uint)(info & 0x80) >> 7; // 0 = copy, 1 = fill
                         var count = (uint)(info & 0x7f); // do mode operation count times
 
                         if (mode != 0)
                         {
-                            var val = bin.ReadByte(); ++in_offset;
+                            var val = bin.ReadByte();
+                            ++in_offset;
                             while (count-- > 0 && out_offset < 4096)
                             {
                                 mcal[layer].layer[out_offset] = val;
@@ -625,14 +625,16 @@ namespace WoWFormatLib.FileReaders
                         {
                             while (count-- > 0 && out_offset < 4096)
                             {
-                                var val = bin.ReadByte(); ++in_offset;
+                                var val = bin.ReadByte();
+                                ++in_offset;
                                 mcal[layer].layer[out_offset] = val;
                                 ++out_offset;
                             }
                         }
                     }
                     read_offset += in_offset;
-                    if (out_offset != 4096) throw new Exception("we somehow overshoot. this should not be the case, except for broken adts");
+                    if (out_offset != 4096)
+                        throw new Exception("we somehow overshoot. this should not be the case, except for broken adts");
                 }
                 else if (wdt.mphd.flags.HasFlag(Structs.WDT.mphdFlags.adt_has_big_alpha) || wdt.mphd.flags.HasFlag(Structs.WDT.mphdFlags.adt_has_height_texturing)) // Uncompressed (4096)
                 {
@@ -655,7 +657,8 @@ namespace WoWFormatLib.FileReaders
                 }
             }
 
-            if (read_offset != size) throw new Exception("Haven't finished reading chunk but should be");
+            if (read_offset != size)
+                throw new Exception("Haven't finished reading chunk but should be");
 
             return mcal;
         }
@@ -678,7 +681,7 @@ namespace WoWFormatLib.FileReaders
         {
             var count = size / 4;
             var filedataids = new uint[count];
-            for(var i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 filedataids[i] = bin.ReadUInt32();
             }

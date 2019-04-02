@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WoWFormatLib.Structs.BLS;
 using WoWFormatLib.Utils;
 
@@ -27,14 +24,14 @@ namespace WoWFormatLib.FileReaders
                 using (var bin = new BinaryReader(CASC.OpenFile(fileDataID)))
                 {
                     var identifier = new string(bin.ReadChars(4).Reverse().ToArray());
-                    if(identifier != "GXSH")
+                    if (identifier != "GXSH")
                     {
                         throw new Exception("Unsupported shader file: " + identifier);
                     }
 
                     shaderFile.version = bin.ReadUInt32();
 
-                    if(shaderFile.version != 0x10006)
+                    if (shaderFile.version != 0x10006)
                     {
                         Console.WriteLine("Unsupported shader version: " + shaderFile.version.ToString("X") + ", skipping..");
                         return shaderFile;
@@ -52,7 +49,7 @@ namespace WoWFormatLib.FileReaders
                         shaderFile.ofsShaderBlocks[i] = bin.ReadUInt32();
                     }
 
-                    if(bin.BaseStream.Position != shaderFile.ofsCompressedChunks)
+                    if (bin.BaseStream.Position != shaderFile.ofsCompressedChunks)
                     {
                         Console.WriteLine("!!! Didn't end up at ofsCompressedChunks, there might be unread data at " + bin.BaseStream.Position + "!");
                         bin.BaseStream.Position = shaderFile.ofsCompressedChunks;
@@ -101,10 +98,10 @@ namespace WoWFormatLib.FileReaders
 
                         // Skip non-GL shaders for now
                         var magic = new string(bin.ReadChars(4));
-                        if(magic != "3SLG")
+                        if (magic != "3SLG")
                         {
                             Console.WriteLine("Skipping " + magic);
-                            break; 
+                            break;
                         }
                         bin.BaseStream.Position -= 4;
 
@@ -122,7 +119,7 @@ namespace WoWFormatLib.FileReaders
 
                         shaderFile.shaderBlocks[i].shaderContent = bin.ReadCString();
 
-                        if(bin.BaseStream.Position != (GLSL3start + header.inputParamsOffset))
+                        if (bin.BaseStream.Position != (GLSL3start + header.inputParamsOffset))
                         {
                             Console.WriteLine("!!! Didn't end up at inputParamsOffset, code block might have changed " + bin.BaseStream.Position + "!");
                             bin.BaseStream.Position = GLSL3start + header.inputParamsOffset;
@@ -130,7 +127,7 @@ namespace WoWFormatLib.FileReaders
 
                         shaderFile.shaderBlocks[i].inputShaderInfo = new InputShaderInfo[header.inputParamCount];
 
-                        for(var j = 0; j < header.inputParamCount; j++)
+                        for (var j = 0; j < header.inputParamCount; j++)
                         {
                             shaderFile.shaderBlocks[i].inputShaderInfo[j].glslParamNameOffset = bin.ReadUInt32();
                             shaderFile.shaderBlocks[i].inputShaderInfo[j].unk0 = bin.ReadUInt32();
