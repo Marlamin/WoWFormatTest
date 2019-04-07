@@ -88,11 +88,11 @@ namespace DBCDumpHost
 
             Structs.VersionDefinitions? versionToUse;
 
-            if (!Utils.GetVersionDefinitionByLayoutHash(defs, reader.LayoutHash.ToString("X8"), out versionToUse))
+            if (!DBDefsLib.Utils.GetVersionDefinitionByLayoutHash(defs, reader.LayoutHash.ToString("X8"), out versionToUse))
             {
                 if (!string.IsNullOrWhiteSpace(build))
                 {
-                    if (!Utils.GetVersionDefinitionByBuild(defs, new Build(build), out versionToUse))
+                    if (!DBDefsLib.Utils.GetVersionDefinitionByBuild(defs, new Build(build), out versionToUse))
                     {
                         throw new Exception("No valid definition found for this layouthash or build!");
                     }
