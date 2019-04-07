@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DBCDumpHost.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DBCDumpHost.Controllers
@@ -19,6 +20,8 @@ namespace DBCDumpHost.Controllers
         [HttpGet("{filedataid}")]
         public Dictionary<uint, List<uint>> Get(int filedataid, string build)
         {
+            Logger.WriteLine("Serving texture lookup for filedataid " + filedataid + " build " + build);
+
             var modelFileData = DBCManager.LoadDBC("modelfiledata", build, true);
             var itemDisplayInfo = DBCManager.LoadDBC("itemdisplayinfo", build, true);
             var textureFileData = DBCManager.LoadDBC("texturefiledata", build, true);

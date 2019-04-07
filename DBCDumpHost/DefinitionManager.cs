@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using DB2FileReaderLib.NET.Attributes;
 using DB2FileReaderLib.NET;
+using DBCDumpHost.Utils;
 
 namespace DBCDumpHost
 {
@@ -30,7 +31,7 @@ namespace DBCDumpHost
         public static void LoadDefinitions()
         {
             var definitionsDir = SettingManager.definitionDir;
-            Console.WriteLine("Reloading definitions from directory " + definitionsDir);
+            Logger.WriteLine("Reloading definitions from directory " + definitionsDir);
             var newDict = new Dictionary<string, Structs.DBDefinition>();
 
             var reader = new DBDReader();
@@ -41,7 +42,7 @@ namespace DBCDumpHost
             }
 
             definitionLookup = newDict;
-            Console.Write("Loaded " + definitionLookup.Count + " definitions!");
+            Logger.WriteLine("Loaded " + definitionLookup.Count + " definitions!");
         }
 
         public static Type CompileDefinition(string filename, string build, bool force = false)

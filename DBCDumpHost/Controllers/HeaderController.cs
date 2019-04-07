@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DBCDumpHost.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DBCDumpHost.Controllers
@@ -25,7 +26,7 @@ namespace DBCDumpHost.Controllers
         [HttpGet("{name}")]
         public HeaderResult Get(string name, string build)
         {
-            Console.WriteLine("Handling headers for " + name + " (" + build + ")");
+            Logger.WriteLine("Serving headers for " + name + " (" + build + ")");
 
             var result = new HeaderResult();
 

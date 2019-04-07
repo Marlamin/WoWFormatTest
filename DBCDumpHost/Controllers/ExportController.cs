@@ -15,6 +15,7 @@ namespace DBCDumpHost.Controllers
         [HttpGet]
         public ActionResult ExportCSV(string name, string build)
         {
+            Logger.WriteLine("Exporting DBC " + name + " for build " + build);
             try
             {
                 var storage = DBCManager.LoadDBC(name, build);

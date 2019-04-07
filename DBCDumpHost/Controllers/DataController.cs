@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DBCDumpHost.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DBCDumpHost.Controllers
@@ -31,12 +32,12 @@ namespace DBCDumpHost.Controllers
 
             if (string.IsNullOrWhiteSpace(Request.Query["search[value]"]))
             {
-                Console.WriteLine("Handling data " + start + "," + length + " for dbc " + name + " (" + build + ") for draw " + draw);
+                Logger.WriteLine("Serving data " + start + "," + length + " for dbc " + name + " (" + build + ") for draw " + draw);
             }
             else
             {
                 searching = true;
-                Console.WriteLine("Handling data " + start + "," + length + " for dbc " + name + " (" + build + ") for draw " + draw + " with filter " + Request.Query["search[value]"]);
+                Logger.WriteLine("Serving data " + start + "," + length + " for dbc " + name + " (" + build + ") for draw " + draw + " with filter " + Request.Query["search[value]"]);
             }
 
             var searchValue = Request.Query["search[value]"];

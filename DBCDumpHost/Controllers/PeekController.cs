@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DBCDumpHost.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DBCDumpHost.Controllers
@@ -25,7 +26,7 @@ namespace DBCDumpHost.Controllers
         [HttpGet("{name}")]
         public PeekResult Get(string name, string build, string bc, string col, int val)
         {
-            Console.WriteLine("Handling foreign key row for " + name + "::" + col + " (" + build + "/" + bc + ") value " + val);
+            Logger.WriteLine("Serving foreign key row for " + name + "::" + col + " (" + build + "/" + bc + ") value " + val);
 
             var storage = DBCManager.LoadDBC(name, build);
 
