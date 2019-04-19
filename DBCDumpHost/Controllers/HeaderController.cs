@@ -32,11 +32,6 @@ namespace DBCDumpHost.Controllers
 
             var storage = DBCManager.LoadDBC(name, build);
 
-            if (storage.Values.Count == 0)
-            {
-                throw new Exception("No rows found!");
-            }
-
             if (!DefinitionManager.definitionLookup.ContainsKey(name))
             {
                 throw new KeyNotFoundException("Definition for " + name);
@@ -48,46 +43,66 @@ namespace DBCDumpHost.Controllers
 
             result.headers = new List<string>();
             result.fks = new Dictionary<string, string>();
-            foreach(var item in storage.Values)
+
+            if (storage.Values.Count == 0)
             {
                 for (var j = 0; j < fields.Length; ++j)
                 {
                     var field = fields[j];
+                    result.headers.Add(field.Name);
 
-                    if (field.FieldType.IsArray)
+                    foreach (var columnDef in definition.columnDefinitions)
                     {
-                        var a = (Array)field.GetValue(item);
-                        for (var i = 0; i < a.Length; i++)
+                        if (columnDef.Key == field.Name && columnDef.Value.foreignTable != null)
                         {
-                            var isEndOfArray = a.Length - 1 == i;
+                            result.fks.Add(field.Name, columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in storage.Values)
+                {
+                    for (var j = 0; j < fields.Length; ++j)
+                    {
+                        var field = fields[j];
 
-                            result.headers.Add($"{field.Name}[{i}]");
-
-                            foreach(var columnDef in definition.columnDefinitions)
+                        if (field.FieldType.IsArray)
+                        {
+                            var a = (Array)field.GetValue(item);
+                            for (var i = 0; i < a.Length; i++)
                             {
-                                if(columnDef.Key == field.Name && columnDef.Value.foreignTable != null)
+                                var isEndOfArray = a.Length - 1 == i;
+
+                                result.headers.Add($"{field.Name}[{i}]");
+
+                                foreach (var columnDef in definition.columnDefinitions)
                                 {
-                                    result.fks.Add($"{field.Name}[{i}]", columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
+                                    if (columnDef.Key == field.Name && columnDef.Value.foreignTable != null)
+                                    {
+                                        result.fks.Add($"{field.Name}[{i}]", columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
+                                    }
+                                }
+                            }
+                        }
+
+                        else
+                        {
+                            result.headers.Add(field.Name);
+
+                            foreach (var columnDef in definition.columnDefinitions)
+                            {
+                                if (columnDef.Key == field.Name && columnDef.Value.foreignTable != null)
+                                {
+                                    result.fks.Add(field.Name, columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
                                 }
                             }
                         }
                     }
 
-                    else
-                    {
-                        result.headers.Add(field.Name);
-
-                        foreach (var columnDef in definition.columnDefinitions)
-                        {
-                            if (columnDef.Key == field.Name && columnDef.Value.foreignTable != null)
-                            {
-                                result.fks.Add(field.Name, columnDef.Value.foreignTable + "::" + columnDef.Value.foreignColumn);
-                            }
-                        }
-                    }
+                    break;
                 }
-
-                break;
             }
 
             return result;

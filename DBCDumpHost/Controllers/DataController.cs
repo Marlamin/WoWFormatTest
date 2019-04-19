@@ -48,11 +48,6 @@ namespace DBCDumpHost.Controllers
             
             var storage = DBCManager.LoadDBC(name, build);
 
-            if (storage.Values.Count == 0)
-            {
-                throw new Exception("No rows found!");
-            }
-
             result.recordsTotal = storage.Values.Count;
 
             var fields = DefinitionManager.definitionCache[(name, build)].GetFields();
