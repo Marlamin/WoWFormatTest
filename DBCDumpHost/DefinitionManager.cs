@@ -42,6 +42,10 @@ namespace DBCDumpHost
             }
 
             definitionLookup = newDict;
+
+            // Reset cache
+            definitionCache = new Dictionary<(string, string), Type>();
+
             Logger.WriteLine("Loaded " + definitionLookup.Count + " definitions!");
         }
 

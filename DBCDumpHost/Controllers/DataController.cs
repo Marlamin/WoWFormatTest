@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using DBCDumpHost.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace DBCDumpHost.Controllers
             public int recordsFiltered;
             public int recordsTotal;
             public List<List<string>> data;
+            public string error;
         }
 
         // GET: data/
@@ -45,33 +47,46 @@ namespace DBCDumpHost.Controllers
             var result = new DataTablesResult();
 
             result.draw = draw;
-            
-            var storage = DBCManager.LoadDBC(name, build);
 
-            result.recordsTotal = storage.Values.Count;
-
-            var fields = DefinitionManager.definitionCache[(name, build)].GetFields();
-
-            result.data = new List<List<string>>();
-
-            var resultCount = 0;
-            foreach (var item in storage.Values)
+            try
             {
-                var rowList = new List<string>();
-                var matches = false;
+                var storage = DBCManager.LoadDBC(name, build);
+                result.recordsTotal = storage.Values.Count;
 
-                for (var i = 0; i < fields.Length; ++i)
+                var fields = DefinitionManager.definitionCache[(name, build)].GetFields();
+
+                result.data = new List<List<string>>();
+
+                var resultCount = 0;
+                foreach (var item in storage.Values)
                 {
-                    var field = fields[i];
+                    var rowList = new List<string>();
+                    var matches = false;
 
-                    if (field.FieldType.IsArray)
+                    for (var i = 0; i < fields.Length; ++i)
                     {
-                        var a = (Array)field.GetValue(item);
+                        var field = fields[i];
 
-                        for (var j = 0; j < a.Length; j++)
+                        if (field.FieldType.IsArray)
                         {
-                            var isEndOfArray = a.Length - 1 == j;
-                            var val = a.GetValue(j).ToString();
+                            var a = (Array)field.GetValue(item);
+
+                            for (var j = 0; j < a.Length; j++)
+                            {
+                                var isEndOfArray = a.Length - 1 == j;
+                                var val = a.GetValue(j).ToString();
+                                if (searching)
+                                {
+                                    if (val.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase))
+                                        matches = true;
+                                }
+
+                                rowList.Add(val);
+                            }
+                        }
+                        else
+                        {
+                            var val = field.GetValue(item).ToString();
                             if (searching)
                             {
                                 if (val.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase))
@@ -81,43 +96,37 @@ namespace DBCDumpHost.Controllers
                             rowList.Add(val);
                         }
                     }
-                    else
+
+                    if (searching)
                     {
-                        var val = field.GetValue(item).ToString();
-                        if (searching)
+                        if (matches)
                         {
-                            if (val.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase))
-                                matches = true;
+                            resultCount++;
+                            result.data.Add(rowList);
                         }
-
-                        rowList.Add(val);
                     }
-                }
-
-                if (searching)
-                {
-                    if (matches)
+                    else
                     {
                         resultCount++;
                         result.data.Add(rowList);
                     }
                 }
-                else
+
+                result.recordsFiltered = resultCount;
+
+                var takeLength = length;
+                if ((start + length) > resultCount)
                 {
-                    resultCount++;
-                    result.data.Add(rowList);
+                    takeLength = resultCount - start;
                 }
+
+                result.data = result.data.GetRange(start, takeLength);
             }
-
-            result.recordsFiltered = resultCount;
-
-            var takeLength = length;
-            if((start + length) > resultCount)
+            catch (Exception e)
             {
-                takeLength = resultCount - start;
+                Logger.WriteLine("Error occured during serving data: " + e.Message);
+                result.error = e.Message.Replace(SettingManager.dbcDir, "");
             }
-
-            result.data = result.data.GetRange(start, takeLength);
 
             return result;
         }
