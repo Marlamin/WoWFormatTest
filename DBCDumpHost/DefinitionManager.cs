@@ -79,10 +79,29 @@ namespace DBCDumpHost
                         reader = new WDC3Reader(stream);
                         break;
                     case "WDC2":
+                    case "1SLC":
                         reader = new WDC2Reader(stream);
                         break;
                     case "WDC1":
                         reader = new WDC1Reader(stream);
+                        break;
+                    case "WDB6":
+                        reader = new WDB6Reader(stream);
+                        break;
+                    case "WDB5":
+                        reader = new WDB5Reader(stream);
+                        break;
+                    case "WDB4":
+                        reader = new WDB4Reader(stream);
+                        break;
+                    case "WDB3":
+                        reader = new WDB3Reader(stream);
+                        break;
+                    case "WDB2":
+                        reader = new WDB2Reader(stream);
+                        break;
+                    case "WDBC":
+                        reader = new WDBCReader(stream);
                         break;
                     default:
                         throw new Exception("DBC type " + identifier + " is not supported!");

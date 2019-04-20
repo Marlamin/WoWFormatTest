@@ -38,7 +38,15 @@ namespace DBCDumpHost
 
             if (!File.Exists(filename))
             {
-                throw new FileNotFoundException("DBC not found on disk: " + filename);
+                filename = Path.Combine(SettingManager.dbcDir, build, "dbfilesclient", name + ".dbc");
+                if (!File.Exists(filename))
+                {
+                    filename = Path.Combine(SettingManager.dbcDir, build, name + ".dbc");
+                    if (!File.Exists(filename))
+                    {
+                        throw new FileNotFoundException("DBC not found on disk: " + filename);
+                    }
+                }
             }
 
             var rawType = DefinitionManager.CompileDefinition(filename, build);
