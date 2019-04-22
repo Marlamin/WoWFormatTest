@@ -1,4 +1,5 @@
 ﻿using System;
+using WoWFormatLib.Utils;
 
 namespace WoWFormatLib.Structs.WDT
 {
@@ -16,7 +17,22 @@ namespace WoWFormatLib.Structs.WDT
     public struct WDT
     {
         public MPHD mphd;
+        public MODF modf;
         public MapFileDataIDs[] filedataids;
+    }
+
+    public struct MODF
+    {
+        public uint id;
+        public uint uuid;
+        public Vector3 position;
+        public Vector3 rotation;
+        public Vector3 upperExtents;
+        public Vector3 lowerExtents;
+        public short flags;
+        public short doodadSetID;
+        public short nameSet;
+        public short padding;
     }
 
     public struct MapFileDataIDs

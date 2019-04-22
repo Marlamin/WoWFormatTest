@@ -15,6 +15,7 @@ namespace WoWFormatLib.Structs.BLS
         public uint nCompressedChunks;
         public uint ofsCompressedData;
         public uint[] ofsShaderBlocks;
+        public List<byte[]> decompressedBlocks;
         public ShaderBlock[] shaderBlocks;
     }
 
@@ -33,8 +34,6 @@ namespace WoWFormatLib.Structs.BLS
     {
         public uint flags;
         public uint flags2;
-        public uint unk0;
-        public uint unk1;
         public uint length;
     }
 

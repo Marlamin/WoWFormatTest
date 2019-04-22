@@ -11,6 +11,7 @@ namespace WoWFormatLib.FileReaders
     {
         public List<(byte, byte)> tiles = new List<(byte, byte)>();
         public Dictionary<(byte, byte), MapFileDataIDs> tileFiles = new Dictionary<(byte, byte), MapFileDataIDs>();
+        public Dictionary<string, MapFileDataIDs> stringTileFiles = new Dictionary<string, MapFileDataIDs>();
         public WDT wdtfile;
 
         public void LoadWDT(string filename)
@@ -30,6 +31,11 @@ namespace WoWFormatLib.FileReaders
             using (var stream = CASC.OpenFile(filedataid))
             {
                 ReadWDT(stream);
+            }
+
+            foreach(var entry in tileFiles)
+            {
+                stringTileFiles.Add(entry.Key.Item1 + "," + entry.Key.Item2, entry.Value);
             }
         }
 
@@ -88,6 +94,10 @@ namespace WoWFormatLib.FileReaders
                 }
             }
         }
+        private MODF ReadMODFChunk(BinaryReader bin)
+        {
+            return bin.Read<MODF>();
+        }
 
         private void ReadWDT(Stream wdt)
         {
@@ -121,6 +131,7 @@ namespace WoWFormatLib.FileReaders
                         ReadMAIDChunk(bin);
                         break;
                     case WDTChunks.MODF:
+                        wdtfile.modf = ReadMODFChunk(bin);
                         break;
                     default:
                         throw new Exception(string.Format("Found unknown header at offset {1} \"{0}\" while we should've already read them all!", chunkName, position.ToString()));

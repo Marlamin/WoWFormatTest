@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using WoWFormatLib.Structs.BLS;
 using WoWFormatLib.Utils;
 
@@ -10,7 +12,7 @@ namespace WoWFormatLib.FileReaders
     public class BLSReader
     {
         public BLS shaderFile;
-        private MemoryStream targetStream;
+        public MemoryStream targetStream;
 
         public BLS LoadBLS(string filename)
         {
@@ -72,6 +74,8 @@ namespace WoWFormatLib.FileReaders
 
                 targetStream = new MemoryStream();
 
+                shaderFile.decompressedBlocks = new List<byte[]>();
+
                 for (var i = 0; i < shaderFile.nCompressedChunks; i++)
                 {
                     var chunkStart = shaderFile.ofsCompressedData + shaderOffsets[i];
@@ -92,7 +96,7 @@ namespace WoWFormatLib.FileReaders
                     }
                 }
 
-                File.WriteAllBytes("new.bls", targetStream.ToArray());
+                ///File.WriteAllBytes("out.bin", targetStream.ToArray());
             }
 
             // Start reading decompressed data
@@ -105,15 +109,55 @@ namespace WoWFormatLib.FileReaders
                     var chunkLength = shaderFile.ofsShaderBlocks[i + 1] - shaderFile.ofsShaderBlocks[i];
                     bin.BaseStream.Position = shaderFile.ofsShaderBlocks[i];
 
-                    shaderFile.shaderBlocks[i].header = bin.Read<ShaderBlockHeader>();
-
-                    // Skip non-GL shaders for now
+                    //shaderFile.shaderBlocks[i].header = bin.Read<ShaderBlockHeader>();
+                    var length = (int)bin.ReadUInt32();
                     var magic = new string(bin.ReadChars(4));
-                    if (magic != "3SLG")
+                    var magicFound = false;
+                    while (!magicFound)
                     {
-                        Console.WriteLine("Skipping " + magic);
-                        break;
+                        //Console.WriteLine(bin.BaseStream.Position + ": " + magic);
+                        var rawMagic = bin.ReadBytes(4);
+                        magic = Encoding.UTF8.GetString(rawMagic);
+                        if(magic == "DXBC" || magic == "MTLB")
+                        {
+                            //File.WriteAllBytes("mtl.bin", targetStream.ToArray());
+                            magicFound = true;
+                            bin.BaseStream.Position -= 8;
+                            length = bin.ReadInt32();
+                           // Console.WriteLine("Found " + magic + " at " + bin.BaseStream.Position);
+                        }
+
+                        if (bin.BaseStream.Position == bin.BaseStream.Length)
+                        {
+                            return shaderFile;
+                        }
                     }
+
+                    //Console.WriteLine("Reading " + length);
+                    if(length == 1)
+                    {
+                        bin.BaseStream.Position -= 24;
+                        length = bin.ReadInt32();
+                        bin.BaseStream.Position += 20;
+                        length = length - 20;
+                    }
+                    shaderFile.decompressedBlocks.Add(bin.ReadBytes(length));
+
+                    if(length == 1)
+                    {
+                        File.WriteAllBytes("out2.bin", targetStream.ToArray());
+                    }
+                    /*Console.WriteLine(magic);
+                    while (magic != "DXBC" && magic != "MTLB")
+                    {
+                        magic = new string(bin.ReadChars(4));
+                        Console.WriteLine(magic);
+                    }
+
+                    Console.WriteLine("Found " + magic + " at " + (bin.BaseStream.Position - 4));
+                    */
+
+                    /*
                     bin.BaseStream.Position -= 4;
 
                     var GLSL3start = bin.BaseStream.Position;
@@ -234,7 +278,7 @@ namespace WoWFormatLib.FileReaders
                     }
 
                     bin.BaseStream.Position += header.variableStringsSize;
-
+                    */
                     // Padding up to 4 bytes
                     for (var p = 0; p < 4; p++)
                     {
@@ -246,11 +290,10 @@ namespace WoWFormatLib.FileReaders
 
                     if (bin.BaseStream.Position != shaderFile.ofsShaderBlocks[i + 1])
                     {
-                        Console.WriteLine("!!! Didn't end up at next shader (" + shaderFile.ofsShaderBlocks[i + 1] + "), there might be unread data at " + bin.BaseStream.Position + "!");
+                        //Console.WriteLine("!!! Didn't end up at next shader (" + shaderFile.ofsShaderBlocks[i + 1] + "), there might be unread data at " + bin.BaseStream.Position + "!");
                     }
                 }
             }
-
 
             return shaderFile;
         }
