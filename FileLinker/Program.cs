@@ -33,7 +33,7 @@ namespace FileLinker
             var dbConn = new MySqlConnection(File.ReadAllText("connectionstring.txt"));
             dbConn.Open();
 
-            CASC.InitCasc("bnet.marlam.in", args[0], args[1]);
+            CASC.InitCasc("wow.tools", args[0], args[1]);
 
             var insertCmd = new MySqlCommand("INSERT INTO wow_rootfiles_links VALUES (@parent, @child, @type)", dbConn);
             insertCmd.Parameters.AddWithValue("@parent", 0);
@@ -41,7 +41,11 @@ namespace FileLinker
             insertCmd.Parameters.AddWithValue("@type", "");
             insertCmd.Prepare();
 
-            /*
+            var insertUVFNCmd = new MySqlCommand("INSERT INTO wow_communityfiles VALUES (@id, @filename)", dbConn);
+            insertUVFNCmd.Parameters.AddWithValue("@id", 0);
+            insertUVFNCmd.Parameters.AddWithValue("@filename", 0);
+            insertCmd.Prepare();
+
             #region M2
             var m2ids = new List<uint>();
 
@@ -180,7 +184,7 @@ namespace FileLinker
             #endregion
 
             #region WMO
-
+            /*
             var wmoids = new List<uint>();
 
             var groupFixCMD = new MySqlCommand("UPDATE wow_rootfiles SET type = '_xxxwmo' WHERE id = @id LIMIT 1", dbConn);
@@ -279,11 +283,28 @@ namespace FileLinker
                         Console.WriteLine(e.Message);
                     }
                 }
-            }
+            }*/
             #endregion
 
             #region WDT
             var wdtids = new List<uint>();
+            var wdtfullnamemap = new Dictionary<string, uint>();
+            using (var cmd = dbConn.CreateCommand())
+            {
+                Console.WriteLine("[WDT] Generating list of WDT files..");
+                cmd.CommandText = "SELECT id, filename from wow_rootfiles WHERE type = 'wdt' AND filename IS NOT NULL ORDER BY id DESC";
+                var reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    var filename = (string)reader["filename"];
+                    var wdtid = uint.Parse(reader["id"].ToString());
+                    if (filename.Contains("_mpv") || filename.Contains("_lgt") || filename.Contains("_occ") || filename.Contains("_fogs"))
+                        continue;
+                    wdtfullnamemap.Add(filename, wdtid);
+                }
+            }
+
             using (var cmd = dbConn.CreateCommand())
             {
                 if (fullrun)
@@ -293,16 +314,17 @@ namespace FileLinker
                 else
                 {
                     Console.WriteLine("[WDT] Generating list of files to process..");
-                    cmd.CommandText = "SELECT id, filename from wow_rootfiles WHERE type = 'wdt' AND id NOT IN (SELECT parent FROM wow_rootfiles_links) ORDER BY id DESC";
+                    cmd.CommandText = "SELECT id, filename from wow_rootfiles WHERE type = 'wdt' AND filename IS NOT NULL AND id NOT IN (SELECT parent FROM wow_rootfiles_links) ORDER BY id DESC";
                 }
                 var reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
                     var filename = (string)reader["filename"];
+                    var wdtid = uint.Parse(reader["id"].ToString());
                     if (filename.Contains("_mpv") || filename.Contains("_lgt") || filename.Contains("_occ") || filename.Contains("_fogs"))
                         continue;
-                    wdtids.Add(uint.Parse(reader["id"].ToString()));
+                    wdtids.Add(wdtid);
                 }
 
                 reader.Close();
@@ -316,9 +338,24 @@ namespace FileLinker
                     var wdtreader = new WDTReader();
                     wdtreader.LoadWDT(wdtid);
 
-                    foreach(var records in wdtreader.tileFiles)
+                    if (wdtreader.wdtfile.modf.id != 0)
                     {
-                        if(records.Value.rootADT != 0)
+                        Console.WriteLine("WDT has WMO ID: " + wdtreader.wdtfile.modf.id);
+                        try
+                        {
+                            insertCmd.Parameters[1].Value = wdtreader.wdtfile.modf.id;
+                            insertCmd.Parameters[2].Value = "wdt wmo";
+                            insertCmd.ExecuteNonQuery();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("WDT WMO: " + e.Message);
+                        }
+                    }
+
+                    foreach (var records in wdtreader.stringTileFiles)
+                    {
+                        if (records.Value.rootADT != 0)
                         {
                             try
                             {
@@ -331,8 +368,8 @@ namespace FileLinker
                                 Console.WriteLine("Root: " + e.Message);
                             }
                         }
-                        
-                        if(records.Value.tex0ADT != 0)
+
+                        if (records.Value.tex0ADT != 0)
                         {
                             try
                             {
@@ -345,8 +382,8 @@ namespace FileLinker
                                 Console.WriteLine("TEX0: " + e.Message);
                             }
                         }
-                        
-                        if(records.Value.lodADT != 0)
+
+                        if (records.Value.lodADT != 0)
                         {
                             try
                             {
@@ -360,7 +397,7 @@ namespace FileLinker
                             }
                         }
 
-                        if(records.Value.obj0ADT != 0)
+                        if (records.Value.obj0ADT != 0)
                         {
                             try
                             {
@@ -373,8 +410,8 @@ namespace FileLinker
                                 Console.WriteLine("OBJ0: " + e.Message);
                             }
                         }
-                        
-                        if(records.Value.obj1ADT != 0)
+
+                        if (records.Value.obj1ADT != 0)
                         {
                             try
                             {
@@ -387,8 +424,8 @@ namespace FileLinker
                                 Console.WriteLine("OBJ1: " + e.Message);
                             }
                         }
-                        
-                        if(records.Value.mapTexture != 0)
+
+                        if (records.Value.mapTexture != 0)
                         {
                             try
                             {
@@ -401,8 +438,8 @@ namespace FileLinker
                                 Console.WriteLine("MapT: " + e.Message);
                             }
                         }
-                        
-                        if(records.Value.mapTextureN != 0)
+
+                        if (records.Value.mapTextureN != 0)
                         {
                             try
                             {
@@ -415,8 +452,8 @@ namespace FileLinker
                                 Console.WriteLine("MapTN: " + e.Message);
                             }
                         }
-                        
-                        if(records.Value.minimapTexture != 0)
+
+                        if (records.Value.minimapTexture != 0)
                         {
                             try
                             {
@@ -433,7 +470,6 @@ namespace FileLinker
                 }
             }
             #endregion
-            */
 
             #region ADT
             var adtids = new Dictionary<uint, Dictionary<(byte, byte), uint>>();
@@ -458,7 +494,7 @@ namespace FileLinker
                     var mapname = filename.Replace("world/maps/", "").Substring(0, filename.Replace("world/maps/", "").IndexOf("/"));
                     var exploded = Path.GetFileNameWithoutExtension(filename).Split('_');
 
-                    for(var i = 0; i < exploded.Length; i++)
+                    for (var i = 0; i < exploded.Length; i++)
                     {
                         //Console.WriteLine(i + ": " + exploded[i]);
                     }
@@ -474,7 +510,13 @@ namespace FileLinker
                     if (!wdtmapping.ContainsKey(mapname))
                     {
                         var wdtname = "world/maps/" + mapname + "/" + mapname + ".wdt";
-                        wdtmapping.Add(mapname, CASC.getFileDataIdByName(wdtname));
+                        if (!wdtfullnamemap.ContainsKey(wdtname))
+                        {
+                            Console.WriteLine("Unable to get filedataid for " + mapname + ", skipping...");
+                            wdtmapping.Remove(mapname);
+                            continue;
+                        }
+                        wdtmapping.Add(mapname, wdtfullnamemap[wdtname]);
                         if (wdtmapping[mapname] == 0)
                         {
                             // TODO: Support WDTs removed in current build
@@ -501,7 +543,7 @@ namespace FileLinker
 
                     var id = uint.Parse(reader["id"].ToString());
 
-                    if(id == 0)
+                    if (id == 0)
                     {
                         Console.WriteLine("Root ADT " + tileX + ", " + tileY + " with ID 0 on WDT " + wdtmapping[mapname]);
                         continue;
@@ -515,9 +557,9 @@ namespace FileLinker
 
                 reader.Close();
 
-                foreach(var wdtid in adtids)
+                foreach (var wdtid in adtids)
                 {
-                    foreach(var adtid in wdtid.Value)
+                    foreach (var adtid in wdtid.Value)
                     {
                         var inserted = new List<uint>();
                         Console.WriteLine("[ADT] Loading " + adtid.Key.Item1 + ", " + adtid.Key.Item2 + "(" + adtid.Value + ")");
@@ -525,9 +567,17 @@ namespace FileLinker
                         insertCmd.Parameters[0].Value = adtid.Value;
 
                         var adtreader = new ADTReader();
-                        adtreader.LoadADT(wdtid.Key, adtid.Key.Item1, adtid.Key.Item2);
+                        try
+                        {
+                            adtreader.LoadADT(wdtid.Key, adtid.Key.Item1, adtid.Key.Item2);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            continue;
+                        }
 
-                        if(adtreader.adtfile.objects.m2Names.filenames != null)
+                        if (adtreader.adtfile.objects.m2Names.filenames != null)
                         {
                             Console.WriteLine(adtid + " is still using old filenames, skipping!");
                         }
@@ -559,6 +609,8 @@ namespace FileLinker
                 }
             }
             #endregion
+
+
         }
     }
 }
