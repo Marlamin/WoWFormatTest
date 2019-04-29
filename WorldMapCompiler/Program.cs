@@ -111,7 +111,7 @@ namespace WorldMapCompiler
             {
                 var mapName = mapRow.Value.Name_lang;
 
-                Console.WriteLine(mapRow.Value.ID + " = " + mapName);
+                Console.WriteLine(mapRow.Key + " = " + mapName);
 
                 foreach (dynamic mxaRow in UIMapXArt)
                 {
@@ -190,7 +190,7 @@ namespace WorldMapCompiler
 
                         if (saveUnexplored)
                         {
-                            bmp.Save("unexplored/ " + CleanFileName(mapRow.Value.Id + " - " + mapName + ".png"));
+                            bmp.Save("unexplored/ " + CleanFileName(mapRow.Key + " - " + mapName + ".png"));
                         }
 
                         if (!saveLayers && !saveExplored)
@@ -287,11 +287,11 @@ namespace WorldMapCompiler
 
                             if (saveLayers)
                             {
-                                if (!Directory.Exists("layers/" + CleanFileName(mapRow.Value.Id + " - " + mapName) + "/"))
+                                if (!Directory.Exists("layers/" + CleanFileName(mapRow.Key + " - " + mapName) + "/"))
                                 {
-                                    Directory.CreateDirectory("layers/" + CleanFileName(mapRow.Value.Id + " - " + mapName) + "/");
+                                    Directory.CreateDirectory("layers/" + CleanFileName(mapRow.Key + " - " + mapName) + "/");
                                 }
-                                layerBitmap.Save("layers/" + CleanFileName(mapRow.Value.Id + " - " + mapName) + "/" + wmorow.Value.Id + ".png");
+                                layerBitmap.Save("layers/" + CleanFileName(mapRow.Key + " - " + mapName) + "/" + wmorow.Key + ".png");
                             }
                         }
 
