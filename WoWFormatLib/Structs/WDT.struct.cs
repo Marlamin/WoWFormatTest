@@ -49,13 +49,18 @@ namespace WoWFormatLib.Structs.WDT
 
     public struct MPHD
     {
-        public mphdFlags flags;
-        public uint something;
-        public uint[] unused;
+        public MPHDFlags flags;
+        public uint lgtFDID;
+        public uint occFDID;
+        public uint fogsFDID;
+        public uint mpvFDID;
+        public uint texFDID;
+        public uint wdlFDID;
+        public uint unused;
     }
 
     [Flags]
-    public enum mphdFlags : uint
+    public enum MPHDFlags : uint
     {
         wdt_uses_global_map_obj                 = 0x1,
         adt_has_mccv                            = 0x2,

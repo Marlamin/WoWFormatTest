@@ -75,13 +75,7 @@ namespace WoWFormatLib.FileReaders
 
         private MPHD ReadMPHDChunk(BinaryReader bin)
         {
-            var mphd = new MPHD()
-            {
-                flags = (mphdFlags)bin.ReadUInt32(),
-                something = bin.ReadUInt32(),
-                unused = new uint[] { bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32(), bin.ReadUInt32() }
-            };
-            return mphd;
+            return bin.Read<MPHD>();
         }
 
         private void ReadMAIDChunk(BinaryReader bin)

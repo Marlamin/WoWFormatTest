@@ -34,8 +34,7 @@ namespace WoWFormatLib
             return Unsafe.ReadUnaligned<T>(ref result[0]);
         }
 
-
-        public static T[] ReadArray<T>(this BinaryReader reader) where T : struct
+        public static T[] ReadArray<T>(this BinaryReader reader) where T : unmanaged
         {
             int numBytes = (int)reader.ReadInt64();
 
@@ -46,7 +45,7 @@ namespace WoWFormatLib
             return source.CopyTo<T>();
         }
 
-        public static T[] ReadArray<T>(this BinaryReader reader, int size) where T : struct
+        public static T[] ReadArray<T>(this BinaryReader reader, int size) where T : unmanaged
         {
             int numBytes = Unsafe.SizeOf<T>() * size;
 
