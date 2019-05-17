@@ -511,7 +511,7 @@ namespace WoWFormatLib.FileReaders
                     if (ofsFilename < 10)
                     {
                         // Referenced in TXID, no longer in file (rip listfiles)
-                        textures[i].filename = @"Test\QA_TEST_BLP_1.blp";
+                        textures[i].filename = @"dungeons\textures\testing\color_01.blp";
                     }
                     else
                     {
@@ -525,14 +525,14 @@ namespace WoWFormatLib.FileReaders
                         }
                         else
                         {
-                            textures[i].filename = @"Test\QA_TEST_BLP_1.blp";
+                            textures[i].filename = @"dungeons\textures\testing\color_01.blp";
                         }
                         bin.BaseStream.Position = preFilenamePosition;
                     }
                 }
                 else
                 {
-                    textures[i].filename = @"Test\QA_TEST_BLP_1.blp";
+                    textures[i].filename = @"dungeons\textures\testing\color_01.blp";
                 }
             }
             return textures;
