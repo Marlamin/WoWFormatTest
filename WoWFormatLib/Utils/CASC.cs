@@ -45,13 +45,13 @@ namespace WoWFormatLib.Utils
             else
             {
                 basedir = basedir.Replace("_retail_", "").Replace("_ptr_", "");
-                Console.WriteLine("Initializing CASC from local disk with basedir " + basedir);
-                cascHandler = CASCHandler.OpenLocalStorage(basedir, worker);
+                Console.WriteLine("Initializing CASC from local disk with basedir " + basedir + " and program " + program);
+                cascHandler = CASCHandler.OpenLocalStorage(basedir, program, worker);
             }
 
             BuildName = cascHandler.Config.BuildName;
 
-            cascHandler.Root.SetFlags(locale, ContentFlags.None, false);
+            cascHandler.Root.SetFlags(locale);
 
             IsCASCInit = true;
         }

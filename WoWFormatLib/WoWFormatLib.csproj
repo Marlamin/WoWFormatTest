@@ -83,13 +83,13 @@
     <Compile Include="Utils\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CASCExplorer\CascLibCore\CascLibCore.csproj">
-      <Project>{d22ff00e-1652-4dff-a117-473b0849ce06}</Project>
-      <Name>CascLibCore</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\CascLib\CascLib\CascLib.csproj">
+      <Project>{b95c1e03-a385-4d1a-aef5-51cde030e23b}</Project>
+      <Name>CascLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

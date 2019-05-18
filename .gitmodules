@@ -11,3 +11,6 @@
 [submodule "WoWDBDefs"]
 	path = WoWDBDefs
 	url = https://github.com/wowdev/WoWDBDefs/
+[submodule "CascLib"]
+	path = CascLib
+	url = https://github.com/WoW-Tools/CascLib.git
