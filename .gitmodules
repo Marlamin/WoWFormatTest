@@ -14,3 +14,6 @@
 [submodule "CascLib"]
 	path = CascLib
 	url = https://github.com/WoW-Tools/CascLib.git
+[submodule "WoWFormatLib"]
+	path = WoWFormatLib
+	url = https://github.com/Marlamin/WoWFormatLib.git
