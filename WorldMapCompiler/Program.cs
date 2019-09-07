@@ -67,11 +67,13 @@ namespace WorldMapCompiler
                 CASC.InitCasc(null, null, config["program"], locale);
             }
 
-            using (var UIMapStream = CASC.OpenFile("DBFilesClient\\UIMap.db2"))
-            using (var UIMapXArtStream = CASC.OpenFile("DBFilesClient\\UIMapXMapArt.db2"))
-            using (var UIMapArtTileStream = CASC.OpenFile("DBFilesClient\\UIMapArtTile.db2"))
-            using (var WorldMapOverlayStream = CASC.OpenFile("DBFilesClient\\WorldMapOverlay.db2"))
-            using (var WorldMapOverlayTileStream = CASC.OpenFile("DBFilesClient\\WorldMapOverlayTile.db2"))
+            using (var UIMapStream = CASC.OpenFile(1957206))
+            using (var UIMapXArtStream = CASC.OpenFile(1957217))
+            using (var UIMapArtTileStream = CASC.OpenFile(1957210))
+            using (var UIMapArtStream = CASC.OpenFile(1957202))
+            using (var UIMapArtStyleStream = CASC.OpenFile(1957208))
+            using (var WorldMapOverlayStream = CASC.OpenFile(1134579))
+            using (var WorldMapOverlayTileStream = CASC.OpenFile(1957212))
             {
                 if (!Directory.Exists("dbcs"))
                 {
@@ -87,8 +89,16 @@ namespace WorldMapCompiler
                 uimapxartfs.Close();
 
                 var uimapatfs = File.Create("dbcs/UIMapArtTile.db2");
-                UIMapArtTileStream.CopyTo(uimapatfs);
+                UIMapArtTileStream.CopyTo(uimapatfs);   
                 uimapatfs.Close();
+
+                var uimapart = File.Create("dbcs/UIMapArt.db2");
+                UIMapArtStream.CopyTo(uimapart);
+                uimapart.Close();
+
+                var uimapartstyle = File.Create("dbcs/UIMapArtStyleLayer.db2");
+                UIMapArtStyleStream.CopyTo(uimapartstyle);
+                uimapartstyle.Close();
 
                 var wmofs = File.Create("dbcs/WorldMapOverlay.db2");
                 WorldMapOverlayStream.CopyTo(wmofs);
@@ -102,6 +112,8 @@ namespace WorldMapCompiler
             var UIMap = DBCManager.LoadDBC("UIMap", CASC.BuildName);
             var UIMapXArt = DBCManager.LoadDBC("UIMapXMapArt", CASC.BuildName);
             var UIMapArtTile = DBCManager.LoadDBC("UIMapArtTile", CASC.BuildName);
+            var UIMapArt = DBCManager.LoadDBC("UIMapArt", CASC.BuildName);
+            var UIMapArtStyleLayer = DBCManager.LoadDBC("UIMapArtStyleLayer", CASC.BuildName);
             var WorldMapOverlay = DBCManager.LoadDBC("WorldMapOverlay", CASC.BuildName);
             var WorldMapOverlayTile = DBCManager.LoadDBC("WorldMapOverlayTile", CASC.BuildName);
 
@@ -157,8 +169,35 @@ namespace WorldMapCompiler
                             }
                         }
 
-                        var res_x = (maxRows + 1) * 256;
-                        var res_y = (maxCols + 1) * 256;
+                        uint res_x = 0;
+                        uint res_y = 0;
+
+                        foreach (dynamic maRow in UIMapArt)
+                        {
+                            if(maRow.Value.ID == uiMapArtID)
+                            {
+                                foreach (dynamic mastRow in UIMapArtStyleLayer)
+                                {
+                                    if (mastRow.Value.ID == maRow.Value.UiMapArtStyleID)
+                                    {
+                                        res_x = mastRow.Value.LayerHeight;
+                                        res_y = mastRow.Value.LayerWidth;
+                                        continue;
+                                    }
+                                }
+                                continue;
+                            }
+                        }
+
+                        if(res_x == 0)
+                        {
+                            res_x = (maxRows + 1) * 256;
+                        }
+
+                        if(res_y == 0)
+                        {
+                            res_y = (maxCols + 1) * 256;
+                        }
 
                         var bmp = new Bitmap((int)res_y, (int)res_x);
 
