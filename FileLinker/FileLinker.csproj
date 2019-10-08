@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CascLib" Version="1.0.10" />
     <PackageReference Include="MySql.Data" Version="8.0.13" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CASCExplorer\CascLibCore\CascLibCore.csproj" />
-    <ProjectReference Include="..\WoWFormatTest\WoWFormatTest.csproj" />
+    <ProjectReference Include="..\..\WoWFormatLib\WoWFormatLib\WoWFormatLib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -33,6 +33,8 @@ namespace FileLinker
             var dbConn = new MySqlConnection(File.ReadAllText("connectionstring.txt"));
             dbConn.Open();
 
+            CASCLib.Logger.Init();
+
             CASC.InitCasc("wow.tools", args[0], args[1]);
 
             var insertCmd = new MySqlCommand("INSERT INTO wow_rootfiles_links VALUES (@parent, @child, @type)", dbConn);
@@ -184,7 +186,6 @@ namespace FileLinker
             #endregion
 
             #region WMO
-            /*
             var wmoids = new List<uint>();
 
             var groupFixCMD = new MySqlCommand("UPDATE wow_rootfiles SET type = '_xxxwmo' WHERE id = @id LIMIT 1", dbConn);
@@ -283,7 +284,7 @@ namespace FileLinker
                         Console.WriteLine(e.Message);
                     }
                 }
-            }*/
+            }
             #endregion
 
             #region WDT
