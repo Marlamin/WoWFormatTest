@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\WoWFormatLib\WoWFormatLib\WoWFormatLib.csproj" />
+    <ProjectReference Include="..\WoWFormatLib\WoWFormatLib\WoWFormatLib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -315,16 +315,16 @@ namespace FileLinker
                 else
                 {
                     Console.WriteLine("[WDT] Generating list of files to process..");
-                    cmd.CommandText = "SELECT id, filename from wow_rootfiles WHERE type = 'wdt' AND filename IS NOT NULL AND id NOT IN (SELECT parent FROM wow_rootfiles_links) ORDER BY id DESC";
+                    cmd.CommandText = "SELECT id, filename from wow_rootfiles WHERE type = 'wdt' AND id NOT IN (SELECT parent FROM wow_rootfiles_links) ORDER BY id DESC";
                 }
                 var reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    var filename = (string)reader["filename"];
+                    //var filename = (string)reader["filename"];
                     var wdtid = uint.Parse(reader["id"].ToString());
-                    if (filename.Contains("_mpv") || filename.Contains("_lgt") || filename.Contains("_occ") || filename.Contains("_fogs"))
-                        continue;
+                    //if (filename.Contains("_mpv") || filename.Contains("_lgt") || filename.Contains("_occ") || filename.Contains("_fogs"))
+                    //   continue;
                     wdtids.Add(wdtid);
                 }
 
@@ -335,139 +335,145 @@ namespace FileLinker
                     Console.WriteLine("[WDT] Loading " + wdtid);
 
                     insertCmd.Parameters[0].Value = wdtid;
-
-                    var wdtreader = new WDTReader();
-                    wdtreader.LoadWDT(wdtid);
-
-                    if (wdtreader.wdtfile.modf.id != 0)
+                    try
                     {
-                        Console.WriteLine("WDT has WMO ID: " + wdtreader.wdtfile.modf.id);
-                        try
-                        {
-                            insertCmd.Parameters[1].Value = wdtreader.wdtfile.modf.id;
-                            insertCmd.Parameters[2].Value = "wdt wmo";
-                            insertCmd.ExecuteNonQuery();
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("WDT WMO: " + e.Message);
-                        }
-                    }
+                        var wdtreader = new WDTReader();
+                        wdtreader.LoadWDT(wdtid);
 
-                    foreach (var records in wdtreader.stringTileFiles)
+                        if (wdtreader.wdtfile.modf.id != 0)
+                        {
+                            Console.WriteLine("WDT has WMO ID: " + wdtreader.wdtfile.modf.id);
+                            try
+                            {
+                                insertCmd.Parameters[1].Value = wdtreader.wdtfile.modf.id;
+                                insertCmd.Parameters[2].Value = "wdt wmo";
+                                insertCmd.ExecuteNonQuery();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("WDT WMO: " + e.Message);
+                            }
+                        }
+
+                        foreach (var records in wdtreader.stringTileFiles)
+                        {
+                            if (records.Value.rootADT != 0)
+                            {
+                                try
+                                {
+                                    insertCmd.Parameters[1].Value = records.Value.rootADT;
+                                    insertCmd.Parameters[2].Value = "root adt";
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine("Root: " + e.Message);
+                                }
+                            }
+
+                            if (records.Value.tex0ADT != 0)
+                            {
+                                try
+                                {
+                                    insertCmd.Parameters[1].Value = records.Value.tex0ADT;
+                                    insertCmd.Parameters[2].Value = "tex0 adt";
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine("TEX0: " + e.Message);
+                                }
+                            }
+
+                            if (records.Value.lodADT != 0)
+                            {
+                                try
+                                {
+                                    insertCmd.Parameters[1].Value = records.Value.lodADT;
+                                    insertCmd.Parameters[2].Value = "lod adt";
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine("LOD: " + e.Message);
+                                }
+                            }
+
+                            if (records.Value.obj0ADT != 0)
+                            {
+                                try
+                                {
+                                    insertCmd.Parameters[1].Value = records.Value.obj0ADT;
+                                    insertCmd.Parameters[2].Value = "obj0 adt";
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine("OBJ0: " + e.Message);
+                                }
+                            }
+
+                            if (records.Value.obj1ADT != 0)
+                            {
+                                try
+                                {
+                                    insertCmd.Parameters[1].Value = records.Value.obj1ADT;
+                                    insertCmd.Parameters[2].Value = "obj1 adt";
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine("OBJ1: " + e.Message);
+                                }
+                            }
+
+                            if (records.Value.mapTexture != 0)
+                            {
+                                try
+                                {
+                                    insertCmd.Parameters[1].Value = records.Value.mapTexture;
+                                    insertCmd.Parameters[2].Value = "map texture";
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine("MapT: " + e.Message);
+                                }
+                            }
+
+                            if (records.Value.mapTextureN != 0)
+                            {
+                                try
+                                {
+                                    insertCmd.Parameters[1].Value = records.Value.mapTextureN;
+                                    insertCmd.Parameters[2].Value = "mapn texture";
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine("MapTN: " + e.Message);
+                                }
+                            }
+
+                            if (records.Value.minimapTexture != 0)
+                            {
+                                try
+                                {
+                                    insertCmd.Parameters[1].Value = records.Value.minimapTexture;
+                                    insertCmd.Parameters[2].Value = "minimap texture";
+                                    insertCmd.ExecuteNonQuery();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine("Minimap: " + e.Message);
+                                }
+                            }
+                        }
+                    }catch(Exception e)
                     {
-                        if (records.Value.rootADT != 0)
-                        {
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = records.Value.rootADT;
-                                insertCmd.Parameters[2].Value = "root adt";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("Root: " + e.Message);
-                            }
-                        }
-
-                        if (records.Value.tex0ADT != 0)
-                        {
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = records.Value.tex0ADT;
-                                insertCmd.Parameters[2].Value = "tex0 adt";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("TEX0: " + e.Message);
-                            }
-                        }
-
-                        if (records.Value.lodADT != 0)
-                        {
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = records.Value.lodADT;
-                                insertCmd.Parameters[2].Value = "lod adt";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("LOD: " + e.Message);
-                            }
-                        }
-
-                        if (records.Value.obj0ADT != 0)
-                        {
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = records.Value.obj0ADT;
-                                insertCmd.Parameters[2].Value = "obj0 adt";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("OBJ0: " + e.Message);
-                            }
-                        }
-
-                        if (records.Value.obj1ADT != 0)
-                        {
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = records.Value.obj1ADT;
-                                insertCmd.Parameters[2].Value = "obj1 adt";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("OBJ1: " + e.Message);
-                            }
-                        }
-
-                        if (records.Value.mapTexture != 0)
-                        {
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = records.Value.mapTexture;
-                                insertCmd.Parameters[2].Value = "map texture";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("MapT: " + e.Message);
-                            }
-                        }
-
-                        if (records.Value.mapTextureN != 0)
-                        {
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = records.Value.mapTextureN;
-                                insertCmd.Parameters[2].Value = "mapn texture";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("MapTN: " + e.Message);
-                            }
-                        }
-
-                        if (records.Value.minimapTexture != 0)
-                        {
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = records.Value.minimapTexture;
-                                insertCmd.Parameters[2].Value = "minimap texture";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("Minimap: " + e.Message);
-                            }
-                        }
+                        Console.WriteLine(e.Message);
                     }
+                    
                 }
             }
             #endregion
