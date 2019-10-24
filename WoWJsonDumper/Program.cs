@@ -14,6 +14,17 @@ namespace WoWJsonDumper
             }
             else
             {
+                if (args[0] == "wdt")
+                {
+                    if (args.Length != 2)
+                        throw new Exception("Not enough arguments. Need mode, file");
+
+                    var wdt = new WoWFormatLib.FileReaders.WDTReader();
+
+                    wdt.LoadWDT(File.OpenRead(args[1]));
+
+                   Console.WriteLine(JsonConvert.SerializeObject(wdt.wdtfile.manm, Formatting.Indented));
+                }
                 /*
                 if (args[0] == "adt")
                 {
