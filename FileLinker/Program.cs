@@ -276,6 +276,14 @@ namespace FileLinker
                                 insertCmd.Parameters[1].Value = material.texture1;
                                 insertCmd.Parameters[2].Value = "wmo texture";
                                 insertCmd.ExecuteNonQuery();
+
+                                if (material.texture2 == 0 || inserted.Contains(material.texture2))
+                                    continue;
+
+                                inserted.Add(material.texture2);
+                                insertCmd.Parameters[1].Value = material.texture2;
+                                insertCmd.Parameters[2].Value = "wmo texture";
+                                insertCmd.ExecuteNonQuery();
                             }
                         }
                     }
