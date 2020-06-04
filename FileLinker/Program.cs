@@ -9,6 +9,26 @@ namespace FileLinker
 {
     class Program
     {
+        static void insertEntry(MySqlCommand cmd, uint fileDataID, string desc)
+        {
+            if (fileDataID == 0)
+                return;
+
+            try
+            {
+                cmd.Parameters[1].Value = fileDataID;
+                cmd.Parameters[2].Value = desc;
+                cmd.ExecuteNonQuery();
+            }
+            catch(Exception e)
+            {
+                if(!e.Message.StartsWith("Duplicate entry"))
+                {
+                    Console.WriteLine("Error inserting FDID (" + desc + "): " + e.Message);
+                }
+            }
+        }
+
         static void Main(string[] args)
         {
             if (args.Length < 2)
@@ -89,12 +109,7 @@ namespace FileLinker
                         {
                             foreach (var textureID in reader.model.textureFileDataIDs)
                             {
-                                if (textureID == 0)
-                                    continue;
-
-                                insertCmd.Parameters[1].Value = textureID;
-                                insertCmd.Parameters[2].Value = "m2 texture";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, textureID, "m2 texture");
                             }
                         }
 
@@ -102,12 +117,7 @@ namespace FileLinker
                         {
                             foreach (var animFileID in reader.model.animFileDataIDs)
                             {
-                                if (animFileID.fileDataID == 0)
-                                    continue;
-
-                                insertCmd.Parameters[1].Value = animFileID.fileDataID;
-                                insertCmd.Parameters[2].Value = "m2 anim";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, animFileID.fileDataID, "m2 anim");
                             }
                         }
 
@@ -115,12 +125,7 @@ namespace FileLinker
                         {
                             foreach (var skinFileID in reader.model.skinFileDataIDs)
                             {
-                                if (skinFileID == 0)
-                                    continue;
-
-                                insertCmd.Parameters[1].Value = skinFileID;
-                                insertCmd.Parameters[2].Value = "m2 skin";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, skinFileID, "m2 skin");
                             }
                         }
 
@@ -128,12 +133,7 @@ namespace FileLinker
                         {
                             foreach (var boneFileID in reader.model.boneFileDataIDs)
                             {
-                                if (boneFileID == 0)
-                                    continue;
-
-                                insertCmd.Parameters[1].Value = boneFileID;
-                                insertCmd.Parameters[2].Value = "m2 bone";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, boneFileID, "m2 bone");
                             }
                         }
 
@@ -141,12 +141,7 @@ namespace FileLinker
                         {
                             foreach (var rpID in reader.model.recursiveParticleModelFileIDs)
                             {
-                                if (rpID == 0)
-                                    continue;
-
-                                insertCmd.Parameters[1].Value = rpID;
-                                insertCmd.Parameters[2].Value = "m2 recursive particle";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, rpID, "m2 recursive particle");
                             }
                         }
 
@@ -154,28 +149,12 @@ namespace FileLinker
                         {
                             foreach (var gpID in reader.model.geometryParticleModelFileIDs)
                             {
-                                if (gpID == 0)
-                                    continue;
-
-                                insertCmd.Parameters[1].Value = gpID;
-                                insertCmd.Parameters[2].Value = "m2 geometry particle";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, gpID, "m2 geometry particle");
                             }
                         }
 
-                        if (reader.model.skelFileID != 0)
-                        {
-                            insertCmd.Parameters[1].Value = reader.model.skelFileID;
-                            insertCmd.Parameters[2].Value = "m2 skel";
-                            insertCmd.ExecuteNonQuery();
-                        }
-
-                        if (reader.model.physFileID != 0)
-                        {
-                            insertCmd.Parameters[1].Value = reader.model.physFileID;
-                            insertCmd.Parameters[2].Value = "m2 phys";
-                            insertCmd.ExecuteNonQuery();
-                        }
+                        insertEntry(insertCmd, reader.model.skelFileID, "m2 skel");
+                        insertEntry(insertCmd, reader.model.physFileID, "m2 phys");
                     }
                     catch (Exception e)
                     {
@@ -242,12 +221,7 @@ namespace FileLinker
                         {
                             foreach (var groupFileDataID in wmo.groupFileDataIDs)
                             {
-                                if (groupFileDataID == 0)
-                                    continue;
-
-                                insertCmd.Parameters[1].Value = groupFileDataID;
-                                insertCmd.Parameters[2].Value = "wmo group";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, groupFileDataID, "wmo group");
                             }
                         }
 
@@ -255,13 +229,12 @@ namespace FileLinker
                         {
                             foreach (var doodadID in wmo.doodadIds)
                             {
-                                if (doodadID == 0 || inserted.Contains(doodadID))
+                                if (inserted.Contains(doodadID))
                                     continue;
 
                                 inserted.Add(doodadID);
-                                insertCmd.Parameters[1].Value = doodadID;
-                                insertCmd.Parameters[2].Value = "wmo doodad";
-                                insertCmd.ExecuteNonQuery();
+
+                                insertEntry(insertCmd, doodadID, "wmo doodad");
                             }
                         }
 
@@ -273,17 +246,13 @@ namespace FileLinker
                                     continue;
 
                                 inserted.Add(material.texture1);
-                                insertCmd.Parameters[1].Value = material.texture1;
-                                insertCmd.Parameters[2].Value = "wmo texture";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, material.texture1, "wmo texture");
 
                                 if (material.texture2 == 0 || inserted.Contains(material.texture2))
                                     continue;
 
                                 inserted.Add(material.texture2);
-                                insertCmd.Parameters[1].Value = material.texture2;
-                                insertCmd.Parameters[2].Value = "wmo texture";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, material.texture2, "wmo texture");
                             }
                         }
                     }
@@ -351,131 +320,19 @@ namespace FileLinker
                         if (wdtreader.wdtfile.modf.id != 0)
                         {
                             Console.WriteLine("WDT has WMO ID: " + wdtreader.wdtfile.modf.id);
-                            try
-                            {
-                                insertCmd.Parameters[1].Value = wdtreader.wdtfile.modf.id;
-                                insertCmd.Parameters[2].Value = "wdt wmo";
-                                insertCmd.ExecuteNonQuery();
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("WDT WMO: " + e.Message);
-                            }
+                            insertEntry(insertCmd, wdtreader.wdtfile.modf.id, "wdt wmo");
                         }
 
                         foreach (var records in wdtreader.stringTileFiles)
                         {
-                            if (records.Value.rootADT != 0)
-                            {
-                                try
-                                {
-                                    insertCmd.Parameters[1].Value = records.Value.rootADT;
-                                    insertCmd.Parameters[2].Value = "root adt";
-                                    insertCmd.ExecuteNonQuery();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("Root: " + e.Message);
-                                }
-                            }
-
-                            if (records.Value.tex0ADT != 0)
-                            {
-                                try
-                                {
-                                    insertCmd.Parameters[1].Value = records.Value.tex0ADT;
-                                    insertCmd.Parameters[2].Value = "tex0 adt";
-                                    insertCmd.ExecuteNonQuery();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("TEX0: " + e.Message);
-                                }
-                            }
-
-                            if (records.Value.lodADT != 0)
-                            {
-                                try
-                                {
-                                    insertCmd.Parameters[1].Value = records.Value.lodADT;
-                                    insertCmd.Parameters[2].Value = "lod adt";
-                                    insertCmd.ExecuteNonQuery();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("LOD: " + e.Message);
-                                }
-                            }
-
-                            if (records.Value.obj0ADT != 0)
-                            {
-                                try
-                                {
-                                    insertCmd.Parameters[1].Value = records.Value.obj0ADT;
-                                    insertCmd.Parameters[2].Value = "obj0 adt";
-                                    insertCmd.ExecuteNonQuery();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("OBJ0: " + e.Message);
-                                }
-                            }
-
-                            if (records.Value.obj1ADT != 0)
-                            {
-                                try
-                                {
-                                    insertCmd.Parameters[1].Value = records.Value.obj1ADT;
-                                    insertCmd.Parameters[2].Value = "obj1 adt";
-                                    insertCmd.ExecuteNonQuery();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("OBJ1: " + e.Message);
-                                }
-                            }
-
-                            if (records.Value.mapTexture != 0)
-                            {
-                                try
-                                {
-                                    insertCmd.Parameters[1].Value = records.Value.mapTexture;
-                                    insertCmd.Parameters[2].Value = "map texture";
-                                    insertCmd.ExecuteNonQuery();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("MapT: " + e.Message);
-                                }
-                            }
-
-                            if (records.Value.mapTextureN != 0)
-                            {
-                                try
-                                {
-                                    insertCmd.Parameters[1].Value = records.Value.mapTextureN;
-                                    insertCmd.Parameters[2].Value = "mapn texture";
-                                    insertCmd.ExecuteNonQuery();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("MapTN: " + e.Message);
-                                }
-                            }
-
-                            if (records.Value.minimapTexture != 0)
-                            {
-                                try
-                                {
-                                    insertCmd.Parameters[1].Value = records.Value.minimapTexture;
-                                    insertCmd.Parameters[2].Value = "minimap texture";
-                                    insertCmd.ExecuteNonQuery();
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine("Minimap: " + e.Message);
-                                }
-                            }
+                            insertEntry(insertCmd, records.Value.rootADT, "root adt");
+                            insertEntry(insertCmd, records.Value.tex0ADT, "tex0 adt");
+                            insertEntry(insertCmd, records.Value.lodADT, "lod adt");
+                            insertEntry(insertCmd, records.Value.obj0ADT, "obj0 adt");
+                            insertEntry(insertCmd, records.Value.obj1ADT, "obj1 adt");
+                            insertEntry(insertCmd, records.Value.mapTexture, "map texture");
+                            insertEntry(insertCmd, records.Value.mapTextureN, "mapn texture");
+                            insertEntry(insertCmd, records.Value.minimapTexture, "minimap texture");
                         }
                     }catch(Exception e)
                     {
@@ -603,10 +460,8 @@ namespace FileLinker
                                 if (inserted.Contains(worldmodel.mwidEntry))
                                     continue;
 
-                                insertCmd.Parameters[1].Value = worldmodel.mwidEntry;
-                                insertCmd.Parameters[2].Value = "adt worldmodel";
-                                insertCmd.ExecuteNonQuery();
                                 inserted.Add(worldmodel.mwidEntry);
+                                insertEntry(insertCmd, worldmodel.mwidEntry, "adt worldmodel");
                             }
 
                             foreach (var doodad in adtreader.adtfile.objects.models.entries)
@@ -614,9 +469,7 @@ namespace FileLinker
                                 if (inserted.Contains(doodad.mmidEntry))
                                     continue;
 
-                                insertCmd.Parameters[1].Value = doodad.mmidEntry;
-                                insertCmd.Parameters[2].Value = "adt doodad";
-                                insertCmd.ExecuteNonQuery();
+                                insertEntry(insertCmd, doodad.mmidEntry, "adt doodad");
                                 inserted.Add(doodad.mmidEntry);
                             }
                         }
@@ -624,8 +477,6 @@ namespace FileLinker
                 }
             }
             #endregion
-
-
         }
     }
 }
