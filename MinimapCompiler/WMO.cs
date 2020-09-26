@@ -14,18 +14,21 @@ namespace MinimapCompiler
     {
         public WMO(){}
 
-        public void Compile(string wmoname)
+        public void Compile(uint fileDataID)
         {
-            WMOReader wmoreader = new WMOReader();
-            wmoreader.LoadWMO(wmoname);
+            if (!Listfile.fdidToNameMap.TryGetValue(fileDataID, out var filename))
+            {
+                throw new Exception("FileDataID " + fileDataID + " is not named in listfile!");
+            }
 
-            WoWFormatLib.Structs.WMO.WMO wmo = wmoreader.wmofile;
+            var wmoreader = new WMOReader();
+            var wmo = wmoreader.LoadWMO(fileDataID);
 
-            Console.WriteLine(wmoname);
+            Console.WriteLine("Compiling minimaps for WMO " + fileDataID);
 
             if (wmo.group == null || wmo.group.Count() == 0)
             {
-                Console.WriteLine("WMO " + wmoname + " has no groups! Skipping..");
+                Console.WriteLine("WMO " + fileDataID + " has no groups! Skipping..");
                 return;
             }
 
@@ -83,7 +86,7 @@ namespace MinimapCompiler
 
             if (wmoresx == 0 || wmoresy == 0)
             {
-                Console.WriteLine("WMO " + wmoname + " has invalid calculated resolution (" + wmoresx + "x" + wmoresy + ")");
+                Console.WriteLine("WMO " + fileDataID + " has invalid calculated resolution (" + wmoresx + "x" + wmoresy + ")");
                 return;
             }
 
@@ -116,35 +119,33 @@ namespace MinimapCompiler
                 int greenx2 = (int)drawx2 + Math.Abs(wmo_minx);
                 int greeny2 = (int)drawy2 + Math.Abs(wmo_miny);
 
-                /*
-                //Check if minimaps wmo dir for this even exists
-
-                string wmogroupfilename = Path.GetFileNameWithoutExtension(wmoname) + "_" + groupid;
-                string[] filePaths = Directory.GetFiles(Path.Combine(basedir, "World", "Minimaps", wmodirname + Path.DirectorySeparatorChar), wmogroupfilename + "*");
-
-                //check if there are any minimap blps for this group
-                if (filePaths.Count() == 0)
+                try
                 {
-                    Console.WriteLine("WMO has no blps in minimap directory. Skipping..");
-                    continue;
-                }
-                */
-                Bitmap minimapbmp = CompileGroup(wmoname, groupid);
+                    var minimapbmp = CompileGroup(filename, groupid);
 
-                if (minimapbmp.Width > 1)
-                {
-                    wmog.DrawImage(minimapbmp, greenx1, (wmoresy - (greeny1 + (greeny2 - greeny1)) + (greeny2 - greeny1)), new Rectangle(0, minimapbmp.Height, (greenx2 - greenx1), -(greeny2 - greeny1)), GraphicsUnit.Pixel);
+                    if (minimapbmp.Width > 1)
+                    {
+                        wmog.DrawImage(minimapbmp, greenx1,
+                            (wmoresy - (greeny1 + (greeny2 - greeny1)) + (greeny2 - greeny1)),
+                            new Rectangle(0, minimapbmp.Height, (greenx2 - greenx1), -(greeny2 - greeny1)),
+                            GraphicsUnit.Pixel);
+                    }
+
+                    numtiles++;
+                    minimapbmp.Dispose();
                 }
-                numtiles++;
-                minimapbmp.Dispose();
+                catch (FileNotFoundException e)
+                {
+                    return;
+                }
             }
 
             wmog.Dispose();
 
             if (numtiles > 0) //check if it even compiled anything
             {
-                Directory.CreateDirectory("done" + Path.DirectorySeparatorChar + "WMO" + Path.DirectorySeparatorChar + Path.GetDirectoryName(wmoname));
-                wmobmp.Save("done" + Path.DirectorySeparatorChar + "WMO" + Path.DirectorySeparatorChar + Path.Combine(wmoname) + ".png");
+                Directory.CreateDirectory("done" + Path.DirectorySeparatorChar + "WMO" + Path.DirectorySeparatorChar + Path.GetDirectoryName(fileDataID.ToString()));
+                wmobmp.Save("done" + Path.DirectorySeparatorChar + "WMO" + Path.DirectorySeparatorChar + Path.Combine(fileDataID.ToString()) + ".png");
             }
             else
             {
@@ -152,9 +153,9 @@ namespace MinimapCompiler
             }
         }
 
-        private Bitmap CompileGroup(string wmoname, string groupid)
+        private Bitmap CompileGroup(string filename, string groupid)
         {
-            Console.WriteLine("  group " + groupid);
+            //Console.WriteLine("  group " + groupid);
             int min_x = 64;
             int min_y = 64;
 
@@ -164,30 +165,39 @@ namespace MinimapCompiler
             int x = 0;
             int y = 0;
 
-            string wmoonlyname = Path.GetFileNameWithoutExtension(wmoname);
-            string wmodir = Path.GetDirectoryName(wmoname).Replace("world\\", "world\\minimaps\\");
-            List<string> filePaths = new List<string>();
-            string lastpath = "";
+            var wmoonlyname = Path.GetFileNameWithoutExtension(filename);
+            var wmodir = filename.Replace("world/", "world/minimaps/").Replace(wmoonlyname + ".wmo", "");
+            var filePaths = new List<(uint FileDataID, string GroupFileName)>();
+            uint lastpath = 0;
 
+            var hasMinimaps = false;
             for (int cur_x = 0; cur_x < 64; cur_x++)
             {
                 for (int cur_y = 0; cur_y < 64; cur_y++)
                 {
-                    string wmogroupfilename = wmodir + "\\" + wmoonlyname + "_" + groupid + "_" + cur_x.ToString().PadLeft(2, '0') + "_" + cur_y.ToString().PadLeft(2, '0') + ".blp";
-                    //wmogroupfilename = wmogroupfilename.Replace("\\", "\\\\");
+                    string wmogroupfilename = wmodir + wmoonlyname + "_" + groupid + "_" + cur_x.ToString().PadLeft(2, '0') + "_" + cur_y.ToString().PadLeft(2, '0') + ".blp";
                     if (wmogroupfilename.Contains("000_00_00"))
                     {
-                        Console.WriteLine("CHECKING " + wmogroupfilename);
+                        //Console.WriteLine("CHECKING " + wmogroupfilename);
                     }
-                    if (CASC.cascHandler.FileExists(wmogroupfilename))
+
+                    if (Listfile.nameToFDIDMap.TryGetValue(wmogroupfilename, out var groupFileDataID))
                     {
-                        Console.WriteLine(wmogroupfilename + " exists!");
-                        filePaths.Add(wmogroupfilename);
+                        if (CASC.FileExists(groupFileDataID))
+                        {
+                            //Console.WriteLine(wmogroupfilename + " exists!");
+                            filePaths.Add((groupFileDataID, wmogroupfilename));
+                            hasMinimaps = true;
+                        }
+                    }
+                    else
+                    {
+                        //Console.WriteLine("Group filename " + wmogroupfilename + " could not be found in the listfile");
                     }
                 }
             }
 
-            foreach (string path in filePaths)
+            foreach ((uint fdid, string path) in filePaths)
             {
                 Console.WriteLine(path);
                 x = int.Parse(path.Substring(path.Length - 9, 2));
@@ -202,8 +212,9 @@ namespace MinimapCompiler
                 // Console.WriteLine("[" + groupid + "] MIN: " + min_x + " " + min_y);
                 // Console.WriteLine("[" + groupid + "] MAX: " + max_x + " " + max_y);
 
-                lastpath = path;
+                lastpath = fdid;
             }
+
             var res_x = 0;
             var res_y = 0;
 
@@ -225,15 +236,18 @@ namespace MinimapCompiler
             if (res_x < 0) { res_x = 1; }
             if (res_y < 0) { res_y = 1; }
 
-            Bitmap bmp = new Bitmap(res_x, res_y);
-            Graphics g = Graphics.FromImage(bmp);
+            if(!hasMinimaps)
+                throw new FileNotFoundException("No minimaps found for this WMO");
 
-            foreach (string path in filePaths)
+            var bmp = new Bitmap(res_x, res_y);
+            var g = Graphics.FromImage(bmp);
+
+            foreach ((uint fdid, string path) in filePaths)
             {
                 x = int.Parse(path.Substring(path.Length - 9, 2));
                 y = int.Parse(path.Substring(path.Length - 6, 2));
                 var blpreader = new BLPReader();
-                blpreader.LoadBLP(path);
+                blpreader.LoadBLP(fdid);
                 //  Console.WriteLine("BLP Width: " + blpreader.bmp.Width);
                 //  Console.WriteLine("BLP Height: " + blpreader.bmp.Height);
                 var draw_x = (x - min_x) * 256;
